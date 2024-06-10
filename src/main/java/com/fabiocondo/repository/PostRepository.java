@@ -1,0 +1,13 @@
+package com.fabiocondo.repository;
+
+import com.fabiocondo.domain.Post;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+public interface PostRepository  extends JpaRepository<Post, Long> {
+
+    public Page<Post> findById(String username, Pageable pageable);
+}

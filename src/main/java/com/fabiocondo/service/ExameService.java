@@ -3,6 +3,7 @@ package com.fabiocondo.service;
 import com.fabiocondo.domain.Exame;
 import com.fabiocondo.exception.domain.ExameNotFoundException;
 import com.fabiocondo.repository.ExameRepository;
+import com.fabiocondo.repository.filter.ExameFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -30,6 +31,10 @@ public class ExameService {
     public Exame findById(Long id) throws ExameNotFoundException {
         return exameRepository.findById(id)
                 .orElseThrow(() -> new ExameNotFoundException("No exame found by id: " + id));
+    }
+
+    public Page<Exame> filter(ExameFilter exameFilter, Pageable pageable){
+        return exameRepository.filter(exameFilter, pageable);
     }
 
     public Page<Exame> findAll(Pageable pageable) {

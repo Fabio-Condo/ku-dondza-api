@@ -3,6 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.Exame;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.exception.domain.ExameNotFoundException;
+import com.fabiocondo.repository.filter.ExameFilter;
 import com.fabiocondo.service.ExameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,12 +28,17 @@ public class ExameController {
         this.exameService = exameService;
     }
 
+    @GetMapping
+    public Page<Exame> filter(ExameFilter exameFilter, Pageable pageable) {
+        return exameService.filter(exameFilter, pageable);
+    }
+
     @GetMapping("/list")
     public ResponseEntity<List<Exame>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(exameService.findAll());
     }
 
-    @GetMapping()
+    @GetMapping("/findAll")
     public ResponseEntity<Page<Exame>> findAll(Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(exameService.findAll(pageable));
     }

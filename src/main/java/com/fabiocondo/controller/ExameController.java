@@ -28,7 +28,7 @@ public class ExameController {
         this.exameService = exameService;
     }
 
-    @GetMapping
+    @GetMapping("/filter")
     public Page<Exame> filter(ExameFilter exameFilter, Pageable pageable) {
         return exameService.filter(exameFilter, pageable);
     }

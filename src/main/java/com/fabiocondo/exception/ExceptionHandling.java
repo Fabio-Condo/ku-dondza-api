@@ -49,7 +49,7 @@ public class ExceptionHandling implements ErrorController {
     @ExceptionHandler(MissingServletRequestPartException.class)
     public ResponseEntity<HttpResponse> handleMissingServletRequestPartException(MissingServletRequestPartException exception) {
         LOGGER.error(exception.getMessage());
-        return createHttpResponse(BAD_REQUEST, "Required request part 'file'. Is not present".toUpperCase());
+        return createHttpResponse(BAD_REQUEST, exception.getMessage().toUpperCase()); // REQUIRED REQUEST PART 'FILE' IS NOT PRESENT
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)

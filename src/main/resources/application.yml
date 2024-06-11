@@ -2,6 +2,11 @@
 server:
   port: 8080
 
+aws:
+  accessKeyId: AKIAW3MECWUYLS6ENYCX
+  secretKey: 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
+  region.static: us-east-1
+
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/blog?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Africa/Harare

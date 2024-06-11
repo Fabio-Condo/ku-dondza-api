@@ -58,6 +58,11 @@ public class ExameService {
     }
 
     public Exame save(String subject, String description, String level, MultipartFile file)  {
+
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File is missing or empty");
+        }
+
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, bucketName);
 
@@ -80,7 +85,6 @@ public class ExameService {
         existExame.setDescription(description);
         existExame.setLevel(level);
         existExame.setDate(new Date());
-        existExame.setTotalDownloadNumber(0L);
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {

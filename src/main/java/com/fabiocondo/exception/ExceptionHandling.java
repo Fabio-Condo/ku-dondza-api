@@ -12,6 +12,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -43,6 +44,12 @@ public class ExceptionHandling implements ErrorController {
     @ExceptionHandler(InstituicaoNotFoundException.class)
     public ResponseEntity<HttpResponse> instituicaoNotFoundException(InstituicaoNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<HttpResponse> handleMissingServletRequestPartException(MissingServletRequestPartException exception) {
+        LOGGER.error(exception.getMessage());
+        return createHttpResponse(BAD_REQUEST, "Required request part 'file'. Is not present".toUpperCase());
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)

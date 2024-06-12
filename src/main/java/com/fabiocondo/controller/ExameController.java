@@ -50,22 +50,24 @@ public class ExameController {
     }
 
     @PostMapping
-    public ResponseEntity<Exame> save(@RequestParam("subject") String subject,
+    public ResponseEntity<Exame> save(@RequestParam("institution") String institution,
+                                      @RequestParam("subject") String subject,
                                       @RequestParam("description") String description,
                                       @RequestParam("level") String level,
                                       @RequestParam("file") MultipartFile file) {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameService.save(subject, description, level, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameService.save(institution, subject, description, level, file));
     }
 
     @PutMapping
     public ResponseEntity<Exame> update(@RequestParam("id") Long id,
+                                        @RequestParam("institution") String institution,
                                         @RequestParam("subject") String subject,
                                         @RequestParam("description") String description,
                                         @RequestParam("level") String level,
                                         @RequestParam(value = "file", required = false) MultipartFile file) throws ExameNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameService.update(id, subject, description, level, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameService.update(id, institution, subject, description, level, file));
     }
 
     @DeleteMapping("/{id}")

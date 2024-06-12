@@ -14,6 +14,8 @@ public class Exame {
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
+    private String institution;
+
     private String description; // 10 classe, 12 classe, ACIPOL, UP, UEM, ISRI
 
     private String level; // Ensino Geral, Admissao ao Ensino Tecnico, Admissao ao Ensino Superior. Ou Nível de Ensino (e.g., fundamental, médio, superior, pós-graduação)
@@ -31,15 +33,17 @@ public class Exame {
     public Exame() {
     }
 
-    public Exame(String description, String level, String subject, String fileName) {
+    public Exame(String institution, String description, String level, String subject, String fileName) {
+        this.institution = institution;
         this.description = description;
         this.level = level;
         this.subject = subject;
         this.fileName = fileName;
     }
 
-    public Exame(Long id, String description, String level, String subject, String fileName, String urlFile, Date date, Long totalDownloadNumber) {
+    public Exame(Long id, String institution, String description, String level, String subject, String fileName, String urlFile, Date date, Long totalDownloadNumber) {
         this.id = id;
+        this.institution = institution;
         this.description = description;
         this.level = level;
         this.subject = subject;
@@ -55,6 +59,14 @@ public class Exame {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(String institution) {
+        this.institution = institution;
     }
 
     public String getDescription() {

@@ -53,11 +53,12 @@ public class ExameService {
         return exameRepository.findAll();
     }
 
-    public Exame save(String subject, String description, String level, MultipartFile file)  {
+    public Exame save(String institution, String subject, String description, String level, MultipartFile file)  {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         Exame exame = new Exame();
+        exame.setInstitution(institution);
         exame.setSubject(subject);
         exame.setDescription(description);
         exame.setLevel(level);
@@ -70,8 +71,9 @@ public class ExameService {
         return exameRepository.save(exame);
     }
 
-    public Exame update(Long id, String subject, String description, String level, MultipartFile file) throws ExameNotFoundException {
+    public Exame update(Long id, String institution, String subject, String description, String level, MultipartFile file) throws ExameNotFoundException {
         Exame existExame = findById(id);
+        existExame.setInstitution(institution);
         existExame.setSubject(subject);
         existExame.setDescription(description);
         existExame.setLevel(level);

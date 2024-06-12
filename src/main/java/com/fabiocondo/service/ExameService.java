@@ -9,13 +9,8 @@ import com.fabiocondo.repository.filter.ExameFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +23,7 @@ public class ExameService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final String bucketName = "b-tests-bucket";
+    private static final String BUCKET_NAME = "b-tests-bucket";
 
     public ExameRepository exameRepository;
 
@@ -41,6 +36,7 @@ public class ExameService {
     }
 
     public Exame findById(Long id) throws ExameNotFoundException {
+        logger.info("Getting exame by id: " + id);
         return exameRepository.findById(id)
                 .orElseThrow(() -> new ExameNotFoundException("No exame found by id: " + id));
     }
@@ -58,13 +54,8 @@ public class ExameService {
     }
 
     public Exame save(String subject, String description, String level, MultipartFile file)  {
-
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("File is missing or empty");
-        }
-
         logger.info("Uploading file: " + file.getOriginalFilename());
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, bucketName);
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         Exame exame = new Exame();
         exame.setSubject(subject);
@@ -90,9 +81,9 @@ public class ExameService {
         if (file != null) {
             if (existExame.getFileName() != null) {
                 logger.info("Deleting file: " + existExame.getFileName());
-                amazonS3Service.deleteFile(existExame.getFileName(), bucketName);
+                amazonS3Service.deleteFile(existExame.getFileName(), BUCKET_NAME);
             }
-            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, bucketName);
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
             existExame.setUrlFile(s3UploadResponse.getFileUrl());
             existExame.setFileName(file.getOriginalFilename());
         }
@@ -103,20 +94,21 @@ public class ExameService {
 
     public void delete(Long id) throws ExameNotFoundException {
         Exame existExame = findById(id);
-
         logger.info("Deleting exame: " + existExame.getDescription());
         exameRepository.deleteById(id);
         if (existExame.getFileName() != null) {
             logger.info("Deleting file: " + existExame.getFileName());
-            amazonS3Service.deleteFile(existExame.getFileName(), bucketName);
+            amazonS3Service.deleteFile(existExame.getFileName(), BUCKET_NAME);
         }
     }
 
     public byte[] downloadFile(Long id, @PathVariable String fileName) throws ExameNotFoundException {
         Exame existExame = findById(id);
+        logger.info("Downloading file: " + existExame.getFileName());
+        byte[] data = amazonS3Service.downloadFile(fileName, BUCKET_NAME);
         existExame.setTotalDownloadNumber(existExame.getTotalDownloadNumber() + 1);
         exameRepository.save(existExame);
-        return amazonS3Service.downloadFile(fileName, bucketName);
+        return data;
     }
 
 

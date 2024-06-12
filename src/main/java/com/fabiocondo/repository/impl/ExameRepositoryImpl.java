@@ -83,7 +83,9 @@ public class ExameRepositoryImpl implements ExameRepositoryQuery {
                     builder.lower(root.get("subject")), "%" + exameFilter.getGlobal().toLowerCase() + "%");
             Predicate description = builder.like(
                     builder.lower(root.get("description")), "%" + exameFilter.getGlobal().toLowerCase() + "%");
-            predicates.add(builder.or(subject, description));
+            Predicate institution = builder.like(
+                    builder.lower(root.get("institution")), "%" + exameFilter.getGlobal().toLowerCase() + "%");
+            predicates.add(builder.or(subject, description, institution));
         }
     }
 

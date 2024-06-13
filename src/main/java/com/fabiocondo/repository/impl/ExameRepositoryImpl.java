@@ -87,6 +87,31 @@ public class ExameRepositoryImpl implements ExameRepositoryQuery {
                     builder.lower(root.get("institution")), "%" + exameFilter.getGlobal().toLowerCase() + "%");
             predicates.add(builder.or(subject, description, institution));
         }
+
+        if(!ObjectUtils.isEmpty(exameFilter.getSubject())) {
+            predicates.add(builder.like(
+                    builder.lower(root.get("subject")), "%" + exameFilter.getSubject().toLowerCase() + "%"));
+        }
+        if(!ObjectUtils.isEmpty(exameFilter.getLevel())) {
+            predicates.add(builder.like(
+                    builder.lower(root.get("level")), "%" + exameFilter.getLevel().toLowerCase() + "%"));
+        }
+        if(!ObjectUtils.isEmpty(exameFilter.getInstitution())) {
+            predicates.add(builder.like(
+                    builder.lower(root.get("institution")), "%" + exameFilter.getInstitution().toLowerCase() + "%"));
+        }
+        if(!ObjectUtils.isEmpty(exameFilter.getDescription())) {
+            predicates.add(builder.like(
+                    builder.lower(root.get("description")), "%" + exameFilter.getDescription().toLowerCase() + "%"));
+        }
+        if (exameFilter.getBeginDate() != null) {
+            predicates.add(
+                    builder.greaterThanOrEqualTo(root.get("date"), exameFilter.getBeginDate()));
+        }
+        if (exameFilter.getEndDate() != null) {
+            predicates.add(
+                    builder.lessThanOrEqualTo(root.get("date"), exameFilter.getEndDate()));
+        }
     }
 
     public void getSortOrder(ExameFilter exameFilter, CriteriaBuilder builder, CriteriaQuery<Exame> criteria, Root<Exame> root){

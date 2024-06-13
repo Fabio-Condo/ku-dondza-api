@@ -53,7 +53,7 @@ public class ExameService {
         return exameRepository.findAll();
     }
 
-    public Exame save(String institution, String subject, String description, String level, MultipartFile file)  {
+    public Exame save(String institution, String subject, String description, String level, Date date, MultipartFile file)  {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
@@ -62,7 +62,7 @@ public class ExameService {
         exame.setSubject(subject);
         exame.setDescription(description);
         exame.setLevel(level);
-        exame.setDate(new Date());
+        exame.setDate(date);
         exame.setTotalDownloadNumber(0L);
         exame.setUrlFile(s3UploadResponse.getFileUrl());
         exame.setFileName(file.getOriginalFilename());
@@ -71,13 +71,13 @@ public class ExameService {
         return exameRepository.save(exame);
     }
 
-    public Exame update(Long id, String institution, String subject, String description, String level, MultipartFile file) throws ExameNotFoundException {
+    public Exame update(Long id, String institution, String subject, String description, String level, Date date, MultipartFile file) throws ExameNotFoundException {
         Exame existExame = findById(id);
         existExame.setInstitution(institution);
         existExame.setSubject(subject);
         existExame.setDescription(description);
         existExame.setLevel(level);
-        existExame.setDate(new Date());
+        existExame.setDate(date);
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {

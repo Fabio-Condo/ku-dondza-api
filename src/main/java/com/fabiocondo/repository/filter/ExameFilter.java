@@ -1,5 +1,7 @@
 package com.fabiocondo.repository.filter;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 
 public class ExameFilter {
@@ -7,6 +9,8 @@ public class ExameFilter {
     private String global;
 
     private String vocationOrderBy;
+
+    private String institution;
 
     private String description;
 
@@ -16,7 +20,11 @@ public class ExameFilter {
 
     private String urlFile;
 
-    private Date date;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date beginDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date endDate;
 
     private Long totalDownloadNumber;
 
@@ -34,6 +42,14 @@ public class ExameFilter {
 
     public void setVocationOrderBy(String vocationOrderBy) {
         this.vocationOrderBy = vocationOrderBy;
+    }
+
+    public String getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(String institution) {
+        this.institution = institution;
     }
 
     public String getDescription() {
@@ -68,12 +84,20 @@ public class ExameFilter {
         this.urlFile = urlFile;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getBeginDate() {
+        return beginDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setBeginDate(Date beginDate) {
+        this.beginDate = beginDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     public Long getTotalDownloadNumber() {

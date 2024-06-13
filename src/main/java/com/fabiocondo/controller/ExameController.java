@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -54,9 +56,10 @@ public class ExameController {
                                       @RequestParam("subject") String subject,
                                       @RequestParam("description") String description,
                                       @RequestParam("level") String level,
+                                      @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
                                       @RequestParam("file") MultipartFile file) {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameService.save(institution, subject, description, level, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameService.save(institution, subject, description, level, date, file));
     }
 
     @PutMapping
@@ -65,9 +68,10 @@ public class ExameController {
                                         @RequestParam("subject") String subject,
                                         @RequestParam("description") String description,
                                         @RequestParam("level") String level,
+                                        @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
                                         @RequestParam(value = "file", required = false) MultipartFile file) throws ExameNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameService.update(id, institution, subject, description, level, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameService.update(id, institution, subject, description, level, date, file));
     }
 
     @DeleteMapping("/{id}")

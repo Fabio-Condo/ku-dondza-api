@@ -95,8 +95,7 @@ public class ExameController {
 
     @GetMapping("/total")
     public ResponseEntity<Long> getTotal(){
-        long total = exameService.getTotal();
-        return ResponseEntity.status(HttpStatus.OK).body(total);
+        return ResponseEntity.status(HttpStatus.OK).body(exameService.getTotal());
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

@@ -83,26 +83,24 @@ public class ExameRepositoryImpl implements ExameRepositoryQuery {
                     builder.lower(root.get("subject")), "%" + exameFilter.getGlobal().toLowerCase() + "%");
             Predicate description = builder.like(
                     builder.lower(root.get("description")), "%" + exameFilter.getGlobal().toLowerCase() + "%");
-            Predicate institution = builder.like(
-                    builder.lower(root.get("institution")), "%" + exameFilter.getGlobal().toLowerCase() + "%");
-            predicates.add(builder.or(subject, description, institution));
+            Predicate institutionType = builder.like(
+                    builder.lower(root.get("institution").get("type")), "%" + exameFilter.getGlobal().toLowerCase() + "%");
+            Predicate institutionName = builder.like(
+                    builder.lower(root.get("institution").get("name")), "%" + exameFilter.getGlobal().toLowerCase() + "%");
+            predicates.add(builder.or(subject, description, institutionType, institutionName));
         }
 
+        if(!ObjectUtils.isEmpty(exameFilter.getDescription())) {
+            predicates.add(builder.like(
+                    builder.lower(root.get("description")), "%" + exameFilter.getDescription().toLowerCase() + "%"));
+        }
         if(!ObjectUtils.isEmpty(exameFilter.getSubject())) {
             predicates.add(builder.like(
                     builder.lower(root.get("subject")), "%" + exameFilter.getSubject().toLowerCase() + "%"));
         }
-        if(!ObjectUtils.isEmpty(exameFilter.getLevel())) {
-            predicates.add(builder.like(
-                    builder.lower(root.get("level")), "%" + exameFilter.getLevel().toLowerCase() + "%"));
-        }
         if(!ObjectUtils.isEmpty(exameFilter.getInstitution())) {
             predicates.add(builder.like(
-                    builder.lower(root.get("institution")), "%" + exameFilter.getInstitution().toLowerCase() + "%"));
-        }
-        if(!ObjectUtils.isEmpty(exameFilter.getDescription())) {
-            predicates.add(builder.like(
-                    builder.lower(root.get("description")), "%" + exameFilter.getDescription().toLowerCase() + "%"));
+                    builder.lower(root.get("institution").get("name")), "%" + exameFilter.getInstitution().toLowerCase() + "%"));
         }
         if (exameFilter.getBeginDate() != null) {
             predicates.add(

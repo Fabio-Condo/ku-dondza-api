@@ -1,5 +1,6 @@
 package com.fabiocondo.domain;
 
+import com.fabiocondo.enumeration.AdministrationType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -17,6 +18,9 @@ public class Institution {
 
     private String type;  // ensino superior, ensino técnico
 
+    @Enumerated(EnumType.STRING)
+    private AdministrationType administrationType;
+
     private String address; // Rua, Número, Bairro, Cidade, Estado
 
     private String website;
@@ -26,14 +30,16 @@ public class Institution {
     public Institution() {
     }
 
-    public Institution(Long id, String name, String type, String address, String website, String description) {
+    public Institution(Long id, String name, String type, AdministrationType administrationType, String address, String website, String description) {
         this.id = id;
         this.name = name;
         this.type = type;
+        this.administrationType = administrationType;
         this.address = address;
         this.website = website;
         this.description = description;
     }
+
     public Long getId() {
         return id;
     }
@@ -56,6 +62,14 @@ public class Institution {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public AdministrationType getAdministrationType() {
+        return administrationType;
+    }
+
+    public void setAdministrationType(AdministrationType administrationType) {
+        this.administrationType = administrationType;
     }
 
     public String getAddress() {

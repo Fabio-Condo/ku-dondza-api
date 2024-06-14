@@ -3,7 +3,9 @@ package com.fabiocondo.service;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Exame;
+import com.fabiocondo.domain.Institution;
 import com.fabiocondo.exception.domain.ExameNotFoundException;
+import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.repository.ExameRepository;
 import com.fabiocondo.repository.filter.ExameFilter;
 import org.slf4j.Logger;
@@ -29,10 +31,13 @@ public class ExameService {
 
     private final AmazonS3Service amazonS3Service;
 
+    private final InstitutionService institutionService;
+
     @Autowired
-    public ExameService(ExameRepository exameRepository, AmazonS3Service amazonS3Service) {
+    public ExameService(ExameRepository exameRepository, AmazonS3Service amazonS3Service, InstitutionService institutionService) {
         this.exameRepository = exameRepository;
         this.amazonS3Service = amazonS3Service;
+        this.institutionService = institutionService;
     }
 
     public Exame findById(Long id) throws ExameNotFoundException {
@@ -53,15 +58,15 @@ public class ExameService {
         return exameRepository.findAll();
     }
 
-    public Exame save(String institution, String subject, String description, String level, Date date, MultipartFile file)  {
+    public Exame save(String subject, String description, Date date, Long institutionId, MultipartFile file) throws InstituicaoNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
+        Institution institution = institutionService.findById(institutionId);
         Exame exame = new Exame();
         exame.setInstitution(institution);
         exame.setSubject(subject);
         exame.setDescription(description);
-        exame.setLevel(level);
         exame.setDate(date);
         exame.setTotalDownloadNumber(0L);
         exame.setUrlFile(s3UploadResponse.getFileUrl());
@@ -71,12 +76,12 @@ public class ExameService {
         return exameRepository.save(exame);
     }
 
-    public Exame update(Long id, String institution, String subject, String description, String level, Date date, MultipartFile file) throws ExameNotFoundException {
+    public Exame update(Long id, String subject, String description, Date date, Long institutionId, MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException {
+        Institution institution = institutionService.findById(institutionId);
         Exame existExame = findById(id);
         existExame.setInstitution(institution);
         existExame.setSubject(subject);
         existExame.setDescription(description);
-        existExame.setLevel(level);
         existExame.setDate(date);
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo

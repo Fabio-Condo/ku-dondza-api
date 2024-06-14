@@ -14,13 +14,9 @@ public class Exame {
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
-    private String institution;
-
-    private String description; // 10 classe, 12 classe, ACIPOL, UP, UEM, ISRI
-
-    private String level; // Ensino Geral, Admissao ao Ensino Tecnico, Admissao ao Ensino Superior. Ou Nível de Ensino (e.g., fundamental, médio, superior, pós-graduação)
-
     private String subject;
+
+    private String description;
 
     private String fileName;
 
@@ -30,27 +26,22 @@ public class Exame {
 
     private Long totalDownloadNumber;
 
+    @ManyToOne
+    @JoinColumn(name = "institution_id")
+    private Institution institution;
+
     public Exame() {
     }
 
-    public Exame(String institution, String description, String level, String subject, String fileName) {
-        this.institution = institution;
-        this.description = description;
-        this.level = level;
-        this.subject = subject;
-        this.fileName = fileName;
-    }
-
-    public Exame(Long id, String institution, String description, String level, String subject, String fileName, String urlFile, Date date, Long totalDownloadNumber) {
+    public Exame(Long id, String subject, String description,  String fileName, String urlFile, Date date, Long totalDownloadNumber, Institution institution) {
         this.id = id;
-        this.institution = institution;
-        this.description = description;
-        this.level = level;
         this.subject = subject;
+        this.description = description;
         this.fileName = fileName;
         this.urlFile = urlFile;
         this.date = date;
         this.totalDownloadNumber = totalDownloadNumber;
+        this.institution = institution;
     }
 
     public Long getId() {
@@ -61,12 +52,12 @@ public class Exame {
         this.id = id;
     }
 
-    public String getInstitution() {
-        return institution;
+    public String getSubject() {
+        return subject;
     }
 
-    public void setInstitution(String institution) {
-        this.institution = institution;
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 
     public String getDescription() {
@@ -75,22 +66,6 @@ public class Exame {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getLevel() {
-        return level;
-    }
-
-    public void setLevel(String level) {
-        this.level = level;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
     }
 
     public String getFileName() {
@@ -123,5 +98,13 @@ public class Exame {
 
     public void setTotalDownloadNumber(Long totalDownloadNumber) {
         this.totalDownloadNumber = totalDownloadNumber;
+    }
+
+    public Institution getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(Institution institution) {
+        this.institution = institution;
     }
 }

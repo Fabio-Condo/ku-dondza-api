@@ -98,9 +98,9 @@ public class ExameRepositoryImpl implements ExameRepositoryQuery {
             predicates.add(builder.like(
                     builder.lower(root.get("subject")), "%" + exameFilter.getSubject().toLowerCase() + "%"));
         }
-        if(!ObjectUtils.isEmpty(exameFilter.getInstitution())) {
-            predicates.add(builder.like(
-                    builder.lower(root.get("institution").get("name")), "%" + exameFilter.getInstitution().toLowerCase() + "%"));
+        if (exameFilter.getInstitution() != null) {
+            predicates.add(builder.equal(
+                    builder.lower(root.get("institution").get("id")), exameFilter.getInstitution().getId()));
         }
         if (exameFilter.getBeginDate() != null) {
             predicates.add(

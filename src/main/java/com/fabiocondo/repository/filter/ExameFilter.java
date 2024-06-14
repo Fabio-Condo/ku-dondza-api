@@ -1,5 +1,6 @@
 package com.fabiocondo.repository.filter;
 
+import com.fabiocondo.domain.Institution;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -10,7 +11,7 @@ public class ExameFilter {
 
     private String vocationOrderBy;
 
-    private String institution;
+    private Institution institution;
 
     private String description;
 
@@ -44,11 +45,11 @@ public class ExameFilter {
         this.vocationOrderBy = vocationOrderBy;
     }
 
-    public String getInstitution() {
+    public Institution getInstitution() {
         return institution;
     }
 
-    public void setInstitution(String institution) {
+    public void setInstitution(Institution institution) {
         this.institution = institution;
     }
 

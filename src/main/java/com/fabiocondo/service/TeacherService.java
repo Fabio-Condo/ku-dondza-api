@@ -2,16 +2,11 @@ package com.fabiocondo.service;
 
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
-import com.fabiocondo.domain.Exame;
-import com.fabiocondo.domain.Institution;
 import com.fabiocondo.domain.Teacher;
-import com.fabiocondo.exception.domain.ExameNotFoundException;
-import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.exception.domain.TeacherNotFoundException;
 import com.fabiocondo.repository.TeacherRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

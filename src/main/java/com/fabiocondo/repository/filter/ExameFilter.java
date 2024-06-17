@@ -9,7 +9,7 @@ public class ExameFilter {
 
     private String global;
 
-    private String vocationOrderBy;
+    private String exameOrderBy;
 
     private Institution institution;
 
@@ -37,12 +37,12 @@ public class ExameFilter {
         this.global = global;
     }
 
-    public String getVocationOrderBy() {
-        return vocationOrderBy;
+    public String getExameOrderBy() {
+        return exameOrderBy;
     }
 
-    public void setVocationOrderBy(String vocationOrderBy) {
-        this.vocationOrderBy = vocationOrderBy;
+    public void setExameOrderBy(String exameOrderBy) {
+        this.exameOrderBy = exameOrderBy;
     }
 
     public Institution getInstitution() {

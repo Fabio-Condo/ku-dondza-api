@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.*;
 
 @Entity(name = "instituicao")
-public class Institution {
+public class Institution { // ADD SIGLA - UEM, UP, ACIPOL
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

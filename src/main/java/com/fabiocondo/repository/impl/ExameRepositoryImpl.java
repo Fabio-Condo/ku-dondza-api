@@ -71,7 +71,7 @@ public class ExameRepositoryImpl implements ExameRepositoryQuery {
     private Predicate[] createRestrictions(ExameFilter exameFilter, CriteriaBuilder builder,Root<Exame> root) {
         List<Predicate> predicates = new ArrayList<>();
 
-        restrictions( exameFilter, predicates, builder, root);
+        restrictions(exameFilter, predicates, builder, root);
 
         return predicates.toArray(new Predicate[predicates.size()]);
     }
@@ -113,10 +113,10 @@ public class ExameRepositoryImpl implements ExameRepositoryQuery {
     }
 
     public void getSortOrder(ExameFilter exameFilter, CriteriaBuilder builder, CriteriaQuery<Exame> criteria, Root<Exame> root){
-        if(Objects.equals(exameFilter.getVocationOrderBy(), "subject,asc")){
+        if(Objects.equals(exameFilter.getExameOrderBy(), "subject,asc")){
             criteria.orderBy(builder.asc(root.get("subject")));
         }
-        if(Objects.equals(exameFilter.getVocationOrderBy(), "subject,desc")){
+        if(Objects.equals(exameFilter.getExameOrderBy(), "subject,desc")){
             criteria.orderBy(builder.desc(root.get("subject")));
         }
     }

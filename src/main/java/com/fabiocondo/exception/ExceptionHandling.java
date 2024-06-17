@@ -46,6 +46,16 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(CourseNotFoundException.class)
+    public ResponseEntity<HttpResponse> courseNotFoundException(CourseNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(TeacherNotFoundException.class)
+    public ResponseEntity<HttpResponse> teacherNotFoundException(TeacherNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(MissingServletRequestPartException.class)
     public ResponseEntity<HttpResponse> handleMissingServletRequestPartException(MissingServletRequestPartException exception) {
         LOGGER.error(exception.getMessage());

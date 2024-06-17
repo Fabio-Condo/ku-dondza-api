@@ -3,6 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Institution;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
+import com.fabiocondo.repository.filter.InstitutionFilter;
 import com.fabiocondo.service.InstitutionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,9 +28,14 @@ public class InstitutionController {
         return ResponseEntity.status(HttpStatus.OK).body(institutionService.findById(id));
     }
 
-    @GetMapping("/filter")
+    @GetMapping
     public ResponseEntity<Page<Institution>> findAll(Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(institutionService.findAll(pageable));
+    }
+
+    @GetMapping("/filter")
+    public Page<Institution> filter(InstitutionFilter institutionFilter, Pageable pageable) {
+        return institutionService.filter(institutionFilter, pageable);
     }
 
     @PostMapping

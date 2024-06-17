@@ -60,7 +60,7 @@ public class ExameService {
 
     public Exame save(String subject, String description, Date date, Long institutionId, MultipartFile file) throws InstituicaoNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
-        //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         Institution institution = institutionService.findById(institutionId);
         Exame exame = new Exame();
@@ -69,7 +69,7 @@ public class ExameService {
         exame.setDescription(description);
         exame.setDate(date);
         exame.setTotalDownloadNumber(0L);
-        //exame.setUrlFile(s3UploadResponse.getFileUrl());
+        exame.setUrlFile(s3UploadResponse.getFileUrl());
         exame.setFileName(file.getOriginalFilename());
 
         logger.info("Saving new exame: " + exame.getDescription());

@@ -18,13 +18,19 @@ public class Teacher {
 
     private String email;
 
+    private String fileName;
+
+    private String urlFile;
+
     public Teacher() {
     }
 
-    public Teacher(Long id, String name, String email) {
+    public Teacher(Long id, String name, String email, String fileName, String urlFile) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.fileName = fileName;
+        this.urlFile = urlFile;
     }
 
     public Long getId() {
@@ -49,5 +55,21 @@ public class Teacher {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getUrlFile() {
+        return urlFile;
+    }
+
+    public void setUrlFile(String urlFile) {
+        this.urlFile = urlFile;
     }
 }

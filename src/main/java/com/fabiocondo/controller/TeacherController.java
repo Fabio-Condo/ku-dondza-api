@@ -1,15 +1,22 @@
 package com.fabiocondo.controller;
 
+import com.fabiocondo.domain.Exame;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Teacher;
+import com.fabiocondo.exception.domain.ExameNotFoundException;
+import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.exception.domain.TeacherNotFoundException;
 import com.fabiocondo.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Date;
 
 @RestController
 @RequestMapping("/teachers")
@@ -38,13 +45,20 @@ public class TeacherController {
     }
 
     @PostMapping
-    public ResponseEntity<Teacher> save(@RequestBody Teacher teacher) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(teacherService.save(teacher));
+    public ResponseEntity<Teacher> save(@RequestParam("name") String name,
+                                        @RequestParam("email") String email,
+                                        @RequestParam("file") MultipartFile file) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(teacherService.save(name, email, file));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Teacher> update(@PathVariable("id") Long id, @RequestBody Teacher teacher) throws TeacherNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(teacherService.update(teacher, id));
+    @PutMapping
+    public ResponseEntity<Teacher> update(@RequestParam("id") Long id,
+                                          @RequestParam("name") String name,
+                                          @RequestParam("email") String email,
+                                          @RequestParam(value = "file", required = false) MultipartFile file) throws InstituicaoNotFoundException, TeacherNotFoundException {
+
+        return ResponseEntity.status(HttpStatus.OK).body(teacherService.update(id, name, email, file));
     }
 
     @DeleteMapping("/{id}")

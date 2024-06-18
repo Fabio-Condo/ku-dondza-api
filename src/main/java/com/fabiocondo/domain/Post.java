@@ -1,7 +1,6 @@
 package com.fabiocondo.domain;
 
 import com.fabiocondo.enumeration.PostType;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -25,6 +24,10 @@ public class Post {
     private String imageUrl;
 
     private Date date;
+
+    private String fileName;
+
+    private String urlFile;
 
     public Long getId() {
         return id;
@@ -64,5 +67,21 @@ public class Post {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getUrlFile() {
+        return urlFile;
+    }
+
+    public void setUrlFile(String urlFile) {
+        this.urlFile = urlFile;
     }
 }

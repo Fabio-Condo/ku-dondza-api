@@ -87,7 +87,7 @@ public class InstitutionService {
 
     public void delete(Long id) throws InstituicaoNotFoundException {
         Institution existInstitution = findById(id);
-        logger.info("Deleting exame: " + existInstitution.getDescription());
+        logger.info("Deleting institution: " + existInstitution.getDescription());
         institutionRepository.deleteById(id);
         if (existInstitution.getFileName() != null) {
             logger.info("Deleting file: " + existInstitution.getFileName());

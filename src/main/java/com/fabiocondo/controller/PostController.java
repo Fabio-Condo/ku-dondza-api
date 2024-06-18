@@ -41,17 +41,18 @@ public class PostController{
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Post> addNew(@RequestParam("text") String text,
-                                       @RequestParam(value = "postImage", required = false) MultipartFile postImage) throws IOException, NotAnImageFileException {
-        Post newPost = postService.addNew(text, postImage);
-        return new ResponseEntity<>(newPost, OK);
+    public ResponseEntity<Post> save(@RequestParam("text") String text,
+                                       @RequestParam(value = "file", required = false) MultipartFile file) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(postService.save(text, file));
     }
 
     @PostMapping("/update")
-    public ResponseEntity<Post> update(@RequestParam("text") String text,
-                                       @RequestParam(value = "postImage", required = false) MultipartFile postImage) throws IOException, NotAnImageFileException {
-        Post updatedPost = postService.update(text, postImage);
-        return new ResponseEntity<>(updatedPost, OK);
+    public ResponseEntity<Post> update(@RequestParam("id") Long id,
+                                       @RequestParam("text") String text,
+                                       @RequestParam(value = "file", required = false) MultipartFile file) throws IOException, NotAnImageFileException, PostNotFoundException {
+
+        return ResponseEntity.status(HttpStatus.OK).body(postService.update(id, text, file));
     }
 
 

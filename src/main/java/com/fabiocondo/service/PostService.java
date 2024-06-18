@@ -1,5 +1,7 @@
 package com.fabiocondo.service;
 
+import com.fabiocondo.aws.model.S3UploadResponse;
+import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Post;
 import com.fabiocondo.exception.domain.NotAnImageFileException;
 import com.fabiocondo.exception.domain.PostNotFoundException;
@@ -29,11 +31,20 @@ public class PostService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private static final String BUCKET_NAME = "b-tests-bucket";
+
+    private final AmazonS3Service amazonS3Service;
+
     public static final String NO_POST_FOUND_BY_ID = "No post found by id: ";
     public static final String DELETING_POST = "Deleting post with id: ";
 
     @Autowired
     public PostRepository postRepository;
+
+    public PostService(AmazonS3Service amazonS3Service, PostRepository postRepository) {
+        this.amazonS3Service = amazonS3Service;
+        this.postRepository = postRepository;
+    }
 
     public Post findById(Long id) throws PostNotFoundException {
         return postRepository.findById(id)
@@ -44,32 +55,47 @@ public class PostService {
         return postRepository.findAll(pageable);
     }
 
-    public Post addNew(String text, MultipartFile postImage) throws IOException, NotAnImageFileException {
-        logger.info("New post saved: " + text);
-        Post newPost = new Post();
-        newPost.setText(text);
-        newPost.setDate(new Date());
-        newPost.setImageUrl(getTemporaryPostImageUrl(text));
-        savePostImage(newPost, postImage);
-        postRepository.save(newPost);
-        logger.info("New post saved: " + text);
-        return newPost;
+    public Post save(String text, MultipartFile file) {
+        logger.info("Uploading file: " + file.getOriginalFilename());
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+
+        Post post = new Post();
+        post.setText(text);
+        post.setUrlFile(s3UploadResponse.getFileUrl());
+        post.setFileName(file.getOriginalFilename());
+        post.setDate(new Date());
+
+        logger.info("Saving new post: " + post.getText());
+        return postRepository.save(post);
     }
 
-    public Post update(String text, MultipartFile postImage) throws IOException, NotAnImageFileException {
-        Post newPost = new Post();
-        newPost.setText(text);
-        newPost.setImageUrl(getTemporaryPostImageUrl(text));
-        savePostImage(newPost, postImage);
-        postRepository.save(newPost);
-        logger.info("Post updated: " + text);
-        return newPost;
+    public Post update(Long id, String text, MultipartFile file) throws PostNotFoundException {
+        Post existPost = findById(id);
+        existPost.setText(text);
+
+        // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
+        if (file != null) {
+            if (existPost.getFileName() != null) {
+                logger.info("Deleting file: " + existPost.getFileName());
+                amazonS3Service.deleteFile(existPost.getFileName(), BUCKET_NAME);
+            }
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+            existPost.setUrlFile(s3UploadResponse.getFileUrl());
+            existPost.setFileName(file.getOriginalFilename());
+        }
+
+        logger.info("Saving new post: " + existPost.getText());
+        return postRepository.save(existPost);
     }
 
     public void delete(Long id) throws PostNotFoundException {
-        findById(id);
-        logger.info(DELETING_POST + id);
+        Post existPost = findById(id);
+        logger.info("Deleting post: " + existPost.getText());
         postRepository.deleteById(id);
+        if (existPost.getFileName() != null) {
+            logger.info("Deleting file: " + existPost.getFileName());
+            amazonS3Service.deleteFile(existPost.getFileName(), BUCKET_NAME);
+        }
     }
 
     private void savePostImage(Post post, MultipartFile postImage) throws IOException, NotAnImageFileException {

@@ -2,6 +2,8 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Institution;
+import com.fabiocondo.enumeration.AdministrationType;
+import com.fabiocondo.exception.domain.ExameNotFoundException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.repository.filter.InstitutionFilter;
 import com.fabiocondo.service.InstitutionService;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/institutions")
@@ -39,13 +42,26 @@ public class InstitutionController {
     }
 
     @PostMapping
-    public ResponseEntity<Institution> save(@RequestBody Institution institution) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(institutionService.save(institution));
+    public ResponseEntity<Institution> save(@RequestParam("name") String name,
+                                            @RequestParam("type") String type,
+                                            @RequestParam("administrationType") AdministrationType administrationType,
+                                            @RequestParam("address") String address,
+                                            @RequestParam("description") String description,
+                                            @RequestParam("file") MultipartFile file) throws InstituicaoNotFoundException {
+
+        return ResponseEntity.status(HttpStatus.OK).body(institutionService.save(name, type, administrationType, address, description, file));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Institution> update(@PathVariable("id") Long id, @RequestBody Institution institution) throws InstituicaoNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(institutionService.update(institution, id));
+    @PutMapping
+    public ResponseEntity<Institution> update(@RequestParam("id") Long id,
+                                        @RequestParam("name") String name,
+                                        @RequestParam("type") String type,
+                                        @RequestParam("administrationType") AdministrationType administrationType,
+                                        @RequestParam("address") String address,
+                                        @RequestParam("description") String description,
+                                        @RequestParam(value = "file", required = false) MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException {
+
+        return ResponseEntity.status(HttpStatus.OK).body(institutionService.update(id, name, type, administrationType, address, description, file));
     }
 
     @DeleteMapping("/{id}")

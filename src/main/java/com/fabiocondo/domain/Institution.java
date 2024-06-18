@@ -27,10 +27,14 @@ public class Institution { // ADD SIGLA - UEM, UP, ACIPOL
 
     private String description;
 
+    private String fileName;
+
+    private String urlFile;
+
     public Institution() {
     }
 
-    public Institution(Long id, String name, String type, AdministrationType administrationType, String address, String website, String description) {
+    public Institution(Long id, String name, String type, AdministrationType administrationType, String address, String website, String description, String fileName, String urlFile) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -38,6 +42,8 @@ public class Institution { // ADD SIGLA - UEM, UP, ACIPOL
         this.address = address;
         this.website = website;
         this.description = description;
+        this.fileName = fileName;
+        this.urlFile = urlFile;
     }
 
     public Long getId() {
@@ -94,5 +100,21 @@ public class Institution { // ADD SIGLA - UEM, UP, ACIPOL
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getUrlFile() {
+        return urlFile;
+    }
+
+    public void setUrlFile(String urlFile) {
+        this.urlFile = urlFile;
     }
 }

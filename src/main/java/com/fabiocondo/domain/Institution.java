@@ -16,6 +16,8 @@ public class Institution { // ADD SIGLA - UEM, UP, ACIPOL
 
     private String name;
 
+    private String acronym; // sigla
+
     private String type;  // ensino superior, ensino técnico
 
     @Enumerated(EnumType.STRING)
@@ -34,9 +36,10 @@ public class Institution { // ADD SIGLA - UEM, UP, ACIPOL
     public Institution() {
     }
 
-    public Institution(Long id, String name, String type, AdministrationType administrationType, String address, String website, String description, String fileName, String urlFile) {
+    public Institution(Long id, String name, String acronym, String type, AdministrationType administrationType, String address, String website, String description, String fileName, String urlFile) {
         this.id = id;
         this.name = name;
+        this.acronym = acronym;
         this.type = type;
         this.administrationType = administrationType;
         this.address = address;
@@ -60,6 +63,14 @@ public class Institution { // ADD SIGLA - UEM, UP, ACIPOL
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAcronym() {
+        return acronym;
+    }
+
+    public void setAcronym(String acronym) {
+        this.acronym = acronym;
     }
 
     public String getType() {

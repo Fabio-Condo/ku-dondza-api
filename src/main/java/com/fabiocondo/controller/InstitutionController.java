@@ -43,25 +43,27 @@ public class InstitutionController {
 
     @PostMapping
     public ResponseEntity<Institution> save(@RequestParam("name") String name,
+                                            @RequestParam("acronym") String acronym,
                                             @RequestParam("type") String type,
                                             @RequestParam("administrationType") AdministrationType administrationType,
                                             @RequestParam("address") String address,
                                             @RequestParam("description") String description,
                                             @RequestParam("file") MultipartFile file) throws InstituicaoNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(institutionService.save(name, type, administrationType, address, description, file));
+        return ResponseEntity.status(HttpStatus.OK).body(institutionService.save(name, acronym, type, administrationType, address, description, file));
     }
 
     @PutMapping
     public ResponseEntity<Institution> update(@RequestParam("id") Long id,
                                         @RequestParam("name") String name,
+                                        @RequestParam("acronym") String acronym,
                                         @RequestParam("type") String type,
                                         @RequestParam("administrationType") AdministrationType administrationType,
                                         @RequestParam("address") String address,
                                         @RequestParam("description") String description,
                                         @RequestParam(value = "file", required = false) MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(institutionService.update(id, name, type, administrationType, address, description, file));
+        return ResponseEntity.status(HttpStatus.OK).body(institutionService.update(id, name, acronym, type, administrationType, address, description, file));
     }
 
     @DeleteMapping("/{id}")

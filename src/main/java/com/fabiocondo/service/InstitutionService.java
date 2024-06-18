@@ -45,12 +45,13 @@ public class InstitutionService {
         return institutionRepository.filter(institutionFilter, pageable);
     }
 
-    public Institution save(String name, String type, AdministrationType administrationType, String address, String description, MultipartFile file) throws InstituicaoNotFoundException {
+    public Institution save(String name, String acronym, String type, AdministrationType administrationType, String address, String description, MultipartFile file) throws InstituicaoNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         Institution institution = new Institution();
         institution.setName(name);
+        institution.setAcronym(acronym);
         institution.setType(type);
         institution.setAdministrationType(administrationType);
         institution.setAddress(address);
@@ -62,9 +63,10 @@ public class InstitutionService {
         return institutionRepository.save(institution);
     }
 
-    public Institution update(Long id, String name, String type, AdministrationType administrationType, String address, String description, MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException {
+    public Institution update(Long id, String name, String acronym, String type, AdministrationType administrationType, String address, String description, MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException {
         Institution existInstitution = findById(id);
         existInstitution.setName(name);
+        existInstitution.setAcronym(acronym);
         existInstitution.setType(type);
         existInstitution.setAdministrationType(administrationType);
         existInstitution.setAddress(address);

@@ -9,7 +9,7 @@ aws:
 spring:
 
   profiles:
-    active: dev
+    active: prod
 
   jpa:
     properties:

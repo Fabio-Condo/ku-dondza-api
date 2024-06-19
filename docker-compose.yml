@@ -16,21 +16,16 @@ services:
       - kudondza-network
 
   kudondza-api:
-    #image: kudondza-api  # Usar imagem local
-    image: fabiocondo/kudondza-api # Usar imagem do meu docker hub
+    image: fabiocondo/kudondza-api # Usar imagem do seu Docker Hub
     environment:
       DB_HOST: kudondza-mysql
+      REDIS_HOST: kudondza-redis
+      REDIS_PORT: 6379
     networks:
       - kudondza-network
-    #volumes:
-    #  - C:\Users\user\Desktop\SPC-V2\Imagens:/app/imagens
-
-    #volumes:
-    #  - type: bind
-    #    source: C:\Users\user\Desktop\SPC-V2\Imagens
-    #    target: /app/imagens
     depends_on:
       - kudondza-mysql
+      - kudondza-redis
 
   kudondza-proxy:
     build: ./nginx
@@ -41,6 +36,14 @@ services:
       - kudondza-network
     depends_on:
       - kudondza-api
+
+  kudondza-redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - kudondza-network
+
 
   # Se quiser usar a imagem que seta no docker hub
   # docker pull fabiocondo/warehouse-api

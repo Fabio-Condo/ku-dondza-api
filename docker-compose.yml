@@ -16,7 +16,7 @@ services:
       - kudondza-network
 
   kudondza-api:
-    #image: warehouse-api  # Usar imagem local
+    #image: kudondza-api  # Usar imagem local
     image: fabiocondo/kudondza-api # Usar imagem do meu docker hub
     environment:
       DB_HOST: kudondza-mysql
@@ -57,4 +57,4 @@ services:
 
   # RESUMO DE COMANDOS POR EXECUTAR
   # ./mvnw clean package -DskipTests -Pdocker
-  # docker-compose up --scale warehouse-api=3
+  # docker-compose up --scale kudondza-api=3

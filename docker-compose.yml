@@ -1,0 +1,60 @@
+version: "3.9"
+
+networks:
+  kudondza-network:
+    driver: bridge
+
+services:
+  kudondza-mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+    ports:
+      - "3306:3306"
+    networks:
+      - kudondza-network
+
+  kudondza-api:
+    #image: warehouse-api  # Usar imagem local
+    image: fabiocondo/kudondza-api # Usar imagem do meu docker hub
+    environment:
+      DB_HOST: kudondza-mysql
+    networks:
+      - kudondza-network
+    #volumes:
+    #  - C:\Users\user\Desktop\SPC-V2\Imagens:/app/imagens
+
+    #volumes:
+    #  - type: bind
+    #    source: C:\Users\user\Desktop\SPC-V2\Imagens
+    #    target: /app/imagens
+    depends_on:
+      - kudondza-mysql
+
+  kudondza-proxy:
+    build: ./nginx
+    image: kudondza-proxy
+    ports:
+      - "80:80"
+    networks:
+      - kudondza-network
+    depends_on:
+      - kudondza-api
+
+  # Se quiser usar a imagem que seta no docker hub
+  # docker pull fabiocondo/warehouse-api
+  # docker-compose up --scale warehouse-api=3
+
+  # Passo 1: Build da aplicacao  (3 comando que contem -Pdocker)
+  # ./mvnw clean package
+  # ./mvnw clean package -DskipTests
+  # ./mvnw clean package -DskipTests -Pdocker
+
+  # Remover os containers
+  # docker compose down
+  # docker compose down --volumes # Elimina junto com os volumes que guardam dados da BD
+
+  # RESUMO DE COMANDOS POR EXECUTAR
+  # ./mvnw clean package -DskipTests -Pdocker
+  # docker-compose up --scale warehouse-api=3

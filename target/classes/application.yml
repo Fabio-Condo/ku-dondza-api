@@ -1,4 +1,3 @@
-
 server:
   port: 8080
 
@@ -8,12 +7,10 @@ aws:
   region.static: us-east-1
 
 spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/blog?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Africa/Harare
-    username: root
-    password: root
 
-  # Mysql 8.0
+  profiles:
+    active: dev
+
   jpa:
     properties:
       hibernate:

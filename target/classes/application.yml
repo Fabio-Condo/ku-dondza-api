@@ -11,17 +11,6 @@ spring:
   profiles:
     active: dev
 
-  redis:
-    host: localhost
-    port: 6379
-
-  cache:
-    type: redis
-    redis:
-      cache-null-values: true
- #     time-to-live: 5 # tempo de vida em segundos
-
-
   jpa:
     properties:
       hibernate:

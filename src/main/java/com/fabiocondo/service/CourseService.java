@@ -9,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Service
 public class CourseService {
@@ -33,6 +34,10 @@ public class CourseService {
 
     public Page<Course> findByName(String name, Pageable pageable) {
         return courseRepository.findByName(name, pageable);
+    }
+
+    public Page<Course> findByInstitutionId(@RequestParam Long institutionId, Pageable pageable) {
+        return courseRepository.findByInstitutionId(institutionId, pageable);
     }
 
     public Course save(Course course)  {

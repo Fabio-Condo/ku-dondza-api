@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/courses")
 public class CourseController {
@@ -35,6 +37,11 @@ public class CourseController {
     @GetMapping("/filter")
     public ResponseEntity<Page<Course>> findByName(@RequestParam(required = false, defaultValue = "") String name, Pageable pageable){
         return ResponseEntity.status(HttpStatus.OK).body(courseService.findByName(name, pageable));
+    }
+
+    @GetMapping("/findByInstitutionId")
+    public ResponseEntity<Page<Course>>  findByInstitutionId(@RequestParam Long institutionId, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(courseService.findByInstitutionId(institutionId, pageable));
     }
 
     @PostMapping

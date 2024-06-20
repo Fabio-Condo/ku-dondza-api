@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
-    @Query("SELECT c FROM Course c WHERE c.name LIKE %:name% OR c.institution.name LIKE %:name% OR c.institution.type LIKE %:name% ORDER BY name ASC")
+    @Query("SELECT c FROM Course c WHERE c.name LIKE %:name% OR c.institution.name LIKE %:name% OR c.institution.acronym LIKE %:name% OR c.institution.type LIKE %:name% ORDER BY name ASC")
     public Page<Course> findByName(@Param("name") String name, Pageable pageable);
 
     public Page<Course> findByInstitutionId(Long institutionId, Pageable pageable);

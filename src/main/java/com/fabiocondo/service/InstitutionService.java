@@ -45,7 +45,7 @@ public class InstitutionService {
         return institutionRepository.filter(institutionFilter, pageable);
     }
 
-    public Institution save(String name, String acronym, String type, AdministrationType administrationType, String address, String description, MultipartFile file) throws InstituicaoNotFoundException {
+    public Institution save(String name, String acronym, String type, AdministrationType administrationType, String address, String description, String website, MultipartFile file) throws InstituicaoNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
@@ -56,6 +56,7 @@ public class InstitutionService {
         institution.setAdministrationType(administrationType);
         institution.setAddress(address);
         institution.setDescription(description);
+        institution.setWebsite(website);
         institution.setUrlFile(s3UploadResponse.getFileUrl());
         institution.setFileName(file.getOriginalFilename());
 
@@ -63,7 +64,7 @@ public class InstitutionService {
         return institutionRepository.save(institution);
     }
 
-    public Institution update(Long id, String name, String acronym, String type, AdministrationType administrationType, String address, String description, MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException {
+    public Institution update(Long id, String name, String acronym, String type, AdministrationType administrationType, String address, String description, String website, MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException {
         Institution existInstitution = findById(id);
         existInstitution.setName(name);
         existInstitution.setAcronym(acronym);
@@ -71,6 +72,7 @@ public class InstitutionService {
         existInstitution.setAdministrationType(administrationType);
         existInstitution.setAddress(address);
         existInstitution.setDescription(description);
+        existInstitution.setWebsite(website);
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {

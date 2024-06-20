@@ -83,7 +83,9 @@ public class InstitutionRepositoryImpl implements InstitutionRepositoryQuery {
                     builder.lower(root.get("name")), "%" + institutionFilter.getGlobal().toLowerCase() + "%");
             Predicate type = builder.like(
                     builder.lower(root.get("type")), "%" + institutionFilter.getGlobal().toLowerCase() + "%");
-            predicates.add(builder.or(name, type));
+            Predicate acronym = builder.like(
+                    builder.lower(root.get("acronym")), "%" + institutionFilter.getGlobal().toLowerCase() + "%");
+            predicates.add(builder.or(name, type, acronym));
         }
         if(!ObjectUtils.isEmpty(institutionFilter.getAdministrationType())) {
             predicates.add(builder.equal(

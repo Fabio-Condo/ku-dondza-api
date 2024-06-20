@@ -9,11 +9,7 @@ aws:
 spring:
 
   profiles:
-    active: prod
-
-  redis:
-    host: REDIS_HOST
-    port: REDIS_PORT
+    active: dev
 
   jpa:
     properties:

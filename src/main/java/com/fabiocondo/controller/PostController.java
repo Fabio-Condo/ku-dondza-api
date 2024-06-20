@@ -36,8 +36,8 @@ public class PostController{
     }
 
     @GetMapping("/all")
-    public Page<Post> findAll(@RequestParam(required = false, defaultValue = "") String property, Pageable pageable) {
-        return postService.findAll(property, pageable);
+    public Page<Post> findAll(Pageable pageable) {
+        return postService.findAll(pageable);
     }
 
     @PostMapping("/add")

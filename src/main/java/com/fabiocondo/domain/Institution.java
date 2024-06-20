@@ -4,9 +4,11 @@ import com.fabiocondo.enumeration.AdministrationType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
-@Entity(name = "instituicao")
-public class Institution { // ADD SIGLA - UEM, UP, ACIPOL
+@Entity
+@Table(name = "instituicao")
+public class Institution implements Serializable { // ADD SIGLA - UEM, UP, ACIPOL
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

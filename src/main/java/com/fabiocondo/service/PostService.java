@@ -51,7 +51,7 @@ public class PostService {
                 .orElseThrow(() -> new PostNotFoundException(NO_POST_FOUND_BY_ID + id));
     }
 
-    public Page<Post> findAll(String property, Pageable pageable) {
+    public Page<Post> findAll(Pageable pageable) {
         return postRepository.findAll(pageable);
     }
 

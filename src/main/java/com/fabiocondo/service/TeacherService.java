@@ -7,6 +7,7 @@ import com.fabiocondo.exception.domain.TeacherNotFoundException;
 import com.fabiocondo.repository.TeacherRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class TeacherService {
         return teacherRepository.findAll(pageable);
     }
 
+    //@Cacheable(value = "teachers")
     public Page<Teacher> findByName(String name, Pageable pageable) {
         return teacherRepository.findByName(name, pageable);
     }

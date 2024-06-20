@@ -3,10 +3,11 @@ package com.fabiocondo.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "course")
-public class Course {
+public class Course implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

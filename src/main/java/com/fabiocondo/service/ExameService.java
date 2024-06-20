@@ -11,7 +11,6 @@ import com.fabiocondo.repository.filter.ExameFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -47,8 +46,7 @@ public class ExameService {
                 .orElseThrow(() -> new ExameNotFoundException("No exame found by id: " + id));
     }
 
-    @Cacheable(value = "exames")
-    public Page<Exame> filter(ExameFilter exameFilter, Pageable pageable){
+    public Page<Exame> filter(ExameFilter exameFilter, Pageable pageable) {
         return exameRepository.filter(exameFilter, pageable);
     }
 

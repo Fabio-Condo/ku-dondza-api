@@ -4,11 +4,12 @@ import com.fabiocondo.enumeration.PostType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
-@Entity(name = "post")
-public class Post {
+@Entity
+@Table(name = "post")
+public class Post implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

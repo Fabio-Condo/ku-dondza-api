@@ -44,18 +44,20 @@ public class TeacherController {
     @PostMapping
     public ResponseEntity<Teacher> save(@RequestParam("name") String name,
                                         @RequestParam("email") String email,
+                                        @RequestParam("contactNumber") String contactNumber,
                                         @RequestParam("file") MultipartFile file) {
 
-        return ResponseEntity.status(HttpStatus.OK).body(teacherService.save(name, email, file));
+        return ResponseEntity.status(HttpStatus.OK).body(teacherService.save(name, email, contactNumber, file));
     }
 
     @PutMapping
     public ResponseEntity<Teacher> update(@RequestParam("id") Long id,
                                           @RequestParam("name") String name,
                                           @RequestParam("email") String email,
+                                          @RequestParam("contactNumber") String contactNumber,
                                           @RequestParam(value = "file", required = false) MultipartFile file) throws InstituicaoNotFoundException, TeacherNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(teacherService.update(id, name, email, file));
+        return ResponseEntity.status(HttpStatus.OK).body(teacherService.update(id, name, email, contactNumber, file));
     }
 
     @DeleteMapping("/{id}")

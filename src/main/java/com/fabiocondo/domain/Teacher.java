@@ -19,6 +19,8 @@ public class Teacher implements Serializable {
 
     private String email;
 
+    private String contactNumber;
+
     private String fileName;
 
     private String urlFile;
@@ -26,10 +28,10 @@ public class Teacher implements Serializable {
     public Teacher() {
     }
 
-    public Teacher(Long id, String name, String email, String fileName, String urlFile) {
-        this.id = id;
+    public Teacher(String name, String email, String contactNumber, String fileName, String urlFile) {
         this.name = name;
         this.email = email;
+        this.contactNumber = contactNumber;
         this.fileName = fileName;
         this.urlFile = urlFile;
     }
@@ -48,6 +50,14 @@ public class Teacher implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
     }
 
     public String getEmail() {

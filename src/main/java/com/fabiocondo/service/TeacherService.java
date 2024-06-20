@@ -46,13 +46,14 @@ public class TeacherService {
         return teacherRepository.findByName(name, pageable);
     }
 
-    public Teacher save(String name, String email, MultipartFile file) {
+    public Teacher save(String name, String email, String contactNumber, MultipartFile file) {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         Teacher teacher = new Teacher();
         teacher.setName(name);
         teacher.setEmail(email);
+        teacher.setContactNumber(contactNumber);
         teacher.setUrlFile(s3UploadResponse.getFileUrl());
         teacher.setFileName(file.getOriginalFilename());
 
@@ -60,10 +61,11 @@ public class TeacherService {
         return teacherRepository.save(teacher);
     }
 
-    public Teacher update(Long id, String name, String email, MultipartFile file) throws TeacherNotFoundException {
+    public Teacher update(Long id, String name, String email, String contactNumber, MultipartFile file) throws TeacherNotFoundException {
         Teacher existTeacher = findById(id);
         existTeacher.setName(name);
         existTeacher.setEmail(email);
+        existTeacher.setContactNumber(contactNumber);
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {

@@ -80,7 +80,7 @@ public class ExameRepositoryImpl implements ExameRepositoryQuery {
 
         if(!ObjectUtils.isEmpty(exameFilter.getGlobal())) {
             Predicate subject = builder.like(
-                    builder.lower(root.get("subject")), "%" + exameFilter.getGlobal().toLowerCase() + "%");
+                    builder.lower(root.get("subject").get("name")), "%" + exameFilter.getGlobal().toLowerCase() + "%");
             Predicate description = builder.like(
                     builder.lower(root.get("description")), "%" + exameFilter.getGlobal().toLowerCase() + "%");
             Predicate institutionType = builder.like(
@@ -97,8 +97,8 @@ public class ExameRepositoryImpl implements ExameRepositoryQuery {
                     builder.lower(root.get("description")), "%" + exameFilter.getDescription().toLowerCase() + "%"));
         }
         if(!ObjectUtils.isEmpty(exameFilter.getSubject())) {
-            predicates.add(builder.like(
-                    builder.lower(root.get("subject")), "%" + exameFilter.getSubject().toLowerCase() + "%"));
+            predicates.add(builder.equal(
+                    builder.lower(root.get("subject").get("id")), exameFilter.getSubject().getId()));
         }
         if (exameFilter.getInstitution() != null) {
             predicates.add(builder.equal(

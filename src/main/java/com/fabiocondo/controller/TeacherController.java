@@ -2,7 +2,9 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Teacher;
+import com.fabiocondo.exception.domain.CombinationExistException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
+import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.exception.domain.TeacherNotFoundException;
 import com.fabiocondo.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +66,16 @@ public class TeacherController {
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws TeacherNotFoundException {
         teacherService.delete(id);
         return response(HttpStatus.OK, "Teacher deleted successfully");
+    }
+
+    @PostMapping("/{teacherId}/subjects/{subjectId}")
+    public Teacher addSubjectToTeacherSubjectsList(@PathVariable Long teacherId, @PathVariable Long subjectId) throws TeacherNotFoundException, SubjectNotFoundException, CombinationExistException {
+        return teacherService.addSubjectToTeacherSubjectsList(teacherId, subjectId);
+    }
+
+    @PutMapping("/{teacherId}/subjects/{subjectId}")
+    public Teacher removeSubjectFromTeacherSubjectsList(@PathVariable Long teacherId, @PathVariable Long subjectId) throws TeacherNotFoundException, SubjectNotFoundException {
+        return teacherService.removeSubjectFromTeacherSubjectsList(teacherId, subjectId);
     }
 
     @GetMapping("/total")

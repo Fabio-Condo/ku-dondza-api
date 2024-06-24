@@ -4,8 +4,10 @@ import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Exame;
 import com.fabiocondo.domain.Institution;
+import com.fabiocondo.domain.Subject;
 import com.fabiocondo.exception.domain.ExameNotFoundException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
+import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.repository.ExameRepository;
 import com.fabiocondo.repository.filter.ExameFilter;
 import org.slf4j.Logger;
@@ -33,11 +35,14 @@ public class ExameService {
 
     private final InstitutionService institutionService;
 
+    private final SubjectService subjectService;
+
     @Autowired
-    public ExameService(ExameRepository exameRepository, AmazonS3Service amazonS3Service, InstitutionService institutionService) {
+    public ExameService(ExameRepository exameRepository, AmazonS3Service amazonS3Service, InstitutionService institutionService, SubjectService subjectService) {
         this.exameRepository = exameRepository;
         this.amazonS3Service = amazonS3Service;
         this.institutionService = institutionService;
+        this.subjectService = subjectService;
     }
 
     public Exame findById(Long id) throws ExameNotFoundException {
@@ -58,11 +63,13 @@ public class ExameService {
         return exameRepository.findAll();
     }
 
-    public Exame save(String subject, String description, Date date, Long institutionId, MultipartFile file) throws InstituicaoNotFoundException {
+    public Exame save(String description, Date date, Long subjectId, Long institutionId, MultipartFile file) throws InstituicaoNotFoundException, SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         Institution institution = institutionService.findById(institutionId);
+        Subject subject = subjectService.findById(subjectId);
+
         Exame exame = new Exame();
         exame.setInstitution(institution);
         exame.setSubject(subject);
@@ -76,8 +83,10 @@ public class ExameService {
         return exameRepository.save(exame);
     }
 
-    public Exame update(Long id, String subject, String description, Date date, Long institutionId, MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException {
+    public Exame update(Long id, String description, Date date, Long subjectId, Long institutionId, MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException, SubjectNotFoundException {
         Institution institution = institutionService.findById(institutionId);
+        Subject subject = subjectService.findById(subjectId);
+
         Exame existExame = findById(id);
         existExame.setInstitution(institution);
         existExame.setSubject(subject);

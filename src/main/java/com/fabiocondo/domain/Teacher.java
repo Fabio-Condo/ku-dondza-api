@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "teacher")
@@ -25,6 +27,14 @@ public class Teacher implements Serializable {
 
     private String urlFile;
 
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(
+            name = "subject_teacher",
+            joinColumns = @JoinColumn(name = "subject_id"),
+            inverseJoinColumns = @JoinColumn(name = "teacher_id")
+    )
+    private List<Subject> subjects = new ArrayList<>();
+
     public Teacher() {
     }
 
@@ -34,6 +44,16 @@ public class Teacher implements Serializable {
         this.contactNumber = contactNumber;
         this.fileName = fileName;
         this.urlFile = urlFile;
+    }
+
+    public void addSubjectToTeacherSubjectsList(Subject subject) {
+        subjects.add(subject);
+        subject.getTeachers().add(this);
+    }
+
+    public void removeSubjectFromTeacherSubjectsList(Subject subject) {
+        subjects.remove(subject);
+        subject.getTeachers().remove(this);
     }
 
     public Long getId() {
@@ -82,5 +102,13 @@ public class Teacher implements Serializable {
 
     public void setUrlFile(String urlFile) {
         this.urlFile = urlFile;
+    }
+
+    public List<Subject> getSubjects() {
+        return subjects;
+    }
+
+    public void setSubjects(List<Subject> subjects) {
+        this.subjects = subjects;
     }
 }

@@ -16,8 +16,6 @@ public class Exame implements Serializable {
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
-    private String subject;
-
     private String description;
 
     private String fileName;
@@ -32,10 +30,14 @@ public class Exame implements Serializable {
     @JoinColumn(name = "institution_id")
     private Institution institution;
 
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
+
     public Exame() {
     }
 
-    public Exame(Long id, String subject, String description,  String fileName, String urlFile, Date date, Long totalDownloadNumber, Institution institution) {
+    public Exame(Long id, Subject subject, String description,  String fileName, String urlFile, Date date, Long totalDownloadNumber, Institution institution) {
         this.id = id;
         this.subject = subject;
         this.description = description;
@@ -54,11 +56,11 @@ public class Exame implements Serializable {
         this.id = id;
     }
 
-    public String getSubject() {
+    public Subject getSubject() {
         return subject;
     }
 
-    public void setSubject(String subject) {
+    public void setSubject(Subject subject) {
         this.subject = subject;
     }
 

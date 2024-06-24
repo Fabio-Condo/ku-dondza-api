@@ -1,6 +1,7 @@
 package com.fabiocondo.repository.filter;
 
 import com.fabiocondo.domain.Institution;
+import com.fabiocondo.domain.Subject;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -11,13 +12,13 @@ public class ExameFilter {
 
     private String exameOrderBy;
 
+    private Subject subject;
+
     private Institution institution;
 
     private String description;
 
     private String level;
-
-    private String subject;
 
     private String urlFile;
 
@@ -45,6 +46,14 @@ public class ExameFilter {
         this.exameOrderBy = exameOrderBy;
     }
 
+    public Subject getSubject() {
+        return subject;
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
+    }
+
     public Institution getInstitution() {
         return institution;
     }
@@ -67,14 +76,6 @@ public class ExameFilter {
 
     public void setLevel(String level) {
         this.level = level;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
     }
 
     public String getUrlFile() {

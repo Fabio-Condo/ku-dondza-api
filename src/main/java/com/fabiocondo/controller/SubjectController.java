@@ -1,10 +1,8 @@
 package com.fabiocondo.controller;
 
-import com.fabiocondo.domain.Exame;
 import com.fabiocondo.domain.Subject;
-import com.fabiocondo.exception.domain.ExameNotFoundException;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
-import com.fabiocondo.service.SubjectService;
+import com.fabiocondo.service.impl.SubjectServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,24 +13,24 @@ import java.util.List;
 @RequestMapping("/subjects")
 public class SubjectController {
 
-    public SubjectService subjectService;
+    public SubjectServiceImpl subjectServiceImpl;
 
-    public SubjectController(SubjectService subjectService) {
-        this.subjectService = subjectService;
+    public SubjectController(SubjectServiceImpl subjectServiceImpl) {
+        this.subjectServiceImpl = subjectServiceImpl;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Subject> findById(@PathVariable("id") Long id) throws SubjectNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(subjectService.findById(id));
+        return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.findById(id));
     }
 
     @GetMapping
     public ResponseEntity<List<Subject>> findAll() throws SubjectNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(subjectService.findAll());
+        return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.findAll());
     }
 
     @PostMapping
     public ResponseEntity<Subject> save(@RequestBody Subject subject) throws SubjectNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(subjectService.save(subject));
+        return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.save(subject));
     }
 }

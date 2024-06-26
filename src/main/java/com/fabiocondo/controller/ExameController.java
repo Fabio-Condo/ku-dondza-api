@@ -6,7 +6,7 @@ import com.fabiocondo.exception.domain.ExameNotFoundException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.repository.filter.ExameFilter;
-import com.fabiocondo.service.ExameService;
+import com.fabiocondo.service.impl.ExameServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
@@ -26,31 +26,31 @@ import java.util.List;
 @RequestMapping("/exames")
 public class ExameController {
 
-    public ExameService exameService;
+    public ExameServiceImpl exameServiceImpl;
 
     @Autowired
-    public ExameController(ExameService exameService) {
-        this.exameService = exameService;
+    public ExameController(ExameServiceImpl exameServiceImpl) {
+        this.exameServiceImpl = exameServiceImpl;
     }
 
     @GetMapping("/filter")
     public Page<Exame> filter(ExameFilter exameFilter, Pageable pageable) {
-        return exameService.filter(exameFilter, pageable);
+        return exameServiceImpl.filter(exameFilter, pageable);
     }
 
     @GetMapping("/list")
     public ResponseEntity<List<Exame>> findAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(exameService.findAll());
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.findAll());
     }
 
     @GetMapping("/findAll")
     public ResponseEntity<Page<Exame>> findAll(Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(exameService.findAll(pageable));
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.findAll(pageable));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Exame> findById(@PathVariable("id") Long id) throws ExameNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(exameService.findById(id));
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.findById(id));
     }
 
     @PostMapping
@@ -60,7 +60,7 @@ public class ExameController {
                                       @RequestParam("institutionId") Long institutionId,
                                       @RequestParam("file") MultipartFile file) throws InstituicaoNotFoundException, SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameService.save(description, date, subjectId, institutionId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.save(description, date, subjectId, institutionId, file));
     }
 
     @PutMapping
@@ -71,18 +71,18 @@ public class ExameController {
                                         @RequestParam("institutionId") Long institutionId,
                                         @RequestParam(value = "file", required = false) MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException, SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameService.update(id, description, date, subjectId, institutionId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.update(id, description, date, subjectId, institutionId, file));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws ExameNotFoundException {
-        exameService.delete(id);
+        exameServiceImpl.delete(id);
         return response(HttpStatus.OK, "Exame deleted successfully");
     }
 
     @GetMapping("/download/{id}/{fileName}")
     public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable Long id, @PathVariable String fileName) throws ExameNotFoundException {
-        byte[] data = exameService.downloadFile(id, fileName);
+        byte[] data = exameServiceImpl.downloadFile(id, fileName);
         ByteArrayResource resource = new ByteArrayResource(data);
 
         return ResponseEntity
@@ -95,7 +95,7 @@ public class ExameController {
 
     @GetMapping("/total")
     public ResponseEntity<Long> getTotal(){
-        return ResponseEntity.status(HttpStatus.OK).body(exameService.getTotal());
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.getTotal());
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

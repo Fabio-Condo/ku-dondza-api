@@ -1,10 +1,9 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
-import com.fabiocondo.exception.ExceptionHandling;
 import com.fabiocondo.exception.domain.NotAnImageFileException;
 import com.fabiocondo.exception.domain.PostNotFoundException;
-import com.fabiocondo.service.PostService;
+import com.fabiocondo.service.impl.PostServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static com.fabiocondo.constant.FileConstant.*;
-import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
 
 @RestController
@@ -28,23 +26,23 @@ public class PostController{
 
     public static final String POST_DELETED_SUCCESSFULLY = "Post deleted successfully";
     @Autowired
-    PostService postService;
+    PostServiceImpl postServiceImpl;
 
     @GetMapping("/{id}")
     public ResponseEntity<Post> findById(@PathVariable("id") Long id) throws PostNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(postService.findById(id));
+        return ResponseEntity.status(HttpStatus.OK).body(postServiceImpl.findById(id));
     }
 
     @GetMapping("/all")
     public Page<Post> findAll(Pageable pageable) {
-        return postService.findAll(pageable);
+        return postServiceImpl.findAll(pageable);
     }
 
     @PostMapping("/add")
     public ResponseEntity<Post> save(@RequestParam("text") String text,
                                        @RequestParam(value = "file", required = false) MultipartFile file) {
 
-        return ResponseEntity.status(HttpStatus.OK).body(postService.save(text, file));
+        return ResponseEntity.status(HttpStatus.OK).body(postServiceImpl.save(text, file));
     }
 
     @PostMapping("/update")
@@ -52,12 +50,12 @@ public class PostController{
                                        @RequestParam("text") String text,
                                        @RequestParam(value = "file", required = false) MultipartFile file) throws IOException, NotAnImageFileException, PostNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(postService.update(id, text, file));
+        return ResponseEntity.status(HttpStatus.OK).body(postServiceImpl.update(id, text, file));
     }
 
 
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws PostNotFoundException {
-        postService.delete(id);
+        postServiceImpl.delete(id);
         return response(HttpStatus.OK, POST_DELETED_SUCCESSFULLY);
     }
 

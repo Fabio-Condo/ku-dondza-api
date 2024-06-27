@@ -17,6 +17,10 @@ public class Course implements Serializable {
 
     private String name;
 
+    private String duration;
+
+    private String requirements;
+
     @ManyToOne
     @JoinColumn(name = "institution_id")
     private Institution institution;
@@ -24,9 +28,11 @@ public class Course implements Serializable {
     public Course() {
     }
 
-    public Course(Long id, String name, Institution institution) {
+    public Course(Long id, String name, String duration, String requirements, Institution institution) {
         this.id = id;
         this.name = name;
+        this.duration = duration;
+        this.requirements = requirements;
         this.institution = institution;
     }
 
@@ -44,6 +50,22 @@ public class Course implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    public String getRequirements() {
+        return requirements;
+    }
+
+    public void setRequirements(String requirements) {
+        this.requirements = requirements;
     }
 
     public Institution getInstitution() {

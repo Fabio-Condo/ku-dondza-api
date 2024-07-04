@@ -4,21 +4,19 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.io.File;
 import java.util.Arrays;
 
-import static com.fabiocondo.constant.FileConstant.POST_FOLDER;
 @SpringBootApplication
 @EnableCaching
 public class KuDondzaApi {
 
     public static void main(String[] args) {
         SpringApplication.run(KuDondzaApi.class, args);
-        new File(POST_FOLDER).mkdirs();
     }
 
     @Bean
@@ -38,5 +36,10 @@ public class KuDondzaApi {
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
         return new CorsFilter(urlBasedCorsConfigurationSource);
+    }
+
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

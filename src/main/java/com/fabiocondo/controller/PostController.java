@@ -14,11 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static com.fabiocondo.constant.FileConstant.*;
-import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
 
 @RestController
 @RequestMapping(path = {"/post"})
@@ -57,11 +52,6 @@ public class PostController{
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws PostNotFoundException {
         postServiceImpl.delete(id);
         return response(HttpStatus.OK, POST_DELETED_SUCCESSFULLY);
-    }
-
-    @GetMapping(path = "/image/{text}/{fileName}", produces = IMAGE_JPEG_VALUE)
-    public byte[] getProfileImage(@PathVariable("text") String text, @PathVariable("fileName") String fileName) throws IOException {
-        return Files.readAllBytes(Paths.get(POST_FOLDER + text + FORWARD_SLASH + fileName));
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

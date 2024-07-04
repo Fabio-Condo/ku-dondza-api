@@ -31,6 +31,26 @@ public class ExceptionHandling implements ErrorController {
     public static final String ENTITY_IN_USE = "Entity in use, can't be deleted";
 
 
+    @ExceptionHandler(EmailExistException.class)
+    public ResponseEntity<HttpResponse> emailExistException(EmailExistException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(UsernameExistException.class)
+    public ResponseEntity<HttpResponse> usernameExistException(UsernameExistException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<HttpResponse> emailNotFoundException(EmailNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<HttpResponse> userNotFoundException(UserNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(PostNotFoundException.class)
     public ResponseEntity<HttpResponse> postNotFoundException(PostNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());

@@ -1,10 +1,13 @@
-server:
-  port: 8080
+jwt:
+  secret: '[a-zA-Z0-9._]^+$Guidelines89797987forAlphabeticalArraNumeralsandOtherSymbo$'
 
 aws:
   accessKeyId: AKIAW3MECWUYLS6ENYCX
   secretKey: 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
   region.static: us-east-1
+
+server:
+  port: 8080
 
 spring:
 

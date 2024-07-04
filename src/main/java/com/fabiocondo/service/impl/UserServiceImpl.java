@@ -96,6 +96,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User addNewUser(String firstName, String lastName, String username, String email, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
         validateNewUsernameAndEmail(EMPTY, username, email);
+        // Adicionar funcao que diminue o tamanho da imagem
         User user = new User();
         String password = generatePassword();
         user.setUserId(generateUserId());
@@ -121,6 +122,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException {
         User currentUser = validateNewUsernameAndEmail(currentUsername, newUsername, newEmail);
+        // Adicionar funcao que diminue o tamanho da imagem
         currentUser.setFirstName(newFirstName);
         currentUser.setLastName(newLastName);
         currentUser.setUsername(newUsername);

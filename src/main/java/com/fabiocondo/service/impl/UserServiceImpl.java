@@ -1,5 +1,7 @@
 package com.fabiocondo.service.impl;
 
+import com.fabiocondo.aws.model.S3UploadResponse;
+import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.enumeration.Role;
 import com.fabiocondo.exception.domain.EmailExistException;
 import com.fabiocondo.exception.domain.EmailNotFoundException;
@@ -38,25 +40,29 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 @Transactional
 @Qualifier("userDetailsService")  
 public class UserServiceImpl implements UserService, UserDetailsService {
-    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final String BUCKET_NAME = "b-tests-bucket";
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final LoginAttemptService loginAttemptService;
     private final EmailService emailService;
+    private final AmazonS3Service amazonS3Service;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
+        this.amazonS3Service = amazonS3Service;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findUserByUsername(username);
         if (user == null) {
-            LOGGER.error(NO_USER_FOUND_BY_USERNAME + username);
+            logger.error(NO_USER_FOUND_BY_USERNAME + username);
             throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
         } else {
             validateLoginAttempt(user);
@@ -64,7 +70,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             user.setLastLoginDate(new Date());
             userRepository.save(user);
             UserPrincipal userPrincipal = new UserPrincipal(user);
-            LOGGER.info(FOUND_USER_BY_USERNAME + username);
+            logger.info(FOUND_USER_BY_USERNAME + username);
             return userPrincipal;
         }
     }
@@ -85,10 +91,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setNotLocked(true);
         user.setRole(ROLE_SUPER_ADMIN.name());
         user.setAuthorities(ROLE_SUPER_ADMIN.getAuthorities());
-        //user.setProfileImageUrl(getTemporaryProfileImageUrl(username));
-        user.setFirstLogin(true);
         userRepository.save(user);
-        LOGGER.info("New user password (register): " + password);
+        logger.info("New user password (register): " + password);
         emailService.sendNewPasswordEmail(firstName, username, password, email);
         return user;
     }
@@ -96,6 +100,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User addNewUser(String firstName, String lastName, String username, String email, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
         validateNewUsernameAndEmail(EMPTY, username, email);
+
+        logger.info("Uploading file: " + profileImage.getOriginalFilename());
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
+
         // Adicionar funcao que diminue o tamanho da imagem
         User user = new User();
         String password = generatePassword();
@@ -110,12 +118,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setNotLocked(isNonLocked);
         user.setRole(getRoleEnumName(role).name());
         user.setAuthorities(getRoleEnumName(role).getAuthorities());
-        //user.setProfileImageUrl(getTemporaryProfileImageUrl(username));
-        user.setFirstLogin(true);
+        user.setProfileImageUrl(s3UploadResponse.getFileUrl());
         userRepository.save(user);
-        //saveProfileImage(user, profileImage);
         emailService.sendNewPasswordEmail(firstName, username, password, email);
-        LOGGER.info("New user password: " + password);
+        logger.info("New user password: " + password);
         return user;
     }
 
@@ -131,8 +137,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         currentUser.setNotLocked(isNonLocked);
         currentUser.setRole(getRoleEnumName(role).name());
         currentUser.setAuthorities(getRoleEnumName(role).getAuthorities());
+
+        // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
+        if (profileImage != null) {
+            if (currentUser.getFileName() != null) {
+                logger.info("Deleting file: " + currentUser.getFileName());
+                amazonS3Service.deleteFile(currentUser.getFileName(), BUCKET_NAME);
+            }
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
+            currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
+            currentUser.setFileName(profileImage.getOriginalFilename());
+        }
+
         userRepository.save(currentUser);
-        //saveProfileImage(currentUser, profileImage);
         return currentUser;
     }
 
@@ -144,9 +161,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         String password = generatePassword();
         user.setPassword(encodePassword(password));
-        user.setFirstLogin(true);
         userRepository.save(user);
-        LOGGER.info("New user password: " + password);
+        logger.info("New user password: " + password);
         emailService.sendNewPasswordEmail(user.getFirstName(), user.getUsername(), password, user.getEmail());
     }
 
@@ -167,7 +183,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void updatePropertyActive(String username, Boolean active) throws UsernameNotFoundException {
         User userSaved = findUserByUsername(username);
         userSaved.setActive(active);
-        LOGGER.info("Updating user: " + userSaved.getFirstName());
+        logger.info("Updating user: " + userSaved.getFirstName());
         userRepository.save(userSaved);
     }
 
@@ -175,7 +191,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void updatePropertyNotLocked(String username, Boolean notLocked) throws UsernameNotFoundException {
         User userSaved = findUserByUsername(username);
         userSaved.setNotLocked(notLocked);
-        LOGGER.info("Updating user: " + userSaved.getFirstName());
+        logger.info("Updating user: " + userSaved.getFirstName());
         userRepository.save(userSaved);
     }
 

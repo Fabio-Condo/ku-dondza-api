@@ -34,14 +34,12 @@ import static org.springframework.http.HttpStatus.OK;
 public class UserController extends ExceptionHandling {
     private AuthenticationManager authenticationManager;
     private UserService userService;
-    private UserServiceImpl userServiceImpl;
     private JWTTokenProvider jwtTokenProvider;
 
     @Autowired
-    public UserController(AuthenticationManager authenticationManager, UserService userService, UserServiceImpl userServiceImpl, JWTTokenProvider jwtTokenProvider) {
+    public UserController(AuthenticationManager authenticationManager, UserService userService, JWTTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
-        this.userServiceImpl = userServiceImpl;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
@@ -57,7 +55,7 @@ public class UserController extends ExceptionHandling {
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
         User newUser = userService.register(user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail());
-        return new ResponseEntity<>(newUser, OK);
+        return ResponseEntity.status(HttpStatus.OK).body(newUser);
     }
 
     @PostMapping("/add")
@@ -70,7 +68,7 @@ public class UserController extends ExceptionHandling {
                                            @RequestParam("isNonLocked") String isNonLocked,
                                            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
         User newUser = userService.addNewUser(firstName, lastName, username,email, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
-        return new ResponseEntity<>(newUser, OK);
+        return ResponseEntity.status(HttpStatus.OK).body(newUser);
     }
 
     @PostMapping("/update")
@@ -84,19 +82,19 @@ public class UserController extends ExceptionHandling {
                                        @RequestParam("isNonLocked") String isNonLocked,
                                        @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
         User updatedUser = userService.updateUser(currentUsername, firstName, lastName, username,email, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
-        return new ResponseEntity<>(updatedUser, OK);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
     
     @GetMapping("/find/{username}")
     public ResponseEntity<User> getUser(@PathVariable("username") String username) {
         User user = userService.findUserByUsername(username);
-        return new ResponseEntity<>(user, OK);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @GetMapping("/list")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getUsers();
-        return new ResponseEntity<>(users, OK);
+        return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
     @GetMapping("/resetpassword/{email}")
@@ -115,7 +113,7 @@ public class UserController extends ExceptionHandling {
     @PostMapping("/updateProfileImage")
     public ResponseEntity<User> updateProfileImage(@RequestParam("username") String username, @RequestParam(value = "profileImage") MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException {
         User user = userService.updateProfileImage(username, profileImage);
-        return new ResponseEntity<>(user, OK);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
     @PutMapping("/{newUsername}/active-user")

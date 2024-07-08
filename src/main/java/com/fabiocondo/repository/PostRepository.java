@@ -10,4 +10,6 @@ import org.springframework.data.repository.query.Param;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     public Page<Post> findById(String username, Pageable pageable);
+    Page<Post> findAllByCommentsParentCommentIsNotNull(Pageable pageable);
+    Page<Post> findAllByCommentsParentCommentIsNull(Pageable pageable);
 }

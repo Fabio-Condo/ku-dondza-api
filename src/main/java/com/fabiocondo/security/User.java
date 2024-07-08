@@ -24,6 +24,7 @@ public class User implements Serializable {
     private String password;
     private String email;
     private String profileImageUrl;
+    private String fileName;
     private Date lastLoginDate;
     private Date lastLoginDateDisplay;
     private Date joinDate;
@@ -33,11 +34,10 @@ public class User implements Serializable {
     private String[] authorities;
     private boolean isActive;
     private boolean isNotLocked;
-    private boolean isFirstLogin;
 
     public User(){}
 
-    public User(Long id, String userId, String firstName, String lastName, String username, String password, String email, String profileImageUrl, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, boolean isActive, boolean isNotLocked, boolean isFirstLogin) {
+    public User(Long id, String userId, String firstName, String lastName, String username, String password, String email, String profileImageUrl, String fileName, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, boolean isActive, boolean isNotLocked) {
         this.id = id;
         this.userId = userId;
         this.firstName = firstName;
@@ -46,6 +46,7 @@ public class User implements Serializable {
         this.password = password;
         this.email = email;
         this.profileImageUrl = profileImageUrl;
+        this.fileName = fileName;
         this.lastLoginDate = lastLoginDate;
         this.lastLoginDateDisplay = lastLoginDateDisplay;
         this.joinDate = joinDate;
@@ -53,7 +54,6 @@ public class User implements Serializable {
         this.authorities = authorities;
         this.isActive = isActive;
         this.isNotLocked = isNotLocked;
-        this.isFirstLogin = isFirstLogin;
     }
 
     public Long getId() {
@@ -120,6 +120,14 @@ public class User implements Serializable {
         this.profileImageUrl = profileImageUrl;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
     public Date getLastLoginDate() {
         return lastLoginDate;
     }
@@ -174,14 +182,6 @@ public class User implements Serializable {
 
     public void setNotLocked(boolean notLocked) {
         isNotLocked = notLocked;
-    }
-
-    public boolean isFirstLogin() {
-        return isFirstLogin;
-    }
-
-    public void setFirstLogin(boolean firstLogin) {
-        isFirstLogin = firstLogin;
     }
 }
 

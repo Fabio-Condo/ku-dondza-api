@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -41,7 +42,17 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<Post> findAll(Pageable pageable) {
-        return postRepository.findAll(pageable);
+
+        Page<Post> postsPage = postRepository.findAll(pageable);
+
+        // Filtrar apenas os comentários principais (parentComment == null)
+        postsPage.forEach(post -> {
+            post.setComments(post.getComments().stream()
+                    .filter(comment -> comment.getParentComment() == null)
+                    .collect(Collectors.toList()));
+        });
+
+        return postsPage;
     }
 
     @Override

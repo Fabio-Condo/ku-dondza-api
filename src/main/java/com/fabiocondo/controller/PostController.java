@@ -19,7 +19,6 @@ import java.io.IOException;
 @RequestMapping(path = {"/post"})
 public class PostController{
 
-    public static final String POST_DELETED_SUCCESSFULLY = "Post deleted successfully";
     @Autowired
     PostServiceImpl postServiceImpl;
 
@@ -51,7 +50,7 @@ public class PostController{
 
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws PostNotFoundException {
         postServiceImpl.delete(id);
-        return response(HttpStatus.OK, POST_DELETED_SUCCESSFULLY);
+        return response(HttpStatus.OK, "Post deleted successfully");
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

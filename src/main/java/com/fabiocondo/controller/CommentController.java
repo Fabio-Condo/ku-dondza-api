@@ -1,8 +1,13 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.Comment;
+import com.fabiocondo.domain.HttpResponse;
+import com.fabiocondo.exception.domain.CommentNotFoundException;
+import com.fabiocondo.exception.domain.PostNotFoundException;
 import com.fabiocondo.service.impl.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,12 +24,19 @@ public class CommentController {
     }
 
     @PostMapping
-    public Comment createComment(@RequestBody Comment comment) {
-        return commentService.saveComment(comment);
+    public ResponseEntity<Comment> createComment(@RequestBody Comment comment) {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.saveComment(comment));
+    }
+
+    @PostMapping("/v2")
+    public ResponseEntity<Comment> createComment(@RequestParam("postId") Long postId,
+                                                 @RequestParam("parentCommentId") Long parentCommentId,
+                                                 @RequestParam("content") String content) throws PostNotFoundException, CommentNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.saveComment(postId, parentCommentId, content));
     }
 
     @GetMapping("/post/{postId}")
-    public List<Comment> getCommentsByPostId(@PathVariable Long postId) {
-        return commentService.getCommentsByPostId(postId);
+    public ResponseEntity<List<Comment>> getCommentsByPostId(@PathVariable Long postId) {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getCommentsByPostId(postId));
     }
 }

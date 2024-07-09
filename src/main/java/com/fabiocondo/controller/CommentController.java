@@ -4,6 +4,7 @@ import com.fabiocondo.domain.Comment;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.exception.domain.CommentNotFoundException;
 import com.fabiocondo.exception.domain.PostNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,14 +25,14 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<Comment> createComment(@RequestBody Comment comment) {
+    public ResponseEntity<Comment> createComment(@RequestBody Comment comment) throws UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.saveComment(comment));
     }
 
     @PostMapping("/v2")
     public ResponseEntity<Comment> createComment(@RequestParam("postId") Long postId,
                                                  @RequestParam("parentCommentId") Long parentCommentId,
-                                                 @RequestParam("content") String content) throws PostNotFoundException, CommentNotFoundException {
+                                                 @RequestParam("content") String content) throws PostNotFoundException, CommentNotFoundException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.saveComment(postId, parentCommentId, content));
     }
 

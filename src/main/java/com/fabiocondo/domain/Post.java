@@ -1,6 +1,7 @@
 package com.fabiocondo.domain;
 
 import com.fabiocondo.enumeration.PostType;
+import com.fabiocondo.security.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -25,13 +26,15 @@ public class Post implements Serializable {
     @JsonProperty("type")
     private PostType type;
 
-    private String imageUrl;
-
     private Date date;
 
     private String fileName;
 
     private String urlFile;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @JsonIgnoreProperties({"post"})
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -61,14 +64,6 @@ public class Post implements Serializable {
         this.type = type;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
     public Date getDate() {
         return date;
     }
@@ -91,6 +86,14 @@ public class Post implements Serializable {
 
     public void setUrlFile(String urlFile) {
         this.urlFile = urlFile;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public List<Comment> getComments() {

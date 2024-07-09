@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -262,6 +264,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public List<User> getUsers() {
         return userRepository.findAll();
+    }
+
+    public User getAuthenticatedUser() throws UserNotFoundException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        User user = userRepository.findUserByUsername(username);
+        if(user == null){
+            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
+        }
+        logger.info(FOUND_USER_BY_USERNAME + username);
+        return userRepository.findUserByUsername(username);
     }
 
 }

@@ -2,6 +2,7 @@ package com.fabiocondo.service;
 
 import com.fabiocondo.domain.Post;
 import com.fabiocondo.exception.domain.PostNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,7 +12,7 @@ public interface PostService {
 
     Page<Post> findAll(Pageable pageable);
 
-    Post save(String text, MultipartFile file);
+    Post save(String text, MultipartFile file) throws UserNotFoundException;
 
     Post update(Long id, String text, MultipartFile file) throws PostNotFoundException;
 

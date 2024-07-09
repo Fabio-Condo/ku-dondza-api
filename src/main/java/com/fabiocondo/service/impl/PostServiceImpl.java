@@ -4,6 +4,7 @@ import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Post;
 import com.fabiocondo.exception.domain.PostNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.PostRepository;
 import com.fabiocondo.service.PostService;
 import org.slf4j.Logger;
@@ -29,9 +30,13 @@ public class PostServiceImpl implements PostService {
     @Autowired
     public PostRepository postRepository;
 
-    public PostServiceImpl(AmazonS3Service amazonS3Service, PostRepository postRepository) {
+    @Autowired
+    private UserServiceImpl userService;
+
+    public PostServiceImpl(AmazonS3Service amazonS3Service, PostRepository postRepository, UserServiceImpl userService) {
         this.amazonS3Service = amazonS3Service;
         this.postRepository = postRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -56,7 +61,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post save(String text, MultipartFile file) {
+    public Post save(String text, MultipartFile file) throws UserNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
@@ -65,6 +70,7 @@ public class PostServiceImpl implements PostService {
         post.setUrlFile(s3UploadResponse.getFileUrl());
         post.setFileName(file.getOriginalFilename());
         post.setDate(new Date());
+        post.setUser(userService.getAuthenticatedUser());
 
         logger.info("Saving new post: " + post.getText());
         return postRepository.save(post);

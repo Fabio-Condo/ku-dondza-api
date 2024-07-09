@@ -8,7 +8,6 @@ import com.fabiocondo.security.User;
 import com.fabiocondo.security.UserPrincipal;
 import com.fabiocondo.security.utility.JWTTokenProvider;
 import com.fabiocondo.service.UserService;
-import com.fabiocondo.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

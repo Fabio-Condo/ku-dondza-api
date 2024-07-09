@@ -3,6 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.NotAnImageFileException;
 import com.fabiocondo.exception.domain.PostNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.PostServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,7 +35,7 @@ public class PostController{
 
     @PostMapping("/add")
     public ResponseEntity<Post> save(@RequestParam("text") String text,
-                                       @RequestParam(value = "file", required = false) MultipartFile file) {
+                                       @RequestParam(value = "file", required = false) MultipartFile file) throws UserNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(postServiceImpl.save(text, file));
     }

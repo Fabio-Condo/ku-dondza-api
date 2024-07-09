@@ -4,6 +4,7 @@ import com.fabiocondo.domain.Comment;
 import com.fabiocondo.domain.Post;
 import com.fabiocondo.exception.domain.CommentNotFoundException;
 import com.fabiocondo.exception.domain.PostNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.CommentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +22,15 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     @Autowired
-    private PostServiceImpl postService;
+    private final PostServiceImpl postService;
 
-    public CommentService(CommentRepository commentRepository, PostServiceImpl postService) {
+    @Autowired
+    private final UserServiceImpl userService;
+
+    public CommentService(CommentRepository commentRepository, PostServiceImpl postService, UserServiceImpl userService) {
         this.commentRepository = commentRepository;
         this.postService = postService;
+        this.userService = userService;
     }
 
     public Comment findById(Long id) throws CommentNotFoundException {
@@ -34,17 +39,19 @@ public class CommentService {
                 .orElseThrow(() -> new CommentNotFoundException("No comment found by id: " + id));
     }
 
-    public Comment saveComment(Comment comment) {
+    public Comment saveComment(Comment comment) throws UserNotFoundException {
+        comment.setUser(userService.getAuthenticatedUser());
         return commentRepository.save(comment);
     }
 
-    public Comment saveComment(Long postId, Long parentCommentId, String content) throws CommentNotFoundException, PostNotFoundException {
+    public Comment saveComment(Long postId, Long parentCommentId, String content) throws CommentNotFoundException, PostNotFoundException, UserNotFoundException {
         Post post = postService.findById(postId);
         Comment parentComment = findById(parentCommentId);
         Comment comment = new Comment();
         comment.setPost(post);
         comment.setParentComment(parentComment);
         comment.setContent(content);
+        comment.setUser(userService.getAuthenticatedUser());
         return commentRepository.save(comment);
     }
 

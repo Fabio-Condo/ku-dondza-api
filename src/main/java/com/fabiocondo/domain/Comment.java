@@ -1,9 +1,11 @@
 package com.fabiocondo.domain;
 
 
+import com.fabiocondo.security.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 @Entity
 @Table(name = "comment")
@@ -18,6 +20,11 @@ public class Comment {
     @JsonIgnoreProperties("comments")
     @JoinColumn(name = "post_id")
     private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer"})
+    private User user;
 
     @ManyToOne
     @JsonIgnoreProperties({"replies", "post"})
@@ -51,6 +58,14 @@ public class Comment {
 
     public void setPost(Post post) {
         this.post = post;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Comment getParentComment() {

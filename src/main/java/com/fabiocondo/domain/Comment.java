@@ -2,19 +2,25 @@ package com.fabiocondo.domain;
 
 
 import com.fabiocondo.security.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import java.util.Date;
 import java.util.List;
+
 @Entity
 @Table(name = "comment")
 public class Comment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String content;
+
+    @JsonFormat(pattern = "dd/MM/yyyy")
+    private Date date;
 
     @ManyToOne
     @JsonIgnoreProperties("comments")
@@ -50,6 +56,14 @@ public class Comment {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public Post getPost() {

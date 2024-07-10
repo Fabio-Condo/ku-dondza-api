@@ -14,25 +14,39 @@ public class User implements Serializable {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, updatable = false)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
+
     private String userId;
+
     private String firstName;
+
     private String lastName;
+
     private String username;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
     private String email;
+
     private String profileImageUrl;
+
     private String fileName;
+
     private Date lastLoginDate;
+
     private Date lastLoginDateDisplay;
+
     private Date joinDate;
 
     private String role; //ROLE_USER{ read, edit }, ROLE_ADMIN {delete}
+
     @Column(length = 1000)
     private String[] authorities;
+
     private boolean isActive;
+
     private boolean isNotLocked;
 
     public User(){}

@@ -1,8 +1,6 @@
 package com.fabiocondo.domain;
 
-import com.fabiocondo.enumeration.PostType;
 import com.fabiocondo.security.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -23,9 +21,6 @@ public class Post implements Serializable {
 
     private String text;
 
-    @JsonProperty("type")
-    private PostType type;
-
     private Date date;
 
     private String fileName;
@@ -35,6 +30,10 @@ public class Post implements Serializable {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @JsonIgnoreProperties({"post"})
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Like> likes;
 
     @JsonIgnoreProperties({"post"})
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -54,14 +53,6 @@ public class Post implements Serializable {
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public PostType getType() {
-        return type;
-    }
-
-    public void setType(PostType type) {
-        this.type = type;
     }
 
     public Date getDate() {
@@ -94,6 +85,14 @@ public class Post implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<Like> likes) {
+        this.likes = likes;
     }
 
     public List<Comment> getComments() {

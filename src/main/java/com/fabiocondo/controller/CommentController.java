@@ -1,7 +1,6 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.Comment;
-import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.exception.domain.CommentNotFoundException;
 import com.fabiocondo.exception.domain.PostNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;

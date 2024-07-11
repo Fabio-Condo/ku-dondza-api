@@ -1,6 +1,5 @@
 package com.fabiocondo.domain;
 
-import com.fabiocondo.security.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

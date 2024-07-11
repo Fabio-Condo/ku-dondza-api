@@ -2,7 +2,7 @@ package com.fabiocondo.repository;
 
 import com.fabiocondo.domain.Like;
 import com.fabiocondo.domain.Post;
-import com.fabiocondo.security.User;
+import com.fabiocondo.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

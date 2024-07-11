@@ -1,6 +1,6 @@
 package com.fabiocondo.security.listener;
 
-import com.fabiocondo.security.UserPrincipal;
+import com.fabiocondo.domain.UserPrincipal;
 import com.fabiocondo.security.service.LoginAttemptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;

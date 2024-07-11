@@ -1,6 +1,6 @@
 package com.fabiocondo.domain;
 
-import com.fabiocondo.security.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -38,6 +38,9 @@ public class Post implements Serializable {
     @JsonIgnoreProperties({"post"})
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments;
+
+    //@ManyToMany(mappedBy = "savedPosts")
+    //private Set<User> usersWhoSaved = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -102,4 +105,12 @@ public class Post implements Serializable {
     public void setComments(List<Comment> comments) {
         this.comments = comments;
     }
+
+    //public Set<User> getUsersWhoSaved() {
+    //    return usersWhoSaved;
+    //}
+
+    //public void setUsersWhoSaved(Set<User> usersWhoSaved) {
+    //    this.usersWhoSaved = usersWhoSaved;
+    //}
 }

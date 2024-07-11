@@ -1,10 +1,10 @@
 package com.fabiocondo.service;
 
-import com.fabiocondo.exception.domain.EmailExistException;
-import com.fabiocondo.exception.domain.EmailNotFoundException;
-import com.fabiocondo.exception.domain.UserNotFoundException;
-import com.fabiocondo.exception.domain.UsernameExistException;
-import com.fabiocondo.security.User;
+import com.fabiocondo.domain.Post;
+import com.fabiocondo.exception.domain.*;
+import com.fabiocondo.domain.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,4 +35,14 @@ public interface UserService {
     User findUserByEmail(String email);
 
     List<User> getUsers();
+
+    User addPostToSavedPosts(Long userId, Long postId) throws PostNotFoundException;
+
+    User removePostFromSavedPosts(Long userId, Long postId) throws PostNotFoundException;
+
+    List<Post> getSavedPosts(Long id) throws UserNotFoundException;
+
+    Page<Post> getSavedPostsPaginated(Long id, Pageable pageable) throws UserNotFoundException;
+
+    boolean doesUserSavedPost(Long userId, Long postId);
 }

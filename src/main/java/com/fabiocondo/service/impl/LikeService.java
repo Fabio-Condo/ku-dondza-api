@@ -6,7 +6,7 @@ import com.fabiocondo.exception.domain.PostNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.LikeRepository;
 import com.fabiocondo.repository.PostRepository;
-import com.fabiocondo.security.User;
+import com.fabiocondo.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -4,6 +4,7 @@ import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.NotAnImageFileException;
 import com.fabiocondo.exception.domain.PostNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.domain.User;
 import com.fabiocondo.service.impl.PostServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

@@ -2,13 +2,16 @@ package com.fabiocondo.controller;
 
 
 import com.fabiocondo.domain.HttpResponse;
+import com.fabiocondo.domain.Post;
 import com.fabiocondo.exception.ExceptionHandling;
 import com.fabiocondo.exception.domain.*;
-import com.fabiocondo.security.User;
-import com.fabiocondo.security.UserPrincipal;
+import com.fabiocondo.domain.User;
+import com.fabiocondo.domain.UserPrincipal;
 import com.fabiocondo.security.utility.JWTTokenProvider;
 import com.fabiocondo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -125,6 +128,43 @@ public class UserController extends ExceptionHandling {
     @PreAuthorize("hasAnyAuthority('user:update')")
     public void updatePropertyNotLocked(@PathVariable("newUsername") String newUsername, @RequestBody Boolean notLocked) throws UsernameNotFoundException {
         userService.updatePropertyNotLocked(newUsername, notLocked);
+    }
+
+    @PostMapping("/{userId}/savedPosts/{postId}")
+    public ResponseEntity<User> addPostToSavedPosts(@PathVariable Long userId, @PathVariable Long postId) throws PostNotFoundException {
+        User user = userService.addPostToSavedPosts(userId, postId);
+        return ResponseEntity.ok(user);
+    }
+
+    @DeleteMapping("/{userId}/savedPosts/{postId}")
+    public ResponseEntity<User> removePostFromSavedPosts(@PathVariable Long userId, @PathVariable Long postId) {
+        try {
+            User user = userService.removePostFromSavedPosts(userId, postId);
+            return ResponseEntity.ok(user);
+        } catch (PostNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/{userId}/savedPosts")
+    public ResponseEntity<List<Post>> getSavedPosts(@PathVariable Long userId) throws UserNotFoundException {
+        List<Post> savedPosts = userService.getSavedPosts(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(savedPosts);
+    }
+
+    @GetMapping("/{userId}/savedPostsPaginated")
+    public ResponseEntity<Page<Post>> getSavedPostsPaginated(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
+        Page<Post> savedPostsPage = userService.getSavedPostsPaginated(userId, pageable);
+        if (savedPostsPage == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(savedPostsPage);
+    }
+
+    @GetMapping("/{userId}/savedPosts/contains/{postId}")
+    public ResponseEntity<Boolean> doesUserSavedPost(@PathVariable Long userId, @PathVariable Long postId) {
+        boolean doesContain = userService.doesUserSavedPost(userId, postId);
+        return ResponseEntity.ok(doesContain);
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

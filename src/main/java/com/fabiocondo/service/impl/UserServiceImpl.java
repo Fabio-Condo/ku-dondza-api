@@ -2,14 +2,13 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
+import com.fabiocondo.domain.Post;
 import com.fabiocondo.enumeration.Role;
-import com.fabiocondo.exception.domain.EmailExistException;
-import com.fabiocondo.exception.domain.EmailNotFoundException;
-import com.fabiocondo.exception.domain.UserNotFoundException;
-import com.fabiocondo.exception.domain.UsernameExistException;
+import com.fabiocondo.exception.domain.*;
+import com.fabiocondo.repository.PostRepository;
 import com.fabiocondo.repository.UserRepository;
-import com.fabiocondo.security.User;
-import com.fabiocondo.security.UserPrincipal;
+import com.fabiocondo.domain.User;
+import com.fabiocondo.domain.UserPrincipal;
 import com.fabiocondo.security.service.EmailService;
 import com.fabiocondo.security.service.LoginAttemptService;
 import com.fabiocondo.service.UserService;
@@ -19,6 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,8 +33,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static com.fabiocondo.constant.UserImplConstant.*;
 import static com.fabiocondo.enumeration.Role.ROLE_SUPER_ADMIN;
@@ -50,14 +54,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final LoginAttemptService loginAttemptService;
     private final EmailService emailService;
     private final AmazonS3Service amazonS3Service;
+    private PostRepository postRepository;
+
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, PostRepository postRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
         this.amazonS3Service = amazonS3Service;
+        this.postRepository = postRepository;
     }
 
     @Override
@@ -75,6 +82,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             logger.info(FOUND_USER_BY_USERNAME + username);
             return userPrincipal;
         }
+    }
+
+    public User findById(Long id) throws UsernameNotFoundException {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("No user found by id: " + id));
     }
 
     @Override
@@ -264,6 +276,72 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public List<User> getUsers() {
         return userRepository.findAll();
+    }
+
+    public User save(User user){
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User addPostToSavedPosts(Long userId, Long postId) throws PostNotFoundException {
+        User user = findById(userId);
+       Optional<Post> optionalPost = postRepository.findById(postId);
+       if (!optionalPost.isPresent()){
+           throw new PostNotFoundException("Post not found by id: " + postId);
+       }
+        user.getSavedPosts().add(optionalPost.get());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User removePostFromSavedPosts(Long userId, Long postId) throws PostNotFoundException {
+        User user = findById(userId);
+        Optional<Post> optionalPost = postRepository.findById(postId);
+        if (!optionalPost.isPresent()) {
+            throw new PostNotFoundException("Post not found by id: " + postId);
+        }
+        user.getSavedPosts().remove(optionalPost.get());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public List<Post> getSavedPosts(Long userId) throws UserNotFoundException {
+        User user = findById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("User not found by id: " + userId);
+        }
+        return user.getSavedPosts();
+    }
+
+    @Override
+    public Page<Post> getSavedPostsPaginated(Long id, Pageable pageable) throws UserNotFoundException {
+        User user = findById(id);
+        if (user == null) {
+            throw new UserNotFoundException("User not found by id: " + id);
+        }
+
+        List<Post> savedPosts = user.getSavedPosts();
+        if (savedPosts == null) {
+            return Page.empty(pageable);
+        }
+
+        List<Post> savedPostsList = new ArrayList<>(savedPosts);
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), savedPostsList.size());
+        return new PageImpl<>(savedPostsList.subList(start, end), pageable, savedPostsList.size());
+    }
+
+    @Override
+    public boolean doesUserSavedPost(Long userId, Long postId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+        Optional<Post> post = postRepository.findById(postId);
+        if (!post.isPresent()) {
+            return false;
+        }
+        return user.getSavedPosts().contains(post.get());
     }
 
     public User getAuthenticatedUser() throws UserNotFoundException {

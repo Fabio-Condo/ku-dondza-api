@@ -58,4 +58,8 @@ public class CommentService {
     public List<Comment> getCommentsByPostId(Long postId) {
         return commentRepository.findByPostId(postId);
     }
+
+    public Long countCommentsByPostId(Long postId) {
+        return commentRepository.countCommentsByPostId(postId);
+    }
 }

@@ -53,4 +53,8 @@ public class LikeService {
         User user = userService.getAuthenticatedUser();
         return likeRepository.existsByPostIdAndUserId(postId, user.getId());
     }
+
+    public Long countLikesByPostId(Long postId) {
+        return likeRepository.countLikesByPostId(postId);
+    }
 }

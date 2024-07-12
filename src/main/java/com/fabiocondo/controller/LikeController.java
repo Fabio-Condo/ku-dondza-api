@@ -25,4 +25,9 @@ public class LikeController {
         boolean liked = likeService.isPostLikedByUser(postId);
         return ResponseEntity.ok(liked);
     }
+
+    @GetMapping("/count/{postId}")
+    public Long countLikesByPostId(@PathVariable Long postId) {
+        return likeService.countLikesByPostId(postId);
+    }
 }

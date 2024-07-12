@@ -5,6 +5,8 @@ import com.fabiocondo.exception.domain.PostNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.LikeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,5 +31,10 @@ public class LikeController {
     @GetMapping("/count/{postId}")
     public Long countLikesByPostId(@PathVariable Long postId) {
         return likeService.countLikesByPostId(postId);
+    }
+
+    @GetMapping("/post/{postId}")
+    public Page<Like> findLikesByPostId(@PathVariable Long postId, Pageable pageable) {
+        return likeService.findLikesByPostId(postId, pageable);
     }
 }

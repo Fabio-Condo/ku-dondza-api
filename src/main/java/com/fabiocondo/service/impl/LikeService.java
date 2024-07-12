@@ -8,6 +8,8 @@ import com.fabiocondo.repository.LikeRepository;
 import com.fabiocondo.repository.PostRepository;
 import com.fabiocondo.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -56,5 +58,9 @@ public class LikeService {
 
     public Long countLikesByPostId(Long postId) {
         return likeRepository.countLikesByPostId(postId);
+    }
+
+    public Page<Like> findLikesByPostId(Long postId, Pageable pageable) {
+        return likeRepository.findByPostId(postId, pageable);
     }
 }

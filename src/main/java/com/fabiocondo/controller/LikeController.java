@@ -28,13 +28,13 @@ public class LikeController {
         return ResponseEntity.ok(liked);
     }
 
+    @GetMapping("/post/{postId}")
+    public Page<Like> getLikesByPostId(@PathVariable Long postId, Pageable pageable) {
+        return likeService.getLikesByPostId(postId, pageable);
+    }
+
     @GetMapping("/count/{postId}")
     public Long countLikesByPostId(@PathVariable Long postId) {
         return likeService.countLikesByPostId(postId);
-    }
-
-    @GetMapping("/post/{postId}")
-    public Page<Like> findLikesByPostId(@PathVariable Long postId, Pageable pageable) {
-        return likeService.findLikesByPostId(postId, pageable);
     }
 }

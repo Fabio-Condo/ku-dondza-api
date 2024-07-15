@@ -53,11 +53,11 @@ public class PostServiceImpl implements PostService {
         Page<Post> postsPage = postRepository.findAll(pageable);
 
         // Filtrar apenas os comentários principais (parentComment == null)
-        postsPage.forEach(post -> {
-            post.setComments(post.getComments().stream()
-                    .filter(comment -> comment.getParentComment() == null)
-                    .collect(Collectors.toList()));
-        });
+        //postsPage.forEach(post -> {
+        //    post.setComments(post.getComments().stream()
+        //            .filter(comment -> comment.getParentComment() == null)
+        //            .collect(Collectors.toList()));
+        //});
 
         return postsPage;
     }

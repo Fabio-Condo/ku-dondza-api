@@ -1,13 +1,16 @@
 package com.fabiocondo.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "post")
@@ -33,7 +36,7 @@ public class Post implements Serializable {
 
     @JsonIgnoreProperties({"post"})
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Like> likes;
+    private Set<Like> likes = new HashSet<>();
 
     @JsonIgnoreProperties({"post"})
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -90,21 +93,21 @@ public class Post implements Serializable {
         this.user = user;
     }
 
-    public List<Like> getLikes() {
-        return likes;
-    }
+    //public Set<Like> getLikes() {
+    //    return likes;
+    //}
 
-    public void setLikes(List<Like> likes) {
-        this.likes = likes;
-    }
+    //public void setLikes(Set<Like> likes) {
+    //    this.likes = likes;
+    //}
 
-    public List<Comment> getComments() {
-        return comments;
-    }
+    //public List<Comment> getComments() {
+    //    return comments;
+    //}
 
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
+    //public void setComments(List<Comment> comments) {
+    //    this.comments = comments;
+    //}
 
     //public Set<User> getUsersWhoSaved() {
     //    return usersWhoSaved;

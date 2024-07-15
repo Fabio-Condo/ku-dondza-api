@@ -33,10 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.fabiocondo.constant.UserImplConstant.*;
 import static com.fabiocondo.enumeration.Role.ROLE_SUPER_ADMIN;
@@ -278,6 +275,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.findAll();
     }
 
+    @Override
+    public Page<User> findAll(String name, Pageable pageable) throws UserNotFoundException {
+        return userRepository.findByAnyProperty(name, pageable);
+    }
+
     public User save(User user){
         return userRepository.save(user);
     }
@@ -342,6 +344,54 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             return false;
         }
         return user.getSavedPosts().contains(post.get());
+    }
+
+    @Override
+    public List<User> getFriendRequests() throws UserNotFoundException {
+        User user = getAuthenticatedUser();
+        return user.getFriendRequests();
+    }
+
+    @Override
+    public void sendFriendRequest(User friend) throws UserNotFoundException {
+        User user = getAuthenticatedUser();
+        User passedUser = findById(friend.getId());
+        passedUser.getFriendRequests().add(user); // Saving the request in user I passed
+        userRepository.save(passedUser);
+    }
+
+    @Override
+    public User acceptFriendRequest(Long friendId) throws UserNotFoundException {
+        User user = getAuthenticatedUser();
+        User friend = findById(friendId);
+        user.getFriendRequests().remove(friend);
+        user.getFriends().add(friend);
+        friend.getFriends().add(user);
+        userRepository.saveAll(Arrays.asList(user, friend));
+        return friend;
+    }
+
+    @Override
+    public void rejectFriendRequest(Long friendId) throws UserNotFoundException {
+        User user = getAuthenticatedUser();
+        User friend = findById(friendId);
+        user.getFriendRequests().remove(friend);
+        userRepository.save(user);
+    }
+
+    @Override
+    public List<User> getFriends() throws UserNotFoundException {
+        User user = getAuthenticatedUser();
+        return user.getFriends();
+    }
+
+    @Override
+    public void removeFriend(Long friendId) throws UserNotFoundException {
+        User user = getAuthenticatedUser();
+        User friend = findById(friendId);
+        user.getFriends().remove(friend);
+        friend.getFriends().remove(user);
+        userRepository.saveAll(Arrays.asList(user, friend));
     }
 
     public User getAuthenticatedUser() throws UserNotFoundException {

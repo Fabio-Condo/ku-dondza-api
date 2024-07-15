@@ -59,6 +59,23 @@ public class User implements Serializable {
     )
     private List<Post> savedPosts;
 
+    @ManyToMany
+    @JoinTable(
+            name = "friendship",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id")
+    )
+    @JsonBackReference // By adding both annotations in the appropriate places, you are telling Jackson how to handle the circular reference and avoid the StackOverflowError.
+    private List<User> friends = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "friend_request",
+            joinColumns = @JoinColumn(name = "to_user_id"),
+            inverseJoinColumns = @JoinColumn(name = "from_user_id")
+    )
+    private List<User> friendRequests = new ArrayList<>();
+
     public User(){}
 
     public User(Long id, String userId, String firstName, String lastName, String username, String password, String email, String profileImageUrl, String fileName, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, boolean isActive, boolean isNotLocked) {
@@ -216,6 +233,20 @@ public class User implements Serializable {
         this.savedPosts = savedPosts;
     }
 
+    public List<User> getFriends() {
+        return friends;
+    }
 
+    public void setFriends(List<User> friends) {
+        this.friends = friends;
+    }
+
+    public List<User> getFriendRequests() {
+        return friendRequests;
+    }
+
+    public void setFriendRequests(List<User> friendRequests) {
+        this.friendRequests = friendRequests;
+    }
 }
 

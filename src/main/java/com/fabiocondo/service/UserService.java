@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 public interface UserService {
 
@@ -36,6 +37,8 @@ public interface UserService {
 
     List<User> getUsers();
 
+    Page<User> findAll(String name, Pageable pageable) throws UserNotFoundException;
+
     User addPostToSavedPosts(Long userId, Long postId) throws PostNotFoundException;
 
     User removePostFromSavedPosts(Long userId, Long postId) throws PostNotFoundException;
@@ -45,4 +48,16 @@ public interface UserService {
     Page<Post> getSavedPostsPaginated(Long id, Pageable pageable) throws UserNotFoundException;
 
     boolean doesUserSavedPost(Long userId, Long postId);
+
+    List<User> getFriendRequests() throws UserNotFoundException;
+
+    void sendFriendRequest(User friend) throws UserNotFoundException;
+
+    User acceptFriendRequest(Long friendId) throws UserNotFoundException;
+
+    void rejectFriendRequest(Long friendId) throws UserNotFoundException;
+
+    List<User> getFriends() throws UserNotFoundException;
+
+    void removeFriend(Long friendId) throws UserNotFoundException;
 }

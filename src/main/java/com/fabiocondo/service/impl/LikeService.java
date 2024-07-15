@@ -60,7 +60,7 @@ public class LikeService {
         return likeRepository.countLikesByPostId(postId);
     }
 
-    public Page<Like> findLikesByPostId(Long postId, Pageable pageable) {
+    public Page<Like> getLikesByPostId(Long postId, Pageable pageable) {
         return likeRepository.findByPostId(postId, pageable);
     }
 }

@@ -99,6 +99,11 @@ public class UserController extends ExceptionHandling {
         return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
+    @GetMapping("/list/pageable")
+    public Page<User> findAll(@RequestParam(required = false, defaultValue = "") String name, Pageable pageable) throws UserNotFoundException {
+        return userService.findAll(name, pageable);
+    }
+
     @GetMapping("/resetpassword/{email}")
     public ResponseEntity<HttpResponse> resetPassword(@PathVariable("email") String email) throws MessagingException, EmailNotFoundException {
         userService.resetPassword(email);
@@ -132,18 +137,12 @@ public class UserController extends ExceptionHandling {
 
     @PostMapping("/{userId}/savedPosts/{postId}")
     public ResponseEntity<User> addPostToSavedPosts(@PathVariable Long userId, @PathVariable Long postId) throws PostNotFoundException {
-        User user = userService.addPostToSavedPosts(userId, postId);
-        return ResponseEntity.ok(user);
+        return ResponseEntity.status(HttpStatus.OK).body(userService.addPostToSavedPosts(userId, postId));
     }
 
     @DeleteMapping("/{userId}/savedPosts/{postId}")
-    public ResponseEntity<User> removePostFromSavedPosts(@PathVariable Long userId, @PathVariable Long postId) {
-        try {
-            User user = userService.removePostFromSavedPosts(userId, postId);
-            return ResponseEntity.ok(user);
-        } catch (PostNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<User> removePostFromSavedPosts(@PathVariable Long userId, @PathVariable Long postId) throws PostNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.removePostFromSavedPosts(userId, postId));
     }
 
     @GetMapping("/{userId}/savedPosts")
@@ -155,16 +154,43 @@ public class UserController extends ExceptionHandling {
     @GetMapping("/{userId}/savedPostsPaginated")
     public ResponseEntity<Page<Post>> getSavedPostsPaginated(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
         Page<Post> savedPostsPage = userService.getSavedPostsPaginated(userId, pageable);
-        if (savedPostsPage == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(savedPostsPage);
+        return ResponseEntity.status(HttpStatus.OK).body(savedPostsPage);
     }
 
     @GetMapping("/{userId}/savedPosts/contains/{postId}")
     public ResponseEntity<Boolean> doesUserSavedPost(@PathVariable Long userId, @PathVariable Long postId) {
         boolean doesContain = userService.doesUserSavedPost(userId, postId);
-        return ResponseEntity.ok(doesContain);
+        return ResponseEntity.status(HttpStatus.OK).body(doesContain);
+    }
+
+    @GetMapping("/friend-requests")
+    public ResponseEntity<List<User>> getFriendRequests() throws UserNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getFriendRequests());
+    }
+
+    @PostMapping("/send-friend-request")
+    public void sendFriendRequest(@RequestBody User friend) throws UserNotFoundException {
+        userService.sendFriendRequest(friend);
+    }
+
+    @PostMapping("/accept-friend-requests/{friendId}")
+    public User acceptFriendRequest(@PathVariable Long friendId) throws UserNotFoundException {
+        return userService.acceptFriendRequest(friendId);
+    }
+
+    @DeleteMapping("/reject-friend-requests/{friendId}")
+    public void rejectFriendRequest(@PathVariable Long friendId) throws UserNotFoundException {
+        userService.rejectFriendRequest(friendId);
+    }
+
+    @GetMapping("/friends")
+    public List<User> getFriends() throws UserNotFoundException {
+        return userService.getFriends();
+    }
+
+    @DeleteMapping("/friends/{friendId}")
+    public void removeFriend(@PathVariable Long friendId) throws UserNotFoundException {
+        userService.removeFriend(friendId);
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

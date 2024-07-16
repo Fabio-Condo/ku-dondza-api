@@ -33,6 +33,8 @@ public interface UserService {
 
     User findUserByUsername(String username);
 
+    User findUserByUserId(String userId);
+
     User findUserByEmail(String email);
 
     List<User> getUsers();

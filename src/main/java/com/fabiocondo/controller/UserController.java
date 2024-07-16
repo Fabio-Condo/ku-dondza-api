@@ -93,6 +93,12 @@ public class UserController extends ExceptionHandling {
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
+    @GetMapping("/find-by-user-id/{userId}")
+    public ResponseEntity<User> getUserByUserId(@PathVariable("userId") String userId) {
+        User user = userService.findUserByUserId(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(user);
+    }
+
     @GetMapping("/list")
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users = userService.getUsers();

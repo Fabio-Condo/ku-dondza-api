@@ -65,7 +65,7 @@ public class User implements Serializable {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
-    @JsonBackReference // By adding both annotations in the appropriate places, you are telling Jackson how to handle the circular reference and avoid the StackOverflowError.
+    @JsonIgnore
     private List<User> friends = new ArrayList<>();
 
     @ManyToMany
@@ -74,7 +74,7 @@ public class User implements Serializable {
             joinColumns = @JoinColumn(name = "to_user_id"),
             inverseJoinColumns = @JoinColumn(name = "from_user_id")
     )
-    @JsonBackReference // By adding both annotations in the appropriate places, you are telling Jackson how to handle the circular reference and avoid the StackOverflowError.
+    @JsonIgnore
     private List<User> friendRequests = new ArrayList<>();
 
     public User(){}

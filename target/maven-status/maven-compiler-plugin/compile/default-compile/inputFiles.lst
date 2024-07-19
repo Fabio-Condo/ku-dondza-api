@@ -1,3 +1,4 @@
+C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\domain\User.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\exception\domain\InstituicaoNotFoundException.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\repository\impl\InstitutionRepositoryImpl.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\security\utility\JWTTokenProvider.java
@@ -9,7 +10,6 @@ C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\service\impl\TeacherSer
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\repository\ExameRepository.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\service\impl\PostServiceImpl.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\constant\EmailConstant.java
-C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\security\User.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\service\impl\ExameServiceImpl.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\exception\domain\PostNotFoundException.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\exception\domain\CombinationExistException.java
@@ -19,7 +19,6 @@ C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\repository\UserReposito
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\exception\domain\CourseNotFoundException.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\repository\CourseRepository.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\domain\Institution.java
-C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\security\UserPrincipal.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\aws\controller\AmazonS3Controller.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\service\UserService.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\exception\domain\TeacherNotFoundException.java
@@ -37,6 +36,7 @@ C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\repository\SubjectRepos
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\controller\CommentController.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\repository\filter\ExameFilter.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\domain\Like.java
+C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\domain\UserPrincipal.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\enumeration\AdministrationType.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\repository\PostRepository.java
 C:\Users\user\ku-dondza-api\src\main\java\com\fabiocondo\repository\query\InstitutionRepositoryQuery.java

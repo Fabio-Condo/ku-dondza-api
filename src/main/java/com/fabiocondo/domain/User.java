@@ -1,6 +1,5 @@
 package com.fabiocondo.domain;
 
-import com.fabiocondo.domain.Post;
 import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
@@ -26,6 +25,8 @@ public class User implements Serializable {
 
     private String username;
 
+    private String bio;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -34,6 +35,10 @@ public class User implements Serializable {
     private String profileImageUrl;
 
     private String fileName;
+
+    private String profileCoverImageUrl;
+
+    private String fileNameCoverImage;
 
     private Date lastLoginDate;
 
@@ -79,12 +84,13 @@ public class User implements Serializable {
 
     public User(){}
 
-    public User(Long id, String userId, String firstName, String lastName, String username, String password, String email, String profileImageUrl, String fileName, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, boolean isActive, boolean isNotLocked) {
+    public User(Long id, String userId, String firstName, String lastName, String username, String bio, String password, String email, String profileImageUrl, String fileName, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, boolean isActive, boolean isNotLocked) {
         this.id = id;
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
+        this.bio = bio;
         this.password = password;
         this.email = email;
         this.profileImageUrl = profileImageUrl;
@@ -138,6 +144,14 @@ public class User implements Serializable {
         this.username = username;
     }
 
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -164,6 +178,22 @@ public class User implements Serializable {
 
     public String getFileName() {
         return fileName;
+    }
+
+    public String getProfileCoverImageUrl() {
+        return profileCoverImageUrl;
+    }
+
+    public void setProfileCoverImageUrl(String profileCoverImageUrl) {
+        this.profileCoverImageUrl = profileCoverImageUrl;
+    }
+
+    public String getFileNameCoverImage() {
+        return fileNameCoverImage;
+    }
+
+    public void setFileNameCoverImage(String fileNameCoverImage) {
+        this.fileNameCoverImage = fileNameCoverImage;
     }
 
     public void setFileName(String fileName) {

@@ -16,6 +16,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -159,6 +160,68 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
             currentUser.setFileName(profileImage.getOriginalFilename());
         }
+
+        userRepository.save(currentUser);
+        return currentUser;
+    }
+
+    @Override
+    public User update(User user, Long id) throws CourseNotFoundException {
+        User existUser = findById(id);
+        BeanUtils.copyProperties(user, existUser, "id", "password");
+        logger.info("Updating user: " + user.getFirstName());
+        return userRepository.save(existUser);
+    }
+
+    @Override
+    public User updateUserProfilePhoto(String currentUsername, MultipartFile profileImage) throws IOException {
+        // Adicionar funcao que diminue o tamanho da imagem
+
+        User currentUser = userRepository.findUserByUsername(currentUsername);
+        if (currentUser == null) {
+            throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME + currentUsername);
+        }
+
+        if (profileImage == null || profileImage.isEmpty()) {
+            throw new IOException("The file is null or empty");
+        }
+
+        // Deleta o arquivo antigo do S3
+        if (currentUser.getFileName() != null) {
+            logger.info("Deleting file: " + currentUser.getFileName());
+            amazonS3Service.deleteFile(currentUser.getFileName(), BUCKET_NAME);
+        }
+
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
+        currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
+        currentUser.setFileName(profileImage.getOriginalFilename());
+
+        userRepository.save(currentUser);
+        return currentUser;
+    }
+
+    @Override
+    public User updateUserProfileCoverPhoto(String currentUsername, MultipartFile coverImage) throws IOException {
+        // Adicionar funcao que diminue o tamanho da imagem
+
+        User currentUser = userRepository.findUserByUsername(currentUsername);
+        if (currentUser == null) {
+            throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME + currentUsername);
+        }
+
+        if (coverImage == null || coverImage.isEmpty()) {
+            throw new IOException("The file is null or empty");
+        }
+
+        // Deleta o arquivo antigo do S3
+        if (currentUser.getFileNameCoverImage() != null) {
+            logger.info("Deleting file: " + currentUser.getFileNameCoverImage());
+            amazonS3Service.deleteFile(currentUser.getFileNameCoverImage(), BUCKET_NAME);
+        }
+
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(coverImage, BUCKET_NAME);
+        currentUser.setProfileCoverImageUrl(s3UploadResponse.getFileUrl());
+        currentUser.setFileNameCoverImage(coverImage.getOriginalFilename());
 
         userRepository.save(currentUser);
         return currentUser;

@@ -1,12 +1,9 @@
 package com.fabiocondo.controller;
 
 
-import com.fabiocondo.domain.HttpResponse;
-import com.fabiocondo.domain.Post;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.ExceptionHandling;
 import com.fabiocondo.exception.domain.*;
-import com.fabiocondo.domain.User;
-import com.fabiocondo.domain.UserPrincipal;
 import com.fabiocondo.security.utility.JWTTokenProvider;
 import com.fabiocondo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +82,21 @@ public class UserController extends ExceptionHandling {
                                        @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
         User updatedUser = userService.updateUser(currentUsername, firstName, lastName, username,email, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> update(@PathVariable("id") Long id, @RequestBody User user) throws CourseNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.update(user, id));
+    }
+
+    @PostMapping("/{userId}/profile-photo")
+    public ResponseEntity<User> updateProfilePhoto(@PathVariable String userId, @RequestParam("file") MultipartFile file) throws IOException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserProfilePhoto(userId, file));
+    }
+
+    @PostMapping("/{userId}/cover-photo")
+    public ResponseEntity<User> updateUserProfileCoverPhoto(@PathVariable String userId, @RequestParam("file") MultipartFile file) throws IOException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserProfileCoverPhoto(userId, file));
     }
     
     @GetMapping("/find/{username}")

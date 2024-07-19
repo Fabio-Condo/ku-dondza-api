@@ -36,7 +36,6 @@ com\fabiocondo\service\TeacherService.class
 com\fabiocondo\service\impl\PostServiceImpl.class
 com\fabiocondo\exception\domain\PostNotFoundException.class
 com\fabiocondo\exception\domain\CommentNotFoundException.class
-com\fabiocondo\security\User.class
 com\fabiocondo\domain\Post.class
 com\fabiocondo\security\service\LoginAttemptService$1.class
 com\fabiocondo\enumeration\Role.class
@@ -48,7 +47,6 @@ com\fabiocondo\domain\Exame.class
 com\fabiocondo\domain\Subject.class
 com\fabiocondo\exception\domain\NotAnImageFileException.class
 com\fabiocondo\security\filter\JwtAccessDeniedHandler.class
-com\fabiocondo\security\UserPrincipal.class
 com\fabiocondo\repository\InstitutionRepository.class
 com\fabiocondo\controller\CourseController.class
 com\fabiocondo\service\impl\UserServiceImpl.class
@@ -82,6 +80,8 @@ com\fabiocondo\aws\config\AmazonS3Config.class
 com\fabiocondo\enumeration\AdministrationType.class
 com\fabiocondo\exception\domain\UserNotFoundException.class
 com\fabiocondo\security\listener\AuthenticationFailureListener.class
+com\fabiocondo\domain\User.class
+com\fabiocondo\domain\UserPrincipal.class
 com\fabiocondo\aws\controller\AmazonS3Controller.class
 com\fabiocondo\aws\service\AmazonS3Service.class
 com\fabiocondo\exception\domain\SubjectNotFoundException.class

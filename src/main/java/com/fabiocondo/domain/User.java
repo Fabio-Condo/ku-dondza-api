@@ -82,6 +82,14 @@ public class User implements Serializable {
     @JsonIgnore
     private List<User> friendRequests = new ArrayList<>();
 
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(
+            name = "user_interest",
+            joinColumns = @JoinColumn(name = "interest_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<Interest> interests = new HashSet<>();
+
     public User(){}
 
     public User(Long id, String userId, String firstName, String lastName, String username, String bio, String password, String email, String profileImageUrl, String fileName, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, boolean isActive, boolean isNotLocked) {
@@ -278,6 +286,14 @@ public class User implements Serializable {
 
     public void setFriendRequests(List<User> friendRequests) {
         this.friendRequests = friendRequests;
+    }
+
+    public void setInterests(Set<Interest> interests) {
+        this.interests = interests;
+    }
+
+    public Set<Interest> getInterests() {
+        return interests;
     }
 }
 

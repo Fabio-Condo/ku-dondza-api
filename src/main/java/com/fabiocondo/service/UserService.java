@@ -47,6 +47,10 @@ public interface UserService {
 
     Page<User> findAll(String name, Pageable pageable) throws UserNotFoundException;
 
+    User addInterestToUserInterests(Long userId, Long postId) throws InterestNotFoundException;
+
+    User removeInterestFromUserInterests(Long userId, Long postId) throws InterestNotFoundException;
+
     User addPostToSavedPosts(Long userId, Long postId) throws PostNotFoundException;
 
     User removePostFromSavedPosts(Long userId, Long postId) throws PostNotFoundException;

@@ -70,7 +70,7 @@ public class UserController extends ExceptionHandling {
         return ResponseEntity.status(HttpStatus.OK).body(newUser);
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<User> update(@RequestParam("currentUsername") String currentUsername,
                                        @RequestParam("firstName") String firstName,
                                        @RequestParam("lastName") String lastName,
@@ -151,6 +151,16 @@ public class UserController extends ExceptionHandling {
     @PreAuthorize("hasAnyAuthority('user:update')")
     public void updatePropertyNotLocked(@PathVariable("newUsername") String newUsername, @RequestBody Boolean notLocked) throws UsernameNotFoundException {
         userService.updatePropertyNotLocked(newUsername, notLocked);
+    }
+
+    @PostMapping("/{userId}/interests/{interestId}")
+    public ResponseEntity<User> addInterestToUserInterests(@PathVariable Long userId, @PathVariable Long interestId) throws InterestNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.addInterestToUserInterests(userId, interestId));
+    }
+
+    @DeleteMapping("/{userId}/interests/{interestId}")
+    public ResponseEntity<User> removeInterestFromUserInterests(@PathVariable Long userId, @PathVariable Long interestId) throws InterestNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.removeInterestFromUserInterests(userId, interestId));
     }
 
     @PostMapping("/{userId}/savedPosts/{postId}")

@@ -2,9 +2,11 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
+import com.fabiocondo.domain.Interest;
 import com.fabiocondo.domain.Post;
 import com.fabiocondo.enumeration.Role;
 import com.fabiocondo.exception.domain.*;
+import com.fabiocondo.repository.InterestRepository;
 import com.fabiocondo.repository.PostRepository;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.domain.User;
@@ -52,17 +54,21 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final LoginAttemptService loginAttemptService;
     private final EmailService emailService;
     private final AmazonS3Service amazonS3Service;
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
+
+    private final InterestRepository interestRepository;
+
 
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, PostRepository postRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, PostRepository postRepository, InterestRepository interestRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
         this.amazonS3Service = amazonS3Service;
         this.postRepository = postRepository;
+        this.interestRepository = interestRepository;
     }
 
     @Override
@@ -166,7 +172,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User update(User user, Long id) throws CourseNotFoundException {
+    public User update(User user, Long id) {
         User existUser = findById(id);
         BeanUtils.copyProperties(user, existUser, "id", "password");
         logger.info("Updating user: " + user.getFirstName());
@@ -270,85 +276,33 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User findUserByUsername(String username) {
-        return userRepository.findUserByUsername(username);
-    }
-
-    @Override
-    public User findUserByUserId(String userId) {
-        return userRepository.findUserByUserId(userId);
-    }
-
-    @Override
-    public User findUserByEmail(String email) {
-        return userRepository.findUserByEmail(email);
-    }
-
-    private Role getRoleEnumName(String role) {
-        return Role.valueOf(role.toUpperCase());
-    }
-
-    private String encodePassword(String password) {
-        return passwordEncoder.encode(password);
-    }
-
-    private String generatePassword() {
-        return RandomStringUtils.randomAlphanumeric(10);
-    }
-
-    private String generateUserId() {
-        return RandomStringUtils.randomNumeric(10);
-    }
-
-    private void validateLoginAttempt(User user) {
-        if(user.isNotLocked()) {
-            if(loginAttemptService.hasExceededMaxAttempts(user.getUsername())) {
-                user.setNotLocked(false);
-            } else {
-                user.setNotLocked(true);
-            }
-        } else {
-            loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
-        }
-    }
-
-    private User validateNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistException, EmailExistException {
-        User userByNewUsername = findUserByUsername(newUsername);
-        User userByNewEmail = findUserByEmail(newEmail);
-        if(StringUtils.isNotBlank(currentUsername)) {
-            User currentUser = findUserByUsername(currentUsername);
-            if(currentUser == null) {
-                throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + currentUsername);
-            }
-            if(userByNewUsername != null && !currentUser.getId().equals(userByNewUsername.getId())) {
-                throw new UsernameExistException(USERNAME_ALREADY_EXISTS);
-            }
-            if(userByNewEmail != null && !currentUser.getId().equals(userByNewEmail.getId())) {
-                throw new EmailExistException(EMAIL_ALREADY_EXISTS);
-            }
-            return currentUser;
-        } else {
-            if(userByNewUsername != null) {
-                throw new UsernameExistException(USERNAME_ALREADY_EXISTS);
-            }
-            if(userByNewEmail != null) {
-                throw new EmailExistException(EMAIL_ALREADY_EXISTS);
-            }
-            return null;
-        }
-    }
-
-    @Override
-    public List<User> getUsers() {
-        return userRepository.findAll();
-    }
-
-    @Override
     public Page<User> findAll(String name, Pageable pageable) throws UserNotFoundException {
         return userRepository.findByAnyProperty(name, pageable);
     }
 
     public User save(User user){
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User addInterestToUserInterests(Long userId, Long interestId) throws InterestNotFoundException {
+        User user = findById(userId);
+        Optional<Interest> optionalInterest = interestRepository.findById(interestId);
+        if (!optionalInterest.isPresent()){
+            throw new InterestNotFoundException("Post not found by id: " + interestId);
+        }
+        user.getInterests().add(optionalInterest.get());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User removeInterestFromUserInterests(Long userId, Long interestId) throws InterestNotFoundException {
+        User user = findById(userId);
+        Optional<Interest> optionalInterest = interestRepository.findById(interestId);
+        if (!optionalInterest.isPresent()) {
+            throw new InterestNotFoundException("Post not found by id: " + interestId);
+        }
+        user.getInterests().remove(optionalInterest.get());
         return userRepository.save(user);
     }
 
@@ -460,6 +414,80 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.getFriends().remove(friend);
         friend.getFriends().remove(user);
         userRepository.saveAll(Arrays.asList(user, friend));
+    }
+
+    private void validateLoginAttempt(User user) {
+        if(user.isNotLocked()) {
+            if(loginAttemptService.hasExceededMaxAttempts(user.getUsername())) {
+                user.setNotLocked(false);
+            } else {
+                user.setNotLocked(true);
+            }
+        } else {
+            loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
+        }
+    }
+
+    private User validateNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistException, EmailExistException {
+        User userByNewUsername = findUserByUsername(newUsername);
+        User userByNewEmail = findUserByEmail(newEmail);
+        if(StringUtils.isNotBlank(currentUsername)) {
+            User currentUser = findUserByUsername(currentUsername);
+            if(currentUser == null) {
+                throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + currentUsername);
+            }
+            if(userByNewUsername != null && !currentUser.getId().equals(userByNewUsername.getId())) {
+                throw new UsernameExistException(USERNAME_ALREADY_EXISTS);
+            }
+            if(userByNewEmail != null && !currentUser.getId().equals(userByNewEmail.getId())) {
+                throw new EmailExistException(EMAIL_ALREADY_EXISTS);
+            }
+            return currentUser;
+        } else {
+            if(userByNewUsername != null) {
+                throw new UsernameExistException(USERNAME_ALREADY_EXISTS);
+            }
+            if(userByNewEmail != null) {
+                throw new EmailExistException(EMAIL_ALREADY_EXISTS);
+            }
+            return null;
+        }
+    }
+
+    @Override
+    public User findUserByUsername(String username) {
+        return userRepository.findUserByUsername(username);
+    }
+
+    @Override
+    public User findUserByUserId(String userId) {
+        return userRepository.findUserByUserId(userId);
+    }
+
+    @Override
+    public User findUserByEmail(String email) {
+        return userRepository.findUserByEmail(email);
+    }
+
+    private Role getRoleEnumName(String role) {
+        return Role.valueOf(role.toUpperCase());
+    }
+
+    private String encodePassword(String password) {
+        return passwordEncoder.encode(password);
+    }
+
+    private String generatePassword() {
+        return RandomStringUtils.randomAlphanumeric(10);
+    }
+
+    private String generateUserId() {
+        return RandomStringUtils.randomNumeric(10);
+    }
+
+    @Override
+    public List<User> getUsers() {
+        return userRepository.findAll();
     }
 
     public User getAuthenticatedUser() throws UserNotFoundException {

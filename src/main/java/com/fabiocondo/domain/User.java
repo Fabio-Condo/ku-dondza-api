@@ -32,6 +32,10 @@ public class User implements Serializable {
 
     private String email;
 
+    private String institution;
+
+    private String course;
+
     private String profileImageUrl;
 
     private String fileName;
@@ -174,6 +178,22 @@ public class User implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(String institution) {
+        this.institution = institution;
+    }
+
+    public String getCourse() {
+        return course;
+    }
+
+    public void setCourse(String course) {
+        this.course = course;
     }
 
     public String getProfileImageUrl() {

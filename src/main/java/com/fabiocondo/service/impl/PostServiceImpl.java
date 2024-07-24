@@ -3,7 +3,6 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Post;
-import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.PostNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.PostRepository;
@@ -17,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -45,6 +42,11 @@ public class PostServiceImpl implements PostService {
     public Post findById(Long id) throws PostNotFoundException {
         return postRepository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException("No post found by id: " + id));
+    }
+
+    @Override
+    public Page<Post> findByUserId(Long userId, Pageable pageable) {
+        return postRepository.findByUserId(userId, pageable);
     }
 
     @Override

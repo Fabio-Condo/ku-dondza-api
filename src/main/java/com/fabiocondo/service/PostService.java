@@ -10,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 public interface PostService {
     Post findById(Long id) throws PostNotFoundException;
 
+    Page<Post> findByUserId(Long userId, Pageable pageable);
+
     Page<Post> findAll(Pageable pageable);
 
     Post save(String text, MultipartFile file) throws UserNotFoundException;

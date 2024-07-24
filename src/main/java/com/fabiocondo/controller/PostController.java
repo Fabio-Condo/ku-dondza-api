@@ -29,6 +29,11 @@ public class PostController{
         return ResponseEntity.status(HttpStatus.OK).body(postServiceImpl.findById(id));
     }
 
+    @GetMapping("/user/{userId}")
+    public Page<Post> findByUserId(@PathVariable Long userId, Pageable pageable) {
+        return postServiceImpl.findByUserId(userId, pageable);
+    }
+
     @GetMapping("/all")
     public Page<Post> findAll(Pageable pageable) {
         return postServiceImpl.findAll(pageable);

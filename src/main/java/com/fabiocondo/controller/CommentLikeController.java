@@ -1,6 +1,8 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.CommentLike;
+import com.fabiocondo.exception.domain.CommentNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.CommentLikeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,23 +23,14 @@ public class CommentLikeController {
     }
 
     @PostMapping("/{commentId}/toggle")
-    public ResponseEntity<CommentLike> toggleLike(@PathVariable Long commentId) {
-        try {
-            CommentLike like = commentLikeService.toggleLike(commentId);
-            return ResponseEntity.ok(like);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+    public ResponseEntity<CommentLike> toggleLike(@PathVariable Long commentId) throws UserNotFoundException, CommentNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(commentLikeService.toggleLike(commentId));
     }
 
     @GetMapping("/{commentId}/is-liked")
-    public ResponseEntity<Boolean> isCommentLikedByUser(@PathVariable Long commentId) {
-        try {
-            boolean isLiked = commentLikeService.isCommentLikedByUser(commentId);
-            return ResponseEntity.ok(isLiked);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
+    public ResponseEntity<Boolean> isCommentLikedByUser(@PathVariable Long commentId) throws UserNotFoundException {
+        boolean isLiked = commentLikeService.isCommentLikedByUser(commentId);
+        return ResponseEntity.status(HttpStatus.OK).body(isLiked);
     }
 
     //@GetMapping("/{commentId}/likes-count")

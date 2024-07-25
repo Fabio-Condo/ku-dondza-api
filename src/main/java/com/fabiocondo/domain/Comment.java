@@ -40,6 +40,8 @@ public class Comment {
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> replies;
 
+    public Comment() {
+    }
 
     public Long getId() {
         return id;

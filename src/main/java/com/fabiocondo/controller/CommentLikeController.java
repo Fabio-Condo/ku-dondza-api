@@ -33,15 +33,15 @@ public class CommentLikeController {
         return ResponseEntity.status(HttpStatus.OK).body(isLiked);
     }
 
-    //@GetMapping("/{commentId}/likes-count")
-    //public ResponseEntity<Long> getLikesCount(@PathVariable Long commentId) {
-    //    Long likeCount = commentLikeService.countLikesByCommentId(commentId);
-    //    return ResponseEntity.ok(likeCount);
-    //}
+    @GetMapping("/{commentId}/likes-count")
+    public ResponseEntity<Long> getLikesCount(@PathVariable Long commentId) {
+        Long likeCount = commentLikeService.countLikesByCommentId(commentId);
+        return ResponseEntity.status(HttpStatus.OK).body(likeCount);
+    }
 
     @GetMapping("/{commentId}/likes")
     public ResponseEntity<Page<CommentLike>> getLikesByCommentId(@PathVariable Long commentId, Pageable pageable) {
         Page<CommentLike> likes = commentLikeService.getLikesByCommentId(commentId, pageable);
-        return ResponseEntity.ok(likes);
+        return ResponseEntity.status(HttpStatus.OK).body(likes);
     }
 }

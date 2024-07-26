@@ -55,10 +55,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final EmailService emailService;
     private final AmazonS3Service amazonS3Service;
     private final PostRepository postRepository;
-
     private final InterestRepository interestRepository;
-
-
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, PostRepository postRepository, InterestRepository interestRepository) {
@@ -69,6 +66,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.amazonS3Service = amazonS3Service;
         this.postRepository = postRepository;
         this.interestRepository = interestRepository;
+    }
+
+    public Page<User> searchUsers(String query, Pageable pageable) {
+        return userRepository.searchByQuery(query, pageable);
     }
 
     @Override

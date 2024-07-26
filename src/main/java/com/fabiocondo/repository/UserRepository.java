@@ -16,8 +16,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findUserByEmail(String email);
 
-    @Query("SELECT u FROM user u WHERE u.firstName LIKE %:name% OR u.lastName LIKE %:name% OR u.username LIKE %:name% OR u.role LIKE %:name%")
+    @Query("SELECT u FROM User u WHERE u.firstName LIKE %:name% OR u.lastName LIKE %:name% OR u.username LIKE %:name% OR u.role LIKE %:name%")
     public Page<User> findByAnyProperty(@Param("name") String name, Pageable pageable);
 
     public long countByIsActiveTrue();
+
+    @Query("SELECT u FROM User u WHERE u.firstName LIKE %:query% OR u.lastName LIKE %:query%")
+    Page<User> searchByQuery(@Param("query") String query, Pageable pageable);
+
+    //Page<User> findByNameContainingIgnoreCase(String query, Pageable pageable);
 }

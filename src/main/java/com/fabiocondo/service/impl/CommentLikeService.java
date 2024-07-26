@@ -49,9 +49,9 @@ public class CommentLikeService {
         return commentLikeRepository.existsByCommentIdAndUserId(commentId, user.getId());
     }
 
-    //ublic Long countLikesByCommentId(Long commentId) {
-    //    return commentLikeRepository.countLikesByCommentId(commentId);
-    //}
+    public Long countLikesByCommentId(Long commentId) {
+        return commentLikeRepository.countByCommentId(commentId);
+    }
 
     public Page<CommentLike> getLikesByCommentId(Long commentId, Pageable pageable) {
         return commentLikeRepository.findByCommentId(commentId, pageable);

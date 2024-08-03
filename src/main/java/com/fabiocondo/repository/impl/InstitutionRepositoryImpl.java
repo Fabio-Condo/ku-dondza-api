@@ -91,6 +91,10 @@ public class InstitutionRepositoryImpl implements InstitutionRepositoryQuery {
             predicates.add(builder.equal(
                     builder.lower(root.get("administrationType")), institutionFilter.getAdministrationType()));
         }
+        if(!ObjectUtils.isEmpty(institutionFilter.getCountry())) {
+            predicates.add(builder.equal(
+                    builder.lower(root.get("country")), institutionFilter.getCountry()));
+        }
         if(!ObjectUtils.isEmpty(institutionFilter.getType())) {
             predicates.add(builder.like(
                     builder.lower(root.get("type")), "%" + institutionFilter.getType().toLowerCase() + "%"));

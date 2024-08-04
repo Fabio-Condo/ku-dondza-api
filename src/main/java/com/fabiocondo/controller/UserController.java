@@ -2,7 +2,6 @@ package com.fabiocondo.controller;
 
 
 import com.fabiocondo.domain.*;
-import com.fabiocondo.exception.ExceptionHandling;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.security.utility.JWTTokenProvider;
 import com.fabiocondo.service.UserService;
@@ -30,7 +29,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping(path = { "/", "/user"})
-public class UserController extends ExceptionHandling {
+public class UserController {
     private AuthenticationManager authenticationManager;
     private UserService userService;
     private JWTTokenProvider jwtTokenProvider;

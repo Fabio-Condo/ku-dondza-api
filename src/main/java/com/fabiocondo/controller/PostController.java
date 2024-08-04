@@ -60,6 +60,14 @@ public class PostController{
         return response(HttpStatus.OK, "Post deleted successfully");
     }
 
+    @PostMapping("/add-from-group")
+    public ResponseEntity<Post> save(@RequestParam("groupId") Long groupId,
+                                     @RequestParam("text") String text,
+                                     @RequestParam(value = "file", required = false) MultipartFile file) throws UserNotFoundException, PostNotFoundException {
+
+        return ResponseEntity.status(HttpStatus.OK).body(postServiceImpl.saveFromGroup(groupId, text, file));
+    }
+
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(
                 new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(), message),

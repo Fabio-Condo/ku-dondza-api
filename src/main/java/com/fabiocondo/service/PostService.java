@@ -19,4 +19,6 @@ public interface PostService {
     Post update(Long id, String text, MultipartFile file) throws PostNotFoundException;
 
     void delete(Long id) throws PostNotFoundException;
+
+    Post saveFromGroup(Long groupId, String text, MultipartFile file) throws UserNotFoundException, PostNotFoundException;
 }

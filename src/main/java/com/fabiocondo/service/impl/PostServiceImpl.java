@@ -2,9 +2,11 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
+import com.fabiocondo.domain.Group;
 import com.fabiocondo.domain.Post;
 import com.fabiocondo.exception.domain.PostNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.repository.GroupRepository;
 import com.fabiocondo.repository.PostRepository;
 import com.fabiocondo.service.PostService;
 import org.slf4j.Logger;
@@ -32,10 +34,14 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private UserServiceImpl userService;
 
-    public PostServiceImpl(AmazonS3Service amazonS3Service, PostRepository postRepository, UserServiceImpl userService) {
+    @Autowired
+    private GroupRepository groupRepository;
+
+    public PostServiceImpl(AmazonS3Service amazonS3Service, PostRepository postRepository, UserServiceImpl userService, GroupRepository groupRepository) {
         this.amazonS3Service = amazonS3Service;
         this.postRepository = postRepository;
         this.userService = userService;
+        this.groupRepository = groupRepository;
     }
 
     public Page<Post> searchPosts(String query, Pageable pageable) {
@@ -79,6 +85,7 @@ public class PostServiceImpl implements PostService {
         post.setFileName(file.getOriginalFilename());
         post.setDate(new Date());
         post.setUser(userService.getAuthenticatedUser());
+        post.setGroup(null); // Se adicionar a partir do feed principal, o group deve ser null
 
         logger.info("Saving new post: " + post.getText());
         return postRepository.save(post);
@@ -113,6 +120,26 @@ public class PostServiceImpl implements PostService {
             logger.info("Deleting file: " + existPost.getFileName());
             amazonS3Service.deleteFile(existPost.getFileName(), BUCKET_NAME);
         }
+    }
+
+    @Override
+    public Post saveFromGroup(Long groupId, String text, MultipartFile file) throws UserNotFoundException, PostNotFoundException {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new PostNotFoundException("No Group found by id: " + groupId));
+
+        logger.info("Uploading file: " + file.getOriginalFilename());
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+
+        Post post = new Post();
+        post.setText(text);
+        post.setUrlFile(s3UploadResponse.getFileUrl());
+        post.setFileName(file.getOriginalFilename());
+        post.setDate(new Date());
+        post.setUser(userService.getAuthenticatedUser());
+        post.setGroup(group);
+
+        logger.info("Saving new post: " + post.getText());
+        return postRepository.save(post);
     }
 
 }

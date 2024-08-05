@@ -290,7 +290,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = findById(userId);
         Optional<Interest> optionalInterest = interestRepository.findById(interestId);
         if (!optionalInterest.isPresent()){
-            throw new InterestNotFoundException("Post not found by id: " + interestId);
+            throw new InterestNotFoundException("Interest not found by id: " + interestId);
         }
         user.getInterests().add(optionalInterest.get());
         return userRepository.save(user);
@@ -301,7 +301,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = findById(userId);
         Optional<Interest> optionalInterest = interestRepository.findById(interestId);
         if (!optionalInterest.isPresent()) {
-            throw new InterestNotFoundException("Post not found by id: " + interestId);
+            throw new InterestNotFoundException("Interest not found by id: " + interestId);
         }
         user.getInterests().remove(optionalInterest.get());
         return userRepository.save(user);

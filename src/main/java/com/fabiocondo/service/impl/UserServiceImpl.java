@@ -173,6 +173,37 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public User updateUserProfile(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String newInstitution, String newBio, String newCourse, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException {
+        User currentUser = validateNewUsernameAndEmail(currentUsername, newUsername, newEmail);
+        // Adicionar funcao que diminue o tamanho da imagem
+        currentUser.setFirstName(newFirstName);
+        currentUser.setLastName(newLastName);
+        currentUser.setUsername(newUsername);
+        currentUser.setEmail(newEmail);
+        currentUser.setInstitution(newInstitution);
+        currentUser.setBio(newBio);
+        currentUser.setCourse(newCourse);
+        currentUser.setActive(isActive);
+        currentUser.setNotLocked(isNonLocked);
+        currentUser.setRole(getRoleEnumName(role).name());
+        currentUser.setAuthorities(getRoleEnumName(role).getAuthorities());
+
+        // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
+        if (profileImage != null) {
+            if (currentUser.getFileName() != null) {
+                logger.info("Deleting file: " + currentUser.getFileName());
+                amazonS3Service.deleteFile(currentUser.getFileName(), BUCKET_NAME);
+            }
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
+            currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
+            currentUser.setFileName(profileImage.getOriginalFilename());
+        }
+
+        userRepository.save(currentUser);
+        return currentUser;
+    }
+
+    @Override
     public User update(User user, Long id) {
         User existUser = findById(id);
         BeanUtils.copyProperties(user, existUser, "id", "password");

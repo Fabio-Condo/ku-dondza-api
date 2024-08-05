@@ -83,6 +83,23 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 
+    @PutMapping("/update-user-profile")
+    public ResponseEntity<User> updateUserProfile(@RequestParam("currentUsername") String currentUsername,
+                                       @RequestParam("firstName") String firstName,
+                                       @RequestParam("lastName") String lastName,
+                                       @RequestParam("username") String username,
+                                       @RequestParam("email") String email,
+                                       @RequestParam("institution") String institution,
+                                       @RequestParam("bio") String bio,
+                                       @RequestParam("course") String course,
+                                       @RequestParam("role") String role,
+                                       @RequestParam("isActive") String isActive,
+                                       @RequestParam("isNonLocked") String isNonLocked,
+                                       @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
+        User updatedUser = userService.updateUserProfile(currentUsername, firstName, lastName, username,email, institution, bio, course, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<User> update(@PathVariable("id") Long id, @RequestBody User user) throws CourseNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.update(user, id));

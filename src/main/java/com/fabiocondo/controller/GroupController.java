@@ -39,18 +39,20 @@ public class GroupController {
     }
 
     @PostMapping
-    public ResponseEntity<Group> save(@RequestParam("description") String description,
+    public ResponseEntity<Group> save(@RequestParam("name") String name,
+                                      @RequestParam("description") String description,
                                       @RequestParam("file") MultipartFile file) throws InstituicaoNotFoundException, SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(groupService.save(description,  file));
+        return ResponseEntity.status(HttpStatus.OK).body(groupService.save(name, description, file));
     }
 
     @PutMapping
     public ResponseEntity<Group> update(@RequestParam("id") Long id,
+                                        @RequestParam("name") String name,
                                         @RequestParam("description") String description,
                                         @RequestParam(value = "file", required = false) MultipartFile file) throws GroupNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(groupService.update(id, description, file));
+        return ResponseEntity.status(HttpStatus.OK).body(groupService.update(id, name, description, file));
     }
 
     @DeleteMapping("/{id}")

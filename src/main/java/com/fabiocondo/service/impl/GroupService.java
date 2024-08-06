@@ -44,11 +44,12 @@ public class GroupService {
                 .orElseThrow(() -> new GroupNotFoundException("No Group found by id: " + id));
     }
 
-    public Group save(String description, MultipartFile file) {
+    public Group save(String name, String description, MultipartFile file) {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         Group group = new Group();
+        group.setName(name);
         group.setDescription(description);
         group.setUrlFile(s3UploadResponse.getFileUrl());
         group.setFileName(file.getOriginalFilename());
@@ -57,9 +58,10 @@ public class GroupService {
         return groupRepository.save(group);
     }
 
-    public Group update(Long id, String description, MultipartFile file) throws GroupNotFoundException {
+    public Group update(Long id, String name, String description, MultipartFile file) throws GroupNotFoundException {
 
         Group existGroup = findById(id);
+        existGroup.setName(name);
         existGroup.setDescription(description);
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo

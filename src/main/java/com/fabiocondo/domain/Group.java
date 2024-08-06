@@ -16,6 +16,8 @@ public class Group {
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
+    private String name;
+
     private String description;
 
     private String fileName;
@@ -38,8 +40,9 @@ public class Group {
     public Group() {
     }
 
-    public Group(Long id, String description, String fileName, String urlFile) {
+    public Group(Long id, String name, String description, String fileName, String urlFile) {
         this.id = id;
+        this.name = name;
         this.description = description;
         this.fileName = fileName;
         this.urlFile = urlFile;
@@ -52,6 +55,14 @@ public class Group {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {

@@ -30,7 +30,7 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(commentService.saveComment(comment));
     }
 
-    @PostMapping("/v2")
+    @PostMapping("/reply-comment")
     public ResponseEntity<Comment> createComment(@RequestParam("postId") Long postId,
                                                  @RequestParam("parentCommentId") Long parentCommentId,
                                                  @RequestParam("content") String content) throws PostNotFoundException, CommentNotFoundException, UserNotFoundException {

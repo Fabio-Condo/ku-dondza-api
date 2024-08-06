@@ -33,6 +33,7 @@ public class Post implements Serializable {
     private User user;
 
     @ManyToOne
+    @JsonIgnoreProperties({"posts"})
     @JoinColumn(name = "group_id")
     private Group group;
 

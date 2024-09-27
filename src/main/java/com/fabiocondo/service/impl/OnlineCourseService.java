@@ -1,0 +1,91 @@
+package com.fabiocondo.service.impl;
+
+import com.fabiocondo.aws.model.S3UploadResponse;
+import com.fabiocondo.aws.service.AmazonS3Service;
+import com.fabiocondo.domain.OnlineCourse;
+import com.fabiocondo.exception.domain.CourseNotFoundException;
+import com.fabiocondo.repository.OnlineCourseRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+@Service
+public class OnlineCourseService {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private static final String BUCKET_NAME = "b-tests-bucket";
+
+    private final OnlineCourseRepository onlineCourseRepository;
+
+    private final AmazonS3Service amazonS3Service;
+
+
+    public OnlineCourseService(OnlineCourseRepository onlineCourseRepository, AmazonS3Service amazonS3Service) {
+        this.onlineCourseRepository = onlineCourseRepository;
+        this.amazonS3Service = amazonS3Service;
+    }
+
+    public OnlineCourse findById(Long id) throws CourseNotFoundException {
+        logger.info("Getting course by id: " + id);
+        return onlineCourseRepository.findById(id)
+                .orElseThrow(() -> new CourseNotFoundException("No course found by id: " + id));
+    }
+
+    public Page<OnlineCourse> findAll(Pageable pageable) {
+        return onlineCourseRepository.findAll(pageable);
+    }
+
+    public OnlineCourse save(String name, String description, MultipartFile file) {
+        logger.info("Uploading file: " + file.getOriginalFilename());
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+
+        OnlineCourse course = new OnlineCourse();
+        course.setName(name);
+        course.setDescription(description);
+        course.setCoverImageUrl(s3UploadResponse.getFileUrl());
+        course.setFileName(file.getOriginalFilename());
+
+        logger.info("Saving new course: " + course.getDescription());
+        return onlineCourseRepository.save(course);
+    }
+
+    public OnlineCourse update(Long id, String name, String description, MultipartFile file) throws CourseNotFoundException {
+
+        OnlineCourse existCourse = findById(id);
+        existCourse.setName(name);
+        existCourse.setDescription(description);
+
+        // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
+        if (file != null) {
+            if (existCourse.getFileName() != null) {
+                logger.info("Deleting file: " + existCourse.getFileName());
+                amazonS3Service.deleteFile(existCourse.getFileName(), BUCKET_NAME);
+            }
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+            existCourse.setCoverImageUrl(s3UploadResponse.getFileUrl());
+            existCourse.setFileName(file.getOriginalFilename());
+        }
+
+        logger.info("Saving new course: " + existCourse.getDescription());
+        return onlineCourseRepository.save(existCourse);
+    }
+
+    public void delete(Long id) throws CourseNotFoundException {
+        OnlineCourse existCourse = findById(id);
+        logger.info("Deleting course: " + existCourse.getDescription());
+        onlineCourseRepository.deleteById(id);
+        if (existCourse.getFileName() != null) {
+            logger.info("Deleting file: " + existCourse.getFileName());
+            amazonS3Service.deleteFile(existCourse.getFileName(), BUCKET_NAME);
+        }
+    }
+
+    public long getTotal(){
+        logger.info("Total course: " + onlineCourseRepository.count());
+        return onlineCourseRepository.count();
+    }
+}

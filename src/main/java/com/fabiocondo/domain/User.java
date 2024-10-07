@@ -95,6 +95,15 @@ public class User implements Serializable {
     )
     private Set<Interest> interests = new HashSet<>();
 
+    @JsonIgnoreProperties({"courseContents"})
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(
+            name = "user_course",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<OnlineCourse> subscribedOnlineCourses = new HashSet<>();
+
     public User(){}
 
     public User(Long id, String userId, String firstName, String lastName, String username, String bio, String password, String email, String profileImageUrl, String fileName, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, boolean isActive, boolean isNotLocked) {
@@ -315,6 +324,14 @@ public class User implements Serializable {
 
     public Set<Interest> getInterests() {
         return interests;
+    }
+
+    public Set<OnlineCourse> getSubscribedOnlineCourses() {
+        return subscribedOnlineCourses;
+    }
+
+    public void setSubscribedOnlineCourses(Set<OnlineCourse> subscribedOnlineCourses) {
+        this.subscribedOnlineCourses = subscribedOnlineCourses;
     }
 }
 

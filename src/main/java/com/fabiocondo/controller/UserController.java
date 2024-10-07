@@ -237,6 +237,22 @@ public class UserController {
         userService.removeFriend(friendId);
     }
 
+    @PostMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")
+    public ResponseEntity<User> addCourseToSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws PostNotFoundException, CourseNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.addCourseToSubscribedOnlineCourses(userId, onlineCourseId));
+    }
+
+    @DeleteMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")
+    public ResponseEntity<User> removeCourseFromSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws PostNotFoundException, CourseNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.removeCourseFromSubscribedOnlineCourses(userId, onlineCourseId));
+    }
+
+    @GetMapping("/{userId}/subscribedOnlineCourses/contains/{onlineCourseId}")
+    public ResponseEntity<Boolean> doesUserSubscribedOnlineCourse(@PathVariable Long userId, @PathVariable Long onlineCourseId) {
+        boolean doesContain = userService.doesUserSubscribedOnlineCourse(userId, onlineCourseId);
+        return ResponseEntity.status(HttpStatus.OK).body(doesContain);
+    }
+
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(),
                 message), httpStatus);

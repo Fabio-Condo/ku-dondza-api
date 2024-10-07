@@ -39,6 +39,12 @@ public interface UserService {
 
     void updatePropertyNotLocked(String username, Boolean notLocked) throws UsernameNotFoundException;
 
+    User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException;
+
+    User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException;
+
+    boolean doesUserSubscribedOnlineCourse(Long userId, Long onlineCourseId);
+
     User findUserByUsername(String username);
 
     User findUserByUserId(String userId);

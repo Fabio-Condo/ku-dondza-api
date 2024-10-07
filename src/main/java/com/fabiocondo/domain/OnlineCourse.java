@@ -26,14 +26,6 @@ public class OnlineCourse {
     @OneToMany(mappedBy = "onlineCourse", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OnlineCourseContent> courseContents = new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.DETACH)
-    @JoinTable(
-            name = "user_course",
-            joinColumns = @JoinColumn(name = "course_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> students;
-
     // Constructors
     public OnlineCourse() {}
 
@@ -92,24 +84,5 @@ public class OnlineCourse {
         this.courseContents = courseContents;
     }
 
-    public List<User> getStudents() {
-        return students;
-    }
-
-    public void setStudents(List<User> students) {
-        this.students = students;
-    }
-
-    // Method to add a Course Content
-    public void addCourseContent(OnlineCourseContent content) {
-        courseContents.add(content);
-        content.setOnlineCourse(this);
-    }
-
-    // Method to remove a Course Content
-    public void removeCourseContent(OnlineCourseContent content) {
-        courseContents.remove(content);
-        content.setOnlineCourse(null);
-    }
 }
 

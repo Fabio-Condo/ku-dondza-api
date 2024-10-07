@@ -2,15 +2,13 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
-import com.fabiocondo.domain.Interest;
-import com.fabiocondo.domain.Post;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.Role;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.InterestRepository;
+import com.fabiocondo.repository.OnlineCourseRepository;
 import com.fabiocondo.repository.PostRepository;
 import com.fabiocondo.repository.UserRepository;
-import com.fabiocondo.domain.User;
-import com.fabiocondo.domain.UserPrincipal;
 import com.fabiocondo.security.service.EmailService;
 import com.fabiocondo.security.service.LoginAttemptService;
 import com.fabiocondo.service.UserService;
@@ -56,9 +54,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final AmazonS3Service amazonS3Service;
     private final PostRepository postRepository;
     private final InterestRepository interestRepository;
+    private final OnlineCourseRepository onlineCourseRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, PostRepository postRepository, InterestRepository interestRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, PostRepository postRepository, InterestRepository interestRepository, OnlineCourseRepository onlineCourseRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
@@ -66,6 +65,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.amazonS3Service = amazonS3Service;
         this.postRepository = postRepository;
         this.interestRepository = interestRepository;
+        this.onlineCourseRepository = onlineCourseRepository;
     }
 
     public Page<User> searchUsers(String query, Pageable pageable) {
@@ -458,6 +458,41 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         } else {
             loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
         }
+    }
+
+    @Override
+    public User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException {
+        User user = findById(userId);
+        Optional<OnlineCourse> optionalCourse = onlineCourseRepository.findById(onlineCourseId);
+        if (!optionalCourse.isPresent()){
+            throw new CourseNotFoundException("Online Course not found by id: " + onlineCourseId);
+        }
+        user.getSubscribedOnlineCourses().add(optionalCourse.get());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException {
+        User user = findById(userId);
+        Optional<OnlineCourse> optionalCourse = onlineCourseRepository.findById(onlineCourseId);
+        if (!optionalCourse.isPresent()) {
+            throw new CourseNotFoundException("Online Curse not found by id: " + onlineCourseId);
+        }
+        user.getSubscribedOnlineCourses().remove(optionalCourse.get());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public boolean doesUserSubscribedOnlineCourse(Long userId, Long onlineCourseId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+        Optional<OnlineCourse> course = onlineCourseRepository.findById(onlineCourseId);
+        if (!course.isPresent()) {
+            return false;
+        }
+        return user.getSubscribedOnlineCourses().contains(course.get());
     }
 
     private User validateNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistException, EmailExistException {

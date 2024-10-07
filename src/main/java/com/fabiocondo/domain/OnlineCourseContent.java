@@ -10,8 +10,6 @@ public class OnlineCourseContent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
-
     private String description;
 
     private String fileName;
@@ -25,8 +23,7 @@ public class OnlineCourseContent {
     // Constructors
     public OnlineCourseContent() {}
 
-    public OnlineCourseContent(String title, String description, String fileName, String urlFile) {
-        this.title = title;
+    public OnlineCourseContent(String description, String fileName, String urlFile) {
         this.description = description;
         this.fileName = fileName;
         this.urlFile = urlFile;
@@ -39,14 +36,6 @@ public class OnlineCourseContent {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getDescription() {

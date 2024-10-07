@@ -31,6 +31,11 @@ public class OnlineCourseController {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.findAll(pageable));
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<Page<OnlineCourse>> filter(Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.findAll(pageable));
+    }
+
     @PostMapping
     public ResponseEntity<OnlineCourse> save(@RequestParam("name") String name,
                                              @RequestParam("description") String description,

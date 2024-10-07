@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -43,7 +44,7 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.findAll(pageable);
     }
 
-    public OnlineCourseContent save(String description, String title, Long onlineCourseId, MultipartFile file) throws CourseNotFoundException {
+    public OnlineCourseContent save(String description, Long onlineCourseId, MultipartFile file) throws CourseNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
@@ -52,7 +53,6 @@ public class OnlineCourseContentService {
         OnlineCourseContent content = new OnlineCourseContent();
         content.setOnlineCourse(course);
         content.setDescription(description);
-        content.setTitle(title);
         content.setUrlFile(s3UploadResponse.getFileUrl());
         content.setFileName(file.getOriginalFilename());
 
@@ -60,14 +60,12 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.save(content);
     }
 
-    public OnlineCourseContent update(Long id, String description, String title, Long onlineCourseId, MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException {
+    public OnlineCourseContent update(Long id, String description, Long onlineCourseId, MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException {
         OnlineCourse course = onlineCourseService.findById(onlineCourseId);
 
         OnlineCourseContent existContent = findById(id);
         existContent.setOnlineCourse(course);
         existContent.setDescription(description);
-        existContent.setTitle(title);
-
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {
             if (existContent.getFileName() != null) {
@@ -81,6 +79,10 @@ public class OnlineCourseContentService {
 
         logger.info("Updating content: " + existContent.getDescription());
         return onlineCourseContentRepository.save(existContent);
+    }
+
+    public Page<OnlineCourseContent> findByOnlineCourseId(@RequestParam Long onlineCourseId, Pageable pageable) {
+        return onlineCourseContentRepository.findByOnlineCourseId(onlineCourseId, pageable);
     }
 
     public void delete(Long id) throws CourseContentNotFoundException {

@@ -1,5 +1,7 @@
 package com.fabiocondo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +22,17 @@ public class OnlineCourse {
 
     private String coverImageUrl; // URL da imagem de capa do curso
 
+    @JsonIgnoreProperties({"onlineCourse"})
     @OneToMany(mappedBy = "onlineCourse", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OnlineCourseContent> courseContents = new ArrayList<>();
+
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(
+            name = "user_course",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> students;
 
     // Constructors
     public OnlineCourse() {}
@@ -79,6 +90,14 @@ public class OnlineCourse {
 
     public void setCourseContents(List<OnlineCourseContent> courseContents) {
         this.courseContents = courseContents;
+    }
+
+    public List<User> getStudents() {
+        return students;
+    }
+
+    public void setStudents(List<User> students) {
+        this.students = students;
     }
 
     // Method to add a Course Content

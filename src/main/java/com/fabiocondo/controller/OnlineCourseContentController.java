@@ -1,11 +1,14 @@
 package com.fabiocondo.controller;
 
+import com.fabiocondo.domain.Course;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.OnlineCourseContent;
 import com.fabiocondo.exception.domain.CourseContentNotFoundException;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.service.impl.OnlineCourseContentService;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,21 +29,24 @@ public class OnlineCourseContentController {
 
     @PostMapping
     public ResponseEntity<OnlineCourseContent> save(@RequestParam("description") String description,
-                                                    @RequestParam("title") String title,
                                                     @RequestParam("onlineCourseId") Long onlineCourseId,
                                                     @RequestParam("file") MultipartFile file) throws CourseNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.save(description, title, onlineCourseId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.save(description, onlineCourseId, file));
     }
 
     @PutMapping
     public ResponseEntity<OnlineCourseContent> update(@RequestParam("id") Long id,
                                                       @RequestParam("description") String description,
-                                                      @RequestParam("title") String title,
                                                       @RequestParam("onlineCourseId") Long onlineCourseId,
                                                       @RequestParam(value = "file", required = false) MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.update(id, description, title, onlineCourseId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.update(id, description, onlineCourseId, file));
+    }
+
+    @GetMapping("/findByOnlineCourseId")
+    public ResponseEntity<Page<OnlineCourseContent>>  findByOnlineCourseId(@RequestParam Long onlineCourseId, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.findByOnlineCourseId(onlineCourseId, pageable));
     }
 
     @DeleteMapping("/{id}")

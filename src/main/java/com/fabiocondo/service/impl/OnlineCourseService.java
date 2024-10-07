@@ -41,12 +41,12 @@ public class OnlineCourseService {
 
     public OnlineCourse save(String name, String description, MultipartFile file) {
         logger.info("Uploading file: " + file.getOriginalFilename());
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+        //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         OnlineCourse course = new OnlineCourse();
         course.setName(name);
         course.setDescription(description);
-        course.setCoverImageUrl(s3UploadResponse.getFileUrl());
+        //course.setCoverImageUrl(s3UploadResponse.getFileUrl());
         course.setFileName(file.getOriginalFilename());
 
         logger.info("Saving new course: " + course.getDescription());

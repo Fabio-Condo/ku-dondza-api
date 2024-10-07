@@ -69,22 +69,22 @@ public class User implements Serializable {
     )
     private List<Post> savedPosts;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "friendship",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
-    @JsonIgnore
     private List<User> friends = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "friend_request",
             joinColumns = @JoinColumn(name = "to_user_id"),
             inverseJoinColumns = @JoinColumn(name = "from_user_id")
     )
-    @JsonIgnore
     private List<User> friendRequests = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.DETACH)

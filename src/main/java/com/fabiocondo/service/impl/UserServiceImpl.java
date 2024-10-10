@@ -369,11 +369,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public Page<Post> getSavedPostsByUser(Long userId, Pageable pageable) {
-        // Busca o usuário pelo ID e retorna os posts guardados
+    public Page<Post> findSavedPostsByUserId(Long userId, Pageable pageable) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-        return userRepository.findSavedPostsByUser(userId, pageable);
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+        return userRepository.findSavedPostsByUserId(userId, pageable);
+    }
+
+    @Override
+    public long countSavedPostsByUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+        return user.getSavedPosts().size();
     }
 
     @Override

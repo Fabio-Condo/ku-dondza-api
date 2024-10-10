@@ -65,7 +65,9 @@ public interface UserService {
 
     List<Post> getSavedPosts(Long id) throws UserNotFoundException;
 
-    Page<Post> getSavedPostsByUser(Long userId, Pageable pageable);
+    Page<Post> findSavedPostsByUserId(Long userId, Pageable pageable);
+
+    long countSavedPostsByUser(Long userId);
 
     boolean doesUserSavedPost(Long userId, Long postId);
 

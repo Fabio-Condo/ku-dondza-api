@@ -196,8 +196,13 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/savedPosts")
-    public Page<Post> getSavedPosts(@PathVariable Long userId, Pageable pageable) {
-        return userService.getSavedPostsByUser(userId, pageable);
+    public Page<Post> findSavedPostsByUserId(@PathVariable Long userId, Pageable pageable) {
+        return userService.findSavedPostsByUserId(userId, pageable);
+    }
+
+    @GetMapping("/{userId}/savedPosts/count")
+    public long countSavedPosts(@PathVariable Long userId) {
+        return userService.countSavedPostsByUser(userId);
     }
 
     @GetMapping("/{userId}/savedPosts/contains/{postId}")

@@ -123,7 +123,6 @@ public class GroupService {
     }
 
     public boolean doesUserMemberOfGroup(Long groupId, Long userId) {
-
         Group group = groupRepository.findById(groupId).orElse(null);
         if (group == null) {
             return false;
@@ -132,7 +131,6 @@ public class GroupService {
         if (!user.isPresent()) {
             return false;
         }
-
         return group.getMembers().contains(user.get());
     }
 }

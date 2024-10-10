@@ -20,7 +20,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -370,21 +369,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public Page<Post> getSavedPostsPaginated(Long id, Pageable pageable) throws UserNotFoundException {
-        User user = findById(id);
-        if (user == null) {
-            throw new UserNotFoundException("User not found by id: " + id);
-        }
-
-        List<Post> savedPosts = user.getSavedPosts();
-        if (savedPosts == null) {
-            return Page.empty(pageable);
-        }
-
-        List<Post> savedPostsList = new ArrayList<>(savedPosts);
-        int start = (int) pageable.getOffset();
-        int end = Math.min((start + pageable.getPageSize()), savedPostsList.size());
-        return new PageImpl<>(savedPostsList.subList(start, end), pageable, savedPostsList.size());
+    public Page<Post> getSavedPostsByUser(Long userId, Pageable pageable) {
+        // Busca o usuário pelo ID e retorna os posts guardados
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+        return userRepository.findSavedPostsByUser(userId, pageable);
     }
 
     @Override

@@ -17,7 +17,7 @@ public class Post implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, updatable=false)
-    @JsonProperty(access = JsonProperty.Access.READ_WRITE) // Means that other table can read and write
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
     private String text;
@@ -44,9 +44,6 @@ public class Post implements Serializable {
     @JsonIgnoreProperties({"post"})
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments;
-
-    //@ManyToMany(mappedBy = "savedPosts")
-    //private Set<User> usersWhoSaved = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -104,27 +101,4 @@ public class Post implements Serializable {
         this.group = group;
     }
 
-    //public Set<Like> getLikes() {
-    //    return likes;
-    //}
-
-    //public void setLikes(Set<Like> likes) {
-    //    this.likes = likes;
-    //}
-
-    //public List<Comment> getComments() {
-    //    return comments;
-    //}
-
-    //public void setComments(List<Comment> comments) {
-    //    this.comments = comments;
-    //}
-
-    //public Set<User> getUsersWhoSaved() {
-    //    return usersWhoSaved;
-    //}
-
-    //public void setUsersWhoSaved(Set<User> usersWhoSaved) {
-    //    this.usersWhoSaved = usersWhoSaved;
-    //}
 }

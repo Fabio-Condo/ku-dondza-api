@@ -189,16 +189,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.removePostFromSavedPosts(userId, postId));
     }
 
-    @GetMapping("/{userId}/savedPosts")
+    @GetMapping("/{userId}/savedPosts/list")
     public ResponseEntity<List<Post>> getSavedPosts(@PathVariable Long userId) throws UserNotFoundException {
         List<Post> savedPosts = userService.getSavedPosts(userId);
         return ResponseEntity.status(HttpStatus.OK).body(savedPosts);
     }
 
-    @GetMapping("/{userId}/savedPostsPaginated")
-    public ResponseEntity<Page<Post>> getSavedPostsPaginated(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
-        Page<Post> savedPostsPage = userService.getSavedPostsPaginated(userId, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(savedPostsPage);
+    @GetMapping("/{userId}/savedPosts")
+    public Page<Post> getSavedPosts(@PathVariable Long userId, Pageable pageable) {
+        return userService.getSavedPostsByUser(userId, pageable);
     }
 
     @GetMapping("/{userId}/savedPosts/contains/{postId}")

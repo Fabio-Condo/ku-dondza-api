@@ -15,7 +15,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAllByCommentsParentCommentIsNull(Pageable pageable);
     @Query("SELECT p FROM Post p WHERE p.text LIKE %:query%")
     Page<Post> searchByQuery(@Param("query") String query, Pageable pageable);
-
+    public Page<Post> findByGroupId(Long groupId, Pageable pageable);
     //Page<Post> findByContentContainingIgnoreCase(String query, Pageable pageable);
 
 }

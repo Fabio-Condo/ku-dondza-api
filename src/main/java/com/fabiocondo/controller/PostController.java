@@ -4,7 +4,6 @@ import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.NotAnImageFileException;
 import com.fabiocondo.exception.domain.PostNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
-import com.fabiocondo.domain.User;
 import com.fabiocondo.service.impl.PostServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -66,6 +65,11 @@ public class PostController{
                                      @RequestParam(value = "file", required = false) MultipartFile file) throws UserNotFoundException, PostNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(postServiceImpl.saveFromGroup(groupId, text, file));
+    }
+
+    @GetMapping("/findByGroupId")
+    public ResponseEntity<Page<Post>>  findByGroupId(@RequestParam Long groupId, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(postServiceImpl.findByGroupId(groupId, pageable));
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

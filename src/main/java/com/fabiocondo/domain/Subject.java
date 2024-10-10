@@ -1,11 +1,7 @@
 package com.fabiocondo.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "subject")
@@ -18,10 +14,6 @@ public class Subject {
     private Long id;
 
     private String name;
-
-    @ManyToMany(mappedBy = "subjects")
-    @JsonIgnoreProperties({"subjects"})
-    private List<Teacher> teachers = new ArrayList<>();
 
     public Subject() {
     }
@@ -45,13 +37,5 @@ public class Subject {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<Teacher> getTeachers() {
-        return teachers;
-    }
-
-    public void setTeachers(List<Teacher> teachers) {
-        this.teachers = teachers;
     }
 }

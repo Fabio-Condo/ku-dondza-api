@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
@@ -140,6 +141,10 @@ public class PostServiceImpl implements PostService {
 
         logger.info("Saving new post: " + post.getText());
         return postRepository.save(post);
+    }
+
+    public Page<Post> findByGroupId(@RequestParam Long groupId, Pageable pageable) {
+        return postRepository.findByGroupId(groupId, pageable);
     }
 
 }

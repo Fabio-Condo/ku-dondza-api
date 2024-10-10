@@ -1,6 +1,7 @@
 package com.fabiocondo.repository;
 
 
+import com.fabiocondo.domain.Post;
 import com.fabiocondo.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u FROM User u WHERE u.firstName LIKE %:query% OR u.lastName LIKE %:query%")
     Page<User> searchByQuery(@Param("query") String query, Pageable pageable);
+
+    @Query("SELECT u.savedPosts FROM User u WHERE u.id = :userId")
+    Page<Post> findSavedPostsByUser(Long userId, Pageable pageable);
 
     //Page<User> findByNameContainingIgnoreCase(String query, Pageable pageable);
 }

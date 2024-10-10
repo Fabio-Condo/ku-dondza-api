@@ -1,6 +1,5 @@
 package com.fabiocondo.controller;
 
-import com.fabiocondo.domain.Course;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.OnlineCourseContent;
 import com.fabiocondo.exception.domain.CourseContentNotFoundException;

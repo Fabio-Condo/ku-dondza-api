@@ -93,6 +93,17 @@ public class GroupService {
         }
     }
 
+    public long getTotal(){
+        logger.info("Total groups: " + groupRepository.count());
+        return groupRepository.count();
+    }
+
+    public Page<User> getMembersByGroupId(Long groupId, Pageable pageable) throws GroupNotFoundException {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new GroupNotFoundException("Group not found with ID: " + groupId));
+        return groupRepository.findMembersByGroupId(group.getId(), pageable);
+    }
+
     public Group addMemberToGroup(Long groupId, Long userId) throws GroupNotFoundException {
         Group group = findById(groupId);
         User user = userRepository.findById(userId)
@@ -111,8 +122,17 @@ public class GroupService {
         return groupRepository.save(group);
     }
 
-    public long getTotal(){
-        logger.info("Total groups: " + groupRepository.count());
-        return groupRepository.count();
+    public boolean doesUserMemberOfGroup(Long groupId, Long userId) {
+
+        Group group = groupRepository.findById(groupId).orElse(null);
+        if (group == null) {
+            return false;
+        }
+        Optional<User> user = userRepository.findById(userId);
+        if (!user.isPresent()) {
+            return false;
+        }
+
+        return group.getMembers().contains(user.get());
     }
 }

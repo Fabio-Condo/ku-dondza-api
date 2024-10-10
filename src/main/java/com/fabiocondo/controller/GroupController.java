@@ -2,6 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.Group;
 import com.fabiocondo.domain.HttpResponse;
+import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.ExameNotFoundException;
 import com.fabiocondo.exception.domain.GroupNotFoundException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
@@ -58,7 +59,17 @@ public class GroupController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws ExameNotFoundException, GroupNotFoundException {
         groupService.delete(id);
-        return response(HttpStatus.OK, "Exame deleted successfully");
+        return response(HttpStatus.OK, "Group deleted successfully");
+    }
+
+    @GetMapping("/total")
+    public ResponseEntity<Long> getTotal(){
+        return ResponseEntity.status(HttpStatus.OK).body(groupService.getTotal());
+    }
+
+    @GetMapping("/{groupId}/members")
+    public Page<User> getGroupMembers(@PathVariable Long groupId, Pageable pageable) throws GroupNotFoundException {
+        return groupService.getMembersByGroupId(groupId, pageable);
     }
 
     @PostMapping("/{groupId}/members/{userId}")
@@ -73,10 +84,13 @@ public class GroupController {
         return updatedGroup != null ? ResponseEntity.ok(updatedGroup) : ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/total")
-    public ResponseEntity<Long> getTotal(){
-        return ResponseEntity.status(HttpStatus.OK).body(groupService.getTotal());
+    @GetMapping("/{groupId}/members/contains/{userId}")
+    public ResponseEntity<Boolean> doesUserMemberOfGroup(@PathVariable Long groupId, @PathVariable Long userId) {
+        boolean doesContain = groupService.doesUserMemberOfGroup(groupId, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(doesContain);
     }
+
+
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(

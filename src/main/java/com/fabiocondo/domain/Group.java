@@ -1,5 +1,6 @@
 package com.fabiocondo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -24,6 +25,7 @@ public class Group {
 
     private String urlFile;
 
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
             name = "user_group",
@@ -32,7 +34,8 @@ public class Group {
     )
     private List<User> members;
 
-    @JsonIgnoreProperties({"group"})
+    //@JsonIgnoreProperties({"group"})
+    @JsonIgnore
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Post> posts;
 

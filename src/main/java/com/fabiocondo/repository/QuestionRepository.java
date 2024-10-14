@@ -1,6 +1,5 @@
 package com.fabiocondo.repository;
 
-import com.fabiocondo.domain.OnlineCourseContent;
 import com.fabiocondo.domain.Question;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

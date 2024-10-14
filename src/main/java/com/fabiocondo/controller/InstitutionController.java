@@ -3,7 +3,6 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Institution;
 import com.fabiocondo.enumeration.AdministrationType;
-import com.fabiocondo.enumeration.Country;
 import com.fabiocondo.exception.domain.ExameNotFoundException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.repository.filter.InstitutionFilter;
@@ -47,13 +46,12 @@ public class InstitutionController {
                                             @RequestParam("acronym") String acronym,
                                             @RequestParam("type") String type,
                                             @RequestParam("administrationType") AdministrationType administrationType,
-                                            @RequestParam("country") Country country,
                                             @RequestParam("address") String address,
                                             @RequestParam("description") String description,
                                             @RequestParam("website") String website,
                                             @RequestParam("file") MultipartFile file) throws InstituicaoNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(institutionServiceImpl.save(name, acronym, type, administrationType, country, address, description, website, file));
+        return ResponseEntity.status(HttpStatus.OK).body(institutionServiceImpl.save(name, acronym, type, administrationType, address, description, website, file));
     }
 
     @PutMapping
@@ -62,13 +60,12 @@ public class InstitutionController {
                                               @RequestParam("acronym") String acronym,
                                               @RequestParam("type") String type,
                                               @RequestParam("administrationType") AdministrationType administrationType,
-                                              @RequestParam("country") Country country,
                                               @RequestParam("address") String address,
                                               @RequestParam("description") String description,
                                               @RequestParam("website") String website,
                                               @RequestParam(value = "file", required = false) MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(institutionServiceImpl.update(id, name, acronym, type, administrationType, country, address, description, website, file));
+        return ResponseEntity.status(HttpStatus.OK).body(institutionServiceImpl.update(id, name, acronym, type, administrationType, address, description, website, file));
     }
 
     @DeleteMapping("/{id}")

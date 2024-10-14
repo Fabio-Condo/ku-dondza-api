@@ -44,7 +44,7 @@ public class OnlineCourseContentController {
     }
 
     @GetMapping("/findByOnlineCourseId")
-    public ResponseEntity<Page<OnlineCourseContent>>  findByOnlineCourseId(@RequestParam Long onlineCourseId, Pageable pageable) {
+    public ResponseEntity<Page<OnlineCourseContent>> findByOnlineCourseId(@RequestParam Long onlineCourseId, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.findByOnlineCourseId(onlineCourseId, pageable));
     }
 

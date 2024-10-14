@@ -1,7 +1,6 @@
 package com.fabiocondo.domain;
 
 import com.fabiocondo.enumeration.AdministrationType;
-import com.fabiocondo.enumeration.Country;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -26,9 +25,6 @@ public class Institution implements Serializable { // ADD SIGLA - UEM, UP, ACIPO
     @Enumerated(EnumType.STRING)
     private AdministrationType administrationType;
 
-    @Enumerated(EnumType.STRING)
-    private Country country;
-
     private String address; // Rua, Número, Bairro, Cidade, Estado
 
     private String website;
@@ -42,13 +38,12 @@ public class Institution implements Serializable { // ADD SIGLA - UEM, UP, ACIPO
     public Institution() {
     }
 
-    public Institution(Long id, String name, String acronym, String type, AdministrationType administrationType, Country country, String address, String website, String description, String fileName, String urlFile) {
+    public Institution(Long id, String name, String acronym, String type, AdministrationType administrationType, String address, String website, String description, String fileName, String urlFile) {
         this.id = id;
         this.name = name;
         this.acronym = acronym;
         this.type = type;
         this.administrationType = administrationType;
-        this.country = country;
         this.address = address;
         this.website = website;
         this.description = description;
@@ -94,14 +89,6 @@ public class Institution implements Serializable { // ADD SIGLA - UEM, UP, ACIPO
 
     public void setAdministrationType(AdministrationType administrationType) {
         this.administrationType = administrationType;
-    }
-
-    public Country getCountry() {
-        return country;
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
     }
 
     public String getAddress() {

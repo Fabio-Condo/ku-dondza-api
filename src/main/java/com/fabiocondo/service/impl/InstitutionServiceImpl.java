@@ -4,7 +4,6 @@ import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Institution;
 import com.fabiocondo.enumeration.AdministrationType;
-import com.fabiocondo.enumeration.Country;
 import com.fabiocondo.exception.domain.ExameNotFoundException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.repository.InstitutionRepository;
@@ -51,7 +50,7 @@ public class InstitutionServiceImpl implements InstitutionService {
     }
 
     @Override
-    public Institution save(String name, String acronym, String type, AdministrationType administrationType, Country country, String address, String description, String website, MultipartFile file) throws InstituicaoNotFoundException {
+    public Institution save(String name, String acronym, String type, AdministrationType administrationType, String address, String description, String website, MultipartFile file) throws InstituicaoNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
@@ -60,7 +59,6 @@ public class InstitutionServiceImpl implements InstitutionService {
         institution.setAcronym(acronym);
         institution.setType(type);
         institution.setAdministrationType(administrationType);
-        institution.setCountry(country);
         institution.setAddress(address);
         institution.setDescription(description);
         institution.setWebsite(website);
@@ -72,13 +70,12 @@ public class InstitutionServiceImpl implements InstitutionService {
     }
 
     @Override
-    public Institution update(Long id, String name, String acronym, String type, AdministrationType administrationType, Country country, String address, String description, String website, MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException {
+    public Institution update(Long id, String name, String acronym, String type, AdministrationType administrationType, String address, String description, String website, MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException {
         Institution existInstitution = findById(id);
         existInstitution.setName(name);
         existInstitution.setAcronym(acronym);
         existInstitution.setType(type);
         existInstitution.setAdministrationType(administrationType);
-        existInstitution.setCountry(country);
         existInstitution.setAddress(address);
         existInstitution.setDescription(description);
         existInstitution.setWebsite(website);

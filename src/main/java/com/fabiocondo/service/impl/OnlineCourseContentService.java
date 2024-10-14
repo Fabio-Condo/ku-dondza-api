@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -81,7 +80,7 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.save(existContent);
     }
 
-    public Page<OnlineCourseContent> findByOnlineCourseId(@RequestParam Long onlineCourseId, Pageable pageable) {
+    public Page<OnlineCourseContent> findByOnlineCourseId(Long onlineCourseId, Pageable pageable) {
         return onlineCourseContentRepository.findByOnlineCourseId(onlineCourseId, pageable);
     }
 

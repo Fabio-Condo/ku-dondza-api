@@ -1,7 +1,7 @@
 package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.Question;
-import com.fabiocondo.exception.domain.QuizNotFoundException;
+import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +9,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -22,10 +23,10 @@ public class QuestionService {
         this.questionRepository = questionRepository;
     }
 
-    public Question findById(Long id) throws QuizNotFoundException {
+    public Question findById(Long id) throws QuestionNotFoundException {
         logger.info("Getting question by id: " + id);
         return questionRepository.findById(id)
-                .orElseThrow(() -> new QuizNotFoundException("No quiz found by id: " + id));
+                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + id));
     }
 
     public Page<Question> findAll(Pageable pageable) {
@@ -42,7 +43,7 @@ public class QuestionService {
         return questionRepository.save(question);
     }
 
-    public Question update(Question question, Long id) throws QuizNotFoundException {
+    public Question update(Question question, Long id) throws QuestionNotFoundException {
         Question existQuestion = findById(id);
 
         existQuestion.getAnswers().clear();
@@ -54,10 +55,14 @@ public class QuestionService {
         return questionRepository.save(existQuestion);
     }
 
-    public void delete(Long id) throws QuizNotFoundException {
+    public void delete(Long id) throws QuestionNotFoundException {
         Question existQuestion = findById(id);
         logger.info("Deleting quiz: " + existQuestion.getText());
         questionRepository.deleteById(id);
+    }
+
+    public Page<Question> findByQuizId(Long quizId, Pageable pageable) {
+        return questionRepository.findByQuizId(quizId, pageable);
     }
 
     public long getTotal(){

@@ -1,7 +1,6 @@
 package com.fabiocondo.repository.filter;
 
 import com.fabiocondo.enumeration.AdministrationType;
-import com.fabiocondo.enumeration.Country;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -19,16 +18,12 @@ public class InstitutionFilter {
     @Enumerated(EnumType.STRING)
     private AdministrationType administrationType;
 
-    @Enumerated(EnumType.STRING)
-    private Country country;
-
-    public InstitutionFilter(String global, String institutionOrderBy, String name, String type, AdministrationType administrationType, Country country) {
+    public InstitutionFilter(String global, String institutionOrderBy, String name, String type, AdministrationType administrationType) {
         this.global = global;
         this.institutionOrderBy = institutionOrderBy;
         this.name = name;
         this.type = type;
         this.administrationType = administrationType;
-        this.country = country;
     }
 
     public String getGlobal() {
@@ -69,13 +64,5 @@ public class InstitutionFilter {
 
     public void setAdministrationType(AdministrationType administrationType) {
         this.administrationType = administrationType;
-    }
-
-    public Country getCountry() {
-        return country;
-    }
-
-    public void setCountry(Country country) {
-        this.country = country;
     }
 }

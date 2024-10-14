@@ -1,5 +1,7 @@
 package com.fabiocondo.service.impl;
 
+import com.fabiocondo.aws.model.S3UploadResponse;
+import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
@@ -8,17 +10,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+
+import static com.fabiocondo.constant.UserImplConstant.NO_USER_FOUND_BY_USERNAME;
 
 @Service
 public class QuestionService {
 
+    private static final String BUCKET_NAME = "b-tests-bucket";
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final AmazonS3Service amazonS3Service;
     private final QuestionRepository questionRepository;
 
-    public QuestionService(QuestionRepository questionRepository) {
+    public QuestionService(AmazonS3Service amazonS3Service, QuestionRepository questionRepository) {
+        this.amazonS3Service = amazonS3Service;
         this.questionRepository = questionRepository;
     }
 
@@ -67,5 +77,33 @@ public class QuestionService {
     public long getTotal(){
         logger.info("Total quizzes: " + questionRepository.count());
         return questionRepository.count();
+    }
+
+    public Question updateQuestionImage(Long questionId, MultipartFile file) throws IOException, QuestionNotFoundException {
+        // Adicionar funcao que diminue o tamanho da imagem
+
+        System.out.println("Passandooo daqui com " + file.getOriginalFilename());
+
+        Question question = findById(questionId);
+        if (question == null) {
+            throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME + questionId);
+        }
+
+        if (file == null || file.isEmpty()) {
+            throw new IOException("The file is null or empty");
+        }
+
+        // Deleta o arquivo antigo do S3
+        if (question.getFileName() != null) {
+            logger.info("Deleting file: " + question.getFileName());
+            amazonS3Service.deleteFile(question.getFileName(), BUCKET_NAME);
+        }
+
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+        question.setUrlFile(s3UploadResponse.getFileUrl());
+        question.setFileName(file.getOriginalFilename());
+
+        questionRepository.save(question);
+        return question;
     }
 }

@@ -1,6 +1,6 @@
 package com.fabiocondo.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -18,7 +18,7 @@ public class Quiz {
 
     private String title;
 
-    @JsonIgnoreProperties({"quiz"})
+    @JsonIgnore
     @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL)
     private List<Question> questions;
 

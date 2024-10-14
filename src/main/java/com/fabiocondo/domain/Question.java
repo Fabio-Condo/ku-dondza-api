@@ -19,6 +19,10 @@ public class Question {
 
     private String text;
 
+    private String fileName;
+
+    private String urlFile;
+
     @ManyToOne
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
@@ -42,6 +46,22 @@ public class Question {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getUrlFile() {
+        return urlFile;
+    }
+
+    public void setUrlFile(String urlFile) {
+        this.urlFile = urlFile;
     }
 
     public Quiz getQuiz() {

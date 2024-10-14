@@ -2,6 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Question;
+import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.service.impl.QuestionService;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/questions")
@@ -55,6 +59,11 @@ public class QuestionController {
     @GetMapping("/findQuestionsByQuizId")
     public ResponseEntity<Page<Question>> findByQuizId(@RequestParam Long quizId, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.findByQuizId(quizId, pageable));
+    }
+
+    @PostMapping("/{questionId}/question-image")
+    public ResponseEntity<Question> updateQuestionImage(@PathVariable Long questionId, @RequestParam("file") MultipartFile file) throws IOException, QuestionNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(questionService.updateQuestionImage(questionId, file));
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

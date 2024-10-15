@@ -3,7 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Institution;
 import com.fabiocondo.enumeration.AdministrationType;
-import com.fabiocondo.exception.domain.ExameNotFoundException;
+import com.fabiocondo.exception.domain.ExamNotFoundException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.repository.filter.InstitutionFilter;
 import com.fabiocondo.service.impl.InstitutionServiceImpl;
@@ -63,7 +63,7 @@ public class InstitutionController {
                                               @RequestParam("address") String address,
                                               @RequestParam("description") String description,
                                               @RequestParam("website") String website,
-                                              @RequestParam(value = "file", required = false) MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException {
+                                              @RequestParam(value = "file", required = false) MultipartFile file) throws ExamNotFoundException, InstituicaoNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(institutionServiceImpl.update(id, name, acronym, type, administrationType, address, description, website, file));
     }

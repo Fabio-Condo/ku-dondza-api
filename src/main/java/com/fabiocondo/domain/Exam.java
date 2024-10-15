@@ -1,5 +1,6 @@
 package com.fabiocondo.domain;
 
+import com.fabiocondo.enumeration.ExamStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -8,7 +9,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "exame")
-public class Exame implements Serializable {
+public class Exam implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +18,9 @@ public class Exame implements Serializable {
     private Long id;
 
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private ExamStatus status;
 
     private String fileName;
 
@@ -34,13 +38,14 @@ public class Exame implements Serializable {
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
-    public Exame() {
+    public Exam() {
     }
 
-    public Exame(Long id, Subject subject, String description,  String fileName, String urlFile, Date date, Long totalDownloadNumber, Institution institution) {
+    public Exam(Long id, Subject subject, String description, ExamStatus status, String fileName, String urlFile, Date date, Long totalDownloadNumber, Institution institution) {
         this.id = id;
         this.subject = subject;
         this.description = description;
+        this.status = status;
         this.fileName = fileName;
         this.urlFile = urlFile;
         this.date = date;
@@ -70,6 +75,14 @@ public class Exame implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public ExamStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ExamStatus status) {
+        this.status = status;
     }
 
     public String getFileName() {

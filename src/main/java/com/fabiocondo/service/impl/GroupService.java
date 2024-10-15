@@ -3,10 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
-import com.fabiocondo.exception.domain.ExameNotFoundException;
 import com.fabiocondo.exception.domain.GroupNotFoundException;
-import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
-import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.repository.GroupRepository;
 import com.fabiocondo.repository.UserRepository;
 import org.slf4j.Logger;
@@ -18,8 +15,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 @Service

@@ -2,7 +2,7 @@ package com.fabiocondo.service;
 
 import com.fabiocondo.domain.Institution;
 import com.fabiocondo.enumeration.AdministrationType;
-import com.fabiocondo.exception.domain.ExameNotFoundException;
+import com.fabiocondo.exception.domain.ExamNotFoundException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.repository.filter.InstitutionFilter;
 import org.springframework.data.domain.Page;
@@ -18,7 +18,7 @@ public interface InstitutionService {
 
     Institution save(String name, String acronym, String type, AdministrationType administrationType, String address, String description, String website, MultipartFile file) throws InstituicaoNotFoundException;
 
-    Institution update(Long id, String name, String acronym, String type, AdministrationType administrationType, String address, String description, String website, MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException;
+    Institution update(Long id, String name, String acronym, String type, AdministrationType administrationType, String address, String description, String website, MultipartFile file) throws ExamNotFoundException, InstituicaoNotFoundException;
 
     void delete(Long id) throws InstituicaoNotFoundException;
 

@@ -4,7 +4,7 @@ import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Institution;
 import com.fabiocondo.enumeration.AdministrationType;
-import com.fabiocondo.exception.domain.ExameNotFoundException;
+import com.fabiocondo.exception.domain.ExamNotFoundException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.repository.InstitutionRepository;
 import com.fabiocondo.repository.filter.InstitutionFilter;
@@ -70,7 +70,7 @@ public class InstitutionServiceImpl implements InstitutionService {
     }
 
     @Override
-    public Institution update(Long id, String name, String acronym, String type, AdministrationType administrationType, String address, String description, String website, MultipartFile file) throws ExameNotFoundException, InstituicaoNotFoundException {
+    public Institution update(Long id, String name, String acronym, String type, AdministrationType administrationType, String address, String description, String website, MultipartFile file) throws ExamNotFoundException, InstituicaoNotFoundException {
         Institution existInstitution = findById(id);
         existInstitution.setName(name);
         existInstitution.setAcronym(acronym);

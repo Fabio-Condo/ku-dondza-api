@@ -3,7 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.Group;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.User;
-import com.fabiocondo.exception.domain.ExameNotFoundException;
+import com.fabiocondo.exception.domain.ExamNotFoundException;
 import com.fabiocondo.exception.domain.GroupNotFoundException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
@@ -57,7 +57,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws ExameNotFoundException, GroupNotFoundException {
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws ExamNotFoundException, GroupNotFoundException {
         groupService.delete(id);
         return response(HttpStatus.OK, "Group deleted successfully");
     }

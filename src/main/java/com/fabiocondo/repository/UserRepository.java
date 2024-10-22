@@ -29,6 +29,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT sp FROM User u JOIN u.savedPosts sp WHERE u.id = :userId")
     Page<Post> findSavedPostsByUserId(@Param("userId") Long userId, Pageable pageable);
 
+    @Query("SELECT fr FROM User u JOIN u.friends fr WHERE u.id = :userId")
+    Page<User> findFriendsByUserId(@Param("userId") Long userId, Pageable pageable);
+
     public long countByIsActiveTrue();
 
 }

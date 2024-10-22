@@ -72,6 +72,7 @@ public interface UserService {
     boolean doesUserSavedPost(Long userId, Long postId);
 
     List<User> getFriendRequests() throws UserNotFoundException;
+    Page<User> getFriends(Long userId, Pageable pageable);
 
     void sendFriendRequest(User friend) throws UserNotFoundException;
 

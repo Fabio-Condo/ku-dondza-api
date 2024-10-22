@@ -402,6 +402,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public Page<User> getFriends(Long userId, Pageable pageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+        return userRepository.findFriendsByUserId(user.getId(), pageable);
+    }
+
+    @Override
     public void sendFriendRequest(User friend) throws UserNotFoundException {
         User user = getAuthenticatedUser();
         User passedUser = findById(friend.getId());

@@ -20,8 +20,11 @@ import java.io.IOException;
 @RequestMapping(path = {"/post"})
 public class PostController{
 
-    @Autowired
     PostServiceImpl postServiceImpl;
+
+    public PostController(PostServiceImpl postServiceImpl) {
+        this.postServiceImpl = postServiceImpl;
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Post> findById(@PathVariable("id") Long id) throws PostNotFoundException {
@@ -52,7 +55,6 @@ public class PostController{
 
         return ResponseEntity.status(HttpStatus.OK).body(postServiceImpl.update(id, text, file));
     }
-
 
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws PostNotFoundException {
         postServiceImpl.delete(id);

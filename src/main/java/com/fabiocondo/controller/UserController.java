@@ -236,6 +236,11 @@ public class UserController {
         return userService.getFriends();
     }
 
+    @GetMapping("/{userId}/friends")
+    public Page<User> getFriendsById(@PathVariable Long userId, Pageable pageable) {
+        return userService.getFriends(userId, pageable);
+    }
+
     @DeleteMapping("/friends/{friendId}")
     public void removeFriend(@PathVariable Long friendId) throws UserNotFoundException {
         userService.removeFriend(friendId);

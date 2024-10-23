@@ -75,6 +75,8 @@ public interface UserService {
 
     Set<User> getFriendRequests() throws UserNotFoundException;
 
+    Page<User> getCurrentFriendRequests(Pageable pageable) throws UserNotFoundException;
+
     Page<User> getFriends(Long userId, Pageable pageable) throws UserNotFoundException;
 
     Page<User> getCurrentUserFriends(Pageable pageable) throws UserNotFoundException;

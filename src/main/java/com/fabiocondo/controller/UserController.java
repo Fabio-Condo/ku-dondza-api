@@ -217,6 +217,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getFriendRequests());
     }
 
+    @GetMapping("/current-user-friend-requests")
+    public ResponseEntity<Page<User>> getCurrentFriendRequests(Pageable pageable) throws UserNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getCurrentFriendRequests(pageable));
+    }
+
     @PostMapping("/send-friend-request")
     public void sendFriendRequest(@RequestBody User friend) throws UserNotFoundException {
         userService.sendFriendRequest(friend);

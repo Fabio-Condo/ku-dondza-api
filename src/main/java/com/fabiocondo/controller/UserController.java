@@ -237,6 +237,11 @@ public class UserController {
         return userService.getFriends();
     }
 
+    @GetMapping("/current-user-friends")
+    public Page<User> getCurrentUserFriends(Pageable pageable) throws UserNotFoundException {
+        return userService.getCurrentUserFriends(pageable);
+    }
+
     @GetMapping("/{userId}/friends")
     public Page<User> getFriendsById(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
         return userService.getFriends(userId, pageable);
@@ -245,6 +250,12 @@ public class UserController {
     @DeleteMapping("/friends/{friendId}")
     public void removeFriend(@PathVariable Long friendId) throws UserNotFoundException {
         userService.removeFriend(friendId);
+    }
+
+    @GetMapping("/friends/{friendId}")
+    public ResponseEntity<Boolean> checkFriendship(@PathVariable Long friendId) throws UserNotFoundException {
+        boolean areFriends = userService.isFriend(friendId);
+        return ResponseEntity.ok(areFriends);
     }
 
     @PostMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")

@@ -409,6 +409,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public Page<User> getCurrentUserFriends(Pageable pageable) throws UserNotFoundException {
+        User user = getAuthenticatedUser();
+        return userRepository.findFriendsByUserId(user.getId(), pageable);
+    }
+
+    @Override
     public void sendFriendRequest(User friend) throws UserNotFoundException {
         User user = getAuthenticatedUser();
         User passedUser = findById(friend.getId());
@@ -448,6 +454,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.getFriends().remove(friend);
         friend.getFriends().remove(user);
         userRepository.saveAll(Arrays.asList(user, friend));
+    }
+
+    @Override
+    public boolean isFriend(Long friendId) throws UserNotFoundException {
+        //User user = userRepository.findById(userId).orElse(null);
+        User user = getAuthenticatedUser();
+        User friend = userRepository.findById(friendId).orElse(null);
+
+        if (user == null || friend == null) {
+            return false; // Se um dos usuários não existir, retorna falso
+        }
+
+        return user.isFriend(friend); // Chama o método isFriend da classe User
     }
 
     private void validateLoginAttempt(User user) {

@@ -126,6 +126,10 @@ public class User implements Serializable {
         this.isNotLocked = isNotLocked;
     }
 
+    public boolean isFriend(User user) {
+        return user != null && this.friends.contains(user);
+    }
+
     public Long getId() {
         return id;
     }

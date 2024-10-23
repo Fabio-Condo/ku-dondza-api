@@ -39,6 +39,8 @@ public interface UserService {
 
     void updatePropertyNotLocked(String username, Boolean notLocked) throws UsernameNotFoundException;
 
+    boolean isFriend(Long friendId) throws UserNotFoundException;
+
     User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException;
 
     User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException;
@@ -72,7 +74,10 @@ public interface UserService {
     boolean doesUserSavedPost(Long userId, Long postId);
 
     Set<User> getFriendRequests() throws UserNotFoundException;
+
     Page<User> getFriends(Long userId, Pageable pageable) throws UserNotFoundException;
+
+    Page<User> getCurrentUserFriends(Pageable pageable) throws UserNotFoundException;
 
     void sendFriendRequest(User friend) throws UserNotFoundException;
 

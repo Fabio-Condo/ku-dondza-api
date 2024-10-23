@@ -291,7 +291,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void updatePropertyActive(String username, Boolean active) throws UsernameNotFoundException {
+    public void updatePropertyActive(String username, Boolean active) {
         User userSaved = findUserByUsername(username);
         userSaved.setActive(active);
         logger.info("Updating user: " + userSaved.getFirstName());
@@ -299,7 +299,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public void updatePropertyNotLocked(String username, Boolean notLocked) throws UsernameNotFoundException {
+    public void updatePropertyNotLocked(String username, Boolean notLocked) {
         User userSaved = findUserByUsername(username);
         userSaved.setNotLocked(notLocked);
         logger.info("Updating user: " + userSaved.getFirstName());
@@ -369,16 +369,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public Page<Post> findSavedPostsByUserId(Long userId, Pageable pageable) {
+    public Page<Post> findSavedPostsByUserId(Long userId, Pageable pageable) throws UserNotFoundException {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
         return userRepository.findSavedPostsByUserId(user.getId(), pageable);
     }
 
     @Override
-    public long countSavedPostsByUser(Long userId) {
+    public long countSavedPostsByUser(Long userId) throws UserNotFoundException {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
         return user.getSavedPosts().size();
     }
 
@@ -396,15 +396,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public List<User> getFriendRequests() throws UserNotFoundException {
+    public Set<User> getFriendRequests() throws UserNotFoundException {
         User user = getAuthenticatedUser();
         return user.getFriendRequests();
     }
 
     @Override
-    public Page<User> getFriends(Long userId, Pageable pageable) {
+    public Page<User> getFriends(Long userId, Pageable pageable) throws UserNotFoundException {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
         return userRepository.findFriendsByUserId(user.getId(), pageable);
     }
 
@@ -436,7 +436,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public List<User> getFriends() throws UserNotFoundException {
+    public Set<User> getFriends() throws UserNotFoundException {
         User user = getAuthenticatedUser();
         return user.getFriends();
     }

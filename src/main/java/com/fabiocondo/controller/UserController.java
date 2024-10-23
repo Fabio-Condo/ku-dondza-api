@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import static com.fabiocondo.constant.SecurityConstant.JWT_TOKEN_HEADER;
 import static com.fabiocondo.constant.UserImplConstant.EMAIL_SENT;
@@ -196,12 +197,12 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/savedPosts")
-    public Page<Post> findSavedPostsByUserId(@PathVariable Long userId, Pageable pageable) {
+    public Page<Post> findSavedPostsByUserId(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
         return userService.findSavedPostsByUserId(userId, pageable);
     }
 
     @GetMapping("/{userId}/savedPosts/count")
-    public long countSavedPosts(@PathVariable Long userId) {
+    public long countSavedPosts(@PathVariable Long userId) throws UserNotFoundException {
         return userService.countSavedPostsByUser(userId);
     }
 
@@ -212,7 +213,7 @@ public class UserController {
     }
 
     @GetMapping("/friend-requests")
-    public ResponseEntity<List<User>> getFriendRequests() throws UserNotFoundException {
+    public ResponseEntity<Set<User>> getFriendRequests() throws UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getFriendRequests());
     }
 
@@ -232,12 +233,12 @@ public class UserController {
     }
 
     @GetMapping("/friends")
-    public List<User> getFriends() throws UserNotFoundException {
+    public Set<User> getFriends() throws UserNotFoundException {
         return userService.getFriends();
     }
 
     @GetMapping("/{userId}/friends")
-    public Page<User> getFriendsById(@PathVariable Long userId, Pageable pageable) {
+    public Page<User> getFriendsById(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
         return userService.getFriends(userId, pageable);
     }
 

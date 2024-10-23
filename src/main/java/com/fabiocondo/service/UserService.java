@@ -65,14 +65,14 @@ public interface UserService {
 
     List<Post> getSavedPosts(Long id) throws UserNotFoundException;
 
-    Page<Post> findSavedPostsByUserId(Long userId, Pageable pageable);
+    Page<Post> findSavedPostsByUserId(Long userId, Pageable pageable) throws UserNotFoundException;
 
-    long countSavedPostsByUser(Long userId);
+    long countSavedPostsByUser(Long userId) throws UserNotFoundException;
 
     boolean doesUserSavedPost(Long userId, Long postId);
 
-    List<User> getFriendRequests() throws UserNotFoundException;
-    Page<User> getFriends(Long userId, Pageable pageable);
+    Set<User> getFriendRequests() throws UserNotFoundException;
+    Page<User> getFriends(Long userId, Pageable pageable) throws UserNotFoundException;
 
     void sendFriendRequest(User friend) throws UserNotFoundException;
 
@@ -80,7 +80,7 @@ public interface UserService {
 
     void rejectFriendRequest(Long friendId) throws UserNotFoundException;
 
-    List<User> getFriends() throws UserNotFoundException;
+    Set<User> getFriends() throws UserNotFoundException;
 
     void removeFriend(Long friendId) throws UserNotFoundException;
 }

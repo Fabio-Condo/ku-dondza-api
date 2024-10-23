@@ -76,7 +76,7 @@ public class User implements Serializable {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
-    private List<User> friends = new ArrayList<>();
+    private Set<User> friends = new HashSet<>();
 
     @JsonIgnore
     @ManyToMany
@@ -85,7 +85,7 @@ public class User implements Serializable {
             joinColumns = @JoinColumn(name = "to_user_id"),
             inverseJoinColumns = @JoinColumn(name = "from_user_id")
     )
-    private List<User> friendRequests = new ArrayList<>();
+    private Set<User> friendRequests = new HashSet<>();
 
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
@@ -302,19 +302,19 @@ public class User implements Serializable {
         this.savedPosts = savedPosts;
     }
 
-    public List<User> getFriends() {
+    public Set<User> getFriends() {
         return friends;
     }
 
-    public void setFriends(List<User> friends) {
+    public void setFriends(Set<User> friends) {
         this.friends = friends;
     }
 
-    public List<User> getFriendRequests() {
+    public Set<User> getFriendRequests() {
         return friendRequests;
     }
 
-    public void setFriendRequests(List<User> friendRequests) {
+    public void setFriendRequests(Set<User> friendRequests) {
         this.friendRequests = friendRequests;
     }
 

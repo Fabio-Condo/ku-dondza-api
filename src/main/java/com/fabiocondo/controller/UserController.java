@@ -263,6 +263,12 @@ public class UserController {
         return ResponseEntity.ok(areFriends);
     }
 
+    @GetMapping("/{receptorUserId}/requests/{emissorUserId}")
+    public ResponseEntity<Boolean> checkIfSentFriendRequest(@PathVariable Long receptorUserId, @PathVariable Long emissorUserId) throws UserNotFoundException {
+        boolean sentFriendRequest = userService.sentFriendRequest(receptorUserId, emissorUserId);
+        return ResponseEntity.ok(sentFriendRequest);
+    }
+
     @PostMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")
     public ResponseEntity<User> addCourseToSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws PostNotFoundException, CourseNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.addCourseToSubscribedOnlineCourses(userId, onlineCourseId));

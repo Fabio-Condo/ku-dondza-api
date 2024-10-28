@@ -132,8 +132,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(encodePassword(password));
-        user.setActive(isActive);
-        user.setNotLocked(isNonLocked);
+        //user.setActive(isActive);
+        //user.setNotLocked(isNonLocked);
+        user.setActive(true);
+        user.setNotLocked(true);
         user.setRole(getRoleEnumName(role).name());
         user.setAuthorities(getRoleEnumName(role).getAuthorities());
         user.setProfileImageUrl(s3UploadResponse.getFileUrl());
@@ -151,8 +153,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         currentUser.setLastName(newLastName);
         currentUser.setUsername(newUsername);
         currentUser.setEmail(newEmail);
-        currentUser.setActive(isActive);
-        currentUser.setNotLocked(isNonLocked);
+        //currentUser.setActive(isActive);
+        //currentUser.setNotLocked(isNonLocked);
+        currentUser.setActive(true);
+        currentUser.setNotLocked(true);
         currentUser.setRole(getRoleEnumName(role).name());
         currentUser.setAuthorities(getRoleEnumName(role).getAuthorities());
 
@@ -464,7 +468,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public boolean isFriend(Long friendId) throws UserNotFoundException {
-        //User user = userRepository.findById(userId).orElse(null);
         User user = getAuthenticatedUser();
         User friend = userRepository.findById(friendId).orElse(null);
 
@@ -473,6 +476,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         return user.isFriend(friend); // Chama o método isFriend da classe User
+    }
+
+    @Override
+    public boolean sentFriendRequest(Long receptorUserId, Long emissorUserId) {
+        User user = findById(receptorUserId);
+        User friend = userRepository.findById(emissorUserId).orElse(null);
+
+        if (user == null || friend == null) {
+            return false; // Se um dos usuários não existir, retorna falso
+        }
+
+        return user.sentFriendRequest(friend); // Chama o método isFriend da classe User
     }
 
     private void validateLoginAttempt(User user) {

@@ -41,6 +41,8 @@ public interface UserService {
 
     boolean isFriend(Long friendId) throws UserNotFoundException;
 
+    boolean sentFriendRequest(Long receptorUserId, Long emissorUserId) throws UserNotFoundException;
+
     User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException;
 
     User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException;

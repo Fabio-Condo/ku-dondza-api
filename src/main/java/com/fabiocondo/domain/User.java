@@ -130,6 +130,10 @@ public class User implements Serializable {
         return user != null && this.friends.contains(user);
     }
 
+    public boolean sentFriendRequest(User user) {
+        return user != null && this.friendRequests.contains(user);
+    }
+
     public Long getId() {
         return id;
     }

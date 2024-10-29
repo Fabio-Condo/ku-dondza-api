@@ -1,7 +1,11 @@
 package com.fabiocondo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "competition")
@@ -13,21 +17,23 @@ public class Competition {
 
     private String title;
 
+    @JsonIgnoreProperties({"competitions"})
     @ManyToMany
     @JoinTable(
             name = "competition_questions",
             joinColumns = @JoinColumn(name = "competition_id"),
             inverseJoinColumns = @JoinColumn(name = "question_id")
     )
-    private List<Question> questions;
+    private Set<Question> questions = new HashSet<>();
 
+    @JsonIgnoreProperties({"competitions"})
     @ManyToMany
     @JoinTable(
             name = "competition_users",
             joinColumns = @JoinColumn(name = "competition_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> participants;
+    private Set<User> participants = new HashSet<>();
 
     public Competition() {
     }
@@ -52,19 +58,19 @@ public class Competition {
         this.title = title;
     }
 
-    public List<Question> getQuestions() {
+    public Set<Question> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(List<Question> questions) {
+    public void setQuestions(Set<Question> questions) {
         this.questions = questions;
     }
 
-    public List<User> getParticipants() {
+    public Set<User> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(List<User> participants) {
+    public void setParticipants(Set<User> participants) {
         this.participants = participants;
     }
 }

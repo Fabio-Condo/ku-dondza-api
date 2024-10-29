@@ -51,6 +51,11 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(CompetitionNotFoundException.class)
+    public ResponseEntity<HttpResponse> competitionNotFoundException(CompetitionNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(GroupNotFoundException.class)
     public ResponseEntity<HttpResponse> groupNotFoundException(GroupNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());

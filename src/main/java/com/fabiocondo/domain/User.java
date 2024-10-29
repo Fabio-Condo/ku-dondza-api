@@ -104,6 +104,9 @@ public class User implements Serializable {
     )
     private Set<OnlineCourse> subscribedOnlineCourses = new HashSet<>();
 
+    @ManyToMany(mappedBy = "participants")
+    private List<Competition> competitions;
+
     public User(){}
 
     public User(Long id, String userId, String firstName, String lastName, String username, String bio, String password, String email, String profileImageUrl, String fileName, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, boolean isActive, boolean isNotLocked) {
@@ -340,6 +343,14 @@ public class User implements Serializable {
 
     public void setSubscribedOnlineCourses(Set<OnlineCourse> subscribedOnlineCourses) {
         this.subscribedOnlineCourses = subscribedOnlineCourses;
+    }
+
+    public List<Competition> getCompetitions() {
+        return competitions;
+    }
+
+    public void setCompetitions(List<Competition> competitions) {
+        this.competitions = competitions;
     }
 }
 

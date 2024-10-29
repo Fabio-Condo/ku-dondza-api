@@ -1,8 +1,10 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
+import com.fabiocondo.domain.Interest;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.User;
+import com.fabiocondo.exception.domain.InterestNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.service.impl.QuestionService;
 import org.springframework.data.domain.Page;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/questions")
@@ -29,9 +32,14 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.findById(id));
     }
 
-    @GetMapping
+    @GetMapping("/filter")
     public ResponseEntity<Page<Question>> findAll(Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.findAll(pageable));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Question>> findAll() throws InterestNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(questionService.findAll());
     }
 
     @PostMapping
@@ -56,12 +64,12 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.getTotal());
     }
 
-    @GetMapping("/findQuestionsByQuizId")
+    @GetMapping("/findQuestionsByQuizId") // remover
     public ResponseEntity<Page<Question>> findByQuizId(@RequestParam Long quizId, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.findByQuizId(quizId, pageable));
     }
 
-    @PostMapping("/{questionId}/question-image")
+    @PostMapping("/{questionId}/question-image") // remover
     public ResponseEntity<Question> updateQuestionImage(@PathVariable Long questionId, @RequestParam("file") MultipartFile file) throws IOException, QuestionNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.updateQuestionImage(questionId, file));
     }

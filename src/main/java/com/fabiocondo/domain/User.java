@@ -104,6 +104,7 @@ public class User implements Serializable {
     )
     private Set<OnlineCourse> subscribedOnlineCourses = new HashSet<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "participants")
     private List<Competition> competitions;
 

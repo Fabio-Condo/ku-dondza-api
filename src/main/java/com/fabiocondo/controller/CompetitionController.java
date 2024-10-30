@@ -57,6 +57,7 @@ public class CompetitionController {
 
     @GetMapping("/{competitionId}/participants")
     public Page<User> getParticipantsByCompetitionId(@PathVariable Long competitionId, Pageable pageable) throws CompetitionNotFoundException {
+        System.out.println("aaaa olaaaaaa");
         return competitionService.getParticipantsByCompetitionId(competitionId, pageable);
     }
 

@@ -1,8 +1,5 @@
 package com.fabiocondo.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +14,8 @@ public class Competition {
 
     private String title;
 
-    @JsonIgnore
+    //@JsonIgnore
+    //@JsonIgnoreProperties({"competitions"})
     @ManyToMany
     @JoinTable(
             name = "competition_questions",
@@ -26,7 +24,8 @@ public class Competition {
     )
     private Set<Question> questions = new HashSet<>();
 
-    @JsonIgnore
+    //@JsonIgnore
+    //@JsonIgnoreProperties({"competitions"})
     @ManyToMany
     @JoinTable(
             name = "competition_users",

@@ -62,6 +62,7 @@ public class CompetitionService {
     }
 
     public Page<User> getParticipantsByCompetitionId(Long competitionId, Pageable pageable) throws CompetitionNotFoundException {
+        System.out.println("Page: " + pageable.toString());
         Competition competition = competitionRepository.findById(competitionId)
                 .orElseThrow(() -> new CompetitionNotFoundException("Competition not found with ID: " + competitionId));
         return competitionRepository.findParticipantsByCompetitionId(competition.getId(), pageable);

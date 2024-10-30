@@ -14,8 +14,6 @@ public class Competition {
 
     private String title;
 
-    //@JsonIgnore
-    //@JsonIgnoreProperties({"competitions"})
     @ManyToMany
     @JoinTable(
             name = "competition_questions",
@@ -24,8 +22,6 @@ public class Competition {
     )
     private Set<Question> questions = new HashSet<>();
 
-    //@JsonIgnore
-    //@JsonIgnoreProperties({"competitions"})
     @ManyToMany
     @JoinTable(
             name = "competition_users",

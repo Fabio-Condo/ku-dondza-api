@@ -1,7 +1,9 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
+import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
+import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.service.impl.QuizService;
 import org.springframework.data.domain.Page;
@@ -58,6 +60,28 @@ public class QuizController {
     @GetMapping("/total")
     public ResponseEntity<Long> getTotal(){
         return ResponseEntity.status(HttpStatus.OK).body(quizService.getTotal());
+    }
+
+    @GetMapping("/{quizId}/questions")
+    public Page<Question> getQuestionsByQuizId(@PathVariable Long quizId, Pageable pageable) throws QuizNotFoundException {
+        return quizService.getQuestionsByQuizId(quizId, pageable);
+    }
+
+    @PostMapping("/{quizId}/questions/{questionId}")
+    public ResponseEntity<Quiz> addQuestionToQuiz(@PathVariable Long quizId, @PathVariable Long questionId) throws QuestionNotFoundException, QuizNotFoundException {
+        Quiz updatedQuiz = quizService.addQuestionToQuiz(quizId, questionId);
+        return updatedQuiz != null ? ResponseEntity.ok(updatedQuiz) : ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{quizId}/questions/{questionId}")
+    public ResponseEntity<Quiz> removeQuestionFromQuiz(@PathVariable Long quizId, @PathVariable Long questionId) throws QuestionNotFoundException, QuizNotFoundException {
+        Quiz updatedQuiz = quizService.removeQuestionFromQuiz(quizId, questionId);
+        return updatedQuiz != null ? ResponseEntity.ok(updatedQuiz) : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{quizId}/questions/total")
+    public ResponseEntity<Long> countQuestionsByQuizId(@PathVariable Long quizId){
+        return ResponseEntity.status(HttpStatus.OK).body(quizService.countQuestionsByQuizId(quizId));
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

@@ -90,6 +90,11 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.OK).body(doesContain);
     }
 
+    @GetMapping("/{groupId}/members/total")
+    public ResponseEntity<Long> countMembersByGroupId(@PathVariable Long groupId){
+        return ResponseEntity.status(HttpStatus.OK).body(groupService.countMembersByGroupId(groupId));
+    }
+
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(
                 new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(), message),

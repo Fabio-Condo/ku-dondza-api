@@ -15,7 +15,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.Set;
+
+import static com.fabiocondo.constant.UserImplConstant.FOUND_USER_BY_USERNAME;
+import static com.fabiocondo.constant.UserImplConstant.NO_USER_FOUND_BY_USERNAME;
 
 @Service
 public class CompetitionService {
@@ -24,7 +32,6 @@ public class CompetitionService {
     private final CompetitionRepository competitionRepository;
     private final QuizRepository quizRepository;
     private final UserRepository userRepository;
-
     private final QuestionRepository questionRepository;
 
     public CompetitionService(CompetitionRepository competitionRepository, QuizRepository quizRepository, UserRepository userRepository, QuestionRepository questionRepository) {
@@ -62,7 +69,6 @@ public class CompetitionService {
     }
 
     public Page<User> getParticipantsByCompetitionId(Long competitionId, Pageable pageable) throws CompetitionNotFoundException {
-        System.out.println("Page: " + pageable.toString());
         Competition competition = competitionRepository.findById(competitionId)
                 .orElseThrow(() -> new CompetitionNotFoundException("Competition not found with ID: " + competitionId));
         return competitionRepository.findParticipantsByCompetitionId(competition.getId(), pageable);
@@ -84,26 +90,72 @@ public class CompetitionService {
         return competitionRepository.save(competition);
     }
 
+    public long countParticipantsByCompetitionId(Long competitionId){
+        return competitionRepository.countParticipantsByCompetitionId(competitionId);
+    }
+
     public Page<Question> getQuestionsByCompetitionId(Long competitionId, Pageable pageable) throws CompetitionNotFoundException {
         Competition competition = competitionRepository.findById(competitionId)
                 .orElseThrow(() -> new CompetitionNotFoundException("Competition not found with ID: " + competitionId));
         return competitionRepository.findQuestionsByCompetitionId(competition.getId(), pageable);
     }
 
-    public Competition addQuestionToCompetition(Long competitionId, Long userId) throws QuestionNotFoundException {
+    public Competition addQuestionToCompetition(Long competitionId, Long questionId) throws QuestionNotFoundException {
         Competition competition = getCompetitionById(competitionId);
-        Question question = questionRepository.findById(userId)
-                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + userId));
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
         competition.getQuestions().add(question);
         return competitionRepository.save(competition);
     }
 
-    public Competition removeQuestionFromCompetition(Long competitionId, Long userId) throws QuestionNotFoundException {
+    public Competition removeQuestionFromCompetition(Long competitionId, Long questionId) throws QuestionNotFoundException {
         Competition competition = getCompetitionById(competitionId);
-        Question question = questionRepository.findById(userId)
-                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + userId));
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
         competition.getQuestions().remove(question);
         return competitionRepository.save(competition);
     }
+
+    public long countQuestionsByCompetitionId(Long competitionId){
+        return competitionRepository.countQuestionsByCompetitionId(competitionId);
+    }
+
+    public void sendParticipationRequest(Long competitionId, Long userId) throws UserNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
+        Competition competition = getCompetitionById(competitionId);
+        competition.getParticipationRequests().add(user);
+        competitionRepository.save(competition);
+    }
+
+    public Competition acceptParticipationRequest(Long competitionId, Long userId) throws UserNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
+        Competition competition = getCompetitionById(competitionId);
+        competition.getParticipationRequests().remove(user);
+        competition.getParticipants().add(user);
+        competitionRepository.save(competition);
+        return competition;
+    }
+
+    public void rejectParticipationRequest(Long competitionId, Long userId) throws UserNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
+        Competition competition = getCompetitionById(competitionId);
+        competition.getParticipationRequests().remove(user);
+        competitionRepository.save(competition);
+    }
+
+    public Page<User> findParticipationRequestsByCompetitionId(Long competitionId, Pageable pageable) throws CompetitionNotFoundException {
+        Competition competition = competitionRepository.findById(competitionId)
+                .orElseThrow(() -> new CompetitionNotFoundException("Competition not found with ID: " + competitionId));
+        return competitionRepository.findParticipationRequestsByCompetitionId(competition.getId(), pageable);
+    }
+
+    public Set<User> getParticipationRequest(Long competitionId) {
+        Competition competition = getCompetitionById(competitionId);
+        return competition.getParticipationRequests();
+    }
+
 }
 

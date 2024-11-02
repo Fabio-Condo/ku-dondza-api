@@ -35,6 +35,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT fr FROM User u JOIN u.friendRequests fr WHERE u.id = :userId")
     Page<User> findFriendRequestsByUserId(@Param("userId") Long userId, Pageable pageable);
 
+    @Query("SELECT COUNT(oc) FROM User u JOIN u.subscribedOnlineCourses oc WHERE u.id = :userId")
+    Long countSubscribedOnlineCoursesByOnlineUserId(@Param("userId") Long userId);
+
     public long countByIsActiveTrue();
 
 }

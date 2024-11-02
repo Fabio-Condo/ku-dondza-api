@@ -70,7 +70,7 @@ public class PostController{
     }
 
     @GetMapping("/findByGroupId")
-    public ResponseEntity<Page<Post>>  findByGroupId(@RequestParam Long groupId, Pageable pageable) {
+    public ResponseEntity<Page<Post>> findByGroupId(@RequestParam Long groupId, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(postServiceImpl.findByGroupId(groupId, pageable));
     }
 

@@ -88,4 +88,8 @@ public class OnlineCourseService {
         logger.info("Total course: " + onlineCourseRepository.count());
         return onlineCourseRepository.count();
     }
+
+    public long countOnlineCourseStudentsByCourseId(Long courseId){
+        return onlineCourseRepository.countOnlineCourseStudentsByCourseId(courseId);
+    }
 }

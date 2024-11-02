@@ -128,4 +128,8 @@ public class GroupService {
         }
         return group.getMembers().contains(user.get());
     }
+
+    public long countMembersByGroupId(Long groupId){
+        return groupRepository.countMembersByGroupId(groupId);
+    }
 }

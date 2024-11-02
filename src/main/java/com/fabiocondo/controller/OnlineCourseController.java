@@ -64,6 +64,11 @@ public class OnlineCourseController {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.getTotal());
     }
 
+    @GetMapping("/{courseId}/students/total")
+    public ResponseEntity<Long> countOnlineCourseStudentsByCourseId(@PathVariable Long courseId){
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.countOnlineCourseStudentsByCourseId(courseId));
+    }
+
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(
                 new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(), message),

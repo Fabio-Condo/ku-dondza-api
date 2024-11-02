@@ -64,11 +64,6 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.getTotal());
     }
 
-    @GetMapping("/findQuestionsByQuizId") // remover
-    public ResponseEntity<Page<Question>> findByQuizId(@RequestParam Long quizId, Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(questionService.findByQuizId(quizId, pageable));
-    }
-
     @PostMapping("/{questionId}/question-image") // remover
     public ResponseEntity<Question> updateQuestionImage(@PathVariable Long questionId, @RequestParam("file") MultipartFile file) throws IOException, QuestionNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.updateQuestionImage(questionId, file));

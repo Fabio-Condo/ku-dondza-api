@@ -70,10 +70,6 @@ public class QuestionService {
         questionRepository.deleteById(id);
     }
 
-    public Page<Question> findByQuizId(Long quizId, Pageable pageable) {
-        return questionRepository.findByQuizId(quizId, pageable);
-    }
-
     public long getTotal(){
         logger.info("Total quizzes: " + questionRepository.count());
         return questionRepository.count();

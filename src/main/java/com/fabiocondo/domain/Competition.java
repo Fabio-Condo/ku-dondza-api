@@ -1,5 +1,7 @@
 package com.fabiocondo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +16,7 @@ public class Competition {
 
     private String title;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "competition_questions",
@@ -22,6 +25,7 @@ public class Competition {
     )
     private Set<Question> questions = new HashSet<>();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "competition_users",
@@ -29,6 +33,15 @@ public class Competition {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> participants = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "participation_request",
+            joinColumns = @JoinColumn(name = "to_competition_id"),
+            inverseJoinColumns = @JoinColumn(name = "from_user_id")
+    )
+    private Set<User> participationRequests = new HashSet<>(); // pedidos de participation na competition
 
     public Competition() {
     }
@@ -67,5 +80,13 @@ public class Competition {
 
     public void setParticipants(Set<User> participants) {
         this.participants = participants;
+    }
+
+    public Set<User> getParticipationRequests() {
+        return participationRequests;
+    }
+
+    public void setParticipationRequests(Set<User> participationRequests) {
+        this.participationRequests = participationRequests;
     }
 }

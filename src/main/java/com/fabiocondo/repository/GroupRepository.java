@@ -11,5 +11,8 @@ import org.springframework.data.repository.query.Param;
 public interface GroupRepository extends JpaRepository<Group, Long> {
     @Query("SELECT u FROM Group g JOIN g.members u WHERE g.id = :groupId")
     Page<User> findMembersByGroupId(@Param("groupId") Long groupId, Pageable pageable);
+
+    @Query("SELECT COUNT(u) FROM Group g JOIN g.members u WHERE g.id = :groupId")
+    Long countMembersByGroupId(@Param("groupId") Long groupId);
 }
 

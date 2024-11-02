@@ -24,8 +24,8 @@ public class Question {
     private String urlFile;
 
     @ManyToOne
-    @JoinColumn(name = "quiz_id")
-    private Quiz quiz;
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
 
     @Valid
     @JsonIgnoreProperties("question")
@@ -64,12 +64,12 @@ public class Question {
         this.urlFile = urlFile;
     }
 
-    public Quiz getQuiz() {
-        return quiz;
+    public Subject getSubject() {
+        return subject;
     }
 
-    public void setQuiz(Quiz quiz) {
-        this.quiz = quiz;
+    public void setSubject(Subject subject) {
+        this.subject = subject;
     }
 
     public List<Answer> getAnswers() {

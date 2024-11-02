@@ -1,5 +1,6 @@
 package com.fabiocondo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -25,6 +26,10 @@ public class OnlineCourse {
     @JsonIgnoreProperties({"onlineCourse"})
     @OneToMany(mappedBy = "onlineCourse", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OnlineCourseContent> courseContents = new ArrayList<>();
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "subscribedOnlineCourses")
+    private List<User> students;
 
     // Constructors
     public OnlineCourse() {}
@@ -84,5 +89,12 @@ public class OnlineCourse {
         this.courseContents = courseContents;
     }
 
+    public List<User> getStudents() {
+        return students;
+    }
+
+    public void setStudents(List<User> students) {
+        this.students = students;
+    }
 }
 

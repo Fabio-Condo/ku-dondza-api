@@ -74,8 +74,8 @@ public class GroupService {
         return groupRepository.save(existGroup);
     }
 
-    public Page<Group> findAll(Pageable pageable) {
-        return groupRepository.findAll(pageable);
+    public Page<Group> findAll(String searchParam, Pageable pageable) {
+        return groupRepository.findAll(searchParam, pageable);
     }
 
     public void delete(Long id) throws GroupNotFoundException {
@@ -117,7 +117,7 @@ public class GroupService {
         return groupRepository.save(group);
     }
 
-    public boolean doesUserMemberOfGroup(Long groupId, Long userId) {
+    public boolean checkMembership(Long groupId, Long userId) {
         Group group = groupRepository.findById(groupId).orElse(null);
         if (group == null) {
             return false;

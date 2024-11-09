@@ -30,8 +30,8 @@ public class GroupController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<Page<Group>> findAll(Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(groupService.findAll(pageable));
+    public ResponseEntity<Page<Group>> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(groupService.findAll(searchParam, pageable));
     }
 
     @GetMapping("/{id}")
@@ -85,8 +85,8 @@ public class GroupController {
     }
 
     @GetMapping("/{groupId}/members/contains/{userId}")
-    public ResponseEntity<Boolean> doesUserMemberOfGroup(@PathVariable Long groupId, @PathVariable Long userId) {
-        boolean doesContain = groupService.doesUserMemberOfGroup(groupId, userId);
+    public ResponseEntity<Boolean> checkMembership(@PathVariable Long groupId, @PathVariable Long userId) {
+        boolean doesContain = groupService.checkMembership(groupId, userId);
         return ResponseEntity.status(HttpStatus.OK).body(doesContain);
     }
 

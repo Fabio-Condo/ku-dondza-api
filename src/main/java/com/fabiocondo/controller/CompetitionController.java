@@ -1,9 +1,6 @@
 package com.fabiocondo.controller;
 
-import com.fabiocondo.domain.Competition;
-import com.fabiocondo.domain.HttpResponse;
-import com.fabiocondo.domain.Question;
-import com.fabiocondo.domain.User;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.CompetitionNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
@@ -32,23 +29,22 @@ public class CompetitionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Competition> updateCompetition(@PathVariable("id") Long id, @RequestBody Competition competition) {
+    public ResponseEntity<Competition> updateCompetition(@PathVariable("id") Long id, @RequestBody Competition competition) throws CompetitionNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(competitionService.updateCompetition(id, competition));
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<Page<Competition>> findAll(Pageable pageable) {
-        System.out.println("Page: " + pageable.toString());
-        return ResponseEntity.status(HttpStatus.OK).body(competitionService.findAll(pageable));
+    public ResponseEntity<Page<Competition>> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(competitionService.findAll(searchParam, pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Competition> getCompetitionById(@PathVariable Long id) {
+    public ResponseEntity<Competition> getCompetitionById(@PathVariable Long id) throws CompetitionNotFoundException {
         return ResponseEntity.ok().body(competitionService.getCompetitionById(id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws CompetitionNotFoundException {
         competitionService.delete(id);
         return response(HttpStatus.OK, "Competition deleted successfully");
     }
@@ -64,15 +60,21 @@ public class CompetitionController {
     }
 
     @PostMapping("/{competitionId}/participants/{userId}")
-    public ResponseEntity<Competition> addParticipantToCompetition(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException {
+    public ResponseEntity<Competition> addParticipantToCompetition(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException, CompetitionNotFoundException {
         Competition updatedCompetition = competitionService.addParticipantToCompetition(competitionId, userId);
         return updatedCompetition != null ? ResponseEntity.ok(updatedCompetition) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{competitionId}/participants/{userId}")
-    public ResponseEntity<Competition> removeParticipantFromCompetition(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException {
+    public ResponseEntity<Competition> removeParticipantFromCompetition(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException, CompetitionNotFoundException {
         Competition updatedCompetition = competitionService.removeParticipantFromCompetition(competitionId, userId);
         return updatedCompetition != null ? ResponseEntity.ok(updatedCompetition) : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("{competitionId}/participants/contains/{userId}")
+    public ResponseEntity<Boolean> checkIfIsParticipant(@PathVariable Long competitionId, @PathVariable Long userId) {
+        boolean isParticipant = competitionService.checkIfIsParticipant(competitionId, userId);
+        return ResponseEntity.ok(isParticipant);
     }
 
     @GetMapping("/{competitionId}/participants/total")
@@ -86,13 +88,13 @@ public class CompetitionController {
     }
 
     @PostMapping("/{competitionId}/questions/{questionId}")
-    public ResponseEntity<Competition> addQuestionToCompetition(@PathVariable Long competitionId, @PathVariable Long questionId) throws QuestionNotFoundException {
+    public ResponseEntity<Competition> addQuestionToCompetition(@PathVariable Long competitionId, @PathVariable Long questionId) throws QuestionNotFoundException, CompetitionNotFoundException {
         Competition updatedCompetition = competitionService.addQuestionToCompetition(competitionId, questionId);
         return updatedCompetition != null ? ResponseEntity.ok(updatedCompetition) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{competitionId}/questions/{questionId}")
-    public ResponseEntity<Competition> removeQuestionFromCompetition(@PathVariable Long competitionId, @PathVariable Long questionId) throws QuestionNotFoundException {
+    public ResponseEntity<Competition> removeQuestionFromCompetition(@PathVariable Long competitionId, @PathVariable Long questionId) throws QuestionNotFoundException, CompetitionNotFoundException {
         Competition updatedCompetition = competitionService.removeQuestionFromCompetition(competitionId, questionId);
         return updatedCompetition != null ? ResponseEntity.ok(updatedCompetition) : ResponseEntity.notFound().build();
     }
@@ -103,17 +105,17 @@ public class CompetitionController {
     }
 
     @PostMapping("/{competitionId}/send-participation-request/{userId}")
-    public void sendParticipationRequest(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException {
+    public void sendParticipationRequest(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException, CompetitionNotFoundException {
         competitionService.sendParticipationRequest(competitionId, userId);
     }
 
     @PostMapping("/{competitionId}/accept-participation-requests/{userId}")
-    public Competition acceptParticipationRequest(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException {
+    public Competition acceptParticipationRequest(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException, CompetitionNotFoundException {
         return competitionService.acceptParticipationRequest(competitionId, userId);
     }
 
     @DeleteMapping("/{competitionId}/reject-participation-requests/{userId}")
-    public void rejectParticipationRequest(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException {
+    public void rejectParticipationRequest(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException, CompetitionNotFoundException {
         competitionService.rejectParticipationRequest(competitionId, userId);
     }
 
@@ -122,8 +124,14 @@ public class CompetitionController {
         return competitionService.findParticipationRequestsByCompetitionId(competitionId, pageable);
     }
 
+    @GetMapping("{competitionId}/participation-requests/contains/{userId}")
+    public ResponseEntity<Boolean> checkIfRequestedParticipation(@PathVariable Long competitionId, @PathVariable Long userId) {
+        boolean requestedParticipation = competitionService.checkIfRequestedParticipation(competitionId, userId);
+        return ResponseEntity.ok(requestedParticipation);
+    }
+
     //@GetMapping("/{competitionId}/participation-requests")
-    public ResponseEntity<Set<User>> getFriendRequests(@PathVariable Long competitionId) {
+    public ResponseEntity<Set<User>> getParticipationRequest(@PathVariable Long competitionId) throws CompetitionNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(competitionService.getParticipationRequest(competitionId));
     }
 

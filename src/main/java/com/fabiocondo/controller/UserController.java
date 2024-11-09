@@ -135,8 +135,13 @@ public class UserController {
     }
 
     @GetMapping("/list/pageable")
-    public Page<User> findAll(@RequestParam(required = false, defaultValue = "") String name, Pageable pageable) throws UserNotFoundException {
-        return userService.findAll(name, pageable);
+    public Page<User> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) throws UserNotFoundException {
+        return userService.findAll(searchParam, pageable);
+    }
+
+    @GetMapping("/total")
+    public ResponseEntity<Long> getTotal(){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getTotal());
     }
 
     @GetMapping("/resetpassword/{email}")
@@ -207,8 +212,8 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/savedPosts/contains/{postId}")
-    public ResponseEntity<Boolean> doesUserSavedPost(@PathVariable Long userId, @PathVariable Long postId) {
-        boolean doesContain = userService.doesUserSavedPost(userId, postId);
+    public ResponseEntity<Boolean> checkIfUserSavedPost(@PathVariable Long userId, @PathVariable Long postId) {
+        boolean doesContain = userService.checkIfUserSavedPost(userId, postId);
         return ResponseEntity.status(HttpStatus.OK).body(doesContain);
     }
 
@@ -237,6 +242,11 @@ public class UserController {
         userService.rejectFriendRequest(friendId);
     }
 
+    @GetMapping("/{userId}/friend-requests/total")
+    public ResponseEntity<Long> countFriendRequestsByUserId(@PathVariable Long userId){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.countFriendRequestsByUserId(userId));
+    }
+
     @GetMapping("/friends")
     public Set<User> getFriends() throws UserNotFoundException {
         return userService.getFriends();
@@ -252,6 +262,11 @@ public class UserController {
         return userService.getFriends(userId, pageable);
     }
 
+    @GetMapping("/{userId}/friends/total")
+    public ResponseEntity<Long> countFriendsByUserId(@PathVariable Long userId){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.countFriendsByUserId(userId));
+    }
+
     @DeleteMapping("/friends/{friendId}")
     public void removeFriend(@PathVariable Long friendId) throws UserNotFoundException {
         userService.removeFriend(friendId);
@@ -259,13 +274,13 @@ public class UserController {
 
     @GetMapping("/friends/{friendId}")
     public ResponseEntity<Boolean> checkFriendship(@PathVariable Long friendId) throws UserNotFoundException {
-        boolean areFriends = userService.isFriend(friendId);
+        boolean areFriends = userService.checkFriendship(friendId);
         return ResponseEntity.ok(areFriends);
     }
 
     @GetMapping("/{receptorUserId}/requests/{emissorUserId}")
     public ResponseEntity<Boolean> checkIfSentFriendRequest(@PathVariable Long receptorUserId, @PathVariable Long emissorUserId) throws UserNotFoundException {
-        boolean sentFriendRequest = userService.sentFriendRequest(receptorUserId, emissorUserId);
+        boolean sentFriendRequest = userService.checkIfSentFriendRequest(receptorUserId, emissorUserId);
         return ResponseEntity.ok(sentFriendRequest);
     }
 

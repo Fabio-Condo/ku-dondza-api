@@ -30,8 +30,8 @@ public class QuizController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Quiz>> findAll(Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(quizService.findAll(pageable));
+    public ResponseEntity<Page<Quiz>> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(quizService.findAll(searchParam, pageable));
     }
 
     @GetMapping("/findAll")

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,8 +34,8 @@ public class QuestionController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<Page<Question>> findAll(Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(questionService.findAll(pageable));
+    public ResponseEntity<Page<Question>> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(questionService.findAll(searchParam, pageable));
     }
 
     @GetMapping
@@ -54,6 +55,7 @@ public class QuestionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('user:delete')")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws QuestionNotFoundException {
         questionService.delete(id);
         return response(HttpStatus.OK, "Question deleted successfully");

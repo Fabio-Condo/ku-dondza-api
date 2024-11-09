@@ -9,6 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
+    @Query("SELECT q FROM Quiz q WHERE q.title LIKE %:searchParam%")
+    public Page<Quiz> findAll(@Param("searchParam") String searchParam, Pageable pageable);
+
     @Query("SELECT qts FROM Quiz qz JOIN qz.questions qts WHERE qz.id = :quizId")
     Page<Question> findQuestionsByQuizId(@Param("quizId") Long quizId, Pageable pageable);
 

@@ -134,7 +134,7 @@ public class User implements Serializable {
         return user != null && this.friends.contains(user);
     }
 
-    public boolean sentFriendRequest(User user) {
+    public boolean checkIfSentFriendRequest(User user) {
         return user != null && this.friendRequests.contains(user);
     }
 

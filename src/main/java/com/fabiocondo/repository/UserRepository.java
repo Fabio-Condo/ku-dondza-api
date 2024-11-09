@@ -17,8 +17,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findUserByEmail(String email);
 
-    @Query("SELECT u FROM User u WHERE u.firstName LIKE %:name% OR u.lastName LIKE %:name% OR u.username LIKE %:name% OR u.role LIKE %:name%")
-    public Page<User> findByAnyProperty(@Param("name") String name, Pageable pageable);
+    @Query("SELECT u FROM User u WHERE u.firstName LIKE %:searchParam% OR u.lastName LIKE %:searchParam% OR u.username LIKE %:searchParam% OR u.role LIKE %:searchParam%")
+    public Page<User> findByAnyProperty(@Param("searchParam") String searchParam, Pageable pageable);
 
     @Query("SELECT u FROM User u WHERE u.firstName LIKE %:query% OR u.lastName LIKE %:query%")
     Page<User> searchByQuery(@Param("query") String query, Pageable pageable);
@@ -32,8 +32,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT fr FROM User u JOIN u.friends fr WHERE u.id = :userId")
     Page<User> findFriendsByUserId(@Param("userId") Long userId, Pageable pageable);
 
+    @Query("SELECT COUNT(f) FROM User u JOIN u.friends f WHERE u.id = :userId")
+    Long countFriendsByUserId(@Param("userId") Long userId);
+
     @Query("SELECT fr FROM User u JOIN u.friendRequests fr WHERE u.id = :userId")
     Page<User> findFriendRequestsByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    @Query("SELECT COUNT(fr) FROM User u JOIN u.friendRequests fr WHERE u.id = :userId")
+    Long countFriendRequestsByUserId(@Param("userId") Long userId);
 
     @Query("SELECT COUNT(oc) FROM User u JOIN u.subscribedOnlineCourses oc WHERE u.id = :userId")
     Long countSubscribedOnlineCoursesByOnlineUserId(@Param("userId") Long userId);

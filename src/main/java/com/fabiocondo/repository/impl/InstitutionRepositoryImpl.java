@@ -78,13 +78,13 @@ public class InstitutionRepositoryImpl implements InstitutionRepositoryQuery {
 
     public void restrictions(InstitutionFilter institutionFilter, List<Predicate> predicates, CriteriaBuilder builder, Root<Institution> root){
 
-        if(!ObjectUtils.isEmpty(institutionFilter.getGlobal())) {
+        if(!ObjectUtils.isEmpty(institutionFilter.getSearchParam())) {
             Predicate name = builder.like(
-                    builder.lower(root.get("name")), "%" + institutionFilter.getGlobal().toLowerCase() + "%");
+                    builder.lower(root.get("name")), "%" + institutionFilter.getSearchParam().toLowerCase() + "%");
             Predicate type = builder.like(
-                    builder.lower(root.get("type")), "%" + institutionFilter.getGlobal().toLowerCase() + "%");
+                    builder.lower(root.get("type")), "%" + institutionFilter.getSearchParam().toLowerCase() + "%");
             Predicate acronym = builder.like(
-                    builder.lower(root.get("acronym")), "%" + institutionFilter.getGlobal().toLowerCase() + "%");
+                    builder.lower(root.get("acronym")), "%" + institutionFilter.getSearchParam().toLowerCase() + "%");
             predicates.add(builder.or(name, type, acronym));
         }
         if(!ObjectUtils.isEmpty(institutionFilter.getAdministrationType())) {

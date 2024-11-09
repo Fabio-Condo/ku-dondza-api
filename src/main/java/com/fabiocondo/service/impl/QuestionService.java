@@ -10,14 +10,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-
-import static com.fabiocondo.constant.UserImplConstant.NO_USER_FOUND_BY_USERNAME;
 
 @Service
 public class QuestionService {
@@ -38,8 +35,8 @@ public class QuestionService {
                 .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + id));
     }
 
-    public Page<Question> findAll(Pageable pageable) {
-        return questionRepository.findAll(pageable);
+    public Page<Question> findAll(String searchParam, Pageable pageable) {
+        return questionRepository.findAll(searchParam, pageable);
     }
 
     public List<Question> findAll() {
@@ -75,15 +72,10 @@ public class QuestionService {
         return questionRepository.count();
     }
 
-    public Question updateQuestionImage(Long questionId, MultipartFile file) throws IOException, QuestionNotFoundException {
+    public Question updateQuestionImage(Long questionId, MultipartFile file) throws QuestionNotFoundException, IOException {
         // Adicionar funcao que diminue o tamanho da imagem
 
-        System.out.println("Passandooo daqui com " + file.getOriginalFilename());
-
         Question question = findById(questionId);
-        if (question == null) {
-            throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME + questionId);
-        }
 
         if (file == null || file.isEmpty()) {
             throw new IOException("The file is null or empty");

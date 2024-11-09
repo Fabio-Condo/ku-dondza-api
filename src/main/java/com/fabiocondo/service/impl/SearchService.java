@@ -1,11 +1,12 @@
 package com.fabiocondo.service.impl;
 
-import com.fabiocondo.domain.Post;
+import com.fabiocondo.domain.Group;
+import com.fabiocondo.domain.Institution;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.dto.SearchResultDTO;
-import com.fabiocondo.repository.PostRepository;
+import com.fabiocondo.repository.GroupRepository;
+import com.fabiocondo.repository.InstitutionRepository;
 import com.fabiocondo.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,21 +20,27 @@ import java.util.stream.Collectors;
 @Service
 public class SearchService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
+    private final InstitutionRepository institutionRepository;
 
-    @Autowired
-    private PostRepository postRepository;
+    public SearchService(UserRepository userRepository, GroupRepository groupRepository, InstitutionRepository institutionRepository) {
+        this.userRepository = userRepository;
+        this.groupRepository = groupRepository;
+        this.institutionRepository = institutionRepository;
+    }
 
     public Page<SearchResultDTO> search(String query, Pageable pageable) {
         // Adapte o tipo de retorno de acordo com suas necessidades
         Page<User> users = userRepository.searchByQuery(query, pageable);
-        Page<Post> posts = postRepository.searchByQuery(query, pageable);
+        Page<Group> groups = groupRepository.searchByQuery(query, pageable);
+        Page<Institution> institutions = institutionRepository.searchByQuery(query, pageable);
 
         // Combine os resultados e transforme em DTOs conforme necessário
         List<SearchResultDTO> results = new ArrayList<>();
-        results.addAll(users.stream().map(user -> new SearchResultDTO("User", user.getFirstName() + " " + user.getLastName(), user.getProfileImageUrl())).collect(Collectors.toList()));
-        results.addAll(posts.stream().map(post -> new SearchResultDTO("Post", post.getText(), post.getUrlFile())).collect(Collectors.toList()));
+        results.addAll(users.stream().map(user -> new SearchResultDTO("User", user.getFirstName() + " " + user.getLastName(), user.getProfileImageUrl(), user.getId().toString())).collect(Collectors.toList()));
+        results.addAll(groups.stream().map(group -> new SearchResultDTO("Group", group.getName(), group.getUrlFile(), group.getId().toString())).collect(Collectors.toList()));
+        results.addAll(institutions.stream().map(institution -> new SearchResultDTO("Institution", institution.getName(), institution.getUrlFile(), institution.getId().toString())).collect(Collectors.toList()));
 
         // Crie uma página de resultados combinados
         return new PageImpl<>(results, pageable, results.size());

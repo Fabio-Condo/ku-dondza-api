@@ -39,15 +39,19 @@ public interface UserService {
 
     void updatePropertyNotLocked(String username, Boolean notLocked) throws UsernameNotFoundException;
 
-    boolean isFriend(Long friendId) throws UserNotFoundException;
+    boolean checkFriendship(Long friendId) throws UserNotFoundException;
 
-    boolean sentFriendRequest(Long receptorUserId, Long emissorUserId) throws UserNotFoundException;
+    boolean checkIfSentFriendRequest(Long receptorUserId, Long emissorUserId) throws UserNotFoundException;
 
     User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException;
 
     User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException;
 
     boolean doesUserSubscribedOnlineCourse(Long userId, Long onlineCourseId);
+
+    long countFriendsByUserId(Long userId);
+
+    long countFriendRequestsByUserId(Long userId);
 
     User findUserByUsername(String username);
 
@@ -57,7 +61,9 @@ public interface UserService {
 
     List<User> getUsers();
 
-    Page<User> findAll(String name, Pageable pageable) throws UserNotFoundException;
+    Page<User> findAll(String searchParam, Pageable pageable) throws UserNotFoundException;
+
+    long getTotal();
 
     User addInterestToUserInterests(Long userId, Long postId) throws InterestNotFoundException;
 
@@ -73,7 +79,7 @@ public interface UserService {
 
     long countSavedPostsByUser(Long userId) throws UserNotFoundException;
 
-    boolean doesUserSavedPost(Long userId, Long postId);
+    boolean checkIfUserSavedPost(Long userId, Long postId);
 
     Set<User> getFriendRequests() throws UserNotFoundException;
 

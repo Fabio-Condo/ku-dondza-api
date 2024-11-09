@@ -3,6 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.OnlineCourse;
+import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.repository.OnlineCourseRepository;
 import org.slf4j.Logger;
@@ -35,29 +36,31 @@ public class OnlineCourseService {
                 .orElseThrow(() -> new CourseNotFoundException("No course found by id: " + id));
     }
 
-    public Page<OnlineCourse> findAll(Pageable pageable) {
-        return onlineCourseRepository.findAll(pageable);
+    public Page<OnlineCourse> findAll(String searchParam, Pageable pageable) {
+        return onlineCourseRepository.findAll(searchParam, pageable);
     }
 
-    public OnlineCourse save(String name, String description, MultipartFile file) {
+    public OnlineCourse save(String name, String description, String instrutor, MultipartFile file) {
         logger.info("Uploading file: " + file.getOriginalFilename());
-        //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         OnlineCourse course = new OnlineCourse();
         course.setName(name);
         course.setDescription(description);
-        //course.setCoverImageUrl(s3UploadResponse.getFileUrl());
+        course.setInstrutor(instrutor);
+        course.setCoverImageUrl(s3UploadResponse.getFileUrl());
         course.setFileName(file.getOriginalFilename());
 
         logger.info("Saving new course: " + course.getDescription());
         return onlineCourseRepository.save(course);
     }
 
-    public OnlineCourse update(Long id, String name, String description, MultipartFile file) throws CourseNotFoundException {
+    public OnlineCourse update(Long id, String name, String description, String instrutor, MultipartFile file) throws CourseNotFoundException {
 
         OnlineCourse existCourse = findById(id);
         existCourse.setName(name);
         existCourse.setDescription(description);
+        existCourse.setInstrutor(instrutor);
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {
@@ -87,6 +90,11 @@ public class OnlineCourseService {
     public long getTotal(){
         logger.info("Total course: " + onlineCourseRepository.count());
         return onlineCourseRepository.count();
+    }
+
+    public Page<User> getStudentsByCourseId(Long courseId, Pageable pageable) throws CourseNotFoundException {
+        OnlineCourse existCourse = findById(courseId);
+        return onlineCourseRepository.findStudentsByCourseId(existCourse.getId(), pageable);
     }
 
     public long countOnlineCourseStudentsByCourseId(Long courseId){

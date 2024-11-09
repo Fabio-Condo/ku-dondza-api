@@ -34,8 +34,8 @@ public class QuizService {
                 .orElseThrow(() -> new QuizNotFoundException("No quiz found by id: " + id));
     }
 
-    public Page<Quiz> findAll(Pageable pageable) {
-        return quizRepository.findAll(pageable);
+    public Page<Quiz> findAll(String searchParam, Pageable pageable) {
+        return quizRepository.findAll(searchParam, pageable);
     }
 
     public List<Quiz> findAll() {

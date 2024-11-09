@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class ExamFilter {
 
-    private String global;
+    private String searchParam;
 
     private String exameOrderBy;
 
@@ -30,12 +30,12 @@ public class ExamFilter {
 
     private Long totalDownloadNumber;
 
-    public String getGlobal() {
-        return global;
+    public String getSearchParam() {
+        return searchParam;
     }
 
-    public void setGlobal(String global) {
-        this.global = global;
+    public void setSearchParam(String searchParam) {
+        this.searchParam = searchParam;
     }
 
     public String getExameOrderBy() {

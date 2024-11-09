@@ -45,10 +45,6 @@ public class PostServiceImpl implements PostService {
         this.groupRepository = groupRepository;
     }
 
-    public Page<Post> searchPosts(String query, Pageable pageable) {
-        return postRepository.searchByQuery(query, pageable);
-    }
-
     @Override
     public Post findById(Long id) throws PostNotFoundException {
         return postRepository.findById(id)

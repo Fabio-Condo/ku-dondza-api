@@ -23,6 +23,8 @@ public class OnlineCourse {
 
     private String coverImageUrl; // URL da imagem de capa do curso
 
+    private String instrutor;
+
     @JsonIgnoreProperties({"onlineCourse"})
     @OneToMany(mappedBy = "onlineCourse", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OnlineCourseContent> courseContents = new ArrayList<>();
@@ -34,10 +36,11 @@ public class OnlineCourse {
     // Constructors
     public OnlineCourse() {}
 
-    public OnlineCourse(String name, String description, String coverImageUrl) {
+    public OnlineCourse(String name, String description, String coverImageUrl, String instrutor) {
         this.name = name;
         this.description = description;
         this.coverImageUrl = coverImageUrl;
+        this.instrutor = instrutor;
     }
 
     // Getters and Setters
@@ -79,6 +82,14 @@ public class OnlineCourse {
 
     public void setCoverImageUrl(String coverImageUrl) {
         this.coverImageUrl = coverImageUrl;
+    }
+
+    public String getInstrutor() {
+        return instrutor;
+    }
+
+    public void setInstrutor(String instrutor) {
+        this.instrutor = instrutor;
     }
 
     public List<OnlineCourseContent> getCourseContents() {

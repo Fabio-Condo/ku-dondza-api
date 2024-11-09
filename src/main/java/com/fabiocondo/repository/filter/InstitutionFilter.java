@@ -7,7 +7,7 @@ import javax.persistence.Enumerated;
 
 public class InstitutionFilter {
 
-    private String global;
+    private String searchParam;
 
     private String institutionOrderBy;
 
@@ -18,20 +18,20 @@ public class InstitutionFilter {
     @Enumerated(EnumType.STRING)
     private AdministrationType administrationType;
 
-    public InstitutionFilter(String global, String institutionOrderBy, String name, String type, AdministrationType administrationType) {
-        this.global = global;
+    public InstitutionFilter(String searchParam, String institutionOrderBy, String name, String type, AdministrationType administrationType) {
+        this.searchParam = searchParam;
         this.institutionOrderBy = institutionOrderBy;
         this.name = name;
         this.type = type;
         this.administrationType = administrationType;
     }
 
-    public String getGlobal() {
-        return global;
+    public String getSearchParam() {
+        return searchParam;
     }
 
-    public void setGlobal(String global) {
-        this.global = global;
+    public void setSearchParam(String searchParam) {
+        this.searchParam = searchParam;
     }
 
     public String getInstitutionOrderBy() {

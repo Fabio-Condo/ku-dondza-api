@@ -311,8 +311,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public Page<User> findAll(String name, Pageable pageable) throws UserNotFoundException {
-        return userRepository.findByAnyProperty(name, pageable);
+    public Page<User> findAll(String searchParam, Pageable pageable) throws UserNotFoundException {
+        return userRepository.findByAnyProperty(searchParam, pageable);
+    }
+
+    @Override
+    public long getTotal(){
+        logger.info("Total users: " + userRepository.count());
+        return userRepository.count();
     }
 
     public User save(User user){
@@ -387,13 +393,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public boolean doesUserSavedPost(Long userId, Long postId) {
+    public boolean checkIfUserSavedPost(Long userId, Long postId) {
         User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            return false;
-        }
         Optional<Post> post = postRepository.findById(postId);
-        if (!post.isPresent()) {
+
+        if (user == null || !post.isPresent()) {
             return false;
         }
         return user.getSavedPosts().contains(post.get());
@@ -467,7 +471,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public boolean isFriend(Long friendId) throws UserNotFoundException {
+    public boolean checkFriendship(Long friendId) throws UserNotFoundException {
         User user = getAuthenticatedUser();
         User friend = userRepository.findById(friendId).orElse(null);
 
@@ -479,7 +483,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public boolean sentFriendRequest(Long receptorUserId, Long emissorUserId) {
+    public boolean checkIfSentFriendRequest(Long receptorUserId, Long emissorUserId) {
         User user = findById(receptorUserId);
         User friend = userRepository.findById(emissorUserId).orElse(null);
 
@@ -487,7 +491,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             return false; // Se um dos usuários não existir, retorna falso
         }
 
-        return user.sentFriendRequest(friend); // Chama o método isFriend da classe User
+        return user.checkIfSentFriendRequest(friend); // Chama o método isFriend da classe User
     }
 
     private void validateLoginAttempt(User user) {
@@ -535,6 +539,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             return false;
         }
         return user.getSubscribedOnlineCourses().contains(course.get());
+    }
+
+    @Override
+    public long countFriendsByUserId(Long userId){
+        return userRepository.countFriendsByUserId(userId );
+    }
+
+    @Override
+    public long countFriendRequestsByUserId(Long userId){
+        return userRepository.countFriendRequestsByUserId(userId );
     }
 
     private User validateNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistException, EmailExistException {

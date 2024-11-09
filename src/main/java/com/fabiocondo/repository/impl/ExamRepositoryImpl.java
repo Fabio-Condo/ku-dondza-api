@@ -78,17 +78,17 @@ public class ExamRepositoryImpl implements ExamRepositoryQuery {
 
     public void restrictions(ExamFilter examFilter, List<Predicate> predicates, CriteriaBuilder builder, Root<Exam> root){
 
-        if(!ObjectUtils.isEmpty(examFilter.getGlobal())) {
+        if(!ObjectUtils.isEmpty(examFilter.getSearchParam())) {
             Predicate subject = builder.like(
-                    builder.lower(root.get("subject").get("name")), "%" + examFilter.getGlobal().toLowerCase() + "%");
+                    builder.lower(root.get("subject").get("name")), "%" + examFilter.getSearchParam().toLowerCase() + "%");
             Predicate description = builder.like(
-                    builder.lower(root.get("description")), "%" + examFilter.getGlobal().toLowerCase() + "%");
+                    builder.lower(root.get("description")), "%" + examFilter.getSearchParam().toLowerCase() + "%");
             Predicate institutionType = builder.like(
-                    builder.lower(root.get("institution").get("type")), "%" + examFilter.getGlobal().toLowerCase() + "%");
+                    builder.lower(root.get("institution").get("type")), "%" + examFilter.getSearchParam().toLowerCase() + "%");
             Predicate institutionName = builder.like(
-                    builder.lower(root.get("institution").get("name")), "%" + examFilter.getGlobal().toLowerCase() + "%");
+                    builder.lower(root.get("institution").get("name")), "%" + examFilter.getSearchParam().toLowerCase() + "%");
             Predicate institutionAcronym = builder.like(
-                    builder.lower(root.get("institution").get("acronym")), "%" + examFilter.getGlobal().toLowerCase() + "%");
+                    builder.lower(root.get("institution").get("acronym")), "%" + examFilter.getSearchParam().toLowerCase() + "%");
             predicates.add(builder.or(subject, description, institutionType, institutionName, institutionAcronym));
         }
 

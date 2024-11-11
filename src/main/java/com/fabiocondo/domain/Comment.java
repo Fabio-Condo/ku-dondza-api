@@ -2,6 +2,7 @@ package com.fabiocondo.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -32,10 +33,12 @@ public class Comment {
     private User user;
 
     @ManyToOne
+    @JsonIgnore
     @JsonIgnoreProperties({"replies", "post"})
     @JoinColumn(name = "parent_comment_id")
     private Comment parentComment;
 
+    @JsonIgnore
     @JsonIgnoreProperties({"parentComment", "post"})
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> replies;

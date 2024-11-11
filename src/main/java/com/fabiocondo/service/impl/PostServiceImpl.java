@@ -58,17 +58,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<Post> findAll(Pageable pageable) {
-
-        Page<Post> postsPage = postRepository.findAll(pageable);
-
-        // Filtrar apenas os comentários principais (parentComment == null)
-        //postsPage.forEach(post -> {
-        //    post.setComments(post.getComments().stream()
-        //            .filter(comment -> comment.getParentComment() == null)
-        //            .collect(Collectors.toList()));
-        //});
-
-        return postsPage;
+        return postRepository.findAll(pageable);
     }
 
     @Override

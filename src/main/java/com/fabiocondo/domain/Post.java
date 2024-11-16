@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
@@ -37,6 +38,11 @@ public class Post implements Serializable {
     @JsonIgnoreProperties({"posts"})
     @JoinColumn(name = "group_id")
     private Group group;
+
+    @JsonIgnoreProperties("post")
+    @Valid
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostOption> postOptions;
 
     @JsonIgnore
     @JsonIgnoreProperties({"post"})
@@ -102,6 +108,14 @@ public class Post implements Serializable {
 
     public void setGroup(Group group) {
         this.group = group;
+    }
+
+    public List<PostOption> getPostOptions() {
+        return postOptions;
+    }
+
+    public void setPostOptions(List<PostOption> postOptions) {
+        this.postOptions = postOptions;
     }
 
     public Set<Like> getLikes() {

@@ -1,6 +1,6 @@
 package com.fabiocondo.domain;
 
-import com.fabiocondo.enumeration.ExamStatus;
+import com.fabiocondo.enumeration.ExamType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -20,7 +20,7 @@ public class Exam implements Serializable {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    private ExamStatus status;
+    private ExamType examType;
 
     private String fileName;
 
@@ -41,11 +41,11 @@ public class Exam implements Serializable {
     public Exam() {
     }
 
-    public Exam(Long id, Subject subject, String description, ExamStatus status, String fileName, String urlFile, Date date, Long totalDownloadNumber, Institution institution) {
+    public Exam(Long id, Subject subject, String description, ExamType examType, String fileName, String urlFile, Date date, Long totalDownloadNumber, Institution institution) {
         this.id = id;
         this.subject = subject;
         this.description = description;
-        this.status = status;
+        this.examType = examType;
         this.fileName = fileName;
         this.urlFile = urlFile;
         this.date = date;
@@ -77,12 +77,12 @@ public class Exam implements Serializable {
         this.description = description;
     }
 
-    public ExamStatus getStatus() {
-        return status;
+    public ExamType getExamType() {
+        return examType;
     }
 
-    public void setStatus(ExamStatus status) {
-        this.status = status;
+    public void setExamType(ExamType examType) {
+        this.examType = examType;
     }
 
     public String getFileName() {

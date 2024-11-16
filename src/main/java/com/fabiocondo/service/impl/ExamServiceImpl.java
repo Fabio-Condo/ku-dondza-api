@@ -5,7 +5,7 @@ import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Exam;
 import com.fabiocondo.domain.Institution;
 import com.fabiocondo.domain.Subject;
-import com.fabiocondo.enumeration.ExamStatus;
+import com.fabiocondo.enumeration.ExamType;
 import com.fabiocondo.exception.domain.ExamNotFoundException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
@@ -70,7 +70,7 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public Exam save(String description, ExamStatus status, Date date, Long subjectId, Long institutionId, MultipartFile file) throws InstituicaoNotFoundException, SubjectNotFoundException {
+    public Exam save(String description, ExamType examType, Date date, Long subjectId, Long institutionId, MultipartFile file) throws InstituicaoNotFoundException, SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
@@ -81,7 +81,7 @@ public class ExamServiceImpl implements ExamService {
         exam.setInstitution(institution);
         exam.setSubject(subject);
         exam.setDescription(description);
-        exam.setStatus(status);
+        exam.setExamType(examType);
         exam.setDate(date);
         exam.setTotalDownloadNumber(0L);
         exam.setUrlFile(s3UploadResponse.getFileUrl());
@@ -92,7 +92,7 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public Exam update(Long id, String description, ExamStatus status, Date date, Long subjectId, Long institutionId, MultipartFile file) throws ExamNotFoundException, InstituicaoNotFoundException, SubjectNotFoundException {
+    public Exam update(Long id, String description, ExamType examType, Date date, Long subjectId, Long institutionId, MultipartFile file) throws ExamNotFoundException, InstituicaoNotFoundException, SubjectNotFoundException {
         Institution institution = institutionServiceImpl.findById(institutionId);
         Subject subject = subjectServiceImpl.findById(subjectId);
 
@@ -100,7 +100,7 @@ public class ExamServiceImpl implements ExamService {
         existExam.setInstitution(institution);
         existExam.setSubject(subject);
         existExam.setDescription(description);
-        existExam.setStatus(status);
+        existExam.setExamType(examType);
         existExam.setDate(date);
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo

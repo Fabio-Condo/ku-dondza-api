@@ -5,7 +5,6 @@ import com.fabiocondo.exception.domain.NotAnImageFileException;
 import com.fabiocondo.exception.domain.PostNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.PostServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -15,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = {"/post"})
@@ -46,6 +46,11 @@ public class PostController{
                                        @RequestParam(value = "file", required = false) MultipartFile file) throws UserNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(postServiceImpl.save(text, file));
+    }
+
+    @PostMapping("/add_quiz_post")
+    public ResponseEntity<Post> save_quiz_post(@RequestBody Post post) throws UserNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(postServiceImpl.save_quiz_post(post));
     }
 
     @PostMapping("/update")

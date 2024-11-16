@@ -31,9 +31,9 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequestMapping(path = { "/", "/user"})
 public class UserController {
-    private AuthenticationManager authenticationManager;
-    private UserService userService;
-    private JWTTokenProvider jwtTokenProvider;
+    private final AuthenticationManager authenticationManager;
+    private final UserService userService;
+    private final JWTTokenProvider jwtTokenProvider;
 
     @Autowired
     public UserController(AuthenticationManager authenticationManager, UserService userService, JWTTokenProvider jwtTokenProvider) {
@@ -90,14 +90,12 @@ public class UserController {
                                        @RequestParam("lastName") String lastName,
                                        @RequestParam("username") String username,
                                        @RequestParam("email") String email,
-                                       @RequestParam("institution") String institution,
                                        @RequestParam("bio") String bio,
-                                       @RequestParam("course") String course,
                                        @RequestParam("role") String role,
                                        @RequestParam("isActive") String isActive,
                                        @RequestParam("isNonLocked") String isNonLocked,
                                        @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
-        User updatedUser = userService.updateUserProfile(currentUsername, firstName, lastName, username,email, institution, bio, course, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
+        User updatedUser = userService.updateUserProfile(currentUsername, firstName, lastName, username,email, bio, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 

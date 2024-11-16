@@ -2,7 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.Exam;
 import com.fabiocondo.domain.HttpResponse;
-import com.fabiocondo.enumeration.ExamStatus;
+import com.fabiocondo.enumeration.ExamType;
 import com.fabiocondo.exception.domain.ExamNotFoundException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
@@ -56,25 +56,25 @@ public class ExamController {
 
     @PostMapping
     public ResponseEntity<Exam> save(@RequestParam("description") String description,
-                                     @RequestParam("status") ExamStatus status,
+                                     @RequestParam("examType") ExamType examType,
                                      @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
                                      @RequestParam("subjectId") Long subjectId,
                                      @RequestParam("institutionId") Long institutionId,
                                      @RequestParam("file") MultipartFile file) throws InstituicaoNotFoundException, SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.save(description, status, date, subjectId, institutionId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.save(description, examType, date, subjectId, institutionId, file));
     }
 
     @PutMapping
     public ResponseEntity<Exam> update(@RequestParam("id") Long id,
                                        @RequestParam("description") String description,
-                                       @RequestParam("status") ExamStatus status,
+                                       @RequestParam("examType") ExamType examType,
                                        @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
                                        @RequestParam("subjectId") Long subjectId,
                                        @RequestParam("institutionId") Long institutionId,
                                        @RequestParam(value = "file", required = false) MultipartFile file) throws ExamNotFoundException, InstituicaoNotFoundException, SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.update(id, description, status, date, subjectId, institutionId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.update(id, description, examType, date, subjectId, institutionId, file));
     }
 
     @DeleteMapping("/{id}")

@@ -4,6 +4,7 @@ import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Group;
 import com.fabiocondo.domain.Post;
+import com.fabiocondo.domain.PostOption;
 import com.fabiocondo.exception.domain.PostNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.GroupRepository;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class PostServiceImpl implements PostService {
@@ -74,6 +76,15 @@ public class PostServiceImpl implements PostService {
         post.setUser(userService.getAuthenticatedUser());
         post.setGroup(null); // Se adicionar a partir do feed principal, o group deve ser null
 
+        logger.info("Saving new post: " + post.getText());
+        return postRepository.save(post);
+    }
+
+    public Post save_quiz_post(Post post) throws UserNotFoundException {
+        post.setDate(new Date());
+        post.setUser(userService.getAuthenticatedUser());
+        post.setGroup(null); // Se adicionar a partir do feed principal, o group deve ser null
+        post.getPostOptions().forEach(option -> option.setPost(post)); // if is quiz post type
         logger.info("Saving new post: " + post.getText());
         return postRepository.save(post);
     }

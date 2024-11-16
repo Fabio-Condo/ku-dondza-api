@@ -1,7 +1,7 @@
 package com.fabiocondo.service;
 
 import com.fabiocondo.domain.Exam;
-import com.fabiocondo.enumeration.ExamStatus;
+import com.fabiocondo.enumeration.ExamType;
 import com.fabiocondo.exception.domain.ExamNotFoundException;
 import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
@@ -23,9 +23,9 @@ public interface ExamService {
 
     List<Exam> findAll();
 
-    Exam save(String description, ExamStatus status, Date date, Long subjectId, Long institutionId, MultipartFile file) throws InstituicaoNotFoundException, SubjectNotFoundException;
+    Exam save(String description, ExamType status, Date date, Long subjectId, Long institutionId, MultipartFile file) throws InstituicaoNotFoundException, SubjectNotFoundException;
 
-    Exam update(Long id, String description, ExamStatus status, Date date, Long subjectId, Long institutionId, MultipartFile file) throws ExamNotFoundException, InstituicaoNotFoundException, SubjectNotFoundException;
+    Exam update(Long id, String description, ExamType status, Date date, Long subjectId, Long institutionId, MultipartFile file) throws ExamNotFoundException, InstituicaoNotFoundException, SubjectNotFoundException;
 
     void delete(Long id) throws ExamNotFoundException;
 

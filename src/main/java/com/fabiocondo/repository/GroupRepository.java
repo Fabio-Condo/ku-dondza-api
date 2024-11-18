@@ -19,6 +19,12 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
     @Query("SELECT COUNT(u) FROM Group g JOIN g.members u WHERE g.id = :groupId")
     Long countMembersByGroupId(@Param("groupId") Long groupId);
 
+    @Query("SELECT u FROM Group g JOIN g.administrators u WHERE g.id = :groupId")
+    Page<User> findAdministratorsByGroupId(@Param("groupId") Long groupId, Pageable pageable);
+
+    @Query("SELECT COUNT(u) FROM Group g JOIN g.administrators u WHERE g.id = :groupId")
+    Long countAdministratorsByGroupId(@Param("groupId") Long groupId);
+
     @Query("SELECT g FROM Group g WHERE g.name LIKE %:query%")
     Page<Group> searchByQuery(@Param("query") String query, Pageable pageable);
 }

@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "grupo")
@@ -25,6 +27,10 @@ public class Group {
 
     private String urlFile;
 
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private User creator;
+
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
@@ -32,7 +38,17 @@ public class Group {
             joinColumns = @JoinColumn(name = "group_id"), // Correto: refere-se à coluna `group_id` da tabela `member_group`
             inverseJoinColumns = @JoinColumn(name = "user_id")  // Correto: refere-se à coluna `user_id` da tabela `member_group`
     )
-    private List<User> members;
+    private Set<User> members = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(
+            name = "admin_group",
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "admin_id")
+    )
+    private Set<User> administrators = new HashSet<>();
+
 
     //@JsonIgnoreProperties({"group"})
     @JsonIgnore
@@ -92,12 +108,12 @@ public class Group {
         this.urlFile = urlFile;
     }
 
-    public List<User> getMembers() {
-        return members;
+    public User getCreator() {
+        return creator;
     }
 
-    public void setMembers(List<User> members) {
-        this.members = members;
+    public void setCreator(User creator) {
+        this.creator = creator;
     }
 
     public List<Post> getPosts() {
@@ -106,5 +122,21 @@ public class Group {
 
     public void setPosts(List<Post> posts) {
         this.posts = posts;
+    }
+
+    public Set<User> getMembers() {
+        return members;
+    }
+
+    public void setMembers(Set<User> members) {
+        this.members = members;
+    }
+
+    public Set<User> getAdministrators() {
+        return administrators;
+    }
+
+    public void setAdministrators(Set<User> administrators) {
+        this.administrators = administrators;
     }
 }

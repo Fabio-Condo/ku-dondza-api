@@ -40,14 +40,18 @@ public class OnlineCourseService {
         return onlineCourseRepository.findAll(searchParam, pageable);
     }
 
-    public OnlineCourse save(String name, String description, String instrutor, MultipartFile file) {
+    public OnlineCourse save(String name, String description, String requirements, String lunchDate, String instrutorName, String instrutorDescription, String instrutorSpecialization, MultipartFile file) {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         OnlineCourse course = new OnlineCourse();
         course.setName(name);
         course.setDescription(description);
-        course.setInstrutor(instrutor);
+        course.setRequirements(requirements);
+        course.setLunchDate(lunchDate);
+        course.setInstrutorName(instrutorName);
+        course.setInstrutorDescription(instrutorDescription);
+        course.setInstrutorSpecialization(instrutorSpecialization);
         course.setCoverImageUrl(s3UploadResponse.getFileUrl());
         course.setFileName(file.getOriginalFilename());
 
@@ -55,12 +59,16 @@ public class OnlineCourseService {
         return onlineCourseRepository.save(course);
     }
 
-    public OnlineCourse update(Long id, String name, String description, String instrutor, MultipartFile file) throws CourseNotFoundException {
+    public OnlineCourse update(Long id, String name, String description, String requirements, String lunchDate, String instrutorName, String instrutorDescription, String instrutorSpecialization, MultipartFile file) throws CourseNotFoundException {
 
         OnlineCourse existCourse = findById(id);
         existCourse.setName(name);
         existCourse.setDescription(description);
-        existCourse.setInstrutor(instrutor);
+        existCourse.setRequirements(requirements);
+        existCourse.setLunchDate(lunchDate);
+        existCourse.setInstrutorName(instrutorName);
+        existCourse.setInstrutorDescription(instrutorDescription);
+        existCourse.setInstrutorSpecialization(instrutorSpecialization);
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {

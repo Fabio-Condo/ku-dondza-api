@@ -23,7 +23,15 @@ public class OnlineCourse {
 
     private String coverImageUrl; // URL da imagem de capa do curso
 
-    private String instrutor;
+    private String requirements;
+
+    private String lunchDate;
+
+    private String instrutorName;
+
+    private String instrutorDescription;
+
+    private String instrutorSpecialization;
 
     @JsonIgnoreProperties({"onlineCourse"})
     @OneToMany(mappedBy = "onlineCourse", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -36,14 +44,19 @@ public class OnlineCourse {
     // Constructors
     public OnlineCourse() {}
 
-    public OnlineCourse(String name, String description, String coverImageUrl, String instrutor) {
+    public OnlineCourse(String name, String description, String coverImageUrl, String requirements, String lunchDate, String instrutorName, String instrutorDescription, String instrutorSpecialization) {
         this.name = name;
         this.description = description;
         this.coverImageUrl = coverImageUrl;
-        this.instrutor = instrutor;
+        this.requirements = requirements;
+        this.lunchDate = lunchDate;
+        this.instrutorName = instrutorName;
+        this.instrutorDescription = instrutorDescription;
+        this.instrutorSpecialization = instrutorSpecialization;
     }
 
     // Getters and Setters
+
     public Long getId() {
         return id;
     }
@@ -84,12 +97,44 @@ public class OnlineCourse {
         this.coverImageUrl = coverImageUrl;
     }
 
-    public String getInstrutor() {
-        return instrutor;
+    public String getRequirements() {
+        return requirements;
     }
 
-    public void setInstrutor(String instrutor) {
-        this.instrutor = instrutor;
+    public void setRequirements(String requirements) {
+        this.requirements = requirements;
+    }
+
+    public String getLunchDate() {
+        return lunchDate;
+    }
+
+    public void setLunchDate(String lunchDate) {
+        this.lunchDate = lunchDate;
+    }
+
+    public String getInstrutorName() {
+        return instrutorName;
+    }
+
+    public void setInstrutorName(String instrutorName) {
+        this.instrutorName = instrutorName;
+    }
+
+    public String getInstrutorDescription() {
+        return instrutorDescription;
+    }
+
+    public void setInstrutorDescription(String instrutorDescription) {
+        this.instrutorDescription = instrutorDescription;
+    }
+
+    public String getInstrutorSpecialization() {
+        return instrutorSpecialization;
+    }
+
+    public void setInstrutorSpecialization(String instrutorSpecialization) {
+        this.instrutorSpecialization = instrutorSpecialization;
     }
 
     public List<OnlineCourseContent> getCourseContents() {

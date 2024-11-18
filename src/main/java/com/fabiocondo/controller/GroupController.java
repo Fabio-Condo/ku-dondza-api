@@ -3,10 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.Group;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.User;
-import com.fabiocondo.exception.domain.ExamNotFoundException;
-import com.fabiocondo.exception.domain.GroupNotFoundException;
-import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
-import com.fabiocondo.exception.domain.SubjectNotFoundException;
+import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.service.impl.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -42,7 +39,7 @@ public class GroupController {
     @PostMapping
     public ResponseEntity<Group> save(@RequestParam("name") String name,
                                       @RequestParam("description") String description,
-                                      @RequestParam("file") MultipartFile file) throws InstituicaoNotFoundException, SubjectNotFoundException {
+                                      @RequestParam("file") MultipartFile file) throws InstituicaoNotFoundException, SubjectNotFoundException, UserNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(groupService.save(name, description, file));
     }
@@ -93,6 +90,34 @@ public class GroupController {
     @GetMapping("/{groupId}/members/total")
     public ResponseEntity<Long> countMembersByGroupId(@PathVariable Long groupId){
         return ResponseEntity.status(HttpStatus.OK).body(groupService.countMembersByGroupId(groupId));
+    }
+
+    @GetMapping("/{groupId}/administrators")
+    public Page<User> getAdministratorsByGroupId(@PathVariable Long groupId, Pageable pageable) throws GroupNotFoundException {
+        return groupService.getAdministratorsByGroupId(groupId, pageable);
+    }
+
+    @PostMapping("/{groupId}/administrators/{userId}")
+    public ResponseEntity<Group> addMemberToGroupAdministrators(@PathVariable Long groupId, @PathVariable Long userId) throws GroupNotFoundException {
+        Group updatedGroup = groupService.addMemberToGroupAdministrators(groupId, userId);
+        return updatedGroup != null ? ResponseEntity.ok(updatedGroup) : ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{groupId}/administrators/{userId}")
+    public ResponseEntity<Group> removeMemberFromGroupAdministrators(@PathVariable Long groupId, @PathVariable Long userId) throws GroupNotFoundException {
+        Group updatedGroup = groupService.removeMemberFromGroupAdministrators(groupId, userId);
+        return updatedGroup != null ? ResponseEntity.ok(updatedGroup) : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{groupId}/administrators/contains/{userId}")
+    public ResponseEntity<Boolean> checkIsAdmin(@PathVariable Long groupId, @PathVariable Long userId) {
+        boolean doesContain = groupService.checkIsAdmin(groupId, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(doesContain);
+    }
+
+    @GetMapping("/{groupId}/administrators/total")
+    public ResponseEntity<Long> countAdministratorsByGroupId(@PathVariable Long groupId){
+        return ResponseEntity.status(HttpStatus.OK).body(groupService.countAdministratorsByGroupId(groupId));
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

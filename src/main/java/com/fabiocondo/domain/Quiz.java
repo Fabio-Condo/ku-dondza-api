@@ -23,7 +23,7 @@ public class Quiz {
     @ManyToMany
     @JoinTable(
             name = "quiz_questions",
-            joinColumns = @JoinColumn(name = "competition_id"),
+            joinColumns = @JoinColumn(name = "quiz_id"),
             inverseJoinColumns = @JoinColumn(name = "question_id")
     )
     private Set<Question> questions = new HashSet<>();

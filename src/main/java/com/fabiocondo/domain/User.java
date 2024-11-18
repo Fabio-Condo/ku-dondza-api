@@ -86,17 +86,26 @@ public class User implements Serializable {
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
             name = "user_interest",
-            joinColumns = @JoinColumn(name = "interest_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "interest_id")
     )
     private Set<Interest> interests = new HashSet<>();
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "user_course",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private Set<Course> courses = new HashSet<>();
 
     @JsonIgnoreProperties({"courseContents"})
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
-            name = "user_course",
-            joinColumns = @JoinColumn(name = "course_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            name = "user_online_course",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id")
     )
     private Set<OnlineCourse> subscribedOnlineCourses = new HashSet<>();
 
@@ -310,12 +319,20 @@ public class User implements Serializable {
         this.friendRequests = friendRequests;
     }
 
+    public Set<Interest> getInterests() {
+        return interests;
+    }
+
     public void setInterests(Set<Interest> interests) {
         this.interests = interests;
     }
 
-    public Set<Interest> getInterests() {
-        return interests;
+    public Set<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses;
     }
 
     public Set<OnlineCourse> getSubscribedOnlineCourses() {
@@ -334,4 +351,3 @@ public class User implements Serializable {
         this.competitions = competitions;
     }
 }
-

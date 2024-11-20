@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Service
 public class CourseServiceImpl implements CourseService {
 
@@ -46,13 +48,13 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course save(Course course)  {
+    public Course save(Course course) { // add verificacao de duplicacao
         logger.info("Saving course: " + course.getName());
         return courseRepository.save(course);
     }
 
     @Override
-    public Course update(Course course, Long id) throws CourseNotFoundException {
+    public Course update(Course course, Long id) throws CourseNotFoundException { // add verificacao de duplicacao
         Course existCourse = findById(id);
         BeanUtils.copyProperties(course, existCourse, "id");
         logger.info("Updating course: " + course.getName());
@@ -70,6 +72,11 @@ public class CourseServiceImpl implements CourseService {
     public long getTotal(){
         logger.info("Total course: " + courseRepository.count());
         return courseRepository.count();
+    }
+
+    @Override
+    public List<Course> getByInstitutionId(Long institutionId) {
+        return courseRepository.findByInstitutionIdOrderByNameAsc(institutionId);
     }
 
 }

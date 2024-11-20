@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/courses")
 public class CourseController {
@@ -61,6 +63,11 @@ public class CourseController {
     @GetMapping("/total")
     public ResponseEntity<Long> getTotal(){
         return ResponseEntity.status(HttpStatus.OK).body(courseServiceImpl.getTotal());
+    }
+
+    @GetMapping("/institutions")
+    public List<Course> getByInstitutionId(@RequestParam Long institutionId) {
+        return courseServiceImpl.getByInstitutionId(institutionId);
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

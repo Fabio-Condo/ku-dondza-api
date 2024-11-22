@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "post_option")
-public class PostOption { // If post is a quiz type
+public class PostOption { // RENOMEAR PARA Enquete. LINKEDIN USA ESSE NOME
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

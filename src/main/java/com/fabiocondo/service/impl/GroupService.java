@@ -62,11 +62,13 @@ public class GroupService {
         return groupRepository.save(group);
     }
 
-    public Group update(Long id, String name, String description, MultipartFile file) throws GroupNotFoundException {
+    public Group update(Long id, String name, String description, MultipartFile file) throws GroupNotFoundException, UserNotFoundException {
 
         Group existGroup = findById(id);
         existGroup.setName(name);
         existGroup.setDescription(description);
+        //existGroup.getAdministrators().add(getAuthenticatedUser());
+
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {

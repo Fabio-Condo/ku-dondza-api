@@ -48,7 +48,7 @@ public class GroupController {
     public ResponseEntity<Group> update(@RequestParam("id") Long id,
                                         @RequestParam("name") String name,
                                         @RequestParam("description") String description,
-                                        @RequestParam(value = "file", required = false) MultipartFile file) throws GroupNotFoundException {
+                                        @RequestParam(value = "file", required = false) MultipartFile file) throws GroupNotFoundException, UserNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(groupService.update(id, name, description, file));
     }

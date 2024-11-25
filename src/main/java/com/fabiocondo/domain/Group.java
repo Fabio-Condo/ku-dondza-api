@@ -1,7 +1,6 @@
 package com.fabiocondo.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -35,8 +34,8 @@ public class Group {
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
             name = "user_group",
-            joinColumns = @JoinColumn(name = "group_id"), // Correto: refere-se à coluna `group_id` da tabela `member_group`
-            inverseJoinColumns = @JoinColumn(name = "user_id")  // Correto: refere-se à coluna `user_id` da tabela `member_group`
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> members = new HashSet<>();
 

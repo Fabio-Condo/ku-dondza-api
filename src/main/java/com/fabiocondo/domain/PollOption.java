@@ -7,8 +7,8 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "post_option")
-public class PostOption { // RENOMEAR PARA Enquete. LINKEDIN USA ESSE NOME
+@Table(name = "poll_option")
+public class PollOption { // RENOMEAR PARA Enquete. LINKEDIN USA ESSE NOME
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,9 +29,9 @@ public class PostOption { // RENOMEAR PARA Enquete. LINKEDIN USA ESSE NOME
             joinColumns = @JoinColumn(name = "option_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> peopleWhoSelected;
+    private List<User> usersWhoVoted;
 
-    public PostOption() {
+    public PollOption() {
     }
 
     public Long getId() {
@@ -58,11 +58,11 @@ public class PostOption { // RENOMEAR PARA Enquete. LINKEDIN USA ESSE NOME
         this.post = post;
     }
 
-    public List<User> getPeopleWhoSelected() {
-        return peopleWhoSelected;
+    public List<User> getUsersWhoVoted() {
+        return usersWhoVoted;
     }
 
-    public void setPeopleWhoSelected(List<User> peopleWhoSelected) {
-        this.peopleWhoSelected = peopleWhoSelected;
+    public void setUsersWhoVoted(List<User> usersWhoVoted) {
+        this.usersWhoVoted = usersWhoVoted;
     }
 }

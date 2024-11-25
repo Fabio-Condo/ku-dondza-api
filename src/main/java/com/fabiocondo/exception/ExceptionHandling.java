@@ -76,8 +76,8 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
-    @ExceptionHandler(PostOptionNotFoundException.class)
-    public ResponseEntity<HttpResponse> postOptionNotFoundException(PostOptionNotFoundException exception) {
+    @ExceptionHandler(PollOptionNotFoundException.class)
+    public ResponseEntity<HttpResponse> postOptionNotFoundException(PollOptionNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 

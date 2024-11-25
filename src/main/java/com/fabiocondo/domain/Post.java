@@ -42,7 +42,7 @@ public class Post implements Serializable {
     @JsonIgnoreProperties("post")
     @Valid
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostOption> postOptions;
+    private List<PollOption> pollOptions;
 
     @JsonIgnore
     @JsonIgnoreProperties({"post"})
@@ -110,12 +110,12 @@ public class Post implements Serializable {
         this.group = group;
     }
 
-    public List<PostOption> getPostOptions() {
-        return postOptions;
+    public List<PollOption> getPollOptions() {
+        return pollOptions;
     }
 
-    public void setPostOptions(List<PostOption> postOptions) {
-        this.postOptions = postOptions;
+    public void setPollOptions(List<PollOption> pollOptions) {
+        this.pollOptions = pollOptions;
     }
 
     public Set<Like> getLikes() {

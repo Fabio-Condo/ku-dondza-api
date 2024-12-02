@@ -4,7 +4,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "online_course_content")
-public class OnlineCourseContent {
+public class OnlineCourseContent { // Conteúdo do tema - Depois renomear
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,9 +16,13 @@ public class OnlineCourseContent {
 
     private String urlFile; // URL for storing the location of the video or file in the bucket
 
+    //@ManyToOne
+    //@JoinColumn(name = "online_course_id")
+    //private OnlineCourse onlineCourse;
+
     @ManyToOne
-    @JoinColumn(name = "online_course_id")
-    private OnlineCourse onlineCourse;
+    @JoinColumn(name = "tema_id")
+    private Tema tema;
 
     // Constructors
     public OnlineCourseContent() {}
@@ -62,12 +66,12 @@ public class OnlineCourseContent {
         this.urlFile = urlFile;
     }
 
-    public OnlineCourse getOnlineCourse() {
-        return onlineCourse;
+    public Tema getTema() {
+        return tema;
     }
 
-    public void setOnlineCourse(OnlineCourse onlineCourse) {
-        this.onlineCourse = onlineCourse;
+    public void setTema(Tema tema) {
+        this.tema = tema;
     }
 }
 

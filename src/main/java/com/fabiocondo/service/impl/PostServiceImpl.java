@@ -29,14 +29,11 @@ public class PostServiceImpl implements PostService {
 
     private final AmazonS3Service amazonS3Service;
 
-    @Autowired
     public PostRepository postRepository;
 
-    @Autowired
-    private UserServiceImpl userService;
+    private final UserServiceImpl userService;
 
-    @Autowired
-    private GroupRepository groupRepository;
+    private final GroupRepository groupRepository;
 
     public PostServiceImpl(AmazonS3Service amazonS3Service, PostRepository postRepository, UserServiceImpl userService, GroupRepository groupRepository) {
         this.amazonS3Service = amazonS3Service;

@@ -5,6 +5,7 @@ import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.CourseContentNotFoundException;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
+import com.fabiocondo.exception.domain.TemaNotFoundException;
 import com.fabiocondo.repository.OnlineCourseContentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +24,13 @@ public class OnlineCourseContentService {
 
     private final OnlineCourseContentRepository onlineCourseContentRepository;
 
-    private final OnlineCourseService onlineCourseService;
+    private final TemaService temaService;
 
     private final AmazonS3Service amazonS3Service;
 
-    public OnlineCourseContentService(OnlineCourseContentRepository onlineCourseContentRepository, OnlineCourseService onlineCourseService, AmazonS3Service amazonS3Service) {
+    public OnlineCourseContentService(OnlineCourseContentRepository onlineCourseContentRepository, TemaService temaService, AmazonS3Service amazonS3Service) {
         this.onlineCourseContentRepository = onlineCourseContentRepository;
-        this.onlineCourseService = onlineCourseService;
+        this.temaService = temaService;
         this.amazonS3Service = amazonS3Service;
     }
 
@@ -43,14 +44,14 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.findAll(pageable);
     }
 
-    public OnlineCourseContent save(String description, Long onlineCourseId, MultipartFile file) throws CourseNotFoundException {
+    public OnlineCourseContent save(String description, Long temaId, MultipartFile file) throws CourseNotFoundException, TemaNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
-        OnlineCourse course = onlineCourseService.findById(onlineCourseId);
+        Tema tema = temaService.findById(temaId);
 
         OnlineCourseContent content = new OnlineCourseContent();
-        content.setOnlineCourse(course);
+        content.setTema(tema);
         content.setDescription(description);
         content.setUrlFile(s3UploadResponse.getFileUrl());
         content.setFileName(file.getOriginalFilename());
@@ -59,11 +60,11 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.save(content);
     }
 
-    public OnlineCourseContent update(Long id, String description, Long onlineCourseId, MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException {
-        OnlineCourse course = onlineCourseService.findById(onlineCourseId);
+    public OnlineCourseContent update(Long id, String description, Long temaId, MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
+        Tema tema = temaService.findById(temaId);
 
         OnlineCourseContent existContent = findById(id);
-        existContent.setOnlineCourse(course);
+        existContent.setTema(tema);
         existContent.setDescription(description);
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {
@@ -80,8 +81,8 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.save(existContent);
     }
 
-    public Page<OnlineCourseContent> findByOnlineCourseId(Long onlineCourseId, Pageable pageable) {
-        return onlineCourseContentRepository.findByOnlineCourseId(onlineCourseId, pageable);
+    public Page<OnlineCourseContent> findByTemaId(Long temaId, Pageable pageable) {
+        return onlineCourseContentRepository.findByTemaId(temaId, pageable);
     }
 
     public void delete(Long id) throws CourseContentNotFoundException {

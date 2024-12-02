@@ -69,24 +69,24 @@ public class QuizService {
         return quizRepository.findQuestionsByQuizId(quiz.getId(), pageable);
     }
 
-    public Quiz addQuestionToQuiz(Long quizId, Long userId) throws QuestionNotFoundException, QuizNotFoundException {
+    public Quiz addQuestionToQuiz(Long quizId, Long questionId) throws QuestionNotFoundException, QuizNotFoundException {
         Quiz quiz = findById(quizId);
-        Question question = questionRepository.findById(userId)
-                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + userId));
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
         quiz.getQuestions().add(question);
         return quizRepository.save(quiz);
     }
 
-    public Quiz removeQuestionFromQuiz(Long quizId, Long userId) throws QuestionNotFoundException, QuizNotFoundException {
+    public Quiz removeQuestionFromQuiz(Long quizId, Long questionId) throws QuestionNotFoundException, QuizNotFoundException {
         Quiz quiz = findById(quizId);
-        Question question = questionRepository.findById(userId)
-                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + userId));
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
         quiz.getQuestions().remove(question);
         return quizRepository.save(quiz);
     }
 
-    public long countQuestionsByQuizId(Long competitionId){
-        return quizRepository.countQuestionsByQuizId(competitionId);
+    public long countQuestionsByQuizId(Long quizId){
+        return quizRepository.countQuestionsByQuizId(quizId);
     }
 
 }

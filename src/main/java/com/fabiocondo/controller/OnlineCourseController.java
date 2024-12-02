@@ -1,10 +1,8 @@
 package com.fabiocondo.controller;
 
-import com.fabiocondo.domain.HttpResponse;
-import com.fabiocondo.domain.OnlineCourse;
-import com.fabiocondo.domain.User;
-import com.fabiocondo.exception.domain.CompetitionNotFoundException;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
+import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.service.impl.OnlineCourseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -63,7 +61,6 @@ public class OnlineCourseController {
                                                @RequestParam(value = "file", required = false) MultipartFile file) throws CourseNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.update(id, name, description, requirements, lunchDate, instrutorName, instrutorDescription, instrutorSpecialization, file));
-
     }
 
     @DeleteMapping("/{id}")
@@ -85,6 +82,28 @@ public class OnlineCourseController {
     @GetMapping("/{courseId}/students/total")
     public ResponseEntity<Long> countOnlineCourseStudentsByCourseId(@PathVariable Long courseId){
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.countOnlineCourseStudentsByCourseId(courseId));
+    }
+
+    @GetMapping("/{courseId}/questions")
+    public Page<Question> getQuestionsByCourseId(@PathVariable Long courseId, Pageable pageable) throws CourseNotFoundException {
+        return onlineCourseService.getQuestionsByCourseId(courseId, pageable);
+    }
+
+    @PostMapping("/{courseId}/questions/{questionId}")
+    public ResponseEntity<OnlineCourse> addQuestionToCourse(@PathVariable Long courseId, @PathVariable Long questionId) throws QuestionNotFoundException, CourseNotFoundException {
+        OnlineCourse updatedQuiz = onlineCourseService.addQuestionToCourse(courseId, questionId);
+        return updatedQuiz != null ? ResponseEntity.ok(updatedQuiz) : ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{courseId}/questions/{questionId}")
+    public ResponseEntity<OnlineCourse> removeQuestionFromCourse(@PathVariable Long courseId, @PathVariable Long questionId) throws QuestionNotFoundException, CourseNotFoundException {
+        OnlineCourse updatedQuiz = onlineCourseService.removeQuestionFromCourse(courseId, questionId);
+        return updatedQuiz != null ? ResponseEntity.ok(updatedQuiz) : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{courseId}/questions/total")
+    public ResponseEntity<Long> countQuestionsByCourseId(@PathVariable Long courseId){
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.countQuestionsByCourseId(courseId));
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

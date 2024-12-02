@@ -1,7 +1,5 @@
 package com.fabiocondo.service.impl;
 
-import com.fabiocondo.domain.Course;
-import com.fabiocondo.domain.User;
 import com.fabiocondo.domain.UserCourse;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.exception.domain.UserCourseNotFoundException;

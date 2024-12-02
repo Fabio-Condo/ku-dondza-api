@@ -164,7 +164,6 @@ public class CompetitionService {
         if (user == null || competition == null) {
             return false;
         }
-        System.out.println(competition.getParticipationRequests().contains(user));
         return competition.getParticipationRequests().contains(user);
     }
 

@@ -3,9 +3,12 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.OnlineCourse;
+import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
+import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.repository.OnlineCourseRepository;
+import com.fabiocondo.repository.QuestionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -22,11 +25,14 @@ public class OnlineCourseService {
 
     private final OnlineCourseRepository onlineCourseRepository;
 
+    private final QuestionRepository questionRepository;
+
     private final AmazonS3Service amazonS3Service;
 
 
-    public OnlineCourseService(OnlineCourseRepository onlineCourseRepository, AmazonS3Service amazonS3Service) {
+    public OnlineCourseService(OnlineCourseRepository onlineCourseRepository, QuestionRepository questionRepository, AmazonS3Service amazonS3Service) {
         this.onlineCourseRepository = onlineCourseRepository;
+        this.questionRepository = questionRepository;
         this.amazonS3Service = amazonS3Service;
     }
 
@@ -107,5 +113,30 @@ public class OnlineCourseService {
 
     public long countOnlineCourseStudentsByCourseId(Long courseId){
         return onlineCourseRepository.countOnlineCourseStudentsByCourseId(courseId);
+    }
+
+    public Page<Question> getQuestionsByCourseId(Long courseId, Pageable pageable) throws CourseNotFoundException {
+        OnlineCourse course = findById(courseId);
+        return onlineCourseRepository.findQuestionsByCourseId(course.getId(), pageable);
+    }
+
+    public OnlineCourse addQuestionToCourse(Long courseId, Long questionId) throws CourseNotFoundException, QuestionNotFoundException {
+        OnlineCourse course = findById(courseId);
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
+        course.getQuestions().add(question);
+        return onlineCourseRepository.save(course);
+    }
+
+    public OnlineCourse removeQuestionFromCourse(Long courseId, Long questionId) throws QuestionNotFoundException, CourseNotFoundException {
+        OnlineCourse course = findById(courseId);
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
+        course.getQuestions().remove(question);
+        return onlineCourseRepository.save(course);
+    }
+
+    public long countQuestionsByCourseId(Long courseId){
+        return onlineCourseRepository.countQuestionsByCourseId(courseId);
     }
 }

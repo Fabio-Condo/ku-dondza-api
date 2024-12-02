@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "online_course")
@@ -35,7 +37,16 @@ public class OnlineCourse {
 
     @JsonIgnoreProperties({"onlineCourse"})
     @OneToMany(mappedBy = "onlineCourse", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OnlineCourseContent> courseContents = new ArrayList<>();
+    private List<Tema> temas = new ArrayList<>();
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "online_course_questions",
+            joinColumns = @JoinColumn(name = "online_course_id"),
+            inverseJoinColumns = @JoinColumn(name = "question_id")
+    )
+    private Set<Question> questions = new HashSet<>();
 
     @JsonIgnore
     @ManyToMany(mappedBy = "subscribedOnlineCourses")
@@ -137,12 +148,20 @@ public class OnlineCourse {
         this.instrutorSpecialization = instrutorSpecialization;
     }
 
-    public List<OnlineCourseContent> getCourseContents() {
-        return courseContents;
+    public List<Tema> getTemas() {
+        return temas;
     }
 
-    public void setCourseContents(List<OnlineCourseContent> courseContents) {
-        this.courseContents = courseContents;
+    public void setTemas(List<Tema> temas) {
+        this.temas = temas;
+    }
+
+    public Set<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(Set<Question> questions) {
+        this.questions = questions;
     }
 
     public List<User> getStudents() {

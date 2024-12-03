@@ -33,6 +33,10 @@ public class TemaService {
         return temaRepository.findByOnlineCourseId(courseId, pageable);
     }
 
+    public List<Tema> findByOnlineCourseId(Long courseId) {
+        return temaRepository.findByOnlineCourseId(courseId);
+    }
+
     public Page<Tema> findAll(String searchParam, Pageable pageable) {
         return temaRepository.findAll(searchParam, pageable);
     }

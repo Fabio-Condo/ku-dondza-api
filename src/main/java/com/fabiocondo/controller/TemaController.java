@@ -33,6 +33,11 @@ public class TemaController {
         return ResponseEntity.status(HttpStatus.OK).body(temaService.findByOnlineCourseId(courseId, pageable));
     }
 
+    @GetMapping("/getListByCourseId")
+    public ResponseEntity<List<Tema>> findByOnlineCourseId(@RequestParam Long courseId) {
+        return ResponseEntity.status(HttpStatus.OK).body(temaService.findByOnlineCourseId(courseId));
+    }
+
     @GetMapping
     public ResponseEntity<Page<Tema>> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(temaService.findAll(searchParam, pageable));

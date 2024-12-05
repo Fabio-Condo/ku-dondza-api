@@ -2,6 +2,8 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Tema;
+import com.fabiocondo.exception.domain.CourseContentNotFoundException;
+import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.exception.domain.TemaNotFoundException;
 import com.fabiocondo.service.impl.TemaService;
 import org.springframework.data.domain.Page;
@@ -9,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -50,13 +53,20 @@ public class TemaController {
     }
 
     @PostMapping
-    public ResponseEntity<Tema> save(@RequestBody Tema tema) {
-        return ResponseEntity.ok(temaService.save(tema));
+    public ResponseEntity<Tema> save(@RequestParam("name") String name,
+                                                    @RequestParam("onlineCourseId") Long onlineCourseId,
+                                                    @RequestParam("file") MultipartFile file) throws CourseNotFoundException, TemaNotFoundException {
+
+        return ResponseEntity.status(HttpStatus.OK).body(temaService.save(name, onlineCourseId, file));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Tema> update(@PathVariable("id") Long id, @RequestBody Tema tema) throws TemaNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(temaService.update(tema, id));
+    @PutMapping
+    public ResponseEntity<Tema> update(@RequestParam("id") Long id,
+                                                      @RequestParam("name") String name,
+                                                      @RequestParam("onlineCourseId") Long onlineCourseId,
+                                                      @RequestParam(value = "file", required = false) MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
+
+        return ResponseEntity.status(HttpStatus.OK).body(temaService.update(id, name, onlineCourseId, file));
     }
 
     @DeleteMapping("/{id}")

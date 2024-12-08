@@ -9,6 +9,7 @@ import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.CompetitionRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.UserRepository;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -33,12 +34,13 @@ public class CompetitionService {
     }
 
     public Competition createCompetition(Competition competition) {
+        competition.setCompetitionId(generateCompetitionId());
         return competitionRepository.save(competition);
     }
 
     public Competition updateCompetition(Long id, Competition competition) throws CompetitionNotFoundException {
         Competition existingCompetition = getCompetitionById(id);
-        BeanUtils.copyProperties(competition, existingCompetition, "id");
+        BeanUtils.copyProperties(competition, existingCompetition, "id", "competitionId", "questions", "participants");
         return competitionRepository.save(existingCompetition);
     }
 
@@ -48,7 +50,12 @@ public class CompetitionService {
 
     public Competition getCompetitionById(Long id) throws CompetitionNotFoundException {
         return competitionRepository.findById(id)
-                .orElseThrow(() -> new CompetitionNotFoundException("Competition not found with ID: " + id));
+                .orElseThrow(() -> new CompetitionNotFoundException("No competition found by id: " + id));
+    }
+
+    public Competition findCompetitionByCompetitionId(String competitionId) throws CompetitionNotFoundException {
+        return competitionRepository.findCompetitionByCompetitionId(competitionId)
+                .orElseThrow(() -> new CompetitionNotFoundException("No competition found by id: " + competitionId));
     }
 
     public void delete(Long id) throws CompetitionNotFoundException {
@@ -167,5 +174,8 @@ public class CompetitionService {
         return competition.getParticipationRequests().contains(user);
     }
 
+    private String generateCompetitionId() {
+        return RandomStringUtils.randomAlphanumeric(10);
+    }
 }
 

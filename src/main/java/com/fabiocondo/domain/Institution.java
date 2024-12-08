@@ -16,6 +16,8 @@ public class Institution implements Serializable { // ADD SIGLA - UEM, UP, ACIPO
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
+    private String institutionId;
+
     private String name;
 
     private String acronym; // sigla
@@ -57,6 +59,14 @@ public class Institution implements Serializable { // ADD SIGLA - UEM, UP, ACIPO
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getInstitutionId() {
+        return institutionId;
+    }
+
+    public void setInstitutionId(String institutionId) {
+        this.institutionId = institutionId;
     }
 
     public String getName() {

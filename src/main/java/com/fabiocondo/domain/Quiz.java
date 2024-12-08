@@ -17,6 +17,8 @@ public class Quiz {
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
+    private String quizId;
+
     private String title;
 
     @JsonIgnore
@@ -34,6 +36,14 @@ public class Quiz {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getQuizId() {
+        return quizId;
+    }
+
+    public void setQuizId(String quizId) {
+        this.quizId = quizId;
     }
 
     public String getTitle() {

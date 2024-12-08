@@ -9,6 +9,7 @@ import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.repository.OnlineCourseRepository;
 import com.fabiocondo.repository.QuestionRepository;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -42,6 +43,11 @@ public class OnlineCourseService {
                 .orElseThrow(() -> new CourseNotFoundException("No course found by id: " + id));
     }
 
+    public OnlineCourse findOnlineCourseByOnlineCourseId(String onlineCourseId) throws CourseNotFoundException {
+        return onlineCourseRepository.findOnlineCourseByOnlineCourseId(onlineCourseId)
+                .orElseThrow(() -> new CourseNotFoundException("No course found by id: " + onlineCourseId));
+    }
+
     public Page<OnlineCourse> findAll(String searchParam, Pageable pageable) {
         return onlineCourseRepository.findAll(searchParam, pageable);
     }
@@ -52,6 +58,7 @@ public class OnlineCourseService {
 
         OnlineCourse course = new OnlineCourse();
         course.setName(name);
+        course.setOnlineCourseId(generateOnlineCourseId());
         course.setDescription(description);
         course.setRequirements(requirements);
         course.setLunchDate(lunchDate);
@@ -138,5 +145,9 @@ public class OnlineCourseService {
 
     public long countQuestionsByCourseId(Long courseId){
         return onlineCourseRepository.countQuestionsByCourseId(courseId);
+    }
+
+    private String generateOnlineCourseId() {
+        return RandomStringUtils.randomAlphanumeric(10);
     }
 }

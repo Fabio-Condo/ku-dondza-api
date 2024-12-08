@@ -17,6 +17,8 @@ public class OnlineCourse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String onlineCourseId;
+
     private String name;
 
     private String description;
@@ -74,6 +76,14 @@ public class OnlineCourse {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getOnlineCourseId() {
+        return onlineCourseId;
+    }
+
+    public void setOnlineCourseId(String onlineCourseId) {
+        this.onlineCourseId = onlineCourseId;
     }
 
     public String getName() {

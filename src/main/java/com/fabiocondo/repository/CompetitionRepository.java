@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface CompetitionRepository extends JpaRepository<Competition, Long> {
     @Query("SELECT c FROM Competition c WHERE c.title LIKE %:searchParam%")
     public Page<Competition> findAll(@Param("searchParam") String searchParam, Pageable pageable);
@@ -27,5 +29,8 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long> 
 
     @Query("SELECT COUNT(q) FROM Competition c JOIN c.questions q WHERE c.id = :competitionId")
     Long countQuestionsByCompetitionId(@Param("competitionId") Long competitionId);
+
+    Optional<Competition> findCompetitionByCompetitionId(String competitionId);
+
 }
 

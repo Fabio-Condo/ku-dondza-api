@@ -26,6 +26,11 @@ public class OnlineCourseController {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.findById(id));
     }
 
+    @GetMapping("/find-by-courseId/{onlineCourseId}")
+    public ResponseEntity<OnlineCourse> findOnlineCourseByOnlineCourseId(@PathVariable("onlineCourseId") String onlineCourseId) throws CourseNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.findOnlineCourseByOnlineCourseId(onlineCourseId));
+    }
+
     @GetMapping("/findAll")
     public ResponseEntity<Page<OnlineCourse>> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.findAll(searchParam, pageable));

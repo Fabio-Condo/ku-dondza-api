@@ -2,6 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.Group;
 import com.fabiocondo.domain.HttpResponse;
+import com.fabiocondo.domain.OnlineCourse;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.service.impl.GroupService;
@@ -34,6 +35,11 @@ public class GroupController {
     @GetMapping("/{id}")
     public ResponseEntity<Group> findById(@PathVariable("id") Long id) throws GroupNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(groupService.findById(id));
+    }
+
+    @GetMapping("/find-by-groupId/{groupId}")
+    public ResponseEntity<Group> findGroupByGroupId(@PathVariable("groupId") String groupId) throws GroupNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(groupService.findGroupByGroupId(groupId));
     }
 
     @PostMapping

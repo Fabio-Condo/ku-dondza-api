@@ -31,6 +31,11 @@ public class InstitutionController {
         return ResponseEntity.status(HttpStatus.OK).body(institutionServiceImpl.findById(id));
     }
 
+    @GetMapping("/find-by-institutionId/{institutionId}")
+    public ResponseEntity<Institution> findInstitutionByInstitutionId(@PathVariable("institutionId") String institutionId) throws InstituicaoNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(institutionServiceImpl.findInstitutionByInstitutionId(institutionId));
+    }
+
     @GetMapping
     public ResponseEntity<Page<Institution>> findAll(Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(institutionServiceImpl.findAll(pageable));

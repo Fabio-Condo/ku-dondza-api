@@ -3,6 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.CompetitionNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
+import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.CompetitionService;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,11 @@ public class CompetitionController {
     @GetMapping("/{id}")
     public ResponseEntity<Competition> getCompetitionById(@PathVariable Long id) throws CompetitionNotFoundException {
         return ResponseEntity.ok().body(competitionService.getCompetitionById(id));
+    }
+
+    @GetMapping("/find-by-competitionId/{competitionId}")
+    public ResponseEntity<Competition> findCompetitionByCompetitionId(@PathVariable("competitionId") String competitionId) throws CompetitionNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(competitionService.findCompetitionByCompetitionId(competitionId));
     }
 
     @DeleteMapping("/{id}")

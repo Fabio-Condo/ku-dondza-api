@@ -38,9 +38,9 @@ public class SearchService {
 
         // Combine os resultados e transforme em DTOs conforme necessário
         List<SearchResultDTO> results = new ArrayList<>();
-        results.addAll(users.stream().map(user -> new SearchResultDTO("User", user.getFirstName() + " " + user.getLastName(), user.getProfileImageUrl(), user.getId().toString())).collect(Collectors.toList()));
-        results.addAll(groups.stream().map(group -> new SearchResultDTO("Group", group.getName(), group.getUrlFile(), group.getId().toString())).collect(Collectors.toList()));
-        results.addAll(institutions.stream().map(institution -> new SearchResultDTO("Institution", institution.getName(), institution.getUrlFile(), institution.getId().toString())).collect(Collectors.toList()));
+        results.addAll(users.stream().map(user -> new SearchResultDTO("User", user.getFirstName() + " " + user.getLastName(), user.getProfileImageUrl(), user.getUserId())).collect(Collectors.toList()));
+        results.addAll(groups.stream().map(group -> new SearchResultDTO("Group", group.getName(), group.getUrlFile(), group.getGroupId())).collect(Collectors.toList()));
+        results.addAll(institutions.stream().map(institution -> new SearchResultDTO("Institution", institution.getName(), institution.getUrlFile(), institution.getInstitutionId())).collect(Collectors.toList()));
 
         // Crie uma página de resultados combinados
         return new PageImpl<>(results, pageable, results.size());

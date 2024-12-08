@@ -18,6 +18,8 @@ public class Group {
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
+    private String groupId;
+
     private String name;
 
     private String description;
@@ -73,6 +75,14 @@ public class Group {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
     public String getName() {

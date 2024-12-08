@@ -29,6 +29,11 @@ public class QuizController {
         return ResponseEntity.status(HttpStatus.OK).body(quizService.findById(id));
     }
 
+    @GetMapping("/find-by-quizId/{quizId}")
+    public ResponseEntity<Quiz> findQuizByQuizId(@PathVariable("quizId") String quizId) throws QuizNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(quizService.findQuizByQuizId(quizId));
+    }
+
     @GetMapping
     public ResponseEntity<Page<Quiz>> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(quizService.findAll(searchParam, pageable));

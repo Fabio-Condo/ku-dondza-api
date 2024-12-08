@@ -12,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 public interface InstitutionService {
     Institution findById(Long id) throws InstituicaoNotFoundException;
 
+    Institution findInstitutionByInstitutionId(String institutionId) throws InstituicaoNotFoundException;
+
     Page<Institution> findAll(Pageable pageable);
 
     Page<Institution> filter(InstitutionFilter institutionFilter, Pageable pageable);

@@ -14,6 +14,8 @@ public class Competition {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String competitionId;
+
     private String title;
 
     @JsonIgnore
@@ -56,6 +58,14 @@ public class Competition {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCompetitionId() {
+        return competitionId;
+    }
+
+    public void setCompetitionId(String competitionId) {
+        this.competitionId = competitionId;
     }
 
     public String getTitle() {

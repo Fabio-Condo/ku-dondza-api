@@ -6,6 +6,7 @@ import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -34,6 +35,11 @@ public class QuizService {
                 .orElseThrow(() -> new QuizNotFoundException("No quiz found by id: " + id));
     }
 
+    public Quiz findQuizByQuizId(String quizId) throws QuizNotFoundException {
+        return quizRepository.findQuizByQuizId(quizId)
+                .orElseThrow(() -> new QuizNotFoundException("No quiz found by id: " + quizId));
+    }
+
     public Page<Quiz> findAll(String searchParam, Pageable pageable) {
         return quizRepository.findAll(searchParam, pageable);
     }
@@ -43,12 +49,13 @@ public class QuizService {
     }
 
     public Quiz save(Quiz quiz) {
+        quiz.setQuizId(generateQuizId());
         return quizRepository.save(quiz);
     }
 
     public Quiz update(Quiz quiz, Long id) throws QuizNotFoundException {
         Quiz existQuiz = findById(id);
-        BeanUtils.copyProperties(quiz, existQuiz, "id");
+        BeanUtils.copyProperties(quiz, existQuiz, "id", "quizId", "questions");
         logger.info("Updating quiz: " + quiz.getTitle());
         return quizRepository.save(existQuiz);
     }
@@ -87,6 +94,10 @@ public class QuizService {
 
     public long countQuestionsByQuizId(Long quizId){
         return quizRepository.countQuestionsByQuizId(quizId);
+    }
+
+    private String generateQuizId() {
+        return RandomStringUtils.randomAlphanumeric(10);
     }
 
 }

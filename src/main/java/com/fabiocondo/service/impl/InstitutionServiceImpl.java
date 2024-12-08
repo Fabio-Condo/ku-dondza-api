@@ -9,6 +9,7 @@ import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.repository.InstitutionRepository;
 import com.fabiocondo.repository.filter.InstitutionFilter;
 import com.fabiocondo.service.InstitutionService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -40,6 +41,12 @@ public class InstitutionServiceImpl implements InstitutionService {
     }
 
     @Override
+    public Institution findInstitutionByInstitutionId(String institutionId) throws InstituicaoNotFoundException {
+        return institutionRepository.findInstitutionByInstitutionId(institutionId)
+                .orElseThrow(() -> new InstituicaoNotFoundException("No institution found by id: " + institutionId));
+    }
+
+    @Override
     public Page<Institution> findAll(Pageable pageable) {
         return institutionRepository.findAll(pageable);
     }
@@ -55,6 +62,7 @@ public class InstitutionServiceImpl implements InstitutionService {
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         Institution institution = new Institution();
+        institution.setInstitutionId(generateInstitutionId());
         institution.setName(name);
         institution.setAcronym(acronym);
         institution.setType(type);
@@ -110,5 +118,9 @@ public class InstitutionServiceImpl implements InstitutionService {
     public long getTotal(){
         logger.info("Total institution: " + institutionRepository.count());
         return institutionRepository.count();
+    }
+
+    private String generateInstitutionId() {
+        return RandomStringUtils.randomAlphanumeric(10);
     }
 }

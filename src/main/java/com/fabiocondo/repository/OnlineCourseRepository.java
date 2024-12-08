@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface OnlineCourseRepository extends JpaRepository<OnlineCourse, Long> {
     @Query("SELECT oc FROM OnlineCourse oc WHERE oc.name LIKE %:searchParam%")
     public Page<OnlineCourse> findAll(@Param("searchParam") String searchParam, Pageable pageable);
@@ -24,4 +26,6 @@ public interface OnlineCourseRepository extends JpaRepository<OnlineCourse, Long
 
     @Query("SELECT COUNT(qts) FROM OnlineCourse oc JOIN oc.questions qts WHERE oc.id = :courseId")
     Long countQuestionsByCourseId(@Param("courseId") Long courseId);
+
+    Optional<OnlineCourse> findOnlineCourseByOnlineCourseId(String onlineCourseId);
 }

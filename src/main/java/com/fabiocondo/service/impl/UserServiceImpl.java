@@ -603,7 +603,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     private String generateUserId() {
-        return RandomStringUtils.randomNumeric(10);
+        return RandomStringUtils.randomAlphanumeric(10);
     }
 
     @Override

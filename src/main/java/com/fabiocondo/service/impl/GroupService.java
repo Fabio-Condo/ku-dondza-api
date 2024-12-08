@@ -7,6 +7,7 @@ import com.fabiocondo.exception.domain.GroupNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.GroupRepository;
 import com.fabiocondo.repository.UserRepository;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +46,17 @@ public class GroupService {
                 .orElseThrow(() -> new GroupNotFoundException("No Group found by id: " + id));
     }
 
+    public Group findGroupByGroupId(String groupId) throws GroupNotFoundException {
+        return groupRepository.findGroupByGroupId(groupId)
+                .orElseThrow(() -> new GroupNotFoundException("No Group found by id: " + groupId));
+    }
+
     public Group save(String name, String description, MultipartFile file) throws UserNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         Group group = new Group();
+        group.setGroupId(generateGroupId());
         group.setName(name);
         group.setDescription(description);
         group.setUrlFile(s3UploadResponse.getFileUrl());
@@ -190,5 +197,9 @@ public class GroupService {
         }
         logger.info(FOUND_USER_BY_USERNAME + username);
         return userRepository.findUserByUsername(username);
+    }
+
+    private String generateGroupId() {
+        return RandomStringUtils.randomAlphanumeric(10);
     }
 }

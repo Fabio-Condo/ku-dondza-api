@@ -1,13 +1,14 @@
 package com.fabiocondo.repository;
 
 import com.fabiocondo.domain.Group;
-import com.fabiocondo.domain.Post;
 import com.fabiocondo.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.Optional;
 
 public interface GroupRepository extends JpaRepository<Group, Long> {
     @Query("SELECT g FROM Group g WHERE g.name LIKE %:searchParam% OR g.description LIKE %:searchParam%")
@@ -27,5 +28,8 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     @Query("SELECT g FROM Group g WHERE g.name LIKE %:query%")
     Page<Group> searchByQuery(@Param("query") String query, Pageable pageable);
+
+    Optional<Group> findGroupByGroupId(String groupId);
+
 }
 

@@ -2,8 +2,8 @@ jwt:
   secret: '[a-zA-Z0-9._]^+$Guidelines89797987forAlphabeticalArraNumeralsandOtherSymbo$'
 
 aws:
-  accessKeyId: AKIAW3MECWUYLS6ENYCX
-  secretKey: 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
+  accessKeyId: AKIAW3MECWUYFRDFO5GI
+  secretKey: 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
   region.static: us-east-1
 
 server:

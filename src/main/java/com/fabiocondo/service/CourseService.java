@@ -2,6 +2,7 @@ package com.fabiocondo.service;
 
 import com.fabiocondo.domain.Course;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
+import com.fabiocondo.repository.filter.CourseFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +15,8 @@ public interface CourseService {
     List<Course> getByInstitutionId(Long institutionId);
 
     Page<Course> findAll(Pageable pageable);
+
+    Page<Course> filter(CourseFilter courseFilter, Pageable pageable);
 
     Page<Course> findByName(String name, Pageable pageable);
 

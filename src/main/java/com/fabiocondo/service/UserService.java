@@ -1,6 +1,7 @@
 package com.fabiocondo.service;
 
 import com.fabiocondo.domain.Post;
+import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.domain.User;
 import org.springframework.data.domain.Page;
@@ -15,15 +16,17 @@ import java.util.Set;
 
 public interface UserService {
 
+    Page<User> getAllInstrutores(Pageable pageable);
+
     User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, MessagingException, UsernameExistException, EmailExistException;
-
-    User addNewUser(String firstName, String lastName, String username, String email, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException;
-
-    User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException;
 
     User updateUserProfile(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String newBio, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException;
 
-    User update(User user, Long id) throws CourseNotFoundException;
+    User addNewUser(String firstName, String lastName, String username, String email, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException;
+
+    User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException;
+
+    User update(User user, Long id) throws UserNotFoundException;
 
     User updateUserProfilePhoto(String currentUsername, MultipartFile profileImage) throws IOException;
 
@@ -43,9 +46,9 @@ public interface UserService {
 
     boolean checkIfSentFriendRequest(Long receptorUserId, Long emissorUserId) throws UserNotFoundException;
 
-    User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException;
+    User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException;
 
-    User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException;
+    User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException;
 
     boolean doesUserSubscribedOnlineCourse(Long userId, Long onlineCourseId);
 
@@ -65,13 +68,13 @@ public interface UserService {
 
     long getTotal();
 
-    User addInterestToUserInterests(Long userId, Long postId) throws InterestNotFoundException;
+    User addInterestToUserInterests(Long userId, Long postId) throws InterestNotFoundException, UserNotFoundException;
 
-    User removeInterestFromUserInterests(Long userId, Long postId) throws InterestNotFoundException;
+    User removeInterestFromUserInterests(Long userId, Long postId) throws InterestNotFoundException, UserNotFoundException;
 
-    User addPostToSavedPosts(Long userId, Long postId) throws PostNotFoundException;
+    User addPostToSavedPosts(Long userId, Long postId) throws PostNotFoundException, UserNotFoundException;
 
-    User removePostFromSavedPosts(Long userId, Long postId) throws PostNotFoundException;
+    User removePostFromSavedPosts(Long userId, Long postId) throws PostNotFoundException, UserNotFoundException;
 
     List<Post> getSavedPosts(Long id) throws UserNotFoundException;
 

@@ -3,6 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.Course;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
+import com.fabiocondo.repository.filter.CourseFilter;
 import com.fabiocondo.service.impl.CourseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,6 +36,11 @@ public class CourseController {
     }
 
     @GetMapping("/filter")
+    public Page<Course> filter(CourseFilter courseFilter, Pageable pageable) {
+        return courseServiceImpl.filter(courseFilter, pageable);
+    }
+
+    @GetMapping("/findByName")
     public ResponseEntity<Page<Course>> findByName(@RequestParam(required = false, defaultValue = "") String name, Pageable pageable){
         return ResponseEntity.status(HttpStatus.OK).body(courseServiceImpl.findByName(name, pageable));
     }

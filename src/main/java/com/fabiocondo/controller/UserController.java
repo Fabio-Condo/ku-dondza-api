@@ -2,6 +2,8 @@ package com.fabiocondo.controller;
 
 
 import com.fabiocondo.domain.*;
+import com.fabiocondo.enumeration.ExamType;
+import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.security.utility.JWTTokenProvider;
 import com.fabiocondo.service.UserService;
@@ -62,11 +64,12 @@ public class UserController {
                                            @RequestParam("lastName") String lastName,
                                            @RequestParam("username") String username,
                                            @RequestParam("email") String email,
+                                           @RequestParam("userType") UserType userType,
                                            @RequestParam("role") String role,
                                            @RequestParam("isActive") String isActive,
                                            @RequestParam("isNonLocked") String isNonLocked,
                                            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        User newUser = userService.addNewUser(firstName, lastName, username,email, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
+        User newUser = userService.addNewUser(firstName, lastName, username,email, role, userType, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
         return ResponseEntity.status(HttpStatus.OK).body(newUser);
     }
 
@@ -76,11 +79,12 @@ public class UserController {
                                        @RequestParam("lastName") String lastName,
                                        @RequestParam("username") String username,
                                        @RequestParam("email") String email,
+                                       @RequestParam("userType") UserType userType,
                                        @RequestParam("role") String role,
                                        @RequestParam("isActive") String isActive,
                                        @RequestParam("isNonLocked") String isNonLocked,
                                        @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
-        User updatedUser = userService.updateUser(currentUsername, firstName, lastName, username,email, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
+        User updatedUser = userService.updateUser(currentUsername, firstName, lastName, username,email, role, userType, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 
@@ -100,7 +104,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable("id") Long id, @RequestBody User user) throws CourseNotFoundException {
+    public ResponseEntity<User> update(@PathVariable("id") Long id, @RequestBody User user) throws UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.update(user, id));
     }
 
@@ -135,6 +139,11 @@ public class UserController {
     @GetMapping("/list/pageable")
     public Page<User> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) throws UserNotFoundException {
         return userService.findAll(searchParam, pageable);
+    }
+
+    @GetMapping("/instrutores")
+    public Page<User> getAllInstrutores(Pageable pageable) {
+        return userService.getAllInstrutores(pageable);
     }
 
     @GetMapping("/total")
@@ -174,22 +183,22 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/interests/{interestId}")
-    public ResponseEntity<User> addInterestToUserInterests(@PathVariable Long userId, @PathVariable Long interestId) throws InterestNotFoundException {
+    public ResponseEntity<User> addInterestToUserInterests(@PathVariable Long userId, @PathVariable Long interestId) throws InterestNotFoundException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.addInterestToUserInterests(userId, interestId));
     }
 
     @DeleteMapping("/{userId}/interests/{interestId}")
-    public ResponseEntity<User> removeInterestFromUserInterests(@PathVariable Long userId, @PathVariable Long interestId) throws InterestNotFoundException {
+    public ResponseEntity<User> removeInterestFromUserInterests(@PathVariable Long userId, @PathVariable Long interestId) throws InterestNotFoundException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.removeInterestFromUserInterests(userId, interestId));
     }
 
     @PostMapping("/{userId}/savedPosts/{postId}")
-    public ResponseEntity<User> addPostToSavedPosts(@PathVariable Long userId, @PathVariable Long postId) throws PostNotFoundException {
+    public ResponseEntity<User> addPostToSavedPosts(@PathVariable Long userId, @PathVariable Long postId) throws PostNotFoundException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.addPostToSavedPosts(userId, postId));
     }
 
     @DeleteMapping("/{userId}/savedPosts/{postId}")
-    public ResponseEntity<User> removePostFromSavedPosts(@PathVariable Long userId, @PathVariable Long postId) throws PostNotFoundException {
+    public ResponseEntity<User> removePostFromSavedPosts(@PathVariable Long userId, @PathVariable Long postId) throws PostNotFoundException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.removePostFromSavedPosts(userId, postId));
     }
 
@@ -283,12 +292,12 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")
-    public ResponseEntity<User> addCourseToSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws PostNotFoundException, CourseNotFoundException {
+    public ResponseEntity<User> addCourseToSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.addCourseToSubscribedOnlineCourses(userId, onlineCourseId));
     }
 
     @DeleteMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")
-    public ResponseEntity<User> removeCourseFromSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws PostNotFoundException, CourseNotFoundException {
+    public ResponseEntity<User> removeCourseFromSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.removeCourseFromSubscribedOnlineCourses(userId, onlineCourseId));
     }
 

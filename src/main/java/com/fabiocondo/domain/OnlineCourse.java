@@ -37,6 +37,11 @@ public class OnlineCourse {
 
     private String instrutorSpecialization;
 
+    @ManyToOne
+    @JsonIgnoreProperties({"subscribedOnlineCourses"})
+    @JoinColumn(name = "user_id")
+    private User instrutor;
+
     @JsonIgnoreProperties({"onlineCourse"})
     @OneToMany(mappedBy = "onlineCourse", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Tema> temas = new ArrayList<>();
@@ -172,6 +177,14 @@ public class OnlineCourse {
 
     public void setQuestions(Set<Question> questions) {
         this.questions = questions;
+    }
+
+    public User getInstrutor() {
+        return instrutor;
+    }
+
+    public void setInstrutor(User instrutor) {
+        this.instrutor = instrutor;
     }
 
     public List<User> getStudents() {

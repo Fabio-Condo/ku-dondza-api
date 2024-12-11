@@ -3,6 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.OnlineCourseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,12 +47,10 @@ public class OnlineCourseController {
                                              @RequestParam("description") String description,
                                              @RequestParam("requirements") String requirements,
                                              @RequestParam("lunchDate") String lunchDate,
-                                             @RequestParam("instrutorName") String instrutorName,
-                                             @RequestParam("instrutorDescription") String instrutorDescription,
-                                             @RequestParam("instrutorSpecialization") String instrutorSpecialization,
-                                             @RequestParam("file") MultipartFile file){
+                                             @RequestParam("instrutorId") Long instrutorId,
+                                             @RequestParam("file") MultipartFile file) throws UserNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.save(name, description, requirements, lunchDate, instrutorName, instrutorDescription, instrutorSpecialization, file));
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.save(name, description, requirements, lunchDate, instrutorId, file));
     }
 
     @PutMapping
@@ -60,12 +59,10 @@ public class OnlineCourseController {
                                                @RequestParam("description") String description,
                                                @RequestParam("requirements") String requirements,
                                                @RequestParam("lunchDate") String lunchDate,
-                                               @RequestParam("instrutorName") String instrutorName,
-                                               @RequestParam("instrutorDescription") String instrutorDescription,
-                                               @RequestParam("instrutorSpecialization") String instrutorSpecialization,
-                                               @RequestParam(value = "file", required = false) MultipartFile file) throws CourseNotFoundException {
+                                               @RequestParam("instrutorId") Long instrutorId,
+                                               @RequestParam(value = "file", required = false) MultipartFile file) throws CourseNotFoundException, UserNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.update(id, name, description, requirements, lunchDate, instrutorName, instrutorDescription, instrutorSpecialization, file));
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.update(id, name, description, requirements, lunchDate, instrutorId, file));
     }
 
     @DeleteMapping("/{id}")

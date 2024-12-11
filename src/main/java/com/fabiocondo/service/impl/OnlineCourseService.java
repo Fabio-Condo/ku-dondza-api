@@ -7,6 +7,7 @@ import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.OnlineCourseRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -28,12 +29,15 @@ public class OnlineCourseService {
 
     private final QuestionRepository questionRepository;
 
+    private final UserServiceImpl userService;
+
     private final AmazonS3Service amazonS3Service;
 
 
-    public OnlineCourseService(OnlineCourseRepository onlineCourseRepository, QuestionRepository questionRepository, AmazonS3Service amazonS3Service) {
+    public OnlineCourseService(OnlineCourseRepository onlineCourseRepository, QuestionRepository questionRepository, UserServiceImpl userService, AmazonS3Service amazonS3Service) {
         this.onlineCourseRepository = onlineCourseRepository;
         this.questionRepository = questionRepository;
+        this.userService = userService;
         this.amazonS3Service = amazonS3Service;
     }
 
@@ -52,9 +56,11 @@ public class OnlineCourseService {
         return onlineCourseRepository.findAll(searchParam, pageable);
     }
 
-    public OnlineCourse save(String name, String description, String requirements, String lunchDate, String instrutorName, String instrutorDescription, String instrutorSpecialization, MultipartFile file) {
+    public OnlineCourse save(String name, String description, String requirements, String lunchDate, Long instrutorId, MultipartFile file) throws UserNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+
+        User instrutor = userService.findById(instrutorId);
 
         OnlineCourse course = new OnlineCourse();
         course.setName(name);
@@ -62,9 +68,7 @@ public class OnlineCourseService {
         course.setDescription(description);
         course.setRequirements(requirements);
         course.setLunchDate(lunchDate);
-        course.setInstrutorName(instrutorName);
-        course.setInstrutorDescription(instrutorDescription);
-        course.setInstrutorSpecialization(instrutorSpecialization);
+        course.setInstrutor(instrutor);
         course.setCoverImageUrl(s3UploadResponse.getFileUrl());
         course.setFileName(file.getOriginalFilename());
 
@@ -72,16 +76,15 @@ public class OnlineCourseService {
         return onlineCourseRepository.save(course);
     }
 
-    public OnlineCourse update(Long id, String name, String description, String requirements, String lunchDate, String instrutorName, String instrutorDescription, String instrutorSpecialization, MultipartFile file) throws CourseNotFoundException {
+    public OnlineCourse update(Long id, String name, String description, String requirements, String lunchDate, Long instrutorId, MultipartFile file) throws CourseNotFoundException, UserNotFoundException {
+        User instrutor = userService.findById(instrutorId);
 
         OnlineCourse existCourse = findById(id);
         existCourse.setName(name);
         existCourse.setDescription(description);
         existCourse.setRequirements(requirements);
         existCourse.setLunchDate(lunchDate);
-        existCourse.setInstrutorName(instrutorName);
-        existCourse.setInstrutorDescription(instrutorDescription);
-        existCourse.setInstrutorSpecialization(instrutorSpecialization);
+        existCourse.setInstrutor(instrutor);
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {

@@ -4,6 +4,7 @@ import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.Role;
+import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.InterestRepository;
 import com.fabiocondo.repository.OnlineCourseRepository;
@@ -72,6 +73,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public Page<User> getAllInstrutores(Pageable pageable) {
+        return userRepository.findByUserType(UserType.INSTRUTOR, pageable);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findUserByUsername(username);
         if (user == null) {
@@ -88,9 +94,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
-    public User findById(Long id) throws UsernameNotFoundException {
+    public User findById(Long id) throws UserNotFoundException {
         return userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("No user found by id: " + id));
+                .orElseThrow(() -> new UserNotFoundException("No user found by id: " + id));
     }
 
     @Override
@@ -116,7 +122,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User addNewUser(String firstName, String lastName, String username, String email, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
+    public User addNewUser(String firstName, String lastName, String username, String email, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
         validateNewUsernameAndEmail(EMPTY, username, email);
 
         logger.info("Uploading file: " + profileImage.getOriginalFilename());
@@ -136,6 +142,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         //user.setNotLocked(isNonLocked);
         user.setActive(true);
         user.setNotLocked(true);
+        user.setUserType(userType);
         user.setRole(getRoleEnumName(role).name());
         user.setAuthorities(getRoleEnumName(role).getAuthorities());
         user.setProfileImageUrl(s3UploadResponse.getFileUrl());
@@ -146,7 +153,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException {
+    public User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException {
         User currentUser = validateNewUsernameAndEmail(currentUsername, newUsername, newEmail);
         // Adicionar funcao que diminue o tamanho da imagem
         currentUser.setFirstName(newFirstName);
@@ -155,6 +162,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         currentUser.setEmail(newEmail);
         //currentUser.setActive(isActive);
         //currentUser.setNotLocked(isNonLocked);
+        currentUser.setUserType(userType);
         currentUser.setActive(true);
         currentUser.setNotLocked(true);
         currentUser.setRole(getRoleEnumName(role).name());
@@ -205,7 +213,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User update(User user, Long id) {
+    public User update(User user, Long id) throws UserNotFoundException {
         User existUser = findById(id);
         BeanUtils.copyProperties(user, existUser, "id", "password");
         logger.info("Updating user: " + user.getFirstName());
@@ -324,7 +332,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User addInterestToUserInterests(Long userId, Long interestId) throws InterestNotFoundException {
+    public User addInterestToUserInterests(Long userId, Long interestId) throws InterestNotFoundException, UserNotFoundException {
         User user = findById(userId);
         Optional<Interest> optionalInterest = interestRepository.findById(interestId);
         if (!optionalInterest.isPresent()){
@@ -335,7 +343,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User removeInterestFromUserInterests(Long userId, Long interestId) throws InterestNotFoundException {
+    public User removeInterestFromUserInterests(Long userId, Long interestId) throws InterestNotFoundException, UserNotFoundException {
         User user = findById(userId);
         Optional<Interest> optionalInterest = interestRepository.findById(interestId);
         if (!optionalInterest.isPresent()) {
@@ -346,7 +354,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User addPostToSavedPosts(Long userId, Long postId) throws PostNotFoundException {
+    public User addPostToSavedPosts(Long userId, Long postId) throws PostNotFoundException, UserNotFoundException {
         User user = findById(userId);
        Optional<Post> optionalPost = postRepository.findById(postId);
        if (!optionalPost.isPresent()){
@@ -357,7 +365,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User removePostFromSavedPosts(Long userId, Long postId) throws PostNotFoundException {
+    public User removePostFromSavedPosts(Long userId, Long postId) throws PostNotFoundException, UserNotFoundException {
         User user = findById(userId);
         Optional<Post> optionalPost = postRepository.findById(postId);
         if (!optionalPost.isPresent()) {
@@ -481,7 +489,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public boolean checkIfSentFriendRequest(Long receptorUserId, Long emissorUserId) {
+    public boolean checkIfSentFriendRequest(Long receptorUserId, Long emissorUserId) throws UserNotFoundException {
         User user = findById(receptorUserId);
         User friend = userRepository.findById(emissorUserId).orElse(null);
 
@@ -505,7 +513,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException {
+    public User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
         User user = findById(userId);
         Optional<OnlineCourse> optionalCourse = onlineCourseRepository.findById(onlineCourseId);
         if (!optionalCourse.isPresent()){
@@ -516,7 +524,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException {
+    public User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
         User user = findById(userId);
         Optional<OnlineCourse> optionalCourse = onlineCourseRepository.findById(onlineCourseId);
         if (!optionalCourse.isPresent()) {

@@ -1,5 +1,6 @@
 package com.fabiocondo.domain;
 
+import com.fabiocondo.enumeration.UserType;
 import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
@@ -46,6 +47,9 @@ public class User implements Serializable {
     private Date lastLoginDateDisplay;
 
     private Date joinDate;
+
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
 
     private String role; //ROLE_USER{ read, edit }, ROLE_ADMIN {delete}
 
@@ -261,6 +265,14 @@ public class User implements Serializable {
 
     public void setJoinDate(Date joinDate) {
         this.joinDate = joinDate;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 
     public String getRole() {

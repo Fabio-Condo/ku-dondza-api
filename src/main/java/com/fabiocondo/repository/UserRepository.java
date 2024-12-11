@@ -1,8 +1,10 @@
 package com.fabiocondo.repository;
 
 
+import com.fabiocondo.domain.CommentLike;
 import com.fabiocondo.domain.Post;
 import com.fabiocondo.domain.User;
+import com.fabiocondo.enumeration.UserType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +18,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findUserByUserId(String userId);
 
     User findUserByEmail(String email);
+
+    Page<User> findByUserType(UserType userType, Pageable pageable);
 
     @Query("SELECT u FROM User u WHERE u.firstName LIKE %:searchParam% OR u.lastName LIKE %:searchParam% OR u.username LIKE %:searchParam% OR u.role LIKE %:searchParam%")
     public Page<User> findByAnyProperty(@Param("searchParam") String searchParam, Pageable pageable);

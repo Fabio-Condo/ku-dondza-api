@@ -3,6 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.domain.Course;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.repository.CourseRepository;
+import com.fabiocondo.repository.filter.CourseFilter;
 import com.fabiocondo.service.CourseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,11 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Page<Course> findAll(Pageable pageable) {
         return courseRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<Course> filter(CourseFilter courseFilter, Pageable pageable) {
+        return courseRepository.filter(courseFilter, pageable);
     }
 
     @Override

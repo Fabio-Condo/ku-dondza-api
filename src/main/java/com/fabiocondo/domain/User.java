@@ -117,6 +117,10 @@ public class User implements Serializable {
     @ManyToMany(mappedBy = "participants")
     private List<Competition> competitions;
 
+    @JsonIgnore
+    @ManyToMany(mappedBy = "members")
+    private List<Group> groups;
+
     public User(){}
 
     public User(Long id, String userId, String firstName, String lastName, String username, String bio, String password, String email, String profileImageUrl, String fileName, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, boolean isActive, boolean isNotLocked) {
@@ -361,5 +365,13 @@ public class User implements Serializable {
 
     public void setCompetitions(List<Competition> competitions) {
         this.competitions = competitions;
+    }
+
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
     }
 }

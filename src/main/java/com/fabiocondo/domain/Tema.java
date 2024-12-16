@@ -19,10 +19,6 @@ public class Tema {
 
     private String name;
 
-    private String fileName;
-
-    private String urlFile;
-
     @ManyToOne
     @JoinColumn(name = "online_course_id")
     private OnlineCourse onlineCourse;
@@ -56,22 +52,6 @@ public class Tema {
 
     public void setOnlineCourse(OnlineCourse onlineCourse) {
         this.onlineCourse = onlineCourse;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getUrlFile() {
-        return urlFile;
-    }
-
-    public void setUrlFile(String urlFile) {
-        this.urlFile = urlFile;
     }
 
     public List<OnlineCourseContent> getCourseContents() {

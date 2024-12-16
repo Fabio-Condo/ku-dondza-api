@@ -513,6 +513,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public Page<OnlineCourse> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException {
+        User user = findById(userId);
+        return userRepository.findSubscribedOnlineCoursesByUserId(user.getId(), pageable);
+    }
+
+    @Override
+    public long countSubscribedOnlineCoursesByUserId(Long userId) {
+        return userRepository.countSubscribedOnlineCoursesByUserId(userId);
+    }
+
+    @Override
     public User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
         User user = findById(userId);
         Optional<OnlineCourse> optionalCourse = onlineCourseRepository.findById(onlineCourseId);
@@ -545,6 +556,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             return false;
         }
         return user.getSubscribedOnlineCourses().contains(course.get());
+    }
+
+    @Override
+    public Page<Group> getGroupsByUserId(Long userId, Pageable pageable) throws UserNotFoundException {
+        User user = findById(userId);
+        return userRepository.findGroupsByUserId(user.getId(), pageable);
+    }
+
+    @Override
+    public long countGroupsByUserId(Long userId) {
+        return userRepository.countGroupsByUserId(userId);
     }
 
     @Override

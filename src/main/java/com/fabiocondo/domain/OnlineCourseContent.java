@@ -1,5 +1,7 @@
 package com.fabiocondo.domain;
 
+import com.fabiocondo.enumeration.ContentType;
+
 import javax.persistence.*;
 
 @Entity
@@ -12,13 +14,12 @@ public class OnlineCourseContent { // Conteúdo do tema - Depois renomear
 
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    private ContentType contentType;
+
     private String fileName;
 
     private String urlFile; // URL for storing the location of the video or file in the bucket
-
-    //@ManyToOne
-    //@JoinColumn(name = "online_course_id")
-    //private OnlineCourse onlineCourse;
 
     @ManyToOne
     @JoinColumn(name = "tema_id")
@@ -27,8 +28,9 @@ public class OnlineCourseContent { // Conteúdo do tema - Depois renomear
     // Constructors
     public OnlineCourseContent() {}
 
-    public OnlineCourseContent(String description, String fileName, String urlFile) {
+    public OnlineCourseContent(String description, ContentType contentType, String fileName, String urlFile) {
         this.description = description;
+        this.contentType = contentType;
         this.fileName = fileName;
         this.urlFile = urlFile;
     }
@@ -48,6 +50,14 @@ public class OnlineCourseContent { // Conteúdo do tema - Depois renomear
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public ContentType getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(ContentType contentType) {
+        this.contentType = contentType;
     }
 
     public String getFileName() {

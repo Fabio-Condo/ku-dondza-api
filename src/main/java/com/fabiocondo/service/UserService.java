@@ -1,5 +1,7 @@
 package com.fabiocondo.service;
 
+import com.fabiocondo.domain.Group;
+import com.fabiocondo.domain.OnlineCourse;
 import com.fabiocondo.domain.Post;
 import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
@@ -46,11 +48,19 @@ public interface UserService {
 
     boolean checkIfSentFriendRequest(Long receptorUserId, Long emissorUserId) throws UserNotFoundException;
 
+    Page<OnlineCourse> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException;
+
+    long countSubscribedOnlineCoursesByUserId(Long userId);
+
     User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException;
 
     User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException;
 
     boolean doesUserSubscribedOnlineCourse(Long userId, Long onlineCourseId);
+
+    Page<Group> getGroupsByUserId(Long userId, Pageable pageable) throws UserNotFoundException;
+
+    long countGroupsByUserId(Long userId);
 
     long countFriendsByUserId(Long userId);
 

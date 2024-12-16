@@ -2,6 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.OnlineCourseContent;
+import com.fabiocondo.enumeration.ContentType;
 import com.fabiocondo.exception.domain.CourseContentNotFoundException;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.exception.domain.TemaNotFoundException;
@@ -29,19 +30,21 @@ public class OnlineCourseContentController {
 
     @PostMapping
     public ResponseEntity<OnlineCourseContent> save(@RequestParam("description") String description,
+                                                    @RequestParam("contentType") ContentType contentType,
                                                     @RequestParam("temaId") Long temaId,
                                                     @RequestParam("file") MultipartFile file) throws CourseNotFoundException, TemaNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.save(description, temaId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.save(description, contentType, temaId, file));
     }
 
     @PutMapping
     public ResponseEntity<OnlineCourseContent> update(@RequestParam("id") Long id,
                                                       @RequestParam("description") String description,
+                                                      @RequestParam("contentType") ContentType contentType,
                                                       @RequestParam("temaId") Long temaId,
                                                       @RequestParam(value = "file", required = false) MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.update(id, description, temaId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.update(id, description, contentType, temaId, file));
     }
 
     @GetMapping("/findByTemaId")

@@ -291,6 +291,16 @@ public class UserController {
         return ResponseEntity.ok(sentFriendRequest);
     }
 
+    @GetMapping("/{userId}/subscribedOnlineCourses")
+    public Page<OnlineCourse> getSubscribedOnlineCoursesByUserId(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
+        return userService.getSubscribedOnlineCoursesByUserId(userId, pageable);
+    }
+
+    @GetMapping("/{userId}/subscribedOnlineCourses/total")
+    public ResponseEntity<Long> countSubscribedOnlineCoursesByUserId(@PathVariable Long userId){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.countSubscribedOnlineCoursesByUserId(userId));
+    }
+
     @PostMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")
     public ResponseEntity<User> addCourseToSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.addCourseToSubscribedOnlineCourses(userId, onlineCourseId));
@@ -305,6 +315,16 @@ public class UserController {
     public ResponseEntity<Boolean> doesUserSubscribedOnlineCourse(@PathVariable Long userId, @PathVariable Long onlineCourseId) {
         boolean doesContain = userService.doesUserSubscribedOnlineCourse(userId, onlineCourseId);
         return ResponseEntity.status(HttpStatus.OK).body(doesContain);
+    }
+
+    @GetMapping("/{userId}/groups")
+    public Page<Group> getGroupsByUserId(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
+        return userService.getGroupsByUserId(userId, pageable);
+    }
+
+    @GetMapping("/{userId}/groups/total")
+    public ResponseEntity<Long> countGroupsByUserId(@PathVariable Long userId){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.countGroupsByUserId(userId));
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

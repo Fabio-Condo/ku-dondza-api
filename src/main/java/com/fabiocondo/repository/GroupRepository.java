@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface GroupRepository extends JpaRepository<Group, Long> {
+
     @Query("SELECT g FROM Group g WHERE g.name LIKE %:searchParam% OR g.description LIKE %:searchParam%")
     public Page<Group> findAll(@Param("searchParam") String searchParam, Pageable pageable);
 

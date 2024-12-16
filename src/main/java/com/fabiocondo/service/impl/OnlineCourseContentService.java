@@ -3,6 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
+import com.fabiocondo.enumeration.ContentType;
 import com.fabiocondo.exception.domain.CourseContentNotFoundException;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.exception.domain.TemaNotFoundException;
@@ -44,7 +45,7 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.findAll(pageable);
     }
 
-    public OnlineCourseContent save(String description, Long temaId, MultipartFile file) throws CourseNotFoundException, TemaNotFoundException {
+    public OnlineCourseContent save(String description, ContentType contentType, Long temaId, MultipartFile file) throws CourseNotFoundException, TemaNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
@@ -53,6 +54,7 @@ public class OnlineCourseContentService {
         OnlineCourseContent content = new OnlineCourseContent();
         content.setTema(tema);
         content.setDescription(description);
+        content.setContentType(contentType);
         content.setUrlFile(s3UploadResponse.getFileUrl());
         content.setFileName(file.getOriginalFilename());
 
@@ -60,12 +62,13 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.save(content);
     }
 
-    public OnlineCourseContent update(Long id, String description, Long temaId, MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
+    public OnlineCourseContent update(Long id, String description, ContentType contentType, Long temaId, MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
         Tema tema = temaService.findById(temaId);
 
         OnlineCourseContent existContent = findById(id);
         existContent.setTema(tema);
         existContent.setDescription(description);
+        existContent.setContentType(contentType);
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {
             if (existContent.getFileName() != null) {

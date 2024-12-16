@@ -1,9 +1,7 @@
 package com.fabiocondo.repository;
 
 
-import com.fabiocondo.domain.CommentLike;
-import com.fabiocondo.domain.Post;
-import com.fabiocondo.domain.User;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.UserType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,8 +43,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT COUNT(fr) FROM User u JOIN u.friendRequests fr WHERE u.id = :userId")
     Long countFriendRequestsByUserId(@Param("userId") Long userId);
 
+    @Query("SELECT oc FROM User u JOIN u.subscribedOnlineCourses oc WHERE u.id = :userId")
+    Page<OnlineCourse> findSubscribedOnlineCoursesByUserId(@Param("userId") Long userId, Pageable pageable);
+
     @Query("SELECT COUNT(oc) FROM User u JOIN u.subscribedOnlineCourses oc WHERE u.id = :userId")
-    Long countSubscribedOnlineCoursesByOnlineUserId(@Param("userId") Long userId);
+    Long countSubscribedOnlineCoursesByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT g FROM User u JOIN u.groups g WHERE u.id = :userId")
+    Page<Group> findGroupsByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    @Query("SELECT COUNT(g) FROM User u JOIN u.groups g WHERE u.id = :userId")
+    Long countGroupsByUserId(@Param("userId") Long userId);
 
     public long countByIsActiveTrue();
 

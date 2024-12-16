@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -54,19 +53,17 @@ public class TemaController {
 
     @PostMapping
     public ResponseEntity<Tema> save(@RequestParam("name") String name,
-                                                    @RequestParam("onlineCourseId") Long onlineCourseId,
-                                                    @RequestParam("file") MultipartFile file) throws CourseNotFoundException, TemaNotFoundException {
+                                     @RequestParam("onlineCourseId") Long onlineCourseId) throws CourseNotFoundException, TemaNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(temaService.save(name, onlineCourseId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(temaService.save(name, onlineCourseId));
     }
 
     @PutMapping
     public ResponseEntity<Tema> update(@RequestParam("id") Long id,
-                                                      @RequestParam("name") String name,
-                                                      @RequestParam("onlineCourseId") Long onlineCourseId,
-                                                      @RequestParam(value = "file", required = false) MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
+                                       @RequestParam("name") String name,
+                                       @RequestParam("onlineCourseId") Long onlineCourseId) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(temaService.update(id, name, onlineCourseId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(temaService.update(id, name, onlineCourseId));
     }
 
     @DeleteMapping("/{id}")

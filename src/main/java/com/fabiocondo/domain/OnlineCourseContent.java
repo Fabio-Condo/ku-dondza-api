@@ -25,6 +25,8 @@ public class OnlineCourseContent { // Conteúdo do tema - Depois renomear
     @JoinColumn(name = "tema_id")
     private Tema tema;
 
+    private Integer position; // Novo campo para controlar a posição do conteúdo
+
     // Constructors
     public OnlineCourseContent() {}
 
@@ -82,6 +84,14 @@ public class OnlineCourseContent { // Conteúdo do tema - Depois renomear
 
     public void setTema(Tema tema) {
         this.tema = tema;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 }
 

@@ -1,6 +1,7 @@
 package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.OnlineCourse;
+import com.fabiocondo.domain.OnlineCourseContent;
 import com.fabiocondo.domain.Tema;
 import com.fabiocondo.exception.domain.CourseContentNotFoundException;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
@@ -12,7 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TemaService {
@@ -33,7 +37,7 @@ public class TemaService {
     }
 
     public Page<Tema> findByOnlineCourseId(Long courseId, Pageable pageable) {
-        return temaRepository.findByOnlineCourseId(courseId, pageable);
+        return temaRepository.findByOnlineCourseIdOrderByPositionAsc(courseId, pageable);
     }
 
     public List<Tema> findByOnlineCourseId(Long courseId) {
@@ -48,20 +52,22 @@ public class TemaService {
         return temaRepository.findAll();
     }
 
-    public Tema save(String name, Long onlineCourseId) throws CourseNotFoundException, TemaNotFoundException {
+    public Tema save(String name, Long onlineCourseId, Integer position) throws CourseNotFoundException, TemaNotFoundException {
         OnlineCourse onlineCourse = onlineCourseService.findById(onlineCourseId);
         Tema tema = new Tema();
         tema.setName(name);
         tema.setOnlineCourse(onlineCourse);
+        tema.setPosition(position);
         logger.info("Saving new tema: " + tema.getName());
         return temaRepository.save(tema);
     }
 
-    public Tema update(Long id, String name, Long onlineCourseId) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
+    public Tema update(Long id, String name, Long onlineCourseId, Integer position) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
         OnlineCourse onlineCourse = onlineCourseService.findById(onlineCourseId);
         Tema existTema = findById(id);
         existTema.setOnlineCourse(onlineCourse);
         existTema.setName(name);
+        existTema.setPosition(position);
         logger.info("Updating tema: " + existTema.getName());
         return temaRepository.save(existTema);
     }

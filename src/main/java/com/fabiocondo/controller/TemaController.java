@@ -53,17 +53,19 @@ public class TemaController {
 
     @PostMapping
     public ResponseEntity<Tema> save(@RequestParam("name") String name,
-                                     @RequestParam("onlineCourseId") Long onlineCourseId) throws CourseNotFoundException, TemaNotFoundException {
+                                     @RequestParam("onlineCourseId") Long onlineCourseId,
+                                     @RequestParam("position") Integer position) throws CourseNotFoundException, TemaNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(temaService.save(name, onlineCourseId));
+        return ResponseEntity.status(HttpStatus.OK).body(temaService.save(name, onlineCourseId, position));
     }
 
     @PutMapping
     public ResponseEntity<Tema> update(@RequestParam("id") Long id,
                                        @RequestParam("name") String name,
-                                       @RequestParam("onlineCourseId") Long onlineCourseId) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
+                                       @RequestParam("onlineCourseId") Long onlineCourseId,
+                                       @RequestParam("position") Integer position) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(temaService.update(id, name, onlineCourseId));
+        return ResponseEntity.status(HttpStatus.OK).body(temaService.update(id, name, onlineCourseId, position));
     }
 
     @DeleteMapping("/{id}")

@@ -25,7 +25,10 @@ public class Tema {
 
     @JsonIgnoreProperties({"tema"})
     @OneToMany(mappedBy = "tema", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("position ASC") // Ordena os conteúdos ao carregar
     private List<OnlineCourseContent> courseContents = new ArrayList<>();
+
+    private Integer position; // Novo campo para controlar a posição do conteúdo
 
     public Tema() {
     }
@@ -60,5 +63,13 @@ public class Tema {
 
     public void setCourseContents(List<OnlineCourseContent> courseContents) {
         this.courseContents = courseContents;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 }

@@ -35,6 +35,16 @@ public class PollOptionController {
         return ResponseEntity.status(HttpStatus.OK).body(pollOptionService.toggleUserVote(optionId, userId));
     }
 
+    @PostMapping("/{postId}/people/{userId}/remove-vote")
+    public ResponseEntity<PollOption> removeUserVote(@PathVariable Long postId, @PathVariable Long userId) throws PollOptionNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(pollOptionService.removeUserVote(postId, userId));
+    }
+
+    @GetMapping("/{postId}/people/votes/contains/{userId}")
+    public ResponseEntity<Boolean> hasUserVoted(@PathVariable Long postId, @PathVariable Long userId) {
+        return ResponseEntity.status(HttpStatus.OK).body(pollOptionService.hasUserVoted(postId, userId));
+    }
+
     @GetMapping("/{optionId}/people/total")
     public ResponseEntity<Long> countPeopleWhoSelectedByOptionId(@PathVariable Long optionId){
         return ResponseEntity.status(HttpStatus.OK).body(pollOptionService.countPeopleWhoSelectedByOptionId(optionId));

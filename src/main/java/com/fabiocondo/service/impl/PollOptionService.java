@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import javax.transaction.Transactional;
 
 
 @Service
@@ -65,6 +65,29 @@ public class PollOptionService {
 
         // Salva e retorna a opção com o voto atualizado
         return pollOptionRepository.save(option);
+    }
+
+    @Transactional
+    public PollOption removeUserVote(Long postId, Long userId) throws PollOptionNotFoundException, UsernameNotFoundException {
+        // Busca o usuário com o ID fornecido
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("No user found by id: " + userId));
+
+        // Busca a opção de enquete do post em que o usuário votou
+        PollOption currentVote = pollOptionRepository.findByPostIdAndUsersWhoVoted_Id(postId, userId)
+                .orElseThrow(() -> new PollOptionNotFoundException("No vote found for user " + userId + " in post " + postId));
+
+        // Remove o voto do usuário da opção
+        currentVote.getUsersWhoVoted().remove(user);
+
+        // Salva a opção de enquete com o voto removido
+        return pollOptionRepository.save(currentVote);
+    }
+
+    public boolean hasUserVoted(Long postId, Long userId) throws UsernameNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("No user found by id: " + userId));
+        return pollOptionRepository.existsByPostIdAndUsersWhoVoted_Id(postId, user.getId());
     }
 
     public long countPeopleWhoSelectedByOptionId(Long optionId) {

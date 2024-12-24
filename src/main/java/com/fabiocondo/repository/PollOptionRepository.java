@@ -21,4 +21,6 @@ public interface PollOptionRepository extends JpaRepository<PollOption, Long> {
     PollOption findByUsersWhoVotedContaining(User user);
 
     Optional<PollOption> findByPostIdAndUsersWhoVoted_Id(Long postId, Long userId);
+
+    boolean existsByPostIdAndUsersWhoVoted_Id(Long postId, Long userId);
 }

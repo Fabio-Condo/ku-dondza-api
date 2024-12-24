@@ -12,6 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class PollOptionService {
@@ -36,6 +38,32 @@ public class PollOptionService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("No user found by id: " + userId));
         option.getUsersWhoVoted().add(user);
+        return pollOptionRepository.save(option);
+    }
+
+    public PollOption toggleUserVote(Long optionId, Long userId) throws PollOptionNotFoundException {
+        // Busca pela opção de enquete com o ID fornecido
+        PollOption option = pollOptionRepository.findById(optionId)
+                .orElseThrow(() -> new PollOptionNotFoundException("No option found by id: " + optionId));
+
+        // Busca pelo usuário com o ID fornecido
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("No user found by id: " + userId));
+
+        // Verifica se o usuário já votou em alguma opção do mesmo post
+        PollOption currentVote = pollOptionRepository.findByPostIdAndUsersWhoVoted_Id(option.getPost().getId(), userId)
+                .orElse(null);
+
+        if (currentVote != null && !currentVote.equals(option)) {
+            // Se o usuário já votou em uma opção diferente do mesmo post, remove o voto anterior
+            currentVote.getUsersWhoVoted().remove(user);
+            pollOptionRepository.save(currentVote);
+        }
+
+        // Adiciona o voto do usuário na nova opção
+        option.getUsersWhoVoted().add(user);
+
+        // Salva e retorna a opção com o voto atualizado
         return pollOptionRepository.save(option);
     }
 

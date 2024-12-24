@@ -30,6 +30,11 @@ public class PollOptionController {
         return ResponseEntity.status(HttpStatus.OK).body(pollOptionService.addUserToOption(optionId, userId));
     }
 
+    @PostMapping("/{optionId}/people/{userId}/vote")
+    public ResponseEntity<PollOption> toggleUserVote(@PathVariable Long optionId, @PathVariable Long userId) throws PollOptionNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(pollOptionService.toggleUserVote(optionId, userId));
+    }
+
     @GetMapping("/{optionId}/people/total")
     public ResponseEntity<Long> countPeopleWhoSelectedByOptionId(@PathVariable Long optionId){
         return ResponseEntity.status(HttpStatus.OK).body(pollOptionService.countPeopleWhoSelectedByOptionId(optionId));

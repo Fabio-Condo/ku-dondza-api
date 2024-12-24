@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface PollOptionRepository extends JpaRepository<PollOption, Long> {
 
     @Query("SELECT u FROM PollOption o JOIN o.usersWhoVoted u WHERE o.id = :optionId")
@@ -15,4 +17,8 @@ public interface PollOptionRepository extends JpaRepository<PollOption, Long> {
 
     @Query("SELECT COUNT(u) FROM PollOption o JOIN o.usersWhoVoted u WHERE o.id = :optionId")
     Long countPeopleWhoSelectedByOptionId(@Param("optionId") Long optionId);
+
+    PollOption findByUsersWhoVotedContaining(User user);
+
+    Optional<PollOption> findByPostIdAndUsersWhoVoted_Id(Long postId, Long userId);
 }

@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "poll_option")
@@ -29,7 +30,7 @@ public class PollOption { // RENOMEAR PARA Enquete. LINKEDIN USA ESSE NOME
             joinColumns = @JoinColumn(name = "option_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> usersWhoVoted;
+    private Set<User> usersWhoVoted = new HashSet<>();
 
     public PollOption() {
     }
@@ -58,11 +59,11 @@ public class PollOption { // RENOMEAR PARA Enquete. LINKEDIN USA ESSE NOME
         this.post = post;
     }
 
-    public List<User> getUsersWhoVoted() {
+    public Set<User> getUsersWhoVoted() {
         return usersWhoVoted;
     }
 
-    public void setUsersWhoVoted(List<User> usersWhoVoted) {
+    public void setUsersWhoVoted(Set<User> usersWhoVoted) {
         this.usersWhoVoted = usersWhoVoted;
     }
 }

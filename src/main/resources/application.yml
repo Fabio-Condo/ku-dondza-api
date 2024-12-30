@@ -2,8 +2,14 @@ jwt:
   secret: '[a-zA-Z0-9._]^+$Guidelines89797987forAlphabeticalArraNumeralsandOtherSymbo$'
 
 aws:
-  accessKeyId: AKIAW3MECWUYFRDFO5GI
-  secretKey: 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
+  # user: root
+  #accessKeyId: AKIAW3MECWUYFRDFO5GI
+  #secretKey: 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
+
+  # user: kudondza-user-production
+  accessKeyId: AKIAW3MECWUYMZWWMU4J
+  secretKey: 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
+
   region.static: us-east-1
 
 server:

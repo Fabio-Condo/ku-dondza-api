@@ -1,5 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://${DB_HOST}/blog?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Africa/Harare # Docker compose
+    #url: jdbc:mysql://${DB_HOST}/blog?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Africa/Harare # Docker compose
+    url: :mysql://${DB_HOST:localhost}/blog?createDatabaseIfNotExist=true&serverTimezone=UTC
     username: root
     password: root

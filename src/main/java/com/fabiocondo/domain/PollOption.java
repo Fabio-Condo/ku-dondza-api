@@ -9,11 +9,11 @@ import java.util.Set;
 
 @Entity
 @Table(name = "poll_option")
-public class PollOption { // RENOMEAR PARA Enquete. LINKEDIN USA ESSE NOME
+public class PollOption {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, updatable=false)
+    @Column(nullable = false, updatable = false)
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
@@ -65,5 +65,10 @@ public class PollOption { // RENOMEAR PARA Enquete. LINKEDIN USA ESSE NOME
 
     public void setUsersWhoVoted(Set<User> usersWhoVoted) {
         this.usersWhoVoted = usersWhoVoted;
+    }
+
+    // Método para retornar o número de votos
+    public int getVoteCount() {
+        return usersWhoVoted.size();
     }
 }

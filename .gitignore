@@ -1,0 +1,43 @@
+# Ignorar arquivos de estado do Terraform
+*.tfstate
+*.tfstate.*
+
+# Ignorar arquivos de bloqueio do Terraform
+.terraform.lock.hcl
+
+# Ignorar diretório de cache do Terraform
+.terraform/
+
+# Ignorar arquivos de variáveis sensíveis
+*.tfvars
+
+# Ignorar arquivos de log
+*.log
+
+# Ignorar arquivos de IDE/Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Ignorar arquivos de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ignorar arquivos temporários
+*.tmp
+*.bak
+
+# Ignorar diretórios de dependências e build do Maven
+target/
+**/target/
+**/*.jar
+**/*.war
+**/*.ear
+
+# Ignorar arquivos de configuração local
+.env
+.env.local
+
+# Ignorar arquivos de build do Docker
+docker-compose.override.yml

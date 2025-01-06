@@ -73,6 +73,18 @@ jobs:
         run: |
           docker push ${{ steps.login-ecr.outputs.registry }}/ku-dondza-repo:latest
 
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7  # Especifique a versão do Terraform que deseja usar
+
+      - name: Verify Terraform directory
+        run: |
+          if [ ! -d "terraform" ]; then
+            echo "Diretório 'terraform' não encontrado."
+            exit 1
+          fi
+
       - name: Terraform Apply
         run: |
           cd terraform

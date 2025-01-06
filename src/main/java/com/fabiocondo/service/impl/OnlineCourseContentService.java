@@ -2,7 +2,8 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
-import com.fabiocondo.domain.*;
+import com.fabiocondo.domain.Module; // Importação explícita
+import com.fabiocondo.domain.OnlineCourseContent; // Importação explícita
 import com.fabiocondo.enumeration.ContentType;
 import com.fabiocondo.exception.domain.CourseContentNotFoundException;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
@@ -49,7 +50,7 @@ public class OnlineCourseContentService {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
-        Module module = moduleService.findById(moduleId);
+        Module module = moduleService.findById(moduleId); // Nome totalmente qualificado
 
         OnlineCourseContent content = new OnlineCourseContent();
         content.setModule(module);
@@ -64,7 +65,7 @@ public class OnlineCourseContentService {
     }
 
     public OnlineCourseContent update(Long id, String description, ContentType contentType, Long moduleId, Integer position, MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
-        Module module = moduleService.findById(moduleId);
+        com.fabiocondo.domain.Module module = moduleService.findById(moduleId); // Nome totalmente qualificado
 
         OnlineCourseContent existContent = findById(id);
         existContent.setModule(module);

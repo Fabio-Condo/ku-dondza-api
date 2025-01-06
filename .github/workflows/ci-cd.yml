@@ -1,11 +1,3 @@
-name: CI/CD Pipeline
-
-on:
-  push:
-    branches: [ '**' ]  # Ajuste temporário para testar em todas as branches
-  pull_request:
-    branches: [ '**' ]  # Ajuste temporário para testar em todas as branches
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,6 +16,9 @@ jobs:
       - name: Build with Maven
         run: mvn clean install -Dmaven.test.skip=true
 
+      - name: List target directory
+        run: ls -l target/
+
       - name: Build & push Docker image
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
@@ -36,7 +31,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build  # Executa apenas após o job de build
+    needs: build
 
     steps:
       - name: Checkout code

@@ -42,4 +42,6 @@ public class KuDondzaApi {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    // Test de deploy
 }

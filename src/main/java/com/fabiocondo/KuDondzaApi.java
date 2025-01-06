@@ -26,7 +26,7 @@ public class KuDondzaApi {
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:4200",
-                "http://localhost:4200"
+                "http://kudondza-frontend-app.s3-website-us-east-1.amazonaws.com"
         ));
         corsConfiguration.setAllowedHeaders(Arrays.asList("Origin", "Access-Control-Allow-Origin", "Content-Type",
                 "Accept", "Jwt-Token", "Authorization", "Origin, Accept", "X-Requested-With",

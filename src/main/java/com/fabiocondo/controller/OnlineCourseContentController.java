@@ -31,27 +31,27 @@ public class OnlineCourseContentController {
     @PostMapping
     public ResponseEntity<OnlineCourseContent> save(@RequestParam("description") String description,
                                                     @RequestParam("contentType") ContentType contentType,
-                                                    @RequestParam("temaId") Long temaId,
+                                                    @RequestParam("moduleId") Long moduleId,
                                                     @RequestParam("position") Integer position,
                                                     @RequestParam("file") MultipartFile file) throws CourseNotFoundException, TemaNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.save(description, contentType, temaId, position, file));
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.save(description, contentType, moduleId, position, file));
     }
 
     @PutMapping
     public ResponseEntity<OnlineCourseContent> update(@RequestParam("id") Long id,
                                                       @RequestParam("description") String description,
                                                       @RequestParam("contentType") ContentType contentType,
-                                                      @RequestParam("temaId") Long temaId,
+                                                      @RequestParam("moduleId") Long moduleId,
                                                       @RequestParam("position") Integer position,
                                                       @RequestParam(value = "file", required = false) MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.update(id, description, contentType, temaId, position, file));
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.update(id, description, contentType, moduleId, position, file));
     }
 
-    @GetMapping("/findByTemaId")
-    public ResponseEntity<Page<OnlineCourseContent>> findByTemaId(@RequestParam Long temaId, Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.findByTemaId(temaId, pageable));
+    @GetMapping("/findByModuleId")
+    public ResponseEntity<Page<OnlineCourseContent>> findByModuleId(@RequestParam Long moduleId, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.findByModuleId(moduleId, pageable));
     }
 
     @DeleteMapping("/{id}")

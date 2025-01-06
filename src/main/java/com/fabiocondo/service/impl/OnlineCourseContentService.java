@@ -25,13 +25,13 @@ public class OnlineCourseContentService {
 
     private final OnlineCourseContentRepository onlineCourseContentRepository;
 
-    private final TemaService temaService;
+    private final ModuleService moduleService;
 
     private final AmazonS3Service amazonS3Service;
 
-    public OnlineCourseContentService(OnlineCourseContentRepository onlineCourseContentRepository, TemaService temaService, AmazonS3Service amazonS3Service) {
+    public OnlineCourseContentService(OnlineCourseContentRepository onlineCourseContentRepository, ModuleService moduleService, AmazonS3Service amazonS3Service) {
         this.onlineCourseContentRepository = onlineCourseContentRepository;
-        this.temaService = temaService;
+        this.moduleService = moduleService;
         this.amazonS3Service = amazonS3Service;
     }
 
@@ -45,14 +45,14 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.findAll(pageable);
     }
 
-    public OnlineCourseContent save(String description, ContentType contentType, Long temaId, Integer position, MultipartFile file) throws CourseNotFoundException, TemaNotFoundException {
+    public OnlineCourseContent save(String description, ContentType contentType, Long moduleId, Integer position, MultipartFile file) throws CourseNotFoundException, TemaNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
-        Tema tema = temaService.findById(temaId);
+        Module module = moduleService.findById(moduleId);
 
         OnlineCourseContent content = new OnlineCourseContent();
-        content.setTema(tema);
+        content.setModule(module);
         content.setDescription(description);
         content.setContentType(contentType);
         content.setPosition(position);
@@ -63,11 +63,11 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.save(content);
     }
 
-    public OnlineCourseContent update(Long id, String description, ContentType contentType, Long temaId, Integer position, MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
-        Tema tema = temaService.findById(temaId);
+    public OnlineCourseContent update(Long id, String description, ContentType contentType, Long moduleId, Integer position, MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
+        Module module = moduleService.findById(moduleId);
 
         OnlineCourseContent existContent = findById(id);
-        existContent.setTema(tema);
+        existContent.setModule(module);
         existContent.setDescription(description);
         existContent.setContentType(contentType);
         existContent.setPosition(position);
@@ -86,8 +86,8 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.save(existContent);
     }
 
-    public Page<OnlineCourseContent> findByTemaId(Long temaId, Pageable pageable) {
-        return onlineCourseContentRepository.findByTemaId(temaId, pageable);
+    public Page<OnlineCourseContent> findByModuleId(Long moduleId, Pageable pageable) {
+        return onlineCourseContentRepository.findByModuleId(moduleId, pageable);
     }
 
     public void delete(Long id) throws CourseContentNotFoundException {

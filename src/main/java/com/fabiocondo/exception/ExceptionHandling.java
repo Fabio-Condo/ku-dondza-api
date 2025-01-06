@@ -23,7 +23,6 @@ import static org.springframework.http.HttpStatus.*;
 public class ExceptionHandling implements ErrorController {
 
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
-
     private static final String METHOD_IS_NOT_ALLOWED = "This request method is not allowed on this endpoint. Please send a '%s' request";
     private static final String INTERNAL_SERVER_ERROR_MSG = "An error occurred while processing the request";
     private static final String ERROR_PROCESSING_FILE = "Error occurred while processing file";
@@ -58,6 +57,11 @@ public class ExceptionHandling implements ErrorController {
 
     @ExceptionHandler(GroupNotFoundException.class)
     public ResponseEntity<HttpResponse> groupNotFoundException(GroupNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(TopicNotFoundException.class)
+    public ResponseEntity<HttpResponse> topicNotFoundException(TopicNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 

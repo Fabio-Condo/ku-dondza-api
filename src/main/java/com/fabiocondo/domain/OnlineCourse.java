@@ -44,7 +44,7 @@ public class OnlineCourse {
 
     @JsonIgnoreProperties({"onlineCourse"})
     @OneToMany(mappedBy = "onlineCourse", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Tema> temas = new ArrayList<>();
+    private List<Module> modules = new ArrayList<>();
 
     @JsonIgnore
     @ManyToMany
@@ -163,12 +163,12 @@ public class OnlineCourse {
         this.instrutorSpecialization = instrutorSpecialization;
     }
 
-    public List<Tema> getTemas() {
-        return temas;
+    public List<Module> getModules() {
+        return modules;
     }
 
-    public void setTemas(List<Tema> temas) {
-        this.temas = temas;
+    public void setModules(List<Module> modules) {
+        this.modules = modules;
     }
 
     public Set<Question> getQuestions() {

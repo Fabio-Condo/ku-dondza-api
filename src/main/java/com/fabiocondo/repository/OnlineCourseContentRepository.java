@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OnlineCourseContentRepository extends JpaRepository<OnlineCourseContent, Long> {
 
-    public Page<OnlineCourseContent> findByTemaId(Long temaId, Pageable pageable);
+    public Page<OnlineCourseContent> findByModuleId(Long moduleId, Pageable pageable);
 
 }

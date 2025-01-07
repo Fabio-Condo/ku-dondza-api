@@ -5,6 +5,7 @@ import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
+import com.fabiocondo.repository.filter.QuestionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +34,10 @@ public class QuestionService {
         logger.info("Getting question by id: " + id);
         return questionRepository.findById(id)
                 .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + id));
+    }
+
+    public Page<Question> filter(QuestionFilter questionFilter, Pageable pageable) {
+        return questionRepository.filter(questionFilter, pageable);
     }
 
     public Page<Question> findAll(String searchParam, Pageable pageable) {

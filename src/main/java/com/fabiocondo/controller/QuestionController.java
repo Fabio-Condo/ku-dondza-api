@@ -1,11 +1,9 @@
 package com.fabiocondo.controller;
 
-import com.fabiocondo.domain.HttpResponse;
-import com.fabiocondo.domain.Interest;
-import com.fabiocondo.domain.Question;
-import com.fabiocondo.domain.User;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.InterestNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
+import com.fabiocondo.repository.filter.QuestionFilter;
 import com.fabiocondo.service.impl.QuestionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,9 +31,14 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.findById(id));
     }
 
-    @GetMapping("/filter")
+    //@GetMapping("/filter")
     public ResponseEntity<Page<Question>> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.findAll(searchParam, pageable));
+    }
+
+    @GetMapping("/filter")
+    public Page<Question> filter(QuestionFilter questionFilter, Pageable pageable) {
+        return questionService.filter(questionFilter, pageable);
     }
 
     @GetMapping

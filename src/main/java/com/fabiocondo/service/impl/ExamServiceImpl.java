@@ -120,13 +120,14 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public void delete(Long id) throws ExamNotFoundException {
-        Exam existExam = findById(id);
-        logger.info("Deleting exame: " + existExam.getDescription());
-        examRepository.deleteById(id);
-        if (existExam.getFileName() != null) {
-            logger.info("Deleting file: " + existExam.getFileName());
-            amazonS3Service.deleteFile(existExam.getFileName(), BUCKET_NAME);
-        }
+        throw new ExamNotFoundException("No exame found by id: " + id + 1000);
+        //Exam existExam = findById(id);
+        //logger.info("Deleting exame: " + existExam.getDescription());
+        //examRepository.deleteById(id);
+        //if (existExam.getFileName() != null) {
+        //    logger.info("Deleting file: " + existExam.getFileName());
+        //    amazonS3Service.deleteFile(existExam.getFileName(), BUCKET_NAME);
+        //}
     }
 
     @Override

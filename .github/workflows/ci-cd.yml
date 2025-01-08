@@ -52,3 +52,23 @@ jobs:
       - name: Push Docker image to ECR
         run: |
           docker push ${{ steps.login-ecr.outputs.registry }}/ku-dondza-repo:latest
+
+      - name: Update ECS Service
+        run: |
+          # Registrar uma nova revisão da task definition
+          aws ecs register-task-definition \
+              --family minha-task-definition \
+              --container-definitions '[{
+                  "name": "meu-container",
+                  "image": "${{ steps.login-ecr.outputs.registry }}/ku-dondza-repo:latest",
+                  "memory": 512,
+                  "cpu": 256,
+                  "essential": true
+              }]'
+
+          # Atualizar o serviço no ECS para usar a nova revisão
+          aws ecs update-service \
+              --cluster meu-cluster \
+              --service meu-servico \
+              --task-definition minha-task-definition \
+              --force-new-deployment

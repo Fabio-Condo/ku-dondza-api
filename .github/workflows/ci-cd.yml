@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ 'main' ]
+    branches: [ 'main' ]  # Executa apenas na branch main
   pull_request:
-    branches: [ 'main' ]
+    branches: [ 'main' ]  # Executa apenas em pull requests para a branch main
 
 jobs:
   build:
@@ -28,7 +28,7 @@ jobs:
         uses: mr-smithers-excellent/docker-build-push@v5
         with:
           image: fabiocondo/kudondza-api
-          tags: latest,${{ github.sha }}
+          tags: latest
           registry: docker.io
           dockerfile: Dockerfile
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -47,8 +47,8 @@ jobs:
 
       - name: Build and tag Docker image for ECR
         run: |
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/ku-dondza-repo:${{ github.sha }} .
+          docker build -t ${{ steps.login-ecr.outputs.registry }}/ku-dondza-repo:latest .
 
       - name: Push Docker image to ECR
         run: |
-          docker push ${{ steps.login-ecr.outputs.registry }}/ku-dondza-repo:${{ github.sha }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/ku-dondza-repo:latest

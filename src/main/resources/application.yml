@@ -3,8 +3,8 @@ jwt:
 
 aws:
   # user: root
-  #accessKeyId: AKIAW3MECWUYFRDFO5GI
-  #secretKey: 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
+  #accessKeyId: AKIAW3MECWUYACIYYZ2P
+  #secretKey: 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
 
   # user: kudondza-user-production
   accessKeyId: AKIAW3MECWUYMZWWMU4J

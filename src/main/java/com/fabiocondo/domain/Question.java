@@ -1,6 +1,5 @@
 package com.fabiocondo.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -24,7 +23,6 @@ public class Question {
 
     private String urlFile;
 
-    //@JsonIgnoreProperties({"courseContents"})
     @ManyToOne
     @JoinColumn(name = "topic_id")
     private Topic topic;

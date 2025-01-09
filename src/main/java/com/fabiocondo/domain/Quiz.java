@@ -21,6 +21,10 @@ public class Quiz {
 
     private String title;
 
+    @ManyToOne
+    @JoinColumn(name = "subject_id", nullable = false)
+    private Subject subject;
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -53,6 +57,10 @@ public class Quiz {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public Subject getSubject() { return subject; }
+
+    public void setSubject(Subject subject) { this.subject = subject; }
 
     public Set<Question> getQuestions() {
         return questions;

@@ -11,4 +11,8 @@ import org.springframework.data.repository.query.Param;
 public interface QuestionRepository extends JpaRepository<Question, Long>, QuestionRepositoryQuery {
     @Query("SELECT q FROM Question q WHERE q.text LIKE %:searchParam%")
     public Page<Question> findAll(@Param("searchParam") String searchParam, Pageable pageable);
+
+    // Buscar 5 questões aleatórias de uma disciplina específica
+    @Query("SELECT q FROM Question q WHERE q.topic.subject.id = :subjectId ORDER BY RAND()")
+    public Page<Question> findRandomQuestionsBySubject(@Param("subjectId") Long subjectId, Pageable pageable);
 }

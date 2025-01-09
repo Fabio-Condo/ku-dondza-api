@@ -40,12 +40,12 @@ public class QuestionService {
         return questionRepository.filter(questionFilter, pageable);
     }
 
-    public Page<Question> findAll(String searchParam, Pageable pageable) {
-        return questionRepository.findAll(searchParam, pageable);
-    }
-
     public List<Question> findAll() {
         return questionRepository.findAll();
+    }
+
+    public Page<Question> findRandomQuestionsBySubject(Long subjectId, Pageable pageable) {
+        return questionRepository.findRandomQuestionsBySubject(subjectId, pageable);
     }
 
     public Question save(Question question) {

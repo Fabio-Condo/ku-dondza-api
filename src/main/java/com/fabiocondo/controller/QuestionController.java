@@ -31,11 +31,6 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.findById(id));
     }
 
-    //@GetMapping("/filter")
-    public ResponseEntity<Page<Question>> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(questionService.findAll(searchParam, pageable));
-    }
-
     @GetMapping("/filter")
     public Page<Question> filter(QuestionFilter questionFilter, Pageable pageable) {
         return questionService.filter(questionFilter, pageable);
@@ -44,6 +39,11 @@ public class QuestionController {
     @GetMapping
     public ResponseEntity<List<Question>> findAll() throws InterestNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.findAll());
+    }
+
+    @GetMapping("/random-by-subject/{subjectId}")
+    public ResponseEntity<Page<Question>> findRandomQuestions(@PathVariable("subjectId") Long subjectId, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(questionService.findRandomQuestionsBySubject(subjectId, pageable));
     }
 
     @PostMapping

@@ -31,12 +31,6 @@ public class OnlineCourse {
 
     private String lunchDate;
 
-    private String instrutorName;
-
-    private String instrutorDescription;
-
-    private String instrutorSpecialization;
-
     @ManyToOne
     @JsonIgnoreProperties({"subscribedOnlineCourses"})
     @JoinColumn(name = "user_id")
@@ -62,15 +56,12 @@ public class OnlineCourse {
     // Constructors
     public OnlineCourse() {}
 
-    public OnlineCourse(String name, String description, String coverImageUrl, String requirements, String lunchDate, String instrutorName, String instrutorDescription, String instrutorSpecialization) {
+    public OnlineCourse(String name, String description, String coverImageUrl, String requirements, String lunchDate) {
         this.name = name;
         this.description = description;
         this.coverImageUrl = coverImageUrl;
         this.requirements = requirements;
         this.lunchDate = lunchDate;
-        this.instrutorName = instrutorName;
-        this.instrutorDescription = instrutorDescription;
-        this.instrutorSpecialization = instrutorSpecialization;
     }
 
     // Getters and Setters
@@ -137,30 +128,6 @@ public class OnlineCourse {
 
     public void setLunchDate(String lunchDate) {
         this.lunchDate = lunchDate;
-    }
-
-    public String getInstrutorName() {
-        return instrutorName;
-    }
-
-    public void setInstrutorName(String instrutorName) {
-        this.instrutorName = instrutorName;
-    }
-
-    public String getInstrutorDescription() {
-        return instrutorDescription;
-    }
-
-    public void setInstrutorDescription(String instrutorDescription) {
-        this.instrutorDescription = instrutorDescription;
-    }
-
-    public String getInstrutorSpecialization() {
-        return instrutorSpecialization;
-    }
-
-    public void setInstrutorSpecialization(String instrutorSpecialization) {
-        this.instrutorSpecialization = instrutorSpecialization;
     }
 
     public List<Module> getModules() {

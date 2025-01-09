@@ -3,6 +3,7 @@ package com.fabiocondo.repository;
 import com.fabiocondo.domain.OnlineCourse;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.User;
+import com.fabiocondo.repository.query.OnlineCourseRepositoryQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface OnlineCourseRepository extends JpaRepository<OnlineCourse, Long> {
+public interface OnlineCourseRepository extends JpaRepository<OnlineCourse, Long>, OnlineCourseRepositoryQuery {
     @Query("SELECT oc FROM OnlineCourse oc WHERE oc.name LIKE %:searchParam%")
     public Page<OnlineCourse> findAll(@Param("searchParam") String searchParam, Pageable pageable);
 

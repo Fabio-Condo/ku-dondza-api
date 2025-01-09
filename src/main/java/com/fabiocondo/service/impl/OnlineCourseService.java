@@ -10,6 +10,7 @@ import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.OnlineCourseRepository;
 import com.fabiocondo.repository.QuestionRepository;
+import com.fabiocondo.repository.filter.OnlineCourseFilter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,10 @@ public class OnlineCourseService {
 
     public Page<OnlineCourse> findAll(String searchParam, Pageable pageable) {
         return onlineCourseRepository.findAll(searchParam, pageable);
+    }
+
+    public Page<OnlineCourse> filter(OnlineCourseFilter onlineCourseFilter, Pageable pageable) {
+        return onlineCourseRepository.filter(onlineCourseFilter, pageable);
     }
 
     public OnlineCourse save(String name, String description, String requirements, String lunchDate, Long instrutorId, MultipartFile file) throws UserNotFoundException {

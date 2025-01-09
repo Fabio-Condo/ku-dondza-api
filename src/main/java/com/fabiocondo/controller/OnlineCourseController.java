@@ -4,6 +4,7 @@ import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.repository.filter.OnlineCourseFilter;
 import com.fabiocondo.service.impl.OnlineCourseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,9 +38,14 @@ public class OnlineCourseController {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.findAll(searchParam, pageable));
     }
 
+    //@GetMapping("/filter")
+    //public ResponseEntity<Page<OnlineCourse>> filter(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
+    //    return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.findAll(searchParam, pageable));
+    //}
+
     @GetMapping("/filter")
-    public ResponseEntity<Page<OnlineCourse>> filter(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.findAll(searchParam, pageable));
+    public Page<OnlineCourse> filter(OnlineCourseFilter onlineCourseFilter, Pageable pageable) {
+        return onlineCourseService.filter(onlineCourseFilter, pageable);
     }
 
     @PostMapping

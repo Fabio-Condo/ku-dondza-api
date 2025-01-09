@@ -51,6 +51,10 @@ public class GroupService {
                 .orElseThrow(() -> new GroupNotFoundException("No Group found by id: " + groupId));
     }
 
+    public Page<Group> findAll(String searchParam, Pageable pageable) {
+        return groupRepository.findAll(searchParam, pageable);
+    }
+
     public Group save(String name, String description, MultipartFile file) throws UserNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
@@ -90,10 +94,6 @@ public class GroupService {
 
         logger.info("Updating group: " + existGroup.getDescription());
         return groupRepository.save(existGroup);
-    }
-
-    public Page<Group> findAll(String searchParam, Pageable pageable) {
-        return groupRepository.findAll(searchParam, pageable);
     }
 
     public void delete(Long id) throws GroupNotFoundException {

@@ -80,10 +80,12 @@ public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
 
         if(!ObjectUtils.isEmpty(questionFilter.getSearchParam())) {
             Predicate subject = builder.like(
-                    builder.lower(root.get("subject").get("name")), "%" + questionFilter.getSearchParam().toLowerCase() + "%");
+                    builder.lower(root.get("topic").get("subject").get("name")), "%" + questionFilter.getSearchParam().toLowerCase() + "%");
+            Predicate topic = builder.like(
+                    builder.lower(root.get("topic").get("name")), "%" + questionFilter.getSearchParam().toLowerCase() + "%");
             Predicate text = builder.like(
                     builder.lower(root.get("text")), "%" + questionFilter.getSearchParam().toLowerCase() + "%");
-            predicates.add(builder.or(subject, text));
+            predicates.add(builder.or(subject, topic, text));
         }
 
         if(!ObjectUtils.isEmpty(questionFilter.getText())) {

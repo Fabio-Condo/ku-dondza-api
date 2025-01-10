@@ -2,10 +2,13 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
+import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
+import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.repository.filter.QuizFilter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -23,11 +26,13 @@ public class QuizService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
+    private final UserRepository userRepository;
 
 
-    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository) {
+    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, UserRepository userRepository) {
         this.quizRepository = quizRepository;
         this.questionRepository = questionRepository;
+        this.userRepository = userRepository;
     }
 
     public Quiz findById(Long id) throws QuizNotFoundException {
@@ -76,9 +81,11 @@ public class QuizService {
         return quizRepository.count();
     }
 
-    public Page<Question> getQuestionsByQuizId(Long quizId, Pageable pageable) throws QuizNotFoundException {
+    public Page<Question> getQuestionsByQuizIdAndUserId(Long quizId, Long userId, Pageable pageable) throws QuizNotFoundException, UserNotFoundException {
         Quiz quiz = findById(quizId);
-        return quizRepository.findQuestionsByQuizId(quiz.getId(), pageable);
+        User user = userRepository.findById(userId).
+                orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
+        return quizRepository.getQuestionsByQuizIdAndUserId(quiz.getId(), user.getId(), pageable);
     }
 
     public Quiz addQuestionToQuiz(Long quizId, Long questionId) throws QuestionNotFoundException, QuizNotFoundException {

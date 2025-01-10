@@ -15,8 +15,11 @@ public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositor
     @Query("SELECT q FROM Quiz q WHERE q.title LIKE %:searchParam%")
     public Page<Quiz> findAll(@Param("searchParam") String searchParam, Pageable pageable);
 
-    @Query("SELECT qts FROM Quiz qz JOIN qz.questions qts WHERE qz.id = :quizId")
-    Page<Question> findQuestionsByQuizId(@Param("quizId") Long quizId, Pageable pageable);
+    //@Query("SELECT qts FROM Quiz qz JOIN qz.questions qts WHERE qz.id = :quizId")
+    //Page<Question> findQuestionsByQuizId(@Param("quizId") Long quizId, Pageable pageable);
+
+    @Query("SELECT qts FROM Quiz qz JOIN qz.questions qts WHERE qz.id = :quizId AND qz.user.id = :userId")
+    Page<Question> getQuestionsByQuizIdAndUserId(@Param("quizId") Long quizId, @Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT COUNT(qts) FROM Quiz qz JOIN qz.questions qts WHERE qz.id = :quizId")
     Long countQuestionsByQuizId(@Param("quizId") Long quizId);

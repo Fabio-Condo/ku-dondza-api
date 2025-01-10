@@ -5,6 +5,7 @@ import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.QuizService;
 import org.springframework.data.domain.Page;
@@ -73,9 +74,9 @@ public class QuizController {
         return ResponseEntity.status(HttpStatus.OK).body(quizService.getTotal());
     }
 
-    @GetMapping("/{quizId}/questions")
-    public Page<Question> getQuestionsByQuizId(@PathVariable Long quizId, Pageable pageable) throws QuizNotFoundException {
-        return quizService.getQuestionsByQuizId(quizId, pageable);
+    @GetMapping("/{quizId}/questions/users/{userId}")
+    public Page<Question> getQuestionsByQuizIdAndUserId(@PathVariable Long quizId, @PathVariable Long userId, Pageable pageable) throws QuizNotFoundException, UserNotFoundException {
+        return quizService.getQuestionsByQuizIdAndUserId(quizId, userId, pageable);
     }
 
     @PostMapping("/{quizId}/questions/{questionId}")

@@ -25,6 +25,10 @@ public class Quiz {
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -61,6 +65,10 @@ public class Quiz {
     public Subject getSubject() { return subject; }
 
     public void setSubject(Subject subject) { this.subject = subject; }
+
+    public User getUser() { return user; }
+
+    public void setUser(User user) { this.user = user; }
 
     public Set<Question> getQuestions() {
         return questions;

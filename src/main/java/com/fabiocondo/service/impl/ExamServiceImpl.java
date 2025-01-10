@@ -56,6 +56,12 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public Page<Exam> filter(ExamFilter examFilter, Pageable pageable) {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("A operação foi interrompida", e);
+        }
         return examRepository.filter(examFilter, pageable);
     }
 

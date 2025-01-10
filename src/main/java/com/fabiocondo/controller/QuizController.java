@@ -5,6 +5,7 @@ import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
+import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.QuizService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +38,11 @@ public class QuizController {
     @GetMapping
     public ResponseEntity<Page<Quiz>> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(quizService.findAll(searchParam, pageable));
+    }
+
+    @GetMapping("/filter")
+    public Page<Quiz> filter(QuizFilter quizFilter, Pageable pageable) {
+        return quizService.filter(quizFilter, pageable);
     }
 
     @GetMapping("/findAll")

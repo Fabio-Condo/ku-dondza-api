@@ -6,6 +6,7 @@ import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
+import com.fabiocondo.repository.filter.QuizFilter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,10 @@ public class QuizService {
 
     public Page<Quiz> findAll(String searchParam, Pageable pageable) {
         return quizRepository.findAll(searchParam, pageable);
+    }
+
+    public Page<Quiz> filter(QuizFilter quizFilter, Pageable pageable) {
+        return quizRepository.filter(quizFilter, pageable);
     }
 
     public List<Quiz> findAll() {

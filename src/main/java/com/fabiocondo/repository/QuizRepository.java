@@ -2,6 +2,7 @@ package com.fabiocondo.repository;
 
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
+import com.fabiocondo.repository.query.QuizRepositoryQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface QuizRepository extends JpaRepository<Quiz, Long> {
+public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositoryQuery {
     @Query("SELECT q FROM Quiz q WHERE q.title LIKE %:searchParam%")
     public Page<Quiz> findAll(@Param("searchParam") String searchParam, Pageable pageable);
 

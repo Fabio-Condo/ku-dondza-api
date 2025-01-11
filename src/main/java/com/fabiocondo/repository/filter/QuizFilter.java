@@ -1,6 +1,7 @@
 package com.fabiocondo.repository.filter;
 
 import com.fabiocondo.domain.Subject;
+import com.fabiocondo.domain.User;
 
 public class QuizFilter {
 
@@ -11,6 +12,8 @@ public class QuizFilter {
     private String title;
 
     private Subject subject;
+
+    private User user;
 
     public String getSearchParam() {
         return searchParam;
@@ -35,4 +38,8 @@ public class QuizFilter {
     public Subject getSubject() { return subject; }
 
     public void setSubject(Subject subject) { this.subject = subject; }
+
+    public User getUser() { return user; }
+
+    public void setUser(User user) { this.user = user; }
 }

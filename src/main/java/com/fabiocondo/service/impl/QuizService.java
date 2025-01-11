@@ -81,11 +81,16 @@ public class QuizService {
         return quizRepository.count();
     }
 
-    public Page<Question> getQuestionsByQuizIdAndUserId(Long quizId, Long userId, Pageable pageable) throws QuizNotFoundException, UserNotFoundException {
+    public Page<Question> getQuestionsByQuizId(Long quizId, Pageable pageable) throws QuizNotFoundException {
+        //try {
+        //    Thread.sleep(3000);
+        //} catch (InterruptedException e) {
+        //    Thread.currentThread().interrupt();
+        //    throw new RuntimeException("A operação foi interrompida", e);
+        //}
+
         Quiz quiz = findById(quizId);
-        User user = userRepository.findById(userId).
-                orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
-        return quizRepository.getQuestionsByQuizIdAndUserId(quiz.getId(), user.getId(), pageable);
+        return quizRepository.findQuestionsByQuizId(quiz.getId(), pageable);
     }
 
     public Quiz addQuestionToQuiz(Long quizId, Long questionId) throws QuestionNotFoundException, QuizNotFoundException {

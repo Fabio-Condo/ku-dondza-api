@@ -14,6 +14,7 @@ import com.fabiocondo.repository.filter.OnlineCourseFilter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,6 @@ public class OnlineCourseService {
     private final UserServiceImpl userService;
 
     private final AmazonS3Service amazonS3Service;
-
 
     public OnlineCourseService(OnlineCourseRepository onlineCourseRepository, QuestionRepository questionRepository, UserServiceImpl userService, AmazonS3Service amazonS3Service) {
         this.onlineCourseRepository = onlineCourseRepository;
@@ -61,7 +61,7 @@ public class OnlineCourseService {
         return onlineCourseRepository.filter(onlineCourseFilter, pageable);
     }
 
-    public OnlineCourse save(String name, String description, String requirements, String lunchDate, Long instrutorId, MultipartFile file) throws UserNotFoundException {
+    public OnlineCourse save(String name, String description, String lunchDate, Long instrutorId, MultipartFile file) throws UserNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
@@ -71,7 +71,6 @@ public class OnlineCourseService {
         course.setName(name);
         course.setOnlineCourseId(generateOnlineCourseId());
         course.setDescription(description);
-        course.setRequirements(requirements);
         course.setLunchDate(lunchDate);
         course.setInstrutor(instrutor);
         course.setCoverImageUrl(s3UploadResponse.getFileUrl());
@@ -81,13 +80,12 @@ public class OnlineCourseService {
         return onlineCourseRepository.save(course);
     }
 
-    public OnlineCourse update(Long id, String name, String description, String requirements, String lunchDate, Long instrutorId, MultipartFile file) throws CourseNotFoundException, UserNotFoundException {
+    public OnlineCourse update(Long id, String name, String description, String lunchDate, Long instrutorId, MultipartFile file) throws CourseNotFoundException, UserNotFoundException {
         User instrutor = userService.findById(instrutorId);
 
         OnlineCourse existCourse = findById(id);
         existCourse.setName(name);
         existCourse.setDescription(description);
-        existCourse.setRequirements(requirements);
         existCourse.setLunchDate(lunchDate);
         existCourse.setInstrutor(instrutor);
 
@@ -119,6 +117,16 @@ public class OnlineCourseService {
     public long getTotal(){
         logger.info("Total course: " + onlineCourseRepository.count());
         return onlineCourseRepository.count();
+    }
+
+    public OnlineCourse updateRequirements(Long id, OnlineCourse course) throws CourseNotFoundException {
+        OnlineCourse existCourse = findById(id);
+        existCourse.getRequirements().clear();
+        existCourse.getRequirements().addAll(course.getRequirements());
+        existCourse.getRequirements().forEach(requirement -> requirement.setCourse(existCourse));
+        BeanUtils.copyProperties(course, existCourse, "id", "requirements", "modules", "questions");
+        logger.info("Updating course: " + course.getName());
+        return onlineCourseRepository.save(existCourse);
     }
 
     public Page<User> getStudentsByCourseId(Long courseId, Pageable pageable) throws CourseNotFoundException {

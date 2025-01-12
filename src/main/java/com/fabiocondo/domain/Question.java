@@ -17,6 +17,8 @@ public class Question {
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
+    private String questionId;
+
     private String text;
 
     private String fileName;
@@ -38,6 +40,14 @@ public class Question {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getQuestionId() {
+        return questionId;
+    }
+
+    public void setQuestionId(String questionId) {
+        this.questionId = questionId;
     }
 
     public String getText() {

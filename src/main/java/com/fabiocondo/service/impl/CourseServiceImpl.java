@@ -54,15 +54,19 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course save(Course course) { // add verificacao de duplicacao
+    public Course save(Course course) {
+        course.getRequirements().forEach(requirement -> requirement.setCourse(course));
         logger.info("Saving course: " + course.getName());
         return courseRepository.save(course);
     }
 
     @Override
-    public Course update(Course course, Long id) throws CourseNotFoundException { // add verificacao de duplicacao
+    public Course update(Course course, Long id) throws CourseNotFoundException {
         Course existCourse = findById(id);
-        BeanUtils.copyProperties(course, existCourse, "id");
+        existCourse.getRequirements().clear();
+        existCourse.getRequirements().addAll(course.getRequirements());
+        existCourse.getRequirements().forEach(requirement -> requirement.setCourse(existCourse));
+        BeanUtils.copyProperties(course, existCourse, "id", "requirements");
         logger.info("Updating course: " + course.getName());
         return courseRepository.save(existCourse);
     }

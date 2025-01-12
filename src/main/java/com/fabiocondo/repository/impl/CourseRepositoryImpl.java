@@ -86,12 +86,18 @@ public class CourseRepositoryImpl implements CourseRepositoryQuery {
                     builder.lower(root.get("institution").get("name")), "%" + courseFilter.getSearchParam().toLowerCase() + "%");
             Predicate institutionAcronym = builder.like(
                     builder.lower(root.get("institution").get("acronym")), "%" + courseFilter.getSearchParam().toLowerCase() + "%");
-            predicates.add(builder.or(name, institutionType, institutionName, institutionAcronym));
+            Predicate level = builder.like(
+                    builder.lower(root.get("type")), "%" + courseFilter.getSearchParam().toLowerCase() + "%");
+            predicates.add(builder.or(name, institutionType, institutionName, institutionAcronym, level));
         }
 
         if(!ObjectUtils.isEmpty(courseFilter.getName())) {
             predicates.add(builder.like(
                     builder.lower(root.get("name")), "%" + courseFilter.getName().toLowerCase() + "%"));
+        }
+        if(!ObjectUtils.isEmpty(courseFilter.getLevel())) {
+            predicates.add(builder.like(
+                    builder.lower(root.get("level")), "%" + courseFilter.getLevel().toLowerCase() + "%"));
         }
         if (courseFilter.getInstitution() != null) {
             predicates.add(builder.equal(

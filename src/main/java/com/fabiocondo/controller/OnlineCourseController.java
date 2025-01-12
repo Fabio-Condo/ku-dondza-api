@@ -38,11 +38,6 @@ public class OnlineCourseController {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.findAll(searchParam, pageable));
     }
 
-    //@GetMapping("/filter")
-    //public ResponseEntity<Page<OnlineCourse>> filter(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
-    //    return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.findAll(searchParam, pageable));
-    //}
-
     @GetMapping("/filter")
     public Page<OnlineCourse> filter(OnlineCourseFilter onlineCourseFilter, Pageable pageable) {
         return onlineCourseService.filter(onlineCourseFilter, pageable);
@@ -51,24 +46,22 @@ public class OnlineCourseController {
     @PostMapping
     public ResponseEntity<OnlineCourse> save(@RequestParam("name") String name,
                                              @RequestParam("description") String description,
-                                             @RequestParam("requirements") String requirements,
                                              @RequestParam("lunchDate") String lunchDate,
                                              @RequestParam("instrutorId") Long instrutorId,
                                              @RequestParam("file") MultipartFile file) throws UserNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.save(name, description, requirements, lunchDate, instrutorId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.save(name, description, lunchDate, instrutorId, file));
     }
 
     @PutMapping
     public ResponseEntity<OnlineCourse> update(@RequestParam("id") Long id,
                                                @RequestParam("name") String name,
                                                @RequestParam("description") String description,
-                                               @RequestParam("requirements") String requirements,
                                                @RequestParam("lunchDate") String lunchDate,
                                                @RequestParam("instrutorId") Long instrutorId,
                                                @RequestParam(value = "file", required = false) MultipartFile file) throws CourseNotFoundException, UserNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.update(id, name, description, requirements, lunchDate, instrutorId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.update(id, name, description, lunchDate, instrutorId, file));
     }
 
     @DeleteMapping("/{id}")
@@ -80,6 +73,11 @@ public class OnlineCourseController {
     @GetMapping("/total")
     public ResponseEntity<Long> getTotal() {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.getTotal());
+    }
+
+    @PutMapping("/{id}/requirements/update")
+    public ResponseEntity<OnlineCourse> updateRequirements(@PathVariable("id") Long id, @RequestBody OnlineCourse course) throws CourseNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.updateRequirements(id, course));
     }
 
     @GetMapping("/{courseId}/students")

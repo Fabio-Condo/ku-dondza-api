@@ -31,6 +31,11 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.findById(id));
     }
 
+    @GetMapping("/find-by-questionId/{questionId}")
+    public ResponseEntity<Question> findQuestionByQuestionId(@PathVariable("questionId") String questionId) throws QuestionNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(questionService.findQuestionByQuestionId(questionId));
+    }
+
     @GetMapping("/filter")
     public Page<Question> filter(QuestionFilter questionFilter, Pageable pageable) {
         return questionService.filter(questionFilter, pageable);

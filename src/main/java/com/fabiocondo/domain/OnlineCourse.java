@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -27,14 +28,17 @@ public class OnlineCourse {
 
     private String coverImageUrl; // URL da imagem de capa do curso
 
-    private String requirements;
-
     private String lunchDate;
 
     @ManyToOne
     @JsonIgnoreProperties({"subscribedOnlineCourses"})
     @JoinColumn(name = "user_id")
     private User instrutor;
+
+    @Valid
+    @JsonIgnoreProperties("course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OnlineCourseRequirement> requirements;
 
     @JsonIgnoreProperties({"onlineCourse"})
     @OneToMany(mappedBy = "onlineCourse", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -56,11 +60,10 @@ public class OnlineCourse {
     // Constructors
     public OnlineCourse() {}
 
-    public OnlineCourse(String name, String description, String coverImageUrl, String requirements, String lunchDate) {
+    public OnlineCourse(String name, String description, String coverImageUrl, String lunchDate) {
         this.name = name;
         this.description = description;
         this.coverImageUrl = coverImageUrl;
-        this.requirements = requirements;
         this.lunchDate = lunchDate;
     }
 
@@ -114,14 +117,6 @@ public class OnlineCourse {
         this.coverImageUrl = coverImageUrl;
     }
 
-    public String getRequirements() {
-        return requirements;
-    }
-
-    public void setRequirements(String requirements) {
-        this.requirements = requirements;
-    }
-
     public String getLunchDate() {
         return lunchDate;
     }
@@ -152,6 +147,14 @@ public class OnlineCourse {
 
     public void setInstrutor(User instrutor) {
         this.instrutor = instrutor;
+    }
+
+    public List<OnlineCourseRequirement> getRequirements() {
+        return requirements;
+    }
+
+    public void setRequirements(List<OnlineCourseRequirement> requirements) {
+        this.requirements = requirements;
     }
 
     public List<User> getStudents() {

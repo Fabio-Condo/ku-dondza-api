@@ -1,9 +1,12 @@
 package com.fabiocondo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name = "course")
@@ -19,20 +22,24 @@ public class Course implements Serializable {
 
     private String duration;
 
-    private String requirements;
+    private String level;  // Técnico, Licenciatura, Mestrado, Doutorado
 
     @ManyToOne
     @JoinColumn(name = "institution_id")
     private Institution institution;
 
+    @Valid
+    @JsonIgnoreProperties("course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourseRequirement> requirements;
+
     public Course() {
     }
 
-    public Course(Long id, String name, String duration, String requirements, Institution institution) {
+    public Course(Long id, String name, String duration, Institution institution) {
         this.id = id;
         this.name = name;
         this.duration = duration;
-        this.requirements = requirements;
         this.institution = institution;
     }
 
@@ -56,17 +63,11 @@ public class Course implements Serializable {
         return duration;
     }
 
-    public void setDuration(String duration) {
-        this.duration = duration;
-    }
+    public void setDuration(String duration) { this.duration = duration; }
 
-    public String getRequirements() {
-        return requirements;
-    }
+    public String getLevel() { return level; }
 
-    public void setRequirements(String requirements) {
-        this.requirements = requirements;
-    }
+    public void setLevel(String level) { this.level = level; }
 
     public Institution getInstitution() {
         return institution;
@@ -74,5 +75,13 @@ public class Course implements Serializable {
 
     public void setInstitution(Institution institution) {
         this.institution = institution;
+    }
+
+    public List<CourseRequirement> getRequirements() {
+        return requirements;
+    }
+
+    public void setRequirements(List<CourseRequirement> requirements) {
+        this.requirements = requirements;
     }
 }

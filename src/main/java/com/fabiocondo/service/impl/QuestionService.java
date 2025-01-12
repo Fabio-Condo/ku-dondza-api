@@ -6,6 +6,7 @@ import com.fabiocondo.domain.Question;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.filter.QuestionFilter;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -36,6 +37,11 @@ public class QuestionService {
                 .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + id));
     }
 
+    public Question findQuestionByQuestionId(String institutionId) throws QuestionNotFoundException {
+        return questionRepository.findQuestionByQuestionId(institutionId)
+                .orElseThrow(() -> new QuestionNotFoundException("No institution found by id: " + institutionId));
+    }
+
     public Page<Question> filter(QuestionFilter questionFilter, Pageable pageable) {
         return questionRepository.filter(questionFilter, pageable);
     }
@@ -49,6 +55,7 @@ public class QuestionService {
     }
 
     public Question save(Question question) {
+        question.setQuestionId(generateQuestionId());
         question.getAnswers().forEach(answer -> answer.setQuestion(question));
         logger.info("Saving question: " + question.getText());
         return questionRepository.save(question);
@@ -56,6 +63,7 @@ public class QuestionService {
 
     public Question update(Question question, Long id) throws QuestionNotFoundException {
         Question existQuestion = findById(id);
+        existQuestion.setQuestionId(generateQuestionId());
 
         existQuestion.getAnswers().clear();
         existQuestion.getAnswers().addAll(question.getAnswers());
@@ -98,5 +106,9 @@ public class QuestionService {
 
         questionRepository.save(question);
         return question;
+    }
+
+    private String generateQuestionId() {
+        return RandomStringUtils.randomAlphanumeric(10);
     }
 }

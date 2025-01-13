@@ -1,11 +1,12 @@
 package com.fabiocondo.service.impl;
 
+import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
+import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
-import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.repository.filter.QuizFilter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -25,10 +26,13 @@ public class QuizService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
+    private final AnswerRepository answerRepository;
 
-    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, UserRepository userRepository, QuestionRepository questionRepository1) {
+
+    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, AnswerRepository answerRepository) {
         this.quizRepository = quizRepository;
-        this.questionRepository = questionRepository1;
+        this.questionRepository = questionRepository;
+        this.answerRepository = answerRepository;
     }
 
     public Quiz findById(Long id) throws QuizNotFoundException {
@@ -55,22 +59,28 @@ public class QuizService {
     }
 
     @Transactional
-    public Quiz saveQuizWithQuestions(Quiz quiz, Set<Long> questionIds) {
+    public Quiz saveQuizWithQuestions(Quiz quiz, Set<Long> questionIds, Set<Long> userAnswerIds) {
 
         if (quiz == null) {
             throw new IllegalArgumentException("O objeto Quiz não pode ser nulo.");
         }
+
         if (questionIds == null || questionIds.isEmpty()) {
             throw new IllegalArgumentException("O Quiz deve ter pelo menos uma questão associada.");
         }
 
         Set<Question> questions = new HashSet<>(questionRepository.findAllById(questionIds));
 
+        Set<Answer> answers = new HashSet<>(answerRepository.findAllById(userAnswerIds));
+
+
         if (questions.size() != questionIds.size()) {
             throw new IllegalArgumentException("Uma ou mais questões não foram encontradas no banco de dados.");
         }
 
+        quiz.setQuizId(generateQuizId());
         quiz.setQuestions(questions);
+        quiz.setSubmittedAnswers(answers);
 
         return quizRepository.save(quiz);
     }

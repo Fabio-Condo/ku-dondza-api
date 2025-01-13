@@ -38,6 +38,15 @@ public class Quiz {
     )
     private Set<Question> questions = new HashSet<>();
 
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "quiz_selected_answers",
+            joinColumns = @JoinColumn(name = "quiz_id"),
+            inverseJoinColumns = @JoinColumn(name = "answer_id")
+    )
+    private Set<Answer> submittedAnswers = new HashSet<>(); // capturar as respostas
+
     public Long getId() {
         return id;
     }
@@ -76,6 +85,14 @@ public class Quiz {
 
     public void setQuestions(Set<Question> questions) {
         this.questions = questions;
+    }
+
+    public Set<Answer> getSubmittedAnswers() {
+        return submittedAnswers;
+    }
+
+    public void setSubmittedAnswers(Set<Answer> submittedAnswers) {
+        this.submittedAnswers = submittedAnswers;
     }
 }
 

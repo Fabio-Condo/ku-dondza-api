@@ -52,8 +52,8 @@ public class QuizController {
     }
 
     @PostMapping
-    public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz, @RequestParam Set<Long> questionIds) {
-        Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, questionIds);
+    public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz, @RequestParam Set<Long> questionIds, @RequestParam Set<Long> userAnswerIds) {
+        Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, questionIds, userAnswerIds);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedQuiz);
     }
 

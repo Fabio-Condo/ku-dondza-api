@@ -25,14 +25,10 @@ public class QuizService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final QuizRepository quizRepository;
-    private final QuestionRepository questionRepository;
-    private final UserRepository userRepository;
 
 
     public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, UserRepository userRepository) {
         this.quizRepository = quizRepository;
-        this.questionRepository = questionRepository;
-        this.userRepository = userRepository;
     }
 
     public Quiz findById(Long id) throws QuizNotFoundException {
@@ -60,14 +56,10 @@ public class QuizService {
 
     public Quiz save(Quiz quiz) {
         quiz.setQuizId(generateQuizId());
-        return quizRepository.save(quiz);
-    }
-
-    public Quiz update(Quiz quiz, Long id) throws QuizNotFoundException {
-        Quiz existQuiz = findById(id);
-        BeanUtils.copyProperties(quiz, existQuiz, "id", "quizId", "questions");
-        logger.info("Updating quiz: " + quiz.getTitle());
-        return quizRepository.save(existQuiz);
+        quiz.setQuestions(quiz.getQuestions());
+        Quiz saveQuiz = quizRepository.save(quiz);
+        return quizRepository.save(saveQuiz);
+        //return quizRepository.save(quiz);
     }
 
     public void delete(Long id) throws QuizNotFoundException {
@@ -91,22 +83,6 @@ public class QuizService {
 
         Quiz quiz = findById(quizId);
         return quizRepository.findQuestionsByQuizId(quiz.getId(), pageable);
-    }
-
-    public Quiz addQuestionToQuiz(Long quizId, Long questionId) throws QuestionNotFoundException, QuizNotFoundException {
-        Quiz quiz = findById(quizId);
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
-        quiz.getQuestions().add(question);
-        return quizRepository.save(quiz);
-    }
-
-    public Quiz removeQuestionFromQuiz(Long quizId, Long questionId) throws QuestionNotFoundException, QuizNotFoundException {
-        Quiz quiz = findById(quizId);
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
-        quiz.getQuestions().remove(question);
-        return quizRepository.save(quiz);
     }
 
     public long countQuestionsByQuizId(Long quizId){

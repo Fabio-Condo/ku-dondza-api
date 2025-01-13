@@ -3,7 +3,6 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
-import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.QuizService;
@@ -57,11 +56,6 @@ public class QuizController {
         return ResponseEntity.ok(createdQuiz);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Quiz> update(@PathVariable("id") Long id, @RequestBody Quiz quiz) throws QuizNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(quizService.update(quiz, id));
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws QuizNotFoundException {
         quizService.delete(id);
@@ -76,18 +70,6 @@ public class QuizController {
     @GetMapping("/{quizId}/questions")
     public Page<Question> getQuestionsByQuizId(@PathVariable Long quizId, Pageable pageable) throws QuizNotFoundException {
         return quizService.getQuestionsByQuizId(quizId, pageable);
-    }
-
-    @PostMapping("/{quizId}/questions/{questionId}")
-    public ResponseEntity<Quiz> addQuestionToQuiz(@PathVariable Long quizId, @PathVariable Long questionId) throws QuestionNotFoundException, QuizNotFoundException {
-        Quiz updatedQuiz = quizService.addQuestionToQuiz(quizId, questionId);
-        return updatedQuiz != null ? ResponseEntity.ok(updatedQuiz) : ResponseEntity.notFound().build();
-    }
-
-    @DeleteMapping("/{quizId}/questions/{questionId}")
-    public ResponseEntity<Quiz> removeQuestionFromQuiz(@PathVariable Long quizId, @PathVariable Long questionId) throws QuestionNotFoundException, QuizNotFoundException {
-        Quiz updatedQuiz = quizService.removeQuestionFromQuiz(quizId, questionId);
-        return updatedQuiz != null ? ResponseEntity.ok(updatedQuiz) : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{quizId}/questions/total")

@@ -104,7 +104,7 @@ public class User implements Serializable {
     )
     private Set<Course> courses = new HashSet<>();
 
-    @JsonIgnoreProperties({"courseContents"})
+    @JsonIgnoreProperties({"courseContents", "requirements"})
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
             name = "user_online_course",

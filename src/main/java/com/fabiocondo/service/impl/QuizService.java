@@ -2,10 +2,7 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
-import com.fabiocondo.domain.User;
-import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
-import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
 import com.fabiocondo.repository.UserRepository;
@@ -13,22 +10,25 @@ import com.fabiocondo.repository.filter.QuizFilter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class QuizService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final QuizRepository quizRepository;
+    private final QuestionRepository questionRepository;
 
-
-    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, UserRepository userRepository) {
+    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, UserRepository userRepository, QuestionRepository questionRepository1) {
         this.quizRepository = quizRepository;
+        this.questionRepository = questionRepository1;
     }
 
     public Quiz findById(Long id) throws QuizNotFoundException {
@@ -54,12 +54,25 @@ public class QuizService {
         return quizRepository.findAll();
     }
 
-    public Quiz save(Quiz quiz) {
-        quiz.setQuizId(generateQuizId());
-        quiz.setQuestions(quiz.getQuestions());
-        Quiz saveQuiz = quizRepository.save(quiz);
-        return quizRepository.save(saveQuiz);
-        //return quizRepository.save(quiz);
+    @Transactional
+    public Quiz saveQuizWithQuestions(Quiz quiz, Set<Long> questionIds) {
+
+        if (quiz == null) {
+            throw new IllegalArgumentException("O objeto Quiz não pode ser nulo.");
+        }
+        if (questionIds == null || questionIds.isEmpty()) {
+            throw new IllegalArgumentException("O Quiz deve ter pelo menos uma questão associada.");
+        }
+
+        Set<Question> questions = new HashSet<>(questionRepository.findAllById(questionIds));
+
+        if (questions.size() != questionIds.size()) {
+            throw new IllegalArgumentException("Uma ou mais questões não foram encontradas no banco de dados.");
+        }
+
+        quiz.setQuestions(questions);
+
+        return quizRepository.save(quiz);
     }
 
     public void delete(Long id) throws QuizNotFoundException {

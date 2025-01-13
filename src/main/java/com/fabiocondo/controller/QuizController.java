@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/quizzes")
@@ -51,9 +52,9 @@ public class QuizController {
     }
 
     @PostMapping
-    public ResponseEntity<Quiz> save(@RequestBody Quiz quiz) {
-        Quiz createdQuiz = quizService.save(quiz);
-        return ResponseEntity.ok(createdQuiz);
+    public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz, @RequestParam Set<Long> questionIds) {
+        Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, questionIds);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedQuiz);
     }
 
     @DeleteMapping("/{id}")

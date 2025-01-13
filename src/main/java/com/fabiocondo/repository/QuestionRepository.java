@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface QuestionRepository extends JpaRepository<Question, Long>, QuestionRepositoryQuery {
     @Query("SELECT q FROM Question q WHERE q.text LIKE %:searchParam%")
@@ -19,4 +21,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Quest
     public Page<Question> findRandomQuestionsBySubject(@Param("subjectId") Long subjectId, Pageable pageable);
 
     Optional<Question> findQuestionByQuestionId(String questionId);
+
+    //List<Question> findAllById(Set<Long> ids);
+
 }

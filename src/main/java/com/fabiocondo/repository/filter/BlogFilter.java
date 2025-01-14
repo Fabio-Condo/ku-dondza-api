@@ -2,7 +2,7 @@ package com.fabiocondo.repository.filter;
 
 import com.fabiocondo.domain.Subject;
 
-public class BookFilter {
+public class BlogFilter {
 
     private String searchParam;
 
@@ -10,9 +10,7 @@ public class BookFilter {
 
     private Subject subject;
 
-    private String name;
-
-    private String description;
+    private String title;
 
     public String getSearchParam() {
         return searchParam;
@@ -38,19 +36,11 @@ public class BookFilter {
         this.subject = subject;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

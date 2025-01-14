@@ -110,6 +110,11 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(BlogNotFoundException.class)
+    public ResponseEntity<HttpResponse> blogNotFoundException(BlogNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(InstituicaoNotFoundException.class)
     public ResponseEntity<HttpResponse> instituicaoNotFoundException(InstituicaoNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());

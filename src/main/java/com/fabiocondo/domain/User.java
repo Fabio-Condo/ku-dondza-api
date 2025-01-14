@@ -63,11 +63,20 @@ public class User implements Serializable {
     @JsonIgnore
     @ManyToMany
     @JoinTable(
+            name = "saved_blog_posts",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "blog_id")
+    )
+    private Set<Blog> savedBlogPosts;
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
             name = "saved_posts",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "post_id")
     )
-    private List<Post> savedPosts;
+    private Set<Post> savedPosts;
 
     @JsonIgnore
     @ManyToMany
@@ -87,13 +96,14 @@ public class User implements Serializable {
     )
     private Set<User> friendRequests = new HashSet<>();
 
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
-            name = "user_interest",
+            name = "user_subject_interest",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "interest_id")
+            inverseJoinColumns = @JoinColumn(name = "subject_id")
     )
-    private Set<Interest> interests = new HashSet<>();
+    private Set<Subject> subjectsInterests = new HashSet<>();
 
     @JsonIgnore
     @ManyToMany
@@ -104,7 +114,7 @@ public class User implements Serializable {
     )
     private Set<Course> courses = new HashSet<>();
 
-    @JsonIgnoreProperties({"courseContents", "requirements"})
+    @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
             name = "user_online_course",
@@ -311,11 +321,19 @@ public class User implements Serializable {
         isNotLocked = notLocked;
     }
 
-    public List<Post> getSavedPosts() {
+    public Set<Blog> getSavedBlogPosts() {
+        return savedBlogPosts;
+    }
+
+    public void setSavedBlogPosts(Set<Blog> savedBlogPosts) {
+        this.savedBlogPosts = savedBlogPosts;
+    }
+
+    public Set<Post> getSavedPosts() {
         return savedPosts;
     }
 
-    public void setSavedPosts(List<Post> savedPosts) {
+    public void setSavedPosts(Set<Post> savedPosts) {
         this.savedPosts = savedPosts;
     }
 
@@ -335,12 +353,12 @@ public class User implements Serializable {
         this.friendRequests = friendRequests;
     }
 
-    public Set<Interest> getInterests() {
-        return interests;
+    public Set<Subject> getSubjectsInterests() {
+        return subjectsInterests;
     }
 
-    public void setInterests(Set<Interest> interests) {
-        this.interests = interests;
+    public void setSubjectsInterests(Set<Subject> subjectsInterests) {
+        this.subjectsInterests = subjectsInterests;
     }
 
     public Set<Course> getCourses() {

@@ -1,11 +1,8 @@
 package com.fabiocondo.service;
 
-import com.fabiocondo.domain.Group;
-import com.fabiocondo.domain.OnlineCourse;
-import com.fabiocondo.domain.Post;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
-import com.fabiocondo.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -78,15 +75,27 @@ public interface UserService {
 
     long getTotal();
 
-    User addInterestToUserInterests(Long userId, Long postId) throws InterestNotFoundException, UserNotFoundException;
+    Set<Subject> getUserSubjectInterests(Long userId) throws UserNotFoundException;
 
-    User removeInterestFromUserInterests(Long userId, Long postId) throws InterestNotFoundException, UserNotFoundException;
+    User addInterestToUserInterests(Long userId, Long postId) throws SubjectNotFoundException, UserNotFoundException;
+
+    User removeInterestFromUserInterests(Long userId, Long postId) throws SubjectNotFoundException, UserNotFoundException;
+
+    Set<Blog> getSavedBlogs(Long userId) throws UserNotFoundException;
+
+    User addBlogToSavedBlogPosts(Long userId, Long blogId) throws UserNotFoundException, BlogNotFoundException;
+
+    User removeBlogFromSavedBlogPosts(Long userId, Long blogId) throws UserNotFoundException, BlogNotFoundException;
+
+    boolean checkIfUserSavedBlog(Long userId, Long blogId);
+
+    long countSavedBlogsByUser(Long userId) throws UserNotFoundException;
 
     User addPostToSavedPosts(Long userId, Long postId) throws PostNotFoundException, UserNotFoundException;
 
     User removePostFromSavedPosts(Long userId, Long postId) throws PostNotFoundException, UserNotFoundException;
 
-    List<Post> getSavedPosts(Long id) throws UserNotFoundException;
+    Set<Post> getSavedPosts(Long id) throws UserNotFoundException;
 
     Page<Post> findSavedPostsByUserId(Long userId, Pageable pageable) throws UserNotFoundException;
 

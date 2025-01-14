@@ -6,10 +6,7 @@ import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.Role;
 import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
-import com.fabiocondo.repository.InterestRepository;
-import com.fabiocondo.repository.OnlineCourseRepository;
-import com.fabiocondo.repository.PostRepository;
-import com.fabiocondo.repository.UserRepository;
+import com.fabiocondo.repository.*;
 import com.fabiocondo.security.service.EmailService;
 import com.fabiocondo.security.service.LoginAttemptService;
 import com.fabiocondo.service.UserService;
@@ -53,18 +50,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final EmailService emailService;
     private final AmazonS3Service amazonS3Service;
     private final PostRepository postRepository;
-    private final InterestRepository interestRepository;
+    private final BlogRepository blogRepository;
+    private final SubjectRepository subjectRepository;
     private final OnlineCourseRepository onlineCourseRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, PostRepository postRepository, InterestRepository interestRepository, OnlineCourseRepository onlineCourseRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, PostRepository postRepository, BlogRepository blogRepository, SubjectRepository subjectRepository, OnlineCourseRepository onlineCourseRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
         this.amazonS3Service = amazonS3Service;
         this.postRepository = postRepository;
-        this.interestRepository = interestRepository;
+        this.blogRepository = blogRepository;
+        this.subjectRepository = subjectRepository;
         this.onlineCourseRepository = onlineCourseRepository;
     }
 
@@ -332,25 +331,83 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User addInterestToUserInterests(Long userId, Long interestId) throws InterestNotFoundException, UserNotFoundException {
+    public Set<Subject> getUserSubjectInterests(Long userId) throws UserNotFoundException {
         User user = findById(userId);
-        Optional<Interest> optionalInterest = interestRepository.findById(interestId);
-        if (!optionalInterest.isPresent()){
-            throw new InterestNotFoundException("Interest not found by id: " + interestId);
+        if (user == null) {
+            throw new UserNotFoundException("User not found by id: " + userId);
         }
-        user.getInterests().add(optionalInterest.get());
+        return user.getSubjectsInterests();
+    }
+
+    @Override
+    public User addInterestToUserInterests(Long userId, Long interestId) throws SubjectNotFoundException, UserNotFoundException {
+        User user = findById(userId);
+        Optional<Subject> optionalInterest = subjectRepository.findById(interestId);
+        if (!optionalInterest.isPresent()){
+            throw new SubjectNotFoundException("Interest not found by id: " + interestId);
+        }
+        user.getSubjectsInterests().add(optionalInterest.get());
         return userRepository.save(user);
     }
 
     @Override
-    public User removeInterestFromUserInterests(Long userId, Long interestId) throws InterestNotFoundException, UserNotFoundException {
+    public User removeInterestFromUserInterests(Long userId, Long interestId) throws SubjectNotFoundException, UserNotFoundException {
         User user = findById(userId);
-        Optional<Interest> optionalInterest = interestRepository.findById(interestId);
+        Optional<Subject> optionalInterest = subjectRepository.findById(interestId);
         if (!optionalInterest.isPresent()) {
-            throw new InterestNotFoundException("Interest not found by id: " + interestId);
+            throw new SubjectNotFoundException("Interest not found by id: " + interestId);
         }
-        user.getInterests().remove(optionalInterest.get());
+        user.getSubjectsInterests().remove(optionalInterest.get());
         return userRepository.save(user);
+    }
+
+    @Override
+    public Set<Blog> getSavedBlogs(Long userId) throws UserNotFoundException {
+        User user = findById(userId);
+        if (user == null) {
+            throw new UserNotFoundException("No user found by id: " + userId);
+        }
+        return user.getSavedBlogPosts();
+    }
+
+    @Override
+    public User addBlogToSavedBlogPosts(Long userId, Long blogId) throws UserNotFoundException, BlogNotFoundException {
+        User user = findById(userId);
+        Optional<Blog> optionalBlog= blogRepository.findById(blogId);
+        if (!optionalBlog.isPresent()){
+            throw new BlogNotFoundException("No blog found by id: " + blogId);
+        }
+        user.getSavedBlogPosts().add(optionalBlog.get());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User removeBlogFromSavedBlogPosts(Long userId, Long blogId) throws UserNotFoundException, BlogNotFoundException {
+        User user = findById(userId);
+        Optional<Blog> optionalBlog= blogRepository.findById(blogId);
+        if (!optionalBlog.isPresent()) {
+            throw new BlogNotFoundException("No blog found by id: " + blogId);
+        }
+        user.getSavedBlogPosts().remove(optionalBlog.get());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public boolean checkIfUserSavedBlog(Long userId, Long blogId) {
+        User user = userRepository.findById(userId).orElse(null);
+        Optional<Blog> post = blogRepository.findById(blogId);
+
+        if (user == null || !post.isPresent()) {
+            return false;
+        }
+        return user.getSavedBlogPosts().contains(post.get());
+    }
+
+    @Override
+    public long countSavedBlogsByUser(Long userId) throws UserNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("No user found with ID: " + userId));
+        return user.getSavedBlogPosts().size();
     }
 
     @Override
@@ -358,7 +415,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = findById(userId);
        Optional<Post> optionalPost = postRepository.findById(postId);
        if (!optionalPost.isPresent()){
-           throw new PostNotFoundException("Post not found by id: " + postId);
+           throw new PostNotFoundException("No post found by id: " + postId);
        }
         user.getSavedPosts().add(optionalPost.get());
         return userRepository.save(user);
@@ -369,17 +426,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = findById(userId);
         Optional<Post> optionalPost = postRepository.findById(postId);
         if (!optionalPost.isPresent()) {
-            throw new PostNotFoundException("Post not found by id: " + postId);
+            throw new PostNotFoundException("No post found by id: " + postId);
         }
         user.getSavedPosts().remove(optionalPost.get());
         return userRepository.save(user);
     }
 
     @Override
-    public List<Post> getSavedPosts(Long userId) throws UserNotFoundException {
+    public Set<Post> getSavedPosts(Long userId) throws UserNotFoundException {
         User user = findById(userId);
         if (user == null) {
-            throw new UserNotFoundException("User not found by id: " + userId);
+            throw new UserNotFoundException("No user found by id: " + userId);
         }
         return user.getSavedPosts();
     }
@@ -387,14 +444,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public Page<Post> findSavedPostsByUserId(Long userId, Pageable pageable) throws UserNotFoundException {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+                .orElseThrow(() -> new UserNotFoundException("No user found with ID: " + userId));
         return userRepository.findSavedPostsByUserId(user.getId(), pageable);
     }
 
     @Override
     public long countSavedPostsByUser(Long userId) throws UserNotFoundException {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+                .orElseThrow(() -> new UserNotFoundException("No user found with ID: " + userId));
         return user.getSavedPosts().size();
     }
 
@@ -424,7 +481,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public Page<User> getFriends(Long userId, Pageable pageable) throws UserNotFoundException {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+                .orElseThrow(() -> new UserNotFoundException("No user found with ID: " + userId));
         return userRepository.findFriendsByUserId(user.getId(), pageable);
     }
 
@@ -528,7 +585,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = findById(userId);
         Optional<OnlineCourse> optionalCourse = onlineCourseRepository.findById(onlineCourseId);
         if (!optionalCourse.isPresent()){
-            throw new CourseNotFoundException("Online Course not found by id: " + onlineCourseId);
+            throw new CourseNotFoundException("No online course not found by id: " + onlineCourseId);
         }
         user.getSubscribedOnlineCourses().add(optionalCourse.get());
         return userRepository.save(user);
@@ -539,7 +596,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = findById(userId);
         Optional<OnlineCourse> optionalCourse = onlineCourseRepository.findById(onlineCourseId);
         if (!optionalCourse.isPresent()) {
-            throw new CourseNotFoundException("Online Curse not found by id: " + onlineCourseId);
+            throw new CourseNotFoundException("No online course not found by id: " + onlineCourseId);
         }
         user.getSubscribedOnlineCourses().remove(optionalCourse.get());
         return userRepository.save(user);

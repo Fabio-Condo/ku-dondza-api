@@ -182,14 +182,47 @@ public class UserController {
         userService.updatePropertyNotLocked(newUsername, notLocked);
     }
 
+    @GetMapping("/{userId}/interests")
+    public ResponseEntity<Set<Subject>> getUserSubjectInterests(@PathVariable Long userId) throws UserNotFoundException {
+        Set<Subject> savedPosts = userService.getUserSubjectInterests(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(savedPosts);
+    }
+
     @PostMapping("/{userId}/interests/{interestId}")
-    public ResponseEntity<User> addInterestToUserInterests(@PathVariable Long userId, @PathVariable Long interestId) throws InterestNotFoundException, UserNotFoundException {
+    public ResponseEntity<User> addInterestToUserInterests(@PathVariable Long userId, @PathVariable Long interestId) throws SubjectNotFoundException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.addInterestToUserInterests(userId, interestId));
     }
 
     @DeleteMapping("/{userId}/interests/{interestId}")
-    public ResponseEntity<User> removeInterestFromUserInterests(@PathVariable Long userId, @PathVariable Long interestId) throws InterestNotFoundException, UserNotFoundException {
+    public ResponseEntity<User> removeInterestFromUserInterests(@PathVariable Long userId, @PathVariable Long interestId) throws SubjectNotFoundException, UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.removeInterestFromUserInterests(userId, interestId));
+    }
+
+    @GetMapping("/{userId}/savedBlogs/list")
+    public ResponseEntity<Set<Blog>> getSavedBlogs(@PathVariable Long userId) throws UserNotFoundException {
+        Set<Blog> savedBlogs = userService.getSavedBlogs(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(savedBlogs);
+    }
+
+    @PostMapping("/{userId}/savedBlogs/{blogId}")
+    public ResponseEntity<User> addBlogToSavedBlogPosts(@PathVariable Long userId, @PathVariable Long blogId) throws UserNotFoundException, BlogNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.addBlogToSavedBlogPosts(userId, blogId));
+    }
+
+    @DeleteMapping("/{userId}/savedBlogs/{blogId}")
+    public ResponseEntity<User> removeBlogFromSavedBlogPosts(@PathVariable Long userId, @PathVariable Long blogId) throws UserNotFoundException, BlogNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.removeBlogFromSavedBlogPosts(userId, blogId));
+    }
+
+    @GetMapping("/{userId}/savedBlogs/contains/{blogId}")
+    public ResponseEntity<Boolean> checkIfUserSavedBlog(@PathVariable Long userId, @PathVariable Long blogId) {
+        boolean doesContain = userService.checkIfUserSavedBlog(userId, blogId);
+        return ResponseEntity.status(HttpStatus.OK).body(doesContain);
+    }
+
+    @GetMapping("/{userId}/savedBlogs/count")
+    public long countSavedBlogs(@PathVariable Long userId) throws UserNotFoundException {
+        return userService.countSavedBlogsByUser(userId);
     }
 
     @PostMapping("/{userId}/savedPosts/{postId}")
@@ -203,8 +236,8 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/savedPosts/list")
-    public ResponseEntity<List<Post>> getSavedPosts(@PathVariable Long userId) throws UserNotFoundException {
-        List<Post> savedPosts = userService.getSavedPosts(userId);
+    public ResponseEntity<Set<Post>> getSavedPosts(@PathVariable Long userId) throws UserNotFoundException {
+        Set<Post> savedPosts = userService.getSavedPosts(userId);
         return ResponseEntity.status(HttpStatus.OK).body(savedPosts);
     }
 

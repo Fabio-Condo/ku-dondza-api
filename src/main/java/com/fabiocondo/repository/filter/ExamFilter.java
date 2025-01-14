@@ -26,15 +26,12 @@ public class ExamFilter {
 
     private String level;
 
-    private String urlFile;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date beginDate;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
-
-    private Long totalDownloadNumber;
 
     public String getSearchParam() {
         return searchParam;
@@ -92,14 +89,6 @@ public class ExamFilter {
         this.level = level;
     }
 
-    public String getUrlFile() {
-        return urlFile;
-    }
-
-    public void setUrlFile(String urlFile) {
-        this.urlFile = urlFile;
-    }
-
     public Date getBeginDate() {
         return beginDate;
     }
@@ -116,11 +105,4 @@ public class ExamFilter {
         this.endDate = endDate;
     }
 
-    public Long getTotalDownloadNumber() {
-        return totalDownloadNumber;
-    }
-
-    public void setTotalDownloadNumber(Long totalDownloadNumber) {
-        this.totalDownloadNumber = totalDownloadNumber;
-    }
 }

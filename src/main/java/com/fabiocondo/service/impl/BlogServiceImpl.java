@@ -9,6 +9,7 @@ import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.repository.BlogRepository;
 import com.fabiocondo.repository.filter.BlogFilter;
 import com.fabiocondo.service.BlogService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,7 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public Blog findBlogByBlogId(String blogId) throws BlogNotFoundException {
+
         return blogRepository.findBlogByBlogId(blogId)
                 .orElseThrow(() -> new BlogNotFoundException("No blog found by id: " + blogId));
     }
@@ -65,6 +67,7 @@ public class BlogServiceImpl implements BlogService {
         Subject subject = subjectServiceImpl.findById(subjectId);
 
         Blog blog = new Blog();
+        blog.setBlogId(generateBlogId());
         blog.setSubject(subject);
         blog.setTitle(title);
         blog.setContent(content);
@@ -116,4 +119,9 @@ public class BlogServiceImpl implements BlogService {
         logger.info("Total blog: " + blogRepository.count());
         return blogRepository.count();
     }
+
+    private String generateBlogId() {
+        return RandomStringUtils.randomAlphanumeric(10);
+    }
+
 }

@@ -70,8 +70,8 @@ public class QuizController {
     }
 
     @GetMapping("/{quizId}/questions")
-    public Page<Question> getQuestionsByQuizId(@PathVariable Long quizId, Pageable pageable) throws QuizNotFoundException {
-        return quizService.getQuestionsByQuizId(quizId, pageable);
+    public List<Question> getQuestionsByQuizId(@PathVariable Long quizId) throws QuizNotFoundException {
+        return quizService.getQuestionsByQuizId(quizId);
     }
 
     @GetMapping("/{quizId}/questions/total")
@@ -80,8 +80,8 @@ public class QuizController {
     }
 
     @GetMapping("/{quizId}/submitted-answers")
-    public Page<Answer> getUserSubmittedAnswersByQuizId(@PathVariable Long quizId, Pageable pageable) throws QuizNotFoundException {
-        return quizService.getUserSubmittedAnswersByQuizId(quizId, pageable);
+    public List<Answer> getUserSubmittedAnswersByQuizId(@PathVariable Long quizId) throws QuizNotFoundException {
+        return quizService.getUserSubmittedAnswersByQuizId(quizId);
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

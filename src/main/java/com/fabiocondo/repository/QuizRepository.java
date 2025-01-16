@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositoryQuery {
@@ -17,10 +18,10 @@ public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositor
     public Page<Quiz> findAll(@Param("searchParam") String searchParam, Pageable pageable);
 
     @Query("SELECT qts FROM Quiz qz JOIN qz.userSubmittedAnswers qts WHERE qz.id = :quizId")
-    Page<Answer> findUserSubmittedAnswersByQuizId(@Param("quizId") Long quizId, Pageable pageable);
+    List<Answer> findUserSubmittedAnswersByQuizId(@Param("quizId") Long quizId);
 
     @Query("SELECT qts FROM Quiz qz JOIN qz.questions qts WHERE qz.id = :quizId")
-    Page<Question> findQuestionsByQuizId(@Param("quizId") Long quizId, Pageable pageable);
+    List<Question> findQuestionsByQuizId(@Param("quizId") Long quizId);
 
     @Query("SELECT COUNT(qts) FROM Quiz qz JOIN qz.questions qts WHERE qz.id = :quizId")
     Long countQuestionsByQuizId(@Param("quizId") Long quizId);

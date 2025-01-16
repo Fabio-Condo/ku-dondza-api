@@ -96,18 +96,18 @@ public class QuizService {
         return quizRepository.count();
     }
 
-    public Page<Question> getQuestionsByQuizId(Long quizId, Pageable pageable) throws QuizNotFoundException {
+    public List<Question> getQuestionsByQuizId(Long quizId) throws QuizNotFoundException {
         Quiz quiz = findById(quizId);
-        return quizRepository.findQuestionsByQuizId(quiz.getId(), pageable);
+        return quizRepository.findQuestionsByQuizId(quiz.getId());
     }
 
     public long countQuestionsByQuizId(Long quizId){
         return quizRepository.countQuestionsByQuizId(quizId);
     }
 
-    public Page<Answer> getUserSubmittedAnswersByQuizId(Long quizId, Pageable pageable) throws QuizNotFoundException {
+    public List<Answer> getUserSubmittedAnswersByQuizId(Long quizId) throws QuizNotFoundException {
         Quiz quiz = findById(quizId);
-        return quizRepository.findUserSubmittedAnswersByQuizId(quiz.getId(), pageable);
+        return quizRepository.findUserSubmittedAnswersByQuizId(quiz.getId());
     }
 
     private String generateQuizId() {

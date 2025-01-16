@@ -80,7 +80,7 @@ public class QuizService {
 
         quiz.setQuizId(generateQuizId());
         quiz.setQuestions(questions);
-        quiz.setSubmittedAnswers(answers);
+        quiz.setUserSubmittedAnswers(answers);
 
         return quizRepository.save(quiz);
     }
@@ -97,19 +97,17 @@ public class QuizService {
     }
 
     public Page<Question> getQuestionsByQuizId(Long quizId, Pageable pageable) throws QuizNotFoundException {
-        //try {
-        //    Thread.sleep(3000);
-        //} catch (InterruptedException e) {
-        //    Thread.currentThread().interrupt();
-        //    throw new RuntimeException("A operação foi interrompida", e);
-        //}
-
         Quiz quiz = findById(quizId);
         return quizRepository.findQuestionsByQuizId(quiz.getId(), pageable);
     }
 
     public long countQuestionsByQuizId(Long quizId){
         return quizRepository.countQuestionsByQuizId(quizId);
+    }
+
+    public Page<Answer> getUserSubmittedAnswersByQuizId(Long quizId, Pageable pageable) throws QuizNotFoundException {
+        Quiz quiz = findById(quizId);
+        return quizRepository.findUserSubmittedAnswersByQuizId(quiz.getId(), pageable);
     }
 
     private String generateQuizId() {

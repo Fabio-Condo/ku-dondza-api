@@ -1,5 +1,6 @@
 package com.fabiocondo.repository;
 
+import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.repository.query.QuizRepositoryQuery;
@@ -14,6 +15,9 @@ import java.util.Optional;
 public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositoryQuery {
     @Query("SELECT q FROM Quiz q WHERE q.title LIKE %:searchParam%")
     public Page<Quiz> findAll(@Param("searchParam") String searchParam, Pageable pageable);
+
+    @Query("SELECT qts FROM Quiz qz JOIN qz.userSubmittedAnswers qts WHERE qz.id = :quizId")
+    Page<Answer> findUserSubmittedAnswersByQuizId(@Param("quizId") Long quizId, Pageable pageable);
 
     @Query("SELECT qts FROM Quiz qz JOIN qz.questions qts WHERE qz.id = :quizId")
     Page<Question> findQuestionsByQuizId(@Param("quizId") Long quizId, Pageable pageable);

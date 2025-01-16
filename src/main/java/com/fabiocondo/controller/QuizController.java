@@ -1,5 +1,6 @@
 package com.fabiocondo.controller;
 
+import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
@@ -76,6 +77,11 @@ public class QuizController {
     @GetMapping("/{quizId}/questions/total")
     public ResponseEntity<Long> countQuestionsByQuizId(@PathVariable Long quizId){
         return ResponseEntity.status(HttpStatus.OK).body(quizService.countQuestionsByQuizId(quizId));
+    }
+
+    @GetMapping("/{quizId}/submitted-answers")
+    public Page<Answer> getUserSubmittedAnswersByQuizId(@PathVariable Long quizId, Pageable pageable) throws QuizNotFoundException {
+        return quizService.getUserSubmittedAnswersByQuizId(quizId, pageable);
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

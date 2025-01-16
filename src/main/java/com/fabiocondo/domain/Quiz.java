@@ -45,7 +45,7 @@ public class Quiz {
             joinColumns = @JoinColumn(name = "quiz_id"),
             inverseJoinColumns = @JoinColumn(name = "answer_id")
     )
-    private Set<Answer> submittedAnswers = new HashSet<>(); // capturar as respostas
+    private Set<Answer> userSubmittedAnswers = new HashSet<>(); // capturar as respostas
 
     public Long getId() {
         return id;
@@ -87,12 +87,12 @@ public class Quiz {
         this.questions = questions;
     }
 
-    public Set<Answer> getSubmittedAnswers() {
-        return submittedAnswers;
+    public Set<Answer> getUserSubmittedAnswers() {
+        return userSubmittedAnswers;
     }
 
-    public void setSubmittedAnswers(Set<Answer> submittedAnswers) {
-        this.submittedAnswers = submittedAnswers;
+    public void setUserSubmittedAnswers(Set<Answer> userSubmittedAnswers) {
+        this.userSubmittedAnswers = userSubmittedAnswers;
     }
 }
 

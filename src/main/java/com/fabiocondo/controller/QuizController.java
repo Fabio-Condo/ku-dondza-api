@@ -1,9 +1,6 @@
 package com.fabiocondo.controller;
 
-import com.fabiocondo.domain.Answer;
-import com.fabiocondo.domain.HttpResponse;
-import com.fabiocondo.domain.Question;
-import com.fabiocondo.domain.Quiz;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.QuizService;
@@ -53,8 +50,12 @@ public class QuizController {
     }
 
     @PostMapping
-    public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz, @RequestParam Set<Long> questionIds, @RequestParam Set<Long> userAnswerIds) {
-        Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, questionIds, userAnswerIds);
+    public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz,
+                                           @RequestParam Set<Long> topicIds,
+                                           @RequestParam Set<Long> questionIds,
+                                           @RequestParam Set<Long> userAnswerIds) {
+
+        Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, topicIds, questionIds, userAnswerIds);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedQuiz);
     }
 
@@ -77,6 +78,11 @@ public class QuizController {
     @GetMapping("/{quizId}/questions/total")
     public ResponseEntity<Long> countQuestionsByQuizId(@PathVariable Long quizId){
         return ResponseEntity.status(HttpStatus.OK).body(quizService.countQuestionsByQuizId(quizId));
+    }
+
+    @GetMapping("/{quizId}/selected-topics")
+    public List<Topic> getSelectedTopicsByQuizId(@PathVariable Long quizId) throws QuizNotFoundException {
+        return quizService.getSelectedTopicsByQuizId(quizId);
     }
 
     @GetMapping("/{quizId}/submitted-answers")

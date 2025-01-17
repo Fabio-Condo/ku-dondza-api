@@ -3,10 +3,12 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
+import com.fabiocondo.domain.Topic;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
+import com.fabiocondo.repository.TopicRepository;
 import com.fabiocondo.repository.filter.QuizFilter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -26,12 +28,14 @@ public class QuizService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final QuizRepository quizRepository;
+    private final TopicRepository topicRepository;
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
 
 
-    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, AnswerRepository answerRepository) {
+    public QuizService(QuizRepository quizRepository, TopicRepository topicRepository, QuestionRepository questionRepository, AnswerRepository answerRepository) {
         this.quizRepository = quizRepository;
+        this.topicRepository = topicRepository;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
     }
@@ -60,24 +64,32 @@ public class QuizService {
     }
 
     @Transactional
-    public Quiz saveQuizWithQuestions(Quiz quiz, Set<Long> questionIds, Set<Long> userAnswerIds) {
+    public Quiz saveQuizWithQuestions(Quiz quiz, Set<Long> topicIds, Set<Long> questionIds, Set<Long> userAnswerIds) {
 
         if (quiz == null) {
             throw new IllegalArgumentException("O objeto Quiz não pode ser nulo.");
+        }
+        if (topicIds == null || topicIds.isEmpty()) {
+            throw new IllegalArgumentException("O Quiz deve ter pelo menos um tópico associado.");
         }
         if (questionIds == null || questionIds.isEmpty()) {
             throw new IllegalArgumentException("O Quiz deve ter pelo menos uma questão associada.");
         }
 
+        Set<Topic> topics = new HashSet<>(topicRepository.findAllById(topicIds));
         Set<Question> questions = new HashSet<>(questionRepository.findAllById(questionIds));
         Set<Answer> answers = new HashSet<>(answerRepository.findAllById(userAnswerIds));
 
+        if (topics.size() != topicIds.size()) {
+            throw new IllegalArgumentException("Um ou mais tópicos não foram encontrados no banco de dados.");
+        }
         if (questions.size() != questionIds.size()) {
             throw new IllegalArgumentException("Uma ou mais questões não foram encontradas no banco de dados.");
         }
 
         quiz.setQuizId(generateQuizId());
         quiz.setSubmittedAt(new Date());
+        quiz.setSelectedTopics(topics);
         quiz.setQuestions(questions);
         quiz.setUserSubmittedAnswers(answers);
 
@@ -102,6 +114,11 @@ public class QuizService {
 
     public long countQuestionsByQuizId(Long quizId){
         return quizRepository.countQuestionsByQuizId(quizId);
+    }
+
+    public List<Topic> getSelectedTopicsByQuizId(Long quizId) throws QuizNotFoundException {
+        Quiz quiz = findById(quizId);
+        return quizRepository.findSelectedTopicsByQuizId(quiz.getId());
     }
 
     public List<Answer> getUserSubmittedAnswersByQuizId(Long quizId) throws QuizNotFoundException {

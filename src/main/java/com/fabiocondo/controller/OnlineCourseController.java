@@ -90,28 +90,6 @@ public class OnlineCourseController {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.countOnlineCourseStudentsByCourseId(courseId));
     }
 
-    @GetMapping("/{courseId}/questions")
-    public Page<Question> getQuestionsByCourseId(@PathVariable Long courseId, Pageable pageable) throws CourseNotFoundException {
-        return onlineCourseService.getQuestionsByCourseId(courseId, pageable);
-    }
-
-    @PostMapping("/{courseId}/questions/{questionId}")
-    public ResponseEntity<OnlineCourse> addQuestionToCourse(@PathVariable Long courseId, @PathVariable Long questionId) throws QuestionNotFoundException, CourseNotFoundException {
-        OnlineCourse updatedQuiz = onlineCourseService.addQuestionToCourse(courseId, questionId);
-        return updatedQuiz != null ? ResponseEntity.ok(updatedQuiz) : ResponseEntity.notFound().build();
-    }
-
-    @DeleteMapping("/{courseId}/questions/{questionId}")
-    public ResponseEntity<OnlineCourse> removeQuestionFromCourse(@PathVariable Long courseId, @PathVariable Long questionId) throws QuestionNotFoundException, CourseNotFoundException {
-        OnlineCourse updatedQuiz = onlineCourseService.removeQuestionFromCourse(courseId, questionId);
-        return updatedQuiz != null ? ResponseEntity.ok(updatedQuiz) : ResponseEntity.notFound().build();
-    }
-
-    @GetMapping("/{courseId}/questions/total")
-    public ResponseEntity<Long> countQuestionsByCourseId(@PathVariable Long courseId){
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.countQuestionsByCourseId(courseId));
-    }
-
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(
                 new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(), message),

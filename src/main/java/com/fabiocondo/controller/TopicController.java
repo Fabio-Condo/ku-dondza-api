@@ -34,8 +34,8 @@ public class TopicController {
         return ResponseEntity.status(HttpStatus.OK).body(topicService.findAll());
     }
 
-    @GetMapping("/subjects")
-    public List<Topic> getBySubjectId(@RequestParam Long subjectId) {
-        return topicService.getBySubjectId(subjectId);
+    @GetMapping("/{id}/subjects")
+    public List<Topic> getBySubjectId(@PathVariable Long id) {
+        return topicService.getBySubjectId(id);
     }
 }

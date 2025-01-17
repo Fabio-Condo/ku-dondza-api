@@ -87,6 +87,7 @@ public class BlogServiceImpl implements BlogService {
         existBlog.setSubject(subject);
         existBlog.setTitle(title);
         existBlog.setContent(content);
+        existBlog.setLastUpdated(new Date());
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {

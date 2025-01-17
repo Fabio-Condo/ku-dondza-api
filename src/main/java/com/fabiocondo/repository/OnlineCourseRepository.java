@@ -22,11 +22,5 @@ public interface OnlineCourseRepository extends JpaRepository<OnlineCourse, Long
     @Query("SELECT COUNT(u) FROM OnlineCourse oc JOIN oc.students u WHERE oc.id = :courseId")
     Long countOnlineCourseStudentsByCourseId(@Param("courseId") Long courseId);
 
-    @Query("SELECT qts FROM OnlineCourse oc JOIN oc.questions qts WHERE oc.id = :courseId")
-    Page<Question> findQuestionsByCourseId(@Param("courseId") Long courseId, Pageable pageable);
-
-    @Query("SELECT COUNT(qts) FROM OnlineCourse oc JOIN oc.questions qts WHERE oc.id = :courseId")
-    Long countQuestionsByCourseId(@Param("courseId") Long courseId);
-
     Optional<OnlineCourse> findOnlineCourseByOnlineCourseId(String onlineCourseId);
 }

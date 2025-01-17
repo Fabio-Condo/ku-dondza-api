@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,7 +20,10 @@ public class Quiz {
 
     private String quizId;
 
-    private String title;
+    private String description;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date submittedAt;
 
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
@@ -63,12 +67,20 @@ public class Quiz {
         this.quizId = quizId;
     }
 
-    public String getTitle() {
-        return title;
+    public String getDescription() {
+        return description;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Date getSubmittedAt() {
+        return submittedAt;
+    }
+
+    public void setSubmittedAt(Date submittedAt) {
+        this.submittedAt = submittedAt;
     }
 
     public Subject getSubject() { return subject; }

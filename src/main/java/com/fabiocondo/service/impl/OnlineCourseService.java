@@ -138,31 +138,6 @@ public class OnlineCourseService {
         return onlineCourseRepository.countOnlineCourseStudentsByCourseId(courseId);
     }
 
-    public Page<Question> getQuestionsByCourseId(Long courseId, Pageable pageable) throws CourseNotFoundException {
-        OnlineCourse course = findById(courseId);
-        return onlineCourseRepository.findQuestionsByCourseId(course.getId(), pageable);
-    }
-
-    public OnlineCourse addQuestionToCourse(Long courseId, Long questionId) throws CourseNotFoundException, QuestionNotFoundException {
-        OnlineCourse course = findById(courseId);
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
-        course.getQuestions().add(question);
-        return onlineCourseRepository.save(course);
-    }
-
-    public OnlineCourse removeQuestionFromCourse(Long courseId, Long questionId) throws QuestionNotFoundException, CourseNotFoundException {
-        OnlineCourse course = findById(courseId);
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
-        course.getQuestions().remove(question);
-        return onlineCourseRepository.save(course);
-    }
-
-    public long countQuestionsByCourseId(Long courseId){
-        return onlineCourseRepository.countQuestionsByCourseId(courseId);
-    }
-
     private String generateOnlineCourseId() {
         return RandomStringUtils.randomAlphanumeric(10);
     }

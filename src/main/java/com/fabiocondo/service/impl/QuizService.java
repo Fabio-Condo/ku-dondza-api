@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,21 +65,19 @@ public class QuizService {
         if (quiz == null) {
             throw new IllegalArgumentException("O objeto Quiz não pode ser nulo.");
         }
-
         if (questionIds == null || questionIds.isEmpty()) {
             throw new IllegalArgumentException("O Quiz deve ter pelo menos uma questão associada.");
         }
 
         Set<Question> questions = new HashSet<>(questionRepository.findAllById(questionIds));
-
         Set<Answer> answers = new HashSet<>(answerRepository.findAllById(userAnswerIds));
-
 
         if (questions.size() != questionIds.size()) {
             throw new IllegalArgumentException("Uma ou mais questões não foram encontradas no banco de dados.");
         }
 
         quiz.setQuizId(generateQuizId());
+        quiz.setSubmittedAt(new Date());
         quiz.setQuestions(questions);
         quiz.setUserSubmittedAnswers(answers);
 
@@ -87,7 +86,7 @@ public class QuizService {
 
     public void delete(Long id) throws QuizNotFoundException {
         Quiz existQuiz = findById(id);
-        logger.info("Deleting quiz: " + existQuiz.getTitle());
+        logger.info("Deleting quiz: " + existQuiz.getDescription());
         quizRepository.deleteById(id);
     }
 

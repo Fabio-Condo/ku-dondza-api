@@ -45,15 +45,6 @@ public class OnlineCourse {
     private List<Module> modules = new ArrayList<>();
 
     @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-            name = "online_course_questions",
-            joinColumns = @JoinColumn(name = "online_course_id"),
-            inverseJoinColumns = @JoinColumn(name = "question_id")
-    )
-    private Set<Question> questions = new HashSet<>();
-
-    @JsonIgnore
     @ManyToMany(mappedBy = "subscribedOnlineCourses")
     private List<User> students;
 
@@ -131,14 +122,6 @@ public class OnlineCourse {
 
     public void setModules(List<Module> modules) {
         this.modules = modules;
-    }
-
-    public Set<Question> getQuestions() {
-        return questions;
-    }
-
-    public void setQuestions(Set<Question> questions) {
-        this.questions = questions;
     }
 
     public User getInstrutor() {

@@ -25,6 +25,8 @@ public class Blog {
 
     private String content;
 
+    private Date lastUpdated;
+
     private Date postDate;
 
     private String fileName;
@@ -43,14 +45,13 @@ public class Blog {
     public Blog() {
     }
 
-    public Blog(Long id, String title, String content, Date postDate, String fileName, String urlFile, Subject subject) {
+    public Blog(Long id, String blogId, String title, String content, Date lastUpdated, Date postDate) {
         this.id = id;
+        this.blogId = blogId;
         this.title = title;
         this.content = content;
+        this.lastUpdated = lastUpdated;
         this.postDate = postDate;
-        this.fileName = fileName;
-        this.urlFile = urlFile;
-        this.subject = subject;
     }
 
     public Long getId() {
@@ -83,6 +84,14 @@ public class Blog {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
 
     public Date getPostDate() {

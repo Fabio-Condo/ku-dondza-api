@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class QuestionService {
@@ -50,8 +51,12 @@ public class QuestionService {
         return questionRepository.findAll();
     }
 
-    public Page<Question> findRandomQuestionsBySubject(Long subjectId, Pageable pageable) {
-        return questionRepository.findRandomQuestionsBySubject(subjectId, pageable);
+    public List<Question> getQuestionsByTopics(Set<Long> topicIds) {
+        if (topicIds == null || topicIds.isEmpty()) {
+            throw new IllegalArgumentException("O Quiz deve ter pelo menos um tópico associado.");
+        } else {
+            return questionRepository.findByTopicIdIn(topicIds);
+        }
     }
 
     public Question save(Question question) {

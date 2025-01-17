@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/questions")
@@ -46,9 +47,9 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.findAll());
     }
 
-    @GetMapping("/random-by-subject/{subjectId}")
-    public ResponseEntity<Page<Question>> findRandomQuestions(@PathVariable("subjectId") Long subjectId, Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(questionService.findRandomQuestionsBySubject(subjectId, pageable));
+    @GetMapping("/by-topics")
+    public ResponseEntity<List<Question>> getQuestionsByTopics(@RequestParam Set<Long> topicIds) {
+        return ResponseEntity.ok(questionService.getQuestionsByTopics(topicIds));
     }
 
     @PostMapping

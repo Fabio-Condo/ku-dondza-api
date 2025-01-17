@@ -16,12 +16,8 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Quest
     @Query("SELECT q FROM Question q WHERE q.text LIKE %:searchParam%")
     public Page<Question> findAll(@Param("searchParam") String searchParam, Pageable pageable);
 
-    // Buscar 5 questões aleatórias de uma disciplina específica
-    @Query("SELECT q FROM Question q WHERE q.topic.subject.id = :subjectId ORDER BY RAND()")
-    public Page<Question> findRandomQuestionsBySubject(@Param("subjectId") Long subjectId, Pageable pageable);
+    @Query("SELECT q FROM Question q WHERE q.topic.id IN :topicIds")
+    List<Question> findByTopicIdIn(@Param("topicIds") Set<Long> topicIds);
 
     Optional<Question> findQuestionByQuestionId(String questionId);
-
-    //List<Question> findAllById(Set<Long> ids);
-
 }

@@ -9,12 +9,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public interface InstitutionService {
     Institution findById(Long id) throws InstituicaoNotFoundException;
 
     Institution findInstitutionByInstitutionId(String institutionId) throws InstituicaoNotFoundException;
 
-    Page<Institution> findAll(Pageable pageable);
+    List<Institution> findAll();
 
     Page<Institution> filter(InstitutionFilter institutionFilter, Pageable pageable);
 

@@ -15,7 +15,7 @@ import java.util.Set;
 
 public interface UserService {
 
-    Page<User> getAllInstrutores(Pageable pageable);
+    List<User> getAllInstrutores();
 
     User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, MessagingException, UsernameExistException, EmailExistException;
 

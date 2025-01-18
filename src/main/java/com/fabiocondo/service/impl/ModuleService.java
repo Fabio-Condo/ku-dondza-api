@@ -32,12 +32,12 @@ public class ModuleService {
                 .orElseThrow(() -> new TemaNotFoundException("No module found by id: " + id));
     }
 
-    public Page<Module> findByOnlineCourseId(Long courseId, Pageable pageable) {
-        return temaRepository.findByOnlineCourseIdOrderByPositionAsc(courseId, pageable);
-    }
+    //public Page<Module> findByOnlineCourseId(Long courseId, Pageable pageable) {
+    //    return temaRepository.findByOnlineCourseIdOrderByPositionAsc(courseId, pageable);
+    //}
 
     public List<Module> findByOnlineCourseId(Long courseId) {
-        return temaRepository.findByOnlineCourseId(courseId);
+        return temaRepository.findByOnlineCourseIdOrderByPositionAsc(courseId);
     }
 
     public Page<Module> findAll(String searchParam, Pageable pageable) {

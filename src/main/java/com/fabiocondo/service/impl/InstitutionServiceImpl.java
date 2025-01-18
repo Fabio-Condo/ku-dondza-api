@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Service
 public class InstitutionServiceImpl implements InstitutionService {
 
@@ -47,8 +49,8 @@ public class InstitutionServiceImpl implements InstitutionService {
     }
 
     @Override
-    public Page<Institution> findAll(Pageable pageable) {
-        return institutionRepository.findAll(pageable);
+    public List<Institution> findAll() {
+        return institutionRepository.findAll();
     }
 
     @Override

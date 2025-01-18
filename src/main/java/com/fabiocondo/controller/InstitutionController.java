@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/institutions")
 public class InstitutionController {
@@ -36,9 +38,9 @@ public class InstitutionController {
         return ResponseEntity.status(HttpStatus.OK).body(institutionServiceImpl.findInstitutionByInstitutionId(institutionId));
     }
 
-    @GetMapping
-    public ResponseEntity<Page<Institution>> findAll(Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(institutionServiceImpl.findAll(pageable));
+    @GetMapping("/findAll")
+    public ResponseEntity<List<Institution>> findAll() {
+        return ResponseEntity.status(HttpStatus.OK).body(institutionServiceImpl.findAll());
     }
 
     @GetMapping("/filter")

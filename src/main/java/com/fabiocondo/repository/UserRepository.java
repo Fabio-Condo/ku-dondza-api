@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface UserRepository extends JpaRepository<User, Long> {
 
     User findUserByUsername(String username);
@@ -17,7 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findUserByEmail(String email);
 
-    Page<User> findByUserType(UserType userType, Pageable pageable);
+    List<User> findByUserType(UserType userType);
 
     @Query("SELECT u FROM User u WHERE u.firstName LIKE %:searchParam% OR u.lastName LIKE %:searchParam% OR u.username LIKE %:searchParam% OR u.role LIKE %:searchParam%")
     public Page<User> findByAnyProperty(@Param("searchParam") String searchParam, Pageable pageable);

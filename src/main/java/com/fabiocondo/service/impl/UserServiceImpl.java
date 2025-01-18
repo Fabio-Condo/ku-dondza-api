@@ -72,8 +72,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public Page<User> getAllInstrutores(Pageable pageable) {
-        return userRepository.findByUserType(UserType.INSTRUTOR, pageable);
+    public List<User> getAllInstrutores() {
+        return userRepository.findByUserType(UserType.INSTRUTOR);
     }
 
     @Override

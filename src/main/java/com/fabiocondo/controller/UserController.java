@@ -142,8 +142,8 @@ public class UserController {
     }
 
     @GetMapping("/instrutores")
-    public Page<User> getAllInstrutores(Pageable pageable) {
-        return userService.getAllInstrutores(pageable);
+    public List<User> getAllInstrutores() {
+        return userService.getAllInstrutores();
     }
 
     @GetMapping("/total")

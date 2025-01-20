@@ -62,7 +62,7 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public Blog save(String title, String content, Long subjectId, MultipartFile file) throws SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+        //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         Subject subject = subjectServiceImpl.findById(subjectId);
 
@@ -72,7 +72,7 @@ public class BlogServiceImpl implements BlogService {
         blog.setTitle(title);
         blog.setContent(content);
         blog.setPostDate(new Date());
-        blog.setUrlFile(s3UploadResponse.getFileUrl());
+        //blog.setUrlFile(s3UploadResponse.getFileUrl());
         blog.setFileName(file.getOriginalFilename());
 
         logger.info("Saving new blog: " + blog.getTitle());

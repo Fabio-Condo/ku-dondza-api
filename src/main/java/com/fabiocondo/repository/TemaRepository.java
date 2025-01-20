@@ -14,8 +14,6 @@ public interface TemaRepository extends JpaRepository<Module, Long> {
     @Query("SELECT t FROM Module t WHERE t.name LIKE %:searchParam%")
     public Page<Module> findAll(@Param("searchParam") String searchParam, Pageable pageable);
 
-    //public Page<Module> findByOnlineCourseIdOrderByPositionAsc(Long courseId, Pageable pageable);
-
     public List<Module> findByOnlineCourseIdOrderByPositionAsc(Long courseId);
 
 }

@@ -23,6 +23,7 @@ public class Blog {
 
     private String title;
 
+    @Lob // Large Object
     private String content;
 
     private Date lastUpdated;

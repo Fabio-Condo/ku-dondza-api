@@ -1,8 +1,11 @@
 package com.fabiocondo.controller;
 
+import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Topic;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.service.impl.TopicService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +32,16 @@ public class TopicController {
         return ResponseEntity.status(HttpStatus.OK).body(topicService.save(Topic));
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Topic> update(@PathVariable("id") Long id, @RequestBody Topic topic) throws TopicNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(topicService.update(topic, id));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Page<Topic>> findAll(Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(topicService.findAll(pageable));
+    }
+
     @GetMapping
     public ResponseEntity<List<Topic>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(topicService.findAll());
@@ -37,5 +50,22 @@ public class TopicController {
     @GetMapping("/{id}/subjects")
     public List<Topic> getBySubjectId(@PathVariable Long id) {
         return topicService.getBySubjectId(id);
+    }
+
+    @GetMapping("/total")
+    public ResponseEntity<Long> getTotal(){
+        return ResponseEntity.status(HttpStatus.OK).body(topicService.getTotal());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws TopicNotFoundException {
+        topicService.delete(id);
+        return response(HttpStatus.OK, "Topic deleted successfully");
+    }
+
+    private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
+        return new ResponseEntity<>(
+                new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(), message),
+                httpStatus);
     }
 }

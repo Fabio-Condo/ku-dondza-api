@@ -3,7 +3,9 @@ package com.fabiocondo.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -17,6 +19,9 @@ public class Competition {
     private String competitionId;
 
     private String title;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date startedAt;
 
     @JsonIgnore
     @ManyToMany
@@ -39,11 +44,24 @@ public class Competition {
     @JsonIgnore
     @ManyToMany
     @JoinTable(
+            name = "competition_administrators",
+            joinColumns = @JoinColumn(name = "competition_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> administrators = new HashSet<>(); // Administradores ou observadores da competition
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
             name = "participation_request",
             joinColumns = @JoinColumn(name = "to_competition_id"),
             inverseJoinColumns = @JoinColumn(name = "from_user_id")
     )
     private Set<User> participationRequests = new HashSet<>(); // pedidos de participation na competition
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Submission> submissions;
 
     public Competition() {
     }
@@ -76,6 +94,14 @@ public class Competition {
         this.title = title;
     }
 
+    public Date getStartedAt() {
+        return startedAt;
+    }
+
+    public void setStartedAt(Date startedAt) {
+        this.startedAt = startedAt;
+    }
+
     public Set<Question> getQuestions() {
         return questions;
     }
@@ -92,11 +118,27 @@ public class Competition {
         this.participants = participants;
     }
 
+    public Set<User> getAdministrators() {
+        return administrators;
+    }
+
+    public void setAdministrators(Set<User> administrators) {
+        this.administrators = administrators;
+    }
+
     public Set<User> getParticipationRequests() {
         return participationRequests;
     }
 
     public void setParticipationRequests(Set<User> participationRequests) {
         this.participationRequests = participationRequests;
+    }
+
+    public List<Submission> getSubmissions() {
+        return submissions;
+    }
+
+    public void setSubmissions(List<Submission> submissions) {
+        this.submissions = submissions;
     }
 }

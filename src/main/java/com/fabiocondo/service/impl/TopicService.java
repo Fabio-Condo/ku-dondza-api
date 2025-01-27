@@ -1,11 +1,13 @@
 package com.fabiocondo.service.impl;
 
-import com.fabiocondo.domain.Course;
 import com.fabiocondo.domain.Topic;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.TopicRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,11 +33,32 @@ public class TopicService {
         return topicRepository.save(topic);
     }
 
+    public Topic update(Topic topic, Long id) throws TopicNotFoundException {
+        Topic existTopic = findById(id);
+        BeanUtils.copyProperties(topic, existTopic, "id");
+        logger.info("Updating topic: " + topic.getName());
+        return topicRepository.save(existTopic);
+    }
+
+    public Page<Topic> findAll(Pageable pageable) {
+        return topicRepository.findAll(pageable);
+    }
+
     public List<Topic> findAll() {
         return topicRepository.findAll();
     }
 
     public List<Topic> getBySubjectId(Long subjectId) {
         return topicRepository.findBySubjectIdOrderByNameAsc(subjectId);
+    }
+
+    public void delete(Long id) throws TopicNotFoundException {
+        Topic existTopic = findById(id);
+        logger.info("Deleting topic: " + existTopic.getName());
+        topicRepository.deleteById(id);
+    }
+
+    public long getTotal(){
+        return topicRepository.count();
     }
 }

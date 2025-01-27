@@ -15,6 +15,8 @@ public class Topic {
 
     private String name;
 
+    private String content;
+
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
@@ -22,9 +24,10 @@ public class Topic {
     public Topic() {
     }
 
-    public Topic(Long id, String name, Subject subject) {
+    public Topic(Long id, String name, String content, Subject subject) {
         this.id = id;
         this.name = name;
+        this.content = content;
         this.subject = subject;
     }
 
@@ -43,6 +46,14 @@ public class Topic {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public Subject getSubject() {

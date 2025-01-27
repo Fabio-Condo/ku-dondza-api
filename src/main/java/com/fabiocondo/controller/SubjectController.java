@@ -1,8 +1,11 @@
 package com.fabiocondo.controller;
 
+import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Subject;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.service.impl.SubjectServiceImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,11 @@ public class SubjectController {
         return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.findById(id));
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<Page<Subject>> findAll(Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.findAll(pageable));
+    }
+
     @GetMapping
     public ResponseEntity<List<Subject>> findAll() throws SubjectNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.findAll());
@@ -32,5 +40,27 @@ public class SubjectController {
     @PostMapping
     public ResponseEntity<Subject> save(@RequestBody Subject subject) throws SubjectNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.save(subject));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Subject> update(@PathVariable("id") Long id, @RequestBody Subject subject) throws SubjectNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.update(subject, id));
+    }
+
+    @GetMapping("/total")
+    public ResponseEntity<Long> getTotal(){
+        return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.getTotal());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws SubjectNotFoundException {
+        subjectServiceImpl.delete(id);
+        return response(HttpStatus.OK, "Subject deleted successfully");
+    }
+
+    private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
+        return new ResponseEntity<>(
+                new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(), message),
+                httpStatus);
     }
 }

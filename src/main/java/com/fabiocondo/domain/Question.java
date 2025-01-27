@@ -19,7 +19,11 @@ public class Question {
 
     private String questionId;
 
+    @Lob // Large Object
     private String text;
+
+    @Lob // Large Object
+    private String solution;
 
     private String fileName;
 
@@ -59,6 +63,14 @@ public class Question {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getSolution() {
+        return solution;
+    }
+
+    public void setSolution(String solution) {
+        this.solution = solution;
     }
 
     public String getFileName() {

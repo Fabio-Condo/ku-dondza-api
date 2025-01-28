@@ -3,7 +3,6 @@ package com.fabiocondo.repository;
 import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
-import com.fabiocondo.domain.Topic;
 import com.fabiocondo.repository.query.QuizRepositoryQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +19,6 @@ public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositor
 
     @Query("SELECT usa FROM Quiz qz JOIN qz.userSubmittedAnswers usa WHERE qz.id = :quizId")
     List<Answer> findUserSubmittedAnswersByQuizId(@Param("quizId") Long quizId);
-
-    @Query("SELECT topics FROM Quiz qz JOIN qz.selectedTopics topics WHERE qz.id = :quizId")
-    List<Topic> findSelectedTopicsByQuizId(@Param("quizId") Long quizId);
 
     @Query("SELECT qts FROM Quiz qz JOIN qz.questions qts WHERE qz.id = :quizId")
     List<Question> findQuestionsByQuizId(@Param("quizId") Long quizId);

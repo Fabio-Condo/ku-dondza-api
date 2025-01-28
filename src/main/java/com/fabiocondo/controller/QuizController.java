@@ -80,11 +80,6 @@ public class QuizController {
         return ResponseEntity.status(HttpStatus.OK).body(quizService.countQuestionsByQuizId(quizId));
     }
 
-    @GetMapping("/{quizId}/selected-topics")
-    public List<Topic> getSelectedTopicsByQuizId(@PathVariable Long quizId) throws QuizNotFoundException {
-        return quizService.getSelectedTopicsByQuizId(quizId);
-    }
-
     @GetMapping("/{quizId}/submitted-answers")
     public List<Answer> getUserSubmittedAnswersByQuizId(@PathVariable Long quizId) throws QuizNotFoundException {
         return quizService.getUserSubmittedAnswersByQuizId(quizId);

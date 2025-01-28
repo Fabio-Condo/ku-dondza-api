@@ -33,15 +33,6 @@ public class Quiz {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    //@JsonIgnore
-    @ManyToMany
-    @JoinTable(
-            name = "quiz_topics",
-            joinColumns = @JoinColumn(name = "quiz_id"),
-            inverseJoinColumns = @JoinColumn(name = "topic_id")
-    )
-    private Set<Topic> selectedTopics = new HashSet<>();
-
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -99,14 +90,6 @@ public class Quiz {
     public User getUser() { return user; }
 
     public void setUser(User user) { this.user = user; }
-
-    public Set<Topic> getSelectedTopics() {
-        return selectedTopics;
-    }
-
-    public void setSelectedTopics(Set<Topic> selectedTopics) {
-        this.selectedTopics = selectedTopics;
-    }
 
     public Set<Question> getQuestions() {
         return questions;

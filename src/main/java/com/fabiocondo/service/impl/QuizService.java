@@ -89,7 +89,7 @@ public class QuizService {
 
         quiz.setQuizId(generateQuizId());
         quiz.setSubmittedAt(new Date());
-        quiz.setSelectedTopics(topics);
+        //quiz.setSelectedTopics(topics);
         quiz.setQuestions(questions);
         quiz.setUserSubmittedAnswers(answers);
 
@@ -114,11 +114,6 @@ public class QuizService {
 
     public long countQuestionsByQuizId(Long quizId){
         return quizRepository.countQuestionsByQuizId(quizId);
-    }
-
-    public List<Topic> getSelectedTopicsByQuizId(Long quizId) throws QuizNotFoundException {
-        Quiz quiz = findById(quizId);
-        return quizRepository.findSelectedTopicsByQuizId(quiz.getId());
     }
 
     public List<Answer> getUserSubmittedAnswersByQuizId(Long quizId) throws QuizNotFoundException {

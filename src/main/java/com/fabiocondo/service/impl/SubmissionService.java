@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -46,23 +47,8 @@ public class SubmissionService {
                 .orElseThrow(() -> new SubmissionNotFoundException("No submission found by id: " + id));
     }
 
-    @Transactional
-    public Submission create2(Submission submission, Set<Long> userAnswerIds) {
-
-        Set<Answer> answers = new HashSet<>(answerRepository.findAllById(userAnswerIds));
-
-        if (answers.size() != userAnswerIds.size()) {
-            throw new IllegalArgumentException("Algumas respostas fornecidas são inválidas.");
-        }
-
-        if (!submission.getCompetition().getParticipants().contains(submission.getUser())) {
-            throw new IllegalStateException("O usuário não está inscrito nesta competição.");
-        }
-
-        submission.setUserSubmittedAnswers(answers);
-        submission.setSubmittedAt(new Date());
-
-        return submissionRepository.save(submission);
+    public Optional<Submission> findSubmissionByUserAndCompetition(Long userId, Long competitionId) {
+        return submissionRepository.findByUserIdAndCompetitionId(userId, competitionId);
     }
 
     @Transactional

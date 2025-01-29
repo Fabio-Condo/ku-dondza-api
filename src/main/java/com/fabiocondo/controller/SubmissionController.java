@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -30,5 +31,10 @@ public class SubmissionController {
     public ResponseEntity<Submission> save(@RequestBody Submission submission,
                                            @RequestParam Set<Long> userAnswerIds) throws UserNotFoundException, CompetitionNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(submissionService.create(submission, userAnswerIds));
+    }
+
+    @GetMapping("/user/{userId}/competition/{competitionId}")
+    public Optional<Submission> getSubmissionByUserAndCompetition(@PathVariable Long userId, @PathVariable Long competitionId) {
+        return submissionService.findSubmissionByUserAndCompetition(userId, competitionId);
     }
 }

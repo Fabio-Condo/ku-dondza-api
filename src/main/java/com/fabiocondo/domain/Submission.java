@@ -31,8 +31,7 @@ public class Submission {
     @JsonIgnoreProperties(value={"hibernateLazyInitializer"})
     private User user;
 
-    //@JsonIgnoreProperties({"submission"})
-    @JsonIgnore
+    @JsonIgnoreProperties({"submission"})
     @ManyToMany
     @JoinTable(
             name = "submission_selected_answers",

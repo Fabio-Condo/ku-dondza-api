@@ -1,6 +1,8 @@
 package com.fabiocondo.domain;
 
+import com.fabiocondo.enumeration.CompetitionStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -19,6 +21,9 @@ public class Competition {
     private String competitionId;
 
     private String title;
+
+    @Enumerated(EnumType.STRING)
+    private CompetitionStatus status;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date startedAt;
@@ -59,9 +64,18 @@ public class Competition {
     )
     private Set<User> participationRequests = new HashSet<>(); // pedidos de participation na competition
 
+    //@JsonIgnoreProperties({"competition"})
     @JsonIgnore
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Submission> submissions;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Prize> prizes; // premios
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CompetitionWinner> winners;
 
     public Competition() {
     }
@@ -92,6 +106,14 @@ public class Competition {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public CompetitionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(CompetitionStatus status) {
+        this.status = status;
     }
 
     public Date getStartedAt() {
@@ -140,5 +162,21 @@ public class Competition {
 
     public void setSubmissions(List<Submission> submissions) {
         this.submissions = submissions;
+    }
+
+    public List<Prize> getPrizes() {
+        return prizes;
+    }
+
+    public void setPrizes(List<Prize> prizes) {
+        this.prizes = prizes;
+    }
+
+    public List<CompetitionWinner> getWinners() {
+        return winners;
+    }
+
+    public void setWinners(List<CompetitionWinner> winners) {
+        this.winners = winners;
     }
 }

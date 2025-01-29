@@ -67,6 +67,11 @@ public class CompetitionService {
         return competitionRepository.count();
     }
 
+    public Competition submite(Competition competition) {
+        competition.setCompetitionId(generateCompetitionId());
+        return competitionRepository.save(competition);
+    }
+
     public Page<User> getParticipantsByCompetitionId(Long competitionId, Pageable pageable) throws CompetitionNotFoundException {
         Competition competition = getCompetitionById(competitionId);
         return competitionRepository.findParticipantsByCompetitionId(competition.getId(), pageable);

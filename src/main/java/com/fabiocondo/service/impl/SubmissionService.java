@@ -81,4 +81,14 @@ public class SubmissionService {
         return submissionRepository.save(submission);
     }
 
+    // Método para calcular o total de respostas corretas para uma submissão
+    public long getTotalCorrectAnswersForSubmission(Long submissionId) {
+        Submission submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new IllegalArgumentException("Submissão não encontrada"));
+
+        return submission.getUserSubmittedAnswers().stream()
+                .filter(Answer::isCorrect) // Filtra as respostas corretas
+                .count(); // Conta as respostas corretas
+    }
+
 }

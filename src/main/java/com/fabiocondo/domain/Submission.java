@@ -82,4 +82,11 @@ public class Submission {
     public void setUserSubmittedAnswers(Set<Answer> userSubmittedAnswers) {
         this.userSubmittedAnswers = userSubmittedAnswers;
     }
+
+    // Método para calcular o total de respostas corretas
+    public long getTotalCorrectAnswers() {
+        return userSubmittedAnswers.stream()
+                .filter(Answer::isCorrect) // Filtra as respostas corretas
+                .count(); // Conta o total de respostas corretas
+    }
 }

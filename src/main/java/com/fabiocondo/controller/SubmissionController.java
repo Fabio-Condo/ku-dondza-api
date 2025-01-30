@@ -37,4 +37,10 @@ public class SubmissionController {
     public Optional<Submission> getSubmissionByUserAndCompetition(@PathVariable Long userId, @PathVariable Long competitionId) {
         return submissionService.findSubmissionByUserAndCompetition(userId, competitionId);
     }
+
+    @GetMapping("/{id}/total-correct-answers")
+    public ResponseEntity<Long> getTotalCorrectAnswersForSubmission(@PathVariable Long id) {
+        long totalCorrectAnswers = submissionService.getTotalCorrectAnswersForSubmission(id);
+        return ResponseEntity.ok(totalCorrectAnswers);
+    }
 }

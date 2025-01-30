@@ -54,8 +54,6 @@ public class SubmissionService {
     @Transactional
     public Submission create(Submission submission, Set<Long> userAnswerIds) throws CompetitionNotFoundException, UserNotFoundException {
 
-        logger.info("User: " + submission.getUser().getFirstName());
-
         Competition competition = competitionRepository.findById(submission.getCompetition().getId())
                 .orElseThrow(() -> new CompetitionNotFoundException("Competição não encontrada."));
 
@@ -82,7 +80,5 @@ public class SubmissionService {
 
         return submissionRepository.save(submission);
     }
-
-
 
 }

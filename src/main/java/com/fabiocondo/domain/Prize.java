@@ -1,6 +1,6 @@
 package com.fabiocondo.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fabiocondo.enumeration.RankingPosition;
 
 import javax.persistence.*;
 
@@ -13,6 +13,9 @@ public class Prize {
     private Long id;
 
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private RankingPosition position;  // Ex: FIRST_PLACE, SECOND_PLACE, etc.
 
     @ManyToOne
     @JoinColumn(name = "competition_id", nullable = false)
@@ -35,6 +38,14 @@ public class Prize {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public RankingPosition getPosition() {
+        return position;
+    }
+
+    public void setPosition(RankingPosition position) {
+        this.position = position;
     }
 
     public Competition getCompetition() {

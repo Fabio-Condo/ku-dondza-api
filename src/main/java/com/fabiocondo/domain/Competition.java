@@ -64,16 +64,15 @@ public class Competition {
     )
     private Set<User> participationRequests = new HashSet<>(); // pedidos de participation na competition
 
-    //@JsonIgnoreProperties({"competition"})
     @JsonIgnore
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Submission> submissions;
 
-    @JsonIgnore
+    @JsonIgnoreProperties({"competition"})
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Prize> prizes; // premios
 
-    @JsonIgnore
+    @JsonIgnoreProperties({"competition"})
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CompetitionWinner> winners;
 

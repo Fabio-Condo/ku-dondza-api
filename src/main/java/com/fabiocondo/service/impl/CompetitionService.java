@@ -3,6 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.domain.Competition;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.User;
+import com.fabiocondo.enumeration.CompetitionStatus;
 import com.fabiocondo.exception.domain.CompetitionNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
@@ -35,12 +36,13 @@ public class CompetitionService {
 
     public Competition createCompetition(Competition competition) {
         competition.setCompetitionId(generateCompetitionId());
+        competition.setStatus(CompetitionStatus.PLANNING);
         return competitionRepository.save(competition);
     }
 
     public Competition updateCompetition(Long id, Competition competition) throws CompetitionNotFoundException {
         Competition existingCompetition = getCompetitionById(id);
-        BeanUtils.copyProperties(competition, existingCompetition, "id", "competitionId", "questions", "participants");
+        BeanUtils.copyProperties(competition, existingCompetition, "id", "competitionId", "questions", "participants", "prizes", "submissions", "winners");
         return competitionRepository.save(existingCompetition);
     }
 
@@ -65,11 +67,6 @@ public class CompetitionService {
 
     public long getTotal(){
         return competitionRepository.count();
-    }
-
-    public Competition submite(Competition competition) {
-        competition.setCompetitionId(generateCompetitionId());
-        return competitionRepository.save(competition);
     }
 
     public Page<User> getParticipantsByCompetitionId(Long competitionId, Pageable pageable) throws CompetitionNotFoundException {

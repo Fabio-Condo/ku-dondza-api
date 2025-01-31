@@ -1,10 +1,8 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
-import com.fabiocondo.exception.domain.CompetitionNotFoundException;
-import com.fabiocondo.exception.domain.QuestionNotFoundException;
-import com.fabiocondo.exception.domain.QuizNotFoundException;
-import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.enumeration.CompetitionStatus;
+import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.service.impl.CompetitionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -139,6 +137,18 @@ public class CompetitionController {
     //@GetMapping("/{competitionId}/participation-requests")
     public ResponseEntity<Set<User>> getParticipationRequest(@PathVariable Long competitionId) throws CompetitionNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(competitionService.getParticipationRequest(competitionId));
+    }
+
+    @PutMapping("/{competitionId}/finish")
+    public ResponseEntity<?> finishCompetition(@PathVariable Long competitionId) throws CompetitionNotFoundException, CompetitionCannotBeFinishedException {
+            competitionService.finishCompetition(competitionId);
+        return response(HttpStatus.OK, "Status updated successfully");
+    }
+
+    @GetMapping("{competitionId}/defineWinners")
+    public ResponseEntity<?> defineWinners(@PathVariable("competitionId") Long competitionId) throws CompetitionNotFoundException, CompetitionCannotBeFinishedException {
+        competitionService.defineWinners(competitionId);
+        return response(HttpStatus.OK, "Winners defined successfully");
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

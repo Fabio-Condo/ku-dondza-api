@@ -1,14 +1,15 @@
 package com.fabiocondo.service.impl;
 
-import com.fabiocondo.domain.Competition;
-import com.fabiocondo.domain.Question;
-import com.fabiocondo.domain.User;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.CompetitionStatus;
+import com.fabiocondo.enumeration.RankingPosition;
+import com.fabiocondo.exception.domain.CompetitionCannotBeFinishedException;
 import com.fabiocondo.exception.domain.CompetitionNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.CompetitionRepository;
 import com.fabiocondo.repository.QuestionRepository;
+import com.fabiocondo.repository.SubmissionRepository;
 import com.fabiocondo.repository.UserRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -16,9 +17,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CompetitionService {
@@ -27,11 +34,13 @@ public class CompetitionService {
     private final CompetitionRepository competitionRepository;
     private final UserRepository userRepository;
     private final QuestionRepository questionRepository;
+    private final SubmissionRepository submissionRepository;
 
-    public CompetitionService(CompetitionRepository competitionRepository, UserRepository userRepository, QuestionRepository questionRepository) {
+    public CompetitionService(CompetitionRepository competitionRepository, UserRepository userRepository, QuestionRepository questionRepository, SubmissionRepository submissionRepository) {
         this.competitionRepository = competitionRepository;
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
+        this.submissionRepository = submissionRepository;
     }
 
     public Competition createCompetition(Competition competition) {
@@ -174,6 +183,88 @@ public class CompetitionService {
             return false;
         }
         return competition.getParticipationRequests().contains(user);
+    }
+
+    @Transactional
+    public void finishCompetition(Long competitionId) throws CompetitionNotFoundException, CompetitionCannotBeFinishedException {
+        Competition competition = getCompetitionById(competitionId);
+
+        // Só permite mudar para COMPLETED se estiver ONGOING
+        if (competition.getStatus() != CompetitionStatus.ONGOING) {
+            throw new CompetitionCannotBeFinishedException("A competição só pode ser finalizada se estiver em andamento (ONGOING).");
+        }
+
+        // Atualiza o status
+        competition.setStatus(CompetitionStatus.FINISHED);
+        competition.setEndedAt(new Date());
+        competitionRepository.save(competition);
+
+        // Definir os vencedores
+        defineWinners(competitionId);
+    }
+
+    @Transactional
+    public void defineWinners(Long competitionId) throws CompetitionNotFoundException {
+        Competition competition = getCompetitionById(competitionId);
+
+        // 1. Remover todos os vencedores anteriores
+        competition.getWinners().clear();
+        competitionRepository.save(competition); // Garantir que a remoção seja persistida
+
+        // 2. Obter todas as submissões da competição
+        List<Submission> submissions = submissionRepository.findByCompetitionId(competitionId);
+
+        // 3. Ordenar as submissões pelo total de acertos (decrescente) e pela data de submissão (mais antiga primeiro)
+        List<Submission> sortedSubmissions = submissions.stream()
+                .sorted(Comparator
+                        .comparingLong(Submission::getTotalCorrectAnswers).reversed()
+                        .thenComparing(Submission::getSubmittedAt)
+                )
+                .collect(Collectors.toList());
+
+        // 4. Obter os prêmios da competição ordenados por posição (FIRST_PLACE, SECOND_PLACE, etc.)
+        List<Prize> prizes = competition.getPrizes().stream()
+                .sorted(Comparator.comparing(Prize::getPosition))
+                .collect(Collectors.toList());
+
+        // 5. Definir os vencedores com base nas posições dos prêmios
+        for (int i = 0; i < prizes.size() && i < sortedSubmissions.size(); i++) {
+            Prize prize = prizes.get(i);
+            Submission submission = sortedSubmissions.get(i);
+
+            // Criar um novo CompetitionWinner
+            CompetitionWinner winner = new CompetitionWinner();
+            winner.setCompetition(competition);
+            winner.setUser(submission.getUser());
+            winner.setPrize(prize);
+
+            // Definir a posição do vencedor
+            RankingPosition position = RankingPosition.values()[i];
+            winner.setPosition(position);
+
+            // Adicionar o vencedor à lista de vencedores da competição
+            competition.getWinners().add(winner);
+        }
+
+        // 6. Salvar a competição com os vencedores atualizados
+        competitionRepository.save(competition);
+    }
+
+    // Verifica as competições em andamento que estão prestes a terminar
+    //@Scheduled(fixedRate = 600000) // 10 minutos
+    @Scheduled(fixedRate = 60000) // 1 minutos
+    @Transactional  // Garantir que a transação seja aberta
+    public void checkAndFinishCompetitions() throws CompetitionCannotBeFinishedException, CompetitionNotFoundException {
+        // Buscar competições em andamento
+        List<Competition> ongoingCompetitions = competitionRepository.findByStatus(CompetitionStatus.ONGOING);
+
+        for (Competition competition : ongoingCompetitions) {
+            // Verificar se já passou o tempo de término
+            if (competition.getEndedAt().before(new Date())) {
+                // Finalizar a competição
+                finishCompetition(competition.getId());
+            }
+        }
     }
 
     private String generateCompetitionId() {

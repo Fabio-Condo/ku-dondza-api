@@ -1,6 +1,7 @@
 package com.fabiocondo.domain;
 
 import com.fabiocondo.enumeration.RankingPosition;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 
@@ -25,6 +26,7 @@ public class CompetitionWinner {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer"})
     private User user;
 
     public CompetitionWinner() {

@@ -28,6 +28,9 @@ public class Competition {
     @Temporal(TemporalType.TIMESTAMP)
     private Date startedAt;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date endedAt;
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -72,7 +75,7 @@ public class Competition {
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Prize> prizes; // premios
 
-    @JsonIgnoreProperties({"competition"})
+    @JsonIgnoreProperties({"competition", "prize"})
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CompetitionWinner> winners;
 
@@ -121,6 +124,14 @@ public class Competition {
 
     public void setStartedAt(Date startedAt) {
         this.startedAt = startedAt;
+    }
+
+    public Date getEndedAt() {
+        return endedAt;
+    }
+
+    public void setEndedAt(Date endedAt) {
+        this.endedAt = endedAt;
     }
 
     public Set<Question> getQuestions() {

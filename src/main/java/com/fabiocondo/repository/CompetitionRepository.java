@@ -3,12 +3,14 @@ package com.fabiocondo.repository;
 import com.fabiocondo.domain.Competition;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.User;
+import com.fabiocondo.enumeration.CompetitionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CompetitionRepository extends JpaRepository<Competition, Long> {
@@ -31,6 +33,12 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long> 
     Long countQuestionsByCompetitionId(@Param("competitionId") Long competitionId);
 
     Optional<Competition> findCompetitionByCompetitionId(String competitionId);
+
+    List<Competition> findByStatus(CompetitionStatus status);
+
+    @Query("SELECT c FROM Competition c LEFT JOIN FETCH c.winners WHERE c.id = :id")
+    Competition findByIdWithWinners(@Param("id") Long competitionId);
+
 
 }
 

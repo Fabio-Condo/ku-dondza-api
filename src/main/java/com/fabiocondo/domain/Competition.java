@@ -31,6 +31,10 @@ public class Competition {
     @Temporal(TemporalType.TIMESTAMP)
     private Date endedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "subject_id", nullable = false)
+    private Subject subject;
+
     @JsonIgnore
     @ManyToMany
     @JoinTable(
@@ -132,6 +136,14 @@ public class Competition {
 
     public void setEndedAt(Date endedAt) {
         this.endedAt = endedAt;
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
     }
 
     public Set<Question> getQuestions() {

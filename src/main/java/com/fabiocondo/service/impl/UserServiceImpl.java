@@ -53,9 +53,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final BlogRepository blogRepository;
     private final SubjectRepository subjectRepository;
     private final OnlineCourseRepository onlineCourseRepository;
+    private final OnlineCourseContentRepository onlineCourseContentRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, PostRepository postRepository, BlogRepository blogRepository, SubjectRepository subjectRepository, OnlineCourseRepository onlineCourseRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, PostRepository postRepository, BlogRepository blogRepository, SubjectRepository subjectRepository, OnlineCourseRepository onlineCourseRepository, OnlineCourseContentRepository onlineCourseContentRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
@@ -65,6 +66,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.blogRepository = blogRepository;
         this.subjectRepository = subjectRepository;
         this.onlineCourseRepository = onlineCourseRepository;
+        this.onlineCourseContentRepository = onlineCourseContentRepository;
     }
 
     public Page<User> searchUsers(String query, Pageable pageable) {
@@ -555,6 +557,39 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         return user.checkIfSentFriendRequest(friend); // Chama o método isFriend da classe User
+    }
+
+    @Override
+    public User addContentToMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException {
+        User user = findById(userId);
+        Optional<OnlineCourseContent> optionalModule = onlineCourseContentRepository.findById(onlineCourseContentId);
+        if (!optionalModule.isPresent()){
+            throw new CourseContentNotFoundException("No Course Content found by id: " + onlineCourseContentId);
+        }
+        user.getMarkedCourseContents().add(optionalModule.get());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User removeContentFromMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException {
+        User user = findById(userId);
+        Optional<OnlineCourseContent> optionalModule = onlineCourseContentRepository.findById(onlineCourseContentId);
+        if (!optionalModule.isPresent()){
+            throw new CourseContentNotFoundException("No Course Content found by id: " + onlineCourseContentId);
+        }
+        user.getMarkedCourseContents().remove(optionalModule.get());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public boolean checkIfMarkedCourseContent(Long userId, Long onlineCourseContentId) {
+        User user = userRepository.findById(userId).orElse(null);
+        Optional<OnlineCourseContent> optionalModule = onlineCourseContentRepository.findById(onlineCourseContentId);
+
+        if (user == null || !optionalModule.isPresent()) {
+            return false;
+        }
+        return user.getMarkedCourseContents().contains(optionalModule.get());
     }
 
     private void validateLoginAttempt(User user) {

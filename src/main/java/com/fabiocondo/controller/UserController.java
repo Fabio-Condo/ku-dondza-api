@@ -360,6 +360,22 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.countGroupsByUserId(userId));
     }
 
+    @PostMapping("/{userId}/marked-course-content/{onlineCourseContentId}")
+    public ResponseEntity<User> addContentToMarkedCourseContents(@PathVariable Long userId, @PathVariable Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.addContentToMarkedCourseContents(userId, onlineCourseContentId));
+    }
+
+    @DeleteMapping("/{userId}/marked-course-content/{onlineCourseContentId}")
+    public ResponseEntity<User> removeContentFromMarkedCourseContents(@PathVariable Long userId, @PathVariable Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.removeContentFromMarkedCourseContents(userId, onlineCourseContentId));
+    }
+
+    @GetMapping("/{userId}/marked-course-content/contains/{onlineCourseContentId}")
+    public ResponseEntity<Boolean> checkIfMarkedCourseContent(@PathVariable Long userId, @PathVariable Long onlineCourseContentId) {
+        boolean markedCourseContent = userService.checkIfMarkedCourseContent(userId, onlineCourseContentId);
+        return ResponseEntity.ok(markedCourseContent);
+    }
+
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(),
                 message), httpStatus);

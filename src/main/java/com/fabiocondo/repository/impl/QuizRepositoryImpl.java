@@ -81,9 +81,9 @@ public class QuizRepositoryImpl implements QuizRepositoryQuery {
         if(!ObjectUtils.isEmpty(quizFilter.getSearchParam())) {
             Predicate subject = builder.like(
                     builder.lower(root.get("subject").get("name")), "%" + quizFilter.getSearchParam().toLowerCase() + "%");
-            Predicate title = builder.like(
-                    builder.lower(root.get("title")), "%" + quizFilter.getSearchParam().toLowerCase() + "%");
-            predicates.add(builder.or(subject, title));
+            Predicate description = builder.like(
+                    builder.lower(root.get("description")), "%" + quizFilter.getSearchParam().toLowerCase() + "%");
+            predicates.add(builder.or(subject, description));
         }
 
         if(!ObjectUtils.isEmpty(quizFilter.getSubject())) {

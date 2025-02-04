@@ -5,12 +5,8 @@ import com.fabiocondo.enumeration.CompetitionStatus;
 import com.fabiocondo.enumeration.RankingPosition;
 import com.fabiocondo.exception.domain.CompetitionCannotBeFinishedException;
 import com.fabiocondo.exception.domain.CompetitionNotFoundException;
-import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
-import com.fabiocondo.repository.CompetitionRepository;
-import com.fabiocondo.repository.QuestionRepository;
-import com.fabiocondo.repository.SubmissionRepository;
-import com.fabiocondo.repository.UserRepository;
+import com.fabiocondo.repository.*;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,24 +27,76 @@ public class CompetitionService {
     private final CompetitionRepository competitionRepository;
     private final UserRepository userRepository;
     private final QuestionRepository questionRepository;
+    private final TopicRepository topicRepository;
     private final SubmissionRepository submissionRepository;
 
-    public CompetitionService(CompetitionRepository competitionRepository, UserRepository userRepository, QuestionRepository questionRepository, SubmissionRepository submissionRepository) {
+    public CompetitionService(CompetitionRepository competitionRepository, UserRepository userRepository, QuestionRepository questionRepository, TopicRepository topicRepository, SubmissionRepository submissionRepository) {
         this.competitionRepository = competitionRepository;
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
+        this.topicRepository = topicRepository;
         this.submissionRepository = submissionRepository;
     }
 
-    public Competition createCompetition(Competition competition) {
+    @Transactional
+    public Competition createCompetition(Competition competition, Set<Long> topicIds) {
+
+        if (topicIds == null || topicIds.isEmpty()) {
+            throw new IllegalArgumentException("A Competition deve ter pelo menos um tópico associado.");
+        }
+
+        Set<Topic> topics = new HashSet<>(topicRepository.findAllById(topicIds));
+
+        if (topics.size() != topicIds.size()) {
+            throw new IllegalArgumentException("Um ou mais tópicos não foram encontrados no banco de dados.");
+        }
+
+        Set<Question> questions = questionRepository.findByTopicIdIn(topicIds);
+        competition.setQuestions(questions);
+
         competition.setCompetitionId(generateCompetitionId());
         competition.setStatus(CompetitionStatus.PLANNING);
+        competition.getPrizes().forEach(prize -> prize.setCompetition(competition));
+
         return competitionRepository.save(competition);
     }
 
-    public Competition updateCompetition(Long id, Competition competition) throws CompetitionNotFoundException {
+    @Transactional
+    public Competition updateCompetition(Long id, Competition competition, Set<Long> topicIds, Boolean generateQuestions) throws CompetitionNotFoundException {
+
         Competition existingCompetition = getCompetitionById(id);
+
+        if(!existingCompetition.getSubmissions().isEmpty()) {
+            throw new IllegalArgumentException("A Competition não pode ser actualizada. Contém submissões.");
+        }
+        if (existingCompetition.getStatus().equals(CompetitionStatus.ONGOING) || existingCompetition.getStatus().equals(CompetitionStatus.FINISHED)) {
+            throw new IllegalArgumentException("A Competition não pode ser actualizada. Está em andamento ou finalizada.");
+        }
+
+        if (generateQuestions) {
+            if (topicIds == null || topicIds.isEmpty()) {
+                throw new IllegalArgumentException("A Competition deve ter pelo menos um tópico associado.");
+            }
+
+            Set<Topic> topics = new HashSet<>(topicRepository.findAllById(topicIds));
+
+            if (topics.size() != topicIds.size()) {
+                throw new IllegalArgumentException("Um ou mais tópicos não foram encontrados no banco de dados.");
+            }
+
+            existingCompetition.getQuestions().clear();
+            competitionRepository.save(existingCompetition); // Garantir que a remoção seja persistida
+
+            Set<Question> questions = questionRepository.findByTopicIdIn(topicIds);
+            existingCompetition.setQuestions(questions);
+        }
+
+        existingCompetition.getPrizes().clear();
+        existingCompetition.getPrizes().addAll(competition.getPrizes());
+        existingCompetition.getPrizes().forEach(prize -> prize.setCompetition(existingCompetition));
+
         BeanUtils.copyProperties(competition, existingCompetition, "id", "competitionId", "questions", "participants", "prizes", "submissions", "winners");
+
         return competitionRepository.save(existingCompetition);
     }
 
@@ -119,22 +164,6 @@ public class CompetitionService {
         return competitionRepository.findQuestionsByCompetitionId(competition.getId(), pageable);
     }
 
-    public Competition addQuestionToCompetition(Long competitionId, Long questionId) throws QuestionNotFoundException, CompetitionNotFoundException {
-        Competition competition = getCompetitionById(competitionId);
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
-        competition.getQuestions().add(question);
-        return competitionRepository.save(competition);
-    }
-
-    public Competition removeQuestionFromCompetition(Long competitionId, Long questionId) throws QuestionNotFoundException, CompetitionNotFoundException {
-        Competition competition = getCompetitionById(competitionId);
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
-        competition.getQuestions().remove(question);
-        return competitionRepository.save(competition);
-    }
-
     public long countQuestionsByCompetitionId(Long competitionId){
         return competitionRepository.countQuestionsByCompetitionId(competitionId);
     }
@@ -170,11 +199,6 @@ public class CompetitionService {
         return competitionRepository.findParticipationRequestsByCompetitionId(competition.getId(), pageable);
     }
 
-    public Set<User> getParticipationRequest(Long competitionId) throws CompetitionNotFoundException {
-        Competition competition = getCompetitionById(competitionId);
-        return competition.getParticipationRequests();
-    }
-
     public boolean checkIfRequestedParticipation(Long competitionId, Long userId) {
         Competition competition = competitionRepository.findById(competitionId).orElse(null);
         User user = userRepository.findById(userId).orElse(null);
@@ -183,6 +207,20 @@ public class CompetitionService {
             return false;
         }
         return competition.getParticipationRequests().contains(user);
+    }
+
+    public void initCompetition(Long competitionId) throws CompetitionNotFoundException, CompetitionCannotBeFinishedException {
+        Competition competition = getCompetitionById(competitionId);
+
+        // Só permite mudar para ONGOING se estiver PLANNING
+        if (competition.getStatus() != CompetitionStatus.PLANNING) {
+            throw new CompetitionCannotBeFinishedException("A competição só pode ser inicializada se estiver em planeamento (PLANNING).");
+        }
+
+        // Atualiza o status
+        competition.setStatus(CompetitionStatus.ONGOING);
+        competition.setStartedAt(new Date());
+        competitionRepository.save(competition);
     }
 
     @Transactional

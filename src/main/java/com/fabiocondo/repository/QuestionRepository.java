@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -17,7 +16,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Quest
     public Page<Question> findAll(@Param("searchParam") String searchParam, Pageable pageable);
 
     @Query("SELECT q FROM Question q WHERE q.topic.id IN :topicIds")
-    List<Question> findByTopicIdIn(@Param("topicIds") Set<Long> topicIds);
+    Set<Question> findByTopicIdIn(@Param("topicIds") Set<Long> topicIds);
 
     Optional<Question> findQuestionByQuestionId(String questionId);
 }

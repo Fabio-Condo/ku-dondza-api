@@ -124,6 +124,15 @@ public class User implements Serializable {
     private Set<OnlineCourse> subscribedOnlineCourses = new HashSet<>();
 
     @JsonIgnore
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(
+            name = "user_marked_online_course_content",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "online_course_content_id")
+    )
+    private Set<OnlineCourseContent> markedCourseContents = new HashSet<>(); // marcado como assistidos
+
+    @JsonIgnore
     @ManyToMany(mappedBy = "participants")
     private List<Competition> competitions;
 
@@ -375,6 +384,14 @@ public class User implements Serializable {
 
     public void setSubscribedOnlineCourses(Set<OnlineCourse> subscribedOnlineCourses) {
         this.subscribedOnlineCourses = subscribedOnlineCourses;
+    }
+
+    public Set<OnlineCourseContent> getMarkedCourseContents() {
+        return markedCourseContents;
+    }
+
+    public void setMarkedCourseContents(Set<OnlineCourseContent> markedCourseContents) {
+        this.markedCourseContents = markedCourseContents;
     }
 
     public List<Competition> getCompetitions() {

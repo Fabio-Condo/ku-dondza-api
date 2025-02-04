@@ -45,6 +45,12 @@ public interface UserService {
 
     boolean checkIfSentFriendRequest(Long receptorUserId, Long emissorUserId) throws UserNotFoundException;
 
+    User addContentToMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException;
+
+    User removeContentFromMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException;
+
+    boolean checkIfMarkedCourseContent(Long userId, Long onlineCourseContentId);
+
     Page<OnlineCourse> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException;
 
     long countSubscribedOnlineCoursesByUserId(Long userId);

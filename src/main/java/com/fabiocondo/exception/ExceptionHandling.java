@@ -145,6 +145,11 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(ModuleNotFoundException.class)
+    public ResponseEntity<HttpResponse> moduleNotFoundException(ModuleNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(CombinationExistException.class)
     public ResponseEntity<HttpResponse> combinationExistException(CombinationExistException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());

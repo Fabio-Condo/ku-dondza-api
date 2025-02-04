@@ -28,4 +28,6 @@ public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositor
 
     Optional<Quiz> findQuizByQuizId(String quizId);
 
+    Long countByUserId(@Param("userId") Long userId);
+
 }

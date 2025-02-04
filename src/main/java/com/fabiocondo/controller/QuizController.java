@@ -51,11 +51,10 @@ public class QuizController {
 
     @PostMapping
     public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz,
-                                           @RequestParam Set<Long> topicIds,
                                            @RequestParam Set<Long> questionIds,
                                            @RequestParam Set<Long> userAnswerIds) {
 
-        Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, topicIds, questionIds, userAnswerIds);
+        Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, questionIds, userAnswerIds);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedQuiz);
     }
 
@@ -66,8 +65,8 @@ public class QuizController {
     }
 
     @GetMapping("/total")
-    public ResponseEntity<Long> getTotal(){
-        return ResponseEntity.status(HttpStatus.OK).body(quizService.getTotal());
+    public ResponseEntity<Long> getTotalByUser(@RequestParam Long userId){
+        return ResponseEntity.status(HttpStatus.OK).body(quizService.countByUserId(userId));
     }
 
     @GetMapping("/{quizId}/questions")

@@ -51,7 +51,7 @@ public class QuestionService {
         return questionRepository.findAll();
     }
 
-    public List<Question> getQuestionsByTopics(Set<Long> topicIds) {
+    public Set<Question> getQuestionsByTopics(Set<Long> topicIds) {
         if (topicIds == null || topicIds.isEmpty()) {
             throw new IllegalArgumentException("O Quiz deve ter pelo menos um tópico associado.");
         } else {

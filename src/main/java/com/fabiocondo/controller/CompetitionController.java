@@ -1,7 +1,6 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
-import com.fabiocondo.enumeration.CompetitionStatus;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.service.impl.CompetitionService;
 import org.springframework.data.domain.Page;
@@ -23,13 +22,17 @@ public class CompetitionController {
     }
 
     @PostMapping
-    public ResponseEntity<Competition> createCompetition(@RequestBody Competition competition) {
-        return ResponseEntity.status(HttpStatus.OK).body(competitionService.createCompetition(competition));
+    public ResponseEntity<Competition> createCompetition(@RequestBody Competition competition,
+                                                         @RequestParam Set<Long> topicIds) {
+        return ResponseEntity.status(HttpStatus.OK).body(competitionService.createCompetition(competition, topicIds));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Competition> updateCompetition(@PathVariable("id") Long id, @RequestBody Competition competition) throws CompetitionNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(competitionService.updateCompetition(id, competition));
+    public ResponseEntity<Competition> updateCompetition(@PathVariable("id") Long id,
+                                                         @RequestBody Competition competition,
+                                                         @RequestParam Set<Long> topicIds,
+                                                         @RequestParam Boolean generateQuestions) throws CompetitionNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(competitionService.updateCompetition(id, competition, topicIds, generateQuestions));
     }
 
     @GetMapping("/filter")
@@ -91,18 +94,6 @@ public class CompetitionController {
         return competitionService.getQuestionsByCompetitionId(competitionId, pageable);
     }
 
-    @PostMapping("/{competitionId}/questions/{questionId}")
-    public ResponseEntity<Competition> addQuestionToCompetition(@PathVariable Long competitionId, @PathVariable Long questionId) throws QuestionNotFoundException, CompetitionNotFoundException {
-        Competition updatedCompetition = competitionService.addQuestionToCompetition(competitionId, questionId);
-        return updatedCompetition != null ? ResponseEntity.ok(updatedCompetition) : ResponseEntity.notFound().build();
-    }
-
-    @DeleteMapping("/{competitionId}/questions/{questionId}")
-    public ResponseEntity<Competition> removeQuestionFromCompetition(@PathVariable Long competitionId, @PathVariable Long questionId) throws QuestionNotFoundException, CompetitionNotFoundException {
-        Competition updatedCompetition = competitionService.removeQuestionFromCompetition(competitionId, questionId);
-        return updatedCompetition != null ? ResponseEntity.ok(updatedCompetition) : ResponseEntity.notFound().build();
-    }
-
     @GetMapping("/{competitionId}/questions/total")
     public ResponseEntity<Long> countQuestionsByCompetitionId(@PathVariable Long competitionId){
         return ResponseEntity.status(HttpStatus.OK).body(competitionService.countQuestionsByCompetitionId(competitionId));
@@ -134,19 +125,20 @@ public class CompetitionController {
         return ResponseEntity.ok(requestedParticipation);
     }
 
-    //@GetMapping("/{competitionId}/participation-requests")
-    public ResponseEntity<Set<User>> getParticipationRequest(@PathVariable Long competitionId) throws CompetitionNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(competitionService.getParticipationRequest(competitionId));
+    @PutMapping("/{competitionId}/init")
+    public ResponseEntity<?> initCompetition(@PathVariable Long competitionId) throws CompetitionNotFoundException, CompetitionCannotBeFinishedException {
+            competitionService.initCompetition(competitionId);
+        return response(HttpStatus.OK, "Competition started successfully");
     }
 
     @PutMapping("/{competitionId}/finish")
     public ResponseEntity<?> finishCompetition(@PathVariable Long competitionId) throws CompetitionNotFoundException, CompetitionCannotBeFinishedException {
-            competitionService.finishCompetition(competitionId);
-        return response(HttpStatus.OK, "Status updated successfully");
+        competitionService.finishCompetition(competitionId);
+        return response(HttpStatus.OK, "Competition finished successfully");
     }
 
     @GetMapping("{competitionId}/defineWinners")
-    public ResponseEntity<?> defineWinners(@PathVariable("competitionId") Long competitionId) throws CompetitionNotFoundException, CompetitionCannotBeFinishedException {
+    public ResponseEntity<?> defineWinners(@PathVariable("competitionId") Long competitionId) throws CompetitionNotFoundException {
         competitionService.defineWinners(competitionId);
         return response(HttpStatus.OK, "Winners defined successfully");
     }

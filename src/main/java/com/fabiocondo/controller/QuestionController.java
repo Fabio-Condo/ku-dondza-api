@@ -48,7 +48,7 @@ public class QuestionController {
     }
 
     @GetMapping("/by-topics")
-    public ResponseEntity<List<Question>> getQuestionsByTopics(@RequestParam Set<Long> topicIds) {
+    public ResponseEntity<Set<Question>> getQuestionsByTopics(@RequestParam Set<Long> topicIds) {
         return ResponseEntity.ok(questionService.getQuestionsByTopics(topicIds));
     }
 

@@ -2,6 +2,7 @@ package com.fabiocondo.repository;
 
 import com.fabiocondo.domain.Competition;
 import com.fabiocondo.domain.Question;
+import com.fabiocondo.domain.Topic;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.enumeration.CompetitionStatus;
 import org.springframework.data.domain.Page;

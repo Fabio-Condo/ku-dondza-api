@@ -89,6 +89,12 @@ public class CompetitionController {
         return ResponseEntity.status(HttpStatus.OK).body(competitionService.countParticipantsByCompetitionId(competitionId));
     }
 
+    @GetMapping("/{competitionId}/topics")
+    public ResponseEntity<Set<Topic>> getTopicsByCompetitionId(@PathVariable Long competitionId) {
+        Set<Topic> topics = competitionService.getTopicsByCompetitionId(competitionId);
+        return ResponseEntity.ok(topics);
+    }
+
     @GetMapping("/{competitionId}/questions")
     public Page<Question> getQuestionsByCompetitionId(@PathVariable Long competitionId, Pageable pageable) throws CompetitionNotFoundException {
         return competitionService.getQuestionsByCompetitionId(competitionId, pageable);

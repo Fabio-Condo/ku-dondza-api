@@ -66,12 +66,12 @@ public class CompetitionService {
 
         Competition existingCompetition = getCompetitionById(id);
 
-        if(!existingCompetition.getSubmissions().isEmpty()) {
-            throw new IllegalArgumentException("A Competition não pode ser actualizada. Contém submissões.");
-        }
-        if (existingCompetition.getStatus().equals(CompetitionStatus.ONGOING) || existingCompetition.getStatus().equals(CompetitionStatus.FINISHED)) {
-            throw new IllegalArgumentException("A Competition não pode ser actualizada. Está em andamento ou finalizada.");
-        }
+        //if(!existingCompetition.getSubmissions().isEmpty()) {
+        //    throw new IllegalArgumentException("A Competition não pode ser actualizada. Contém submissões.");
+        //}
+        //if (existingCompetition.getStatus().equals(CompetitionStatus.ONGOING) || existingCompetition.getStatus().equals(CompetitionStatus.FINISHED)) {
+        //    throw new IllegalArgumentException("A Competition não pode ser actualizada. Está em andamento ou finalizada.");
+        //}
 
         if (generateQuestions) {
             if (topicIds == null || topicIds.isEmpty()) {
@@ -156,6 +156,24 @@ public class CompetitionService {
 
     public long countParticipantsByCompetitionId(Long competitionId){
         return competitionRepository.countParticipantsByCompetitionId(competitionId);
+    }
+
+    public Set<Topic> getTopicsByCompetitionId(Long competitionId) {
+        // Buscar competição pelo ID
+        Competition competition = competitionRepository.findById(competitionId)
+                .orElseThrow(() -> new RuntimeException("Competição não encontrada"));
+
+        // Usar um Set para garantir que não haja tópicos duplicados
+        Set<Topic> topics = new HashSet<>();
+
+        // Iterar sobre as questões e adicionar os tópicos associados
+        competition.getQuestions().forEach(question -> {
+            if (question.getTopic() != null) {
+                topics.add(question.getTopic());
+            }
+        });
+
+        return topics;
     }
 
     public Page<Question> getQuestionsByCompetitionId(Long competitionId, Pageable pageable) throws CompetitionNotFoundException {

@@ -1,5 +1,6 @@
 package com.fabiocondo.domain;
 
+import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -21,6 +22,9 @@ public class Quiz {
     private String quizId;
 
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private DifficultyLevel difficultyLevel;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date submittedAt;
@@ -45,11 +49,11 @@ public class Quiz {
     @JsonIgnore
     @ManyToMany
     @JoinTable(
-            name = "quiz_selected_answers",
+            name = "quiz_answers",
             joinColumns = @JoinColumn(name = "quiz_id"),
             inverseJoinColumns = @JoinColumn(name = "answer_id")
     )
-    private Set<Answer> userSubmittedAnswers = new HashSet<>(); // capturar as respostas
+    private Set<Answer> answers = new HashSet<>(); // capturar as respostas
 
     public Long getId() {
         return id;
@@ -73,6 +77,14 @@ public class Quiz {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public DifficultyLevel getDifficultyLevel() {
+        return difficultyLevel;
+    }
+
+    public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
+        this.difficultyLevel = difficultyLevel;
     }
 
     public Date getSubmittedAt() {
@@ -99,12 +111,12 @@ public class Quiz {
         this.questions = questions;
     }
 
-    public Set<Answer> getUserSubmittedAnswers() {
-        return userSubmittedAnswers;
+    public Set<Answer> getAnswers() {
+        return answers;
     }
 
-    public void setUserSubmittedAnswers(Set<Answer> userSubmittedAnswers) {
-        this.userSubmittedAnswers = userSubmittedAnswers;
+    public void setAnswers(Set<Answer> answers) {
+        this.answers = answers;
     }
 }
 

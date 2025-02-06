@@ -1,6 +1,7 @@
 package com.fabiocondo.domain;
 
 import com.fabiocondo.enumeration.CompetitionStatus;
+import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -21,6 +22,9 @@ public class Competition {
     private String competitionId;
 
     private String title;
+
+    @Enumerated(EnumType.STRING)
+    private DifficultyLevel difficultyLevel;
 
     @Enumerated(EnumType.STRING)
     private CompetitionStatus status;
@@ -112,6 +116,14 @@ public class Competition {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public DifficultyLevel getDifficultyLevel() {
+        return difficultyLevel;
+    }
+
+    public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
+        this.difficultyLevel = difficultyLevel;
     }
 
     public CompetitionStatus getStatus() {

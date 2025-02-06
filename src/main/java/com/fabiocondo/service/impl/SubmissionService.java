@@ -75,7 +75,7 @@ public class SubmissionService {
 
         submission.setUser(user);
         submission.setCompetition(competition);
-        submission.setUserSubmittedAnswers(answers);
+        submission.setAnswers(answers);
         submission.setSubmittedAt(new Date());
 
         return submissionRepository.save(submission);
@@ -86,7 +86,7 @@ public class SubmissionService {
         Submission submission = submissionRepository.findById(submissionId)
                 .orElseThrow(() -> new IllegalArgumentException("Submissão não encontrada"));
 
-        return submission.getUserSubmittedAnswers().stream()
+        return submission.getAnswers().stream()
                 .filter(Answer::isCorrect) // Filtra as respostas corretas
                 .count(); // Conta as respostas corretas
     }

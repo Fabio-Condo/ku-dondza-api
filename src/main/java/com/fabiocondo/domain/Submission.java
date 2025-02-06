@@ -33,11 +33,11 @@ public class Submission {
     @JsonIgnoreProperties({"submission"})
     @ManyToMany
     @JoinTable(
-            name = "submission_selected_answers",
+            name = "submission_answers",
             joinColumns = @JoinColumn(name = "submission_id"),
             inverseJoinColumns = @JoinColumn(name = "answer_id")
     )
-    private Set<Answer> userSubmittedAnswers = new HashSet<>(); // capturar as respostas
+    private Set<Answer> answers = new HashSet<>(); // capturar as respostas
 
     public Submission() {
     }
@@ -75,17 +75,17 @@ public class Submission {
         this.user = user;
     }
 
-    public Set<Answer> getUserSubmittedAnswers() {
-        return userSubmittedAnswers;
+    public Set<Answer> getAnswers() {
+        return answers;
     }
 
-    public void setUserSubmittedAnswers(Set<Answer> userSubmittedAnswers) {
-        this.userSubmittedAnswers = userSubmittedAnswers;
+    public void setAnswers(Set<Answer> answers) {
+        this.answers = answers;
     }
 
     // Método para calcular o total de respostas corretas
     public long getTotalCorrectAnswers() {
-        return userSubmittedAnswers.stream()
+        return answers.stream()
                 .filter(Answer::isCorrect) // Filtra as respostas corretas
                 .count(); // Conta o total de respostas corretas
     }

@@ -40,6 +40,7 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long> 
     @Query("SELECT c FROM Competition c LEFT JOIN FETCH c.winners WHERE c.id = :id")
     Competition findByIdWithWinners(@Param("id") Long competitionId);
 
+    long countByQuestions(Question question);
 
 }
 

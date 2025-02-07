@@ -83,7 +83,7 @@ public class Competition {
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Prize> prizes; // premios
 
-    @JsonIgnoreProperties({"competition", "prize"})
+    @JsonIgnoreProperties({"competition"})
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CompetitionWinner> winners;
 

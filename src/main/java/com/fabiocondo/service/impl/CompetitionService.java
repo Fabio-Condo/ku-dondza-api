@@ -294,10 +294,6 @@ public class CompetitionService {
             winner.setUser(submission.getUser());
             winner.setPrize(prize);
 
-            // Definir a posição do vencedor
-            RankingPosition position = RankingPosition.values()[i];
-            winner.setPosition(position);
-
             // Adicionar o vencedor à lista de vencedores da competição
             competition.getWinners().add(winner);
         }
@@ -308,7 +304,7 @@ public class CompetitionService {
 
     // Verifica as competições em andamento que estão prestes a terminar
     //@Scheduled(fixedRate = 600000) // 10 minutos
-    @Scheduled(fixedRate = 60000) // 1 minutos
+    //@Scheduled(fixedRate = 60000) // 1 minutos
     @Transactional  // Garantir que a transação seja aberta
     public void checkAndFinishCompetitions() throws CompetitionCannotBeFinishedException, CompetitionNotFoundException {
         // Buscar competições em andamento

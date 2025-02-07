@@ -1,6 +1,6 @@
 package com.fabiocondo.dto;
 
-public class QuestionStatisticsDTO {
+public class CompetitionQuestionStatisticsDTO {
 
     private Long questionId;
     private String questionText;
@@ -9,14 +9,11 @@ public class QuestionStatisticsDTO {
     private String topicName;
     private long totalCorrectAnswers;
     private long totalIncorrectAnswers;
-    private long totalAnswers;  // Novo campo para o total de respostas
-    private long competitionsCount;  // Novo campo para a contagem de competições
+    private long totalAnswers;
+    private long competitionsCount;
 
-
-
-    // Construtor
-    public QuestionStatisticsDTO(Long questionId, String questionText, double accuracyRate, double errorRate,
-                                 String topicName, long totalCorrectAnswers, long totalIncorrectAnswers, long totalAnswers, long competitionsCount) {
+    public CompetitionQuestionStatisticsDTO(Long questionId, String questionText, double accuracyRate, double errorRate,
+                                            String topicName, long totalCorrectAnswers, long totalIncorrectAnswers, long totalAnswers, long competitionsCount) {
         this.questionId = questionId;
         this.questionText = questionText;
         this.accuracyRate = accuracyRate;
@@ -28,7 +25,6 @@ public class QuestionStatisticsDTO {
         this.competitionsCount = competitionsCount;
     }
 
-    // Getters and Setters
     public Long getQuestionId() {
         return questionId;
     }

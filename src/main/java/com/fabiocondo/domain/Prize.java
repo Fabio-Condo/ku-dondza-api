@@ -1,6 +1,7 @@
 package com.fabiocondo.domain;
 
 import com.fabiocondo.enumeration.RankingPosition;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 
@@ -17,6 +18,7 @@ public class Prize {
     @Enumerated(EnumType.STRING)
     private RankingPosition position;  // Ex: FIRST_PLACE, SECOND_PLACE, etc.
 
+    @JsonIgnoreProperties({"winners"})
     @ManyToOne
     @JoinColumn(name = "competition_id", nullable = false)
     private Competition competition;

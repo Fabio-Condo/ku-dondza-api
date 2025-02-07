@@ -4,6 +4,7 @@ import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.Competition;
 import com.fabiocondo.domain.Submission;
 import com.fabiocondo.domain.User;
+import com.fabiocondo.dto.AnswerWithUserDTO;
 import com.fabiocondo.exception.domain.CompetitionNotFoundException;
 import com.fabiocondo.exception.domain.SubmissionNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
@@ -16,10 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SubmissionService {
@@ -90,5 +89,17 @@ public class SubmissionService {
                 .filter(Answer::isCorrect) // Filtra as respostas corretas
                 .count(); // Conta as respostas corretas
     }
+
+    // Método para buscar as respostas de uma questão por ID
+    //public List<AnswerWithUserDTO> getAnswersForQuestion(Long questionId) {
+        // Buscando as submissões que têm respostas associadas à questão
+    //    List<Submission> submissions = submissionRepository.findByAnswersQuestionId(questionId);
+
+        // Extraindo todas as respostas das submissões e associando com o usuário
+    //    return submissions.stream()
+    //            .flatMap(submission -> submission.getAnswers().stream()
+    //                    .map(answer -> new AnswerWithUserDTO(answer, submission.getUser())))
+    //            .collect(Collectors.toList());
+    //}
 
 }

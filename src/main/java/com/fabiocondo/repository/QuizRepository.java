@@ -30,4 +30,14 @@ public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositor
 
     Long countByUserId(@Param("userId") Long userId);
 
+    long countByAnswers_Question(Question question);
+
+    public long countByAnswers_IsCorrectTrueAndAnswers_Question(Question question);
+
+    public long countByAnswers_IsNullAndAnswers_Question(Question question);
+
+    long countByQuestions(Question question);
+
+    public Page<Quiz> findAllByQuestions(Question question, Pageable pageable);
+
 }

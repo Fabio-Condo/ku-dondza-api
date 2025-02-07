@@ -61,6 +61,11 @@ public class QuizService {
         return quizRepository.findAll();
     }
 
+    public Page<Quiz> getQuizzesByQuestionId(Long questionId, Pageable pageable) throws QuizNotFoundException {
+        Question question = questionRepository.findById(questionId).orElseThrow(() -> new QuizNotFoundException("No question found by id: " + questionId));
+        return quizRepository.findAllByQuestions(question, pageable);
+    }
+
     @Transactional
     public Quiz saveQuizWithQuestions(Quiz quiz, Set<Long> questionIds, Set<Long> userAnswerIds) {
 

@@ -49,6 +49,11 @@ public class QuizController {
         return ResponseEntity.ok(quizzes);
     }
 
+    @GetMapping("/by-question/{questionId}")
+    public Page<Quiz> getQuizzesByQuestionId(@PathVariable("questionId") Long questionId, Pageable pageable) throws QuizNotFoundException {
+        return quizService.getQuizzesByQuestionId(questionId, pageable);
+    }
+
     @PostMapping
     public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz,
                                            @RequestParam Set<Long> questionIds,

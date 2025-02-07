@@ -1,7 +1,8 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
-import com.fabiocondo.dto.QuestionStatisticsDTO;
+import com.fabiocondo.dto.CompetitionQuestionStatisticsDTO;
+import com.fabiocondo.dto.QuizQuestionStatisticsDTO;
 import com.fabiocondo.service.impl.QuestionServiceStatistics;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,26 +21,31 @@ public class QuestionStatisticsController {
         this.questionServiceStatistics = questionServiceStatistics;
     }
 
-    // Endpoint para obter as estatísticas de uma questão específica por ID
-    @GetMapping("/{questionId}")
-    public ResponseEntity<QuestionStatisticsDTO> getStatisticsByQuestionId(@PathVariable Long questionId) {
-        QuestionStatisticsDTO statistics = questionServiceStatistics.getStatisticsByQuestionId(questionId);
+    @GetMapping("/{questionId}/quizzes")
+    public ResponseEntity<QuizQuestionStatisticsDTO> getQuizStatisticsByQuestionId(@PathVariable Long questionId) {
+        QuizQuestionStatisticsDTO statistics = questionServiceStatistics.getQuizStatisticsByQuestionId(questionId);
+        return ResponseEntity.ok(statistics);
+    }
+
+    @GetMapping("/{questionId}/competitions")
+    public ResponseEntity<CompetitionQuestionStatisticsDTO> getCompetitionStatisticsByQuestionId(@PathVariable Long questionId) {
+        CompetitionQuestionStatisticsDTO statistics = questionServiceStatistics.getCompetitionStatisticsByQuestionId(questionId);
         return ResponseEntity.ok(statistics);
     }
 
     // Endpoint para obter estatísticas de todas as questões
-    @GetMapping("/all")
-    public ResponseEntity<List<QuestionStatisticsDTO>> getAllStatistics() {
-        List<QuestionStatisticsDTO> statistics = questionServiceStatistics.getAllQuestionStatistics();
-        return ResponseEntity.ok(statistics);
-    }
+    //@GetMapping("/all")
+    //public ResponseEntity<List<CompetitionQuestionStatisticsDTO>> getAllStatistics() {
+    //    List<CompetitionQuestionStatisticsDTO> statistics = questionServiceStatistics.getAllQuestionStatistics();
+    //    return ResponseEntity.ok(statistics);
+    //}
 
     // Endpoint para obter estatísticas agrupadas por tópico
-    @GetMapping("/by-topic")
-    public ResponseEntity<Map<String, List<QuestionStatisticsDTO>>> getStatisticsByTopic() {
-        Map<String, List<QuestionStatisticsDTO>> statisticsByTopic = questionServiceStatistics.getStatisticsByTopic();
-        return ResponseEntity.ok(statisticsByTopic);
-    }
+    //@GetMapping("/by-topic")
+    //public ResponseEntity<Map<String, List<CompetitionQuestionStatisticsDTO>>> getStatisticsByTopic() {
+    //    Map<String, List<CompetitionQuestionStatisticsDTO>> statisticsByTopic = questionServiceStatistics.getStatisticsByTopic();
+    //    return ResponseEntity.ok(statisticsByTopic);
+    //}
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(

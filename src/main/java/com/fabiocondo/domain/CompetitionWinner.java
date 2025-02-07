@@ -17,9 +17,6 @@ public class CompetitionWinner {
     @JoinColumn(name = "competition_id")
     private Competition competition;
 
-    @Enumerated(EnumType.STRING)
-    private RankingPosition position;  // Ex: FIRST_PLACE, SECOND_PLACE, etc.
-
     @ManyToOne
     @JoinColumn(name = "prize_id")
     private Prize prize;  // Prêmio atribuído ao vencedor
@@ -46,14 +43,6 @@ public class CompetitionWinner {
 
     public void setCompetition(Competition competition) {
         this.competition = competition;
-    }
-
-    public RankingPosition getPosition() {
-        return position;
-    }
-
-    public void setPosition(RankingPosition position) {
-        this.position = position;
     }
 
     public Prize getPrize() {

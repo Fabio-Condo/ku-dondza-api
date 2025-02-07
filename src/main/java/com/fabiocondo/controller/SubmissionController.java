@@ -1,6 +1,8 @@
 package com.fabiocondo.controller;
 
+import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.Submission;
+import com.fabiocondo.dto.AnswerWithUserDTO;
 import com.fabiocondo.exception.domain.CompetitionNotFoundException;
 import com.fabiocondo.exception.domain.SubmissionNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
@@ -9,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,4 +46,10 @@ public class SubmissionController {
         long totalCorrectAnswers = submissionService.getTotalCorrectAnswersForSubmission(id);
         return ResponseEntity.ok(totalCorrectAnswers);
     }
+
+    // Endpoint para buscar todas as respostas de uma questão
+    //@GetMapping("/by-question/{questionId}")
+    //public List<AnswerWithUserDTO> getAnswersByQuestion(@PathVariable Long questionId) {
+    //    return submissionService.getAnswersForQuestion(questionId);
+    //}
 }

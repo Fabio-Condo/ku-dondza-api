@@ -1,23 +1,20 @@
 package com.fabiocondo.repository.filter;
 
 import com.fabiocondo.domain.Subject;
-import com.fabiocondo.domain.User;
 import com.fabiocondo.enumeration.DifficultyLevel;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-public class QuizFilter {
+public class CompetitionFilter {
 
     private String searchParam;
 
-    private String quizOrderBy;
+    private String competitionOrderBy;
 
     private String title;
 
     private Subject subject;
-
-    private User user;
 
     @Enumerated(EnumType.STRING)
     private DifficultyLevel difficultyLevel;
@@ -30,9 +27,9 @@ public class QuizFilter {
         this.searchParam = searchParam;
     }
 
-    public String getQuizOrderBy() { return quizOrderBy; }
+    public String getCompetitionOrderBy() { return competitionOrderBy; }
 
-    public void setQuizOrderBy(String quizOrderBy) { this.quizOrderBy = quizOrderBy; }
+    public void setCompetitionOrderBy(String competitionOrderBy) { this.competitionOrderBy = competitionOrderBy; }
 
     public String getTitle() {
         return title;
@@ -45,10 +42,6 @@ public class QuizFilter {
     public Subject getSubject() { return subject; }
 
     public void setSubject(Subject subject) { this.subject = subject; }
-
-    public User getUser() { return user; }
-
-    public void setUser(User user) { this.user = user; }
 
     public DifficultyLevel getDifficultyLevel() {
         return difficultyLevel;

@@ -5,15 +5,16 @@ import com.fabiocondo.enumeration.CompetitionStatus;
 import com.fabiocondo.enumeration.RankingPosition;
 import com.fabiocondo.exception.domain.CompetitionCannotBeFinishedException;
 import com.fabiocondo.exception.domain.CompetitionNotFoundException;
+import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.*;
+import com.fabiocondo.repository.filter.CompetitionFilter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +52,8 @@ public class CompetitionService {
             throw new IllegalArgumentException("Um ou mais tópicos não foram encontrados no banco de dados.");
         }
 
-        Set<Question> questions = questionRepository.findByTopicIdIn(topicIds);
+        //Set<Question> questions = questionRepository.findByTopicIdIn(topicIds);
+        Set<Question> questions = questionRepository.findByTopicIdInAndDifficultyLevel(topicIds, competition.getDifficultyLevel());
         competition.setQuestions(questions);
 
         competition.setCompetitionId(generateCompetitionId());
@@ -87,8 +89,10 @@ public class CompetitionService {
             existingCompetition.getQuestions().clear();
             competitionRepository.save(existingCompetition); // Garantir que a remoção seja persistida
 
-            Set<Question> questions = questionRepository.findByTopicIdIn(topicIds);
+            //Set<Question> questions = questionRepository.findByTopicIdIn(topicIds);
+            Set<Question> questions = questionRepository.findByTopicIdInAndDifficultyLevel(topicIds, competition.getDifficultyLevel());
             existingCompetition.setQuestions(questions);
+            existingCompetition.setDifficultyLevel(competition.getDifficultyLevel());
         }
 
         existingCompetition.getPrizes().clear();
@@ -102,6 +106,16 @@ public class CompetitionService {
 
     public Page<Competition> findAll(String searchParam, Pageable pageable) {
         return competitionRepository.findAll(searchParam, pageable);
+    }
+
+    public Page<Competition> filter(CompetitionFilter quizFilter, Pageable pageable) {
+        return competitionRepository.filter(quizFilter, pageable);
+    }
+
+    public Page<Competition> getQuizzesByQuestionId(Long questionId, Pageable pageable) throws QuizNotFoundException {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuizNotFoundException("No question found by id: " + questionId));
+        return competitionRepository.findAllByQuestions(question, pageable);
     }
 
     public Competition getCompetitionById(Long id) throws CompetitionNotFoundException {

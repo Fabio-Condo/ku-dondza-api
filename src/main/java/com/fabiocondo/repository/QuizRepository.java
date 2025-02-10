@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositoryQuery {
-    @Query("SELECT q FROM Quiz q WHERE q.description LIKE %:searchParam%")
+    @Query("SELECT q FROM Quiz q WHERE q.title LIKE %:searchParam%")
     public Page<Quiz> findAll(@Param("searchParam") String searchParam, Pageable pageable);
 
     @Query("SELECT usa FROM Quiz qz JOIN qz.answers usa WHERE qz.id = :quizId")

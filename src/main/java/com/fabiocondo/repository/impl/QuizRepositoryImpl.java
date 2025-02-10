@@ -81,9 +81,14 @@ public class QuizRepositoryImpl implements QuizRepositoryQuery {
         if(!ObjectUtils.isEmpty(quizFilter.getSearchParam())) {
             Predicate subject = builder.like(
                     builder.lower(root.get("subject").get("name")), "%" + quizFilter.getSearchParam().toLowerCase() + "%");
-            Predicate description = builder.like(
-                    builder.lower(root.get("description")), "%" + quizFilter.getSearchParam().toLowerCase() + "%");
-            predicates.add(builder.or(subject, description));
+            Predicate title = builder.like(
+                    builder.lower(root.get("title")), "%" + quizFilter.getSearchParam().toLowerCase() + "%");
+            predicates.add(builder.or(subject, title));
+        }
+
+        if(!ObjectUtils.isEmpty(quizFilter.getTitle())) {
+            predicates.add(builder.like(
+                    builder.lower(root.get("title")), "%" + quizFilter.getTitle().toLowerCase() + "%"));
         }
 
         if(!ObjectUtils.isEmpty(quizFilter.getSubject())) {
@@ -94,6 +99,11 @@ public class QuizRepositoryImpl implements QuizRepositoryQuery {
         if(!ObjectUtils.isEmpty(quizFilter.getUser())) {
             predicates.add(builder.equal(
                     builder.lower(root.get("user").get("id")), quizFilter.getUser().getId()));
+        }
+
+        if(!ObjectUtils.isEmpty(quizFilter.getDifficultyLevel())) {
+            predicates.add(builder.equal(
+                    builder.lower(root.get("difficultyLevel")), quizFilter.getDifficultyLevel()));
         }
     }
 

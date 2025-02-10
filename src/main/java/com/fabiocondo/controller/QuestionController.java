@@ -1,6 +1,7 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
+import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.exception.domain.InterestNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.repository.filter.QuestionFilter;
@@ -48,8 +49,9 @@ public class QuestionController {
     }
 
     @GetMapping("/by-topics")
-    public ResponseEntity<Set<Question>> getQuestionsByTopics(@RequestParam Set<Long> topicIds) {
-        return ResponseEntity.ok(questionService.getQuestionsByTopics(topicIds));
+    public ResponseEntity<Set<Question>> getQuestionsByTopics(@RequestParam Set<Long> topicIds,
+                                                              @RequestParam DifficultyLevel difficultyLevel) {
+        return ResponseEntity.ok(questionService.getQuestionsByTopics(topicIds, difficultyLevel));
     }
 
     @PostMapping

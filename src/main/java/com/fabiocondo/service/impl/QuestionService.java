@@ -3,6 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Question;
+import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.filter.QuestionFilter;
@@ -51,11 +52,11 @@ public class QuestionService {
         return questionRepository.findAll();
     }
 
-    public Set<Question> getQuestionsByTopics(Set<Long> topicIds) {
+    public Set<Question> getQuestionsByTopics(Set<Long> topicIds, DifficultyLevel difficultyLevel) {
         if (topicIds == null || topicIds.isEmpty()) {
             throw new IllegalArgumentException("O Quiz deve ter pelo menos um tópico associado.");
         } else {
-            return questionRepository.findByTopicIdIn(topicIds);
+            return questionRepository.findByTopicIdInAndDifficultyLevel(topicIds, difficultyLevel);
         }
     }
 

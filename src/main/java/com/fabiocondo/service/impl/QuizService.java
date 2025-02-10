@@ -3,12 +3,10 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
-import com.fabiocondo.domain.Topic;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
-import com.fabiocondo.repository.TopicRepository;
 import com.fabiocondo.repository.filter.QuizFilter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -62,7 +60,8 @@ public class QuizService {
     }
 
     public Page<Quiz> getQuizzesByQuestionId(Long questionId, Pageable pageable) throws QuizNotFoundException {
-        Question question = questionRepository.findById(questionId).orElseThrow(() -> new QuizNotFoundException("No question found by id: " + questionId));
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuizNotFoundException("No question found by id: " + questionId));
         return quizRepository.findAllByQuestions(question, pageable);
     }
 
@@ -94,7 +93,7 @@ public class QuizService {
 
     public void delete(Long id) throws QuizNotFoundException {
         Quiz existQuiz = findById(id);
-        logger.info("Deleting quiz: " + existQuiz.getDescription());
+        logger.info("Deleting quiz: " + existQuiz.getTitle());
         quizRepository.deleteById(id);
     }
 

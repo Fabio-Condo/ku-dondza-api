@@ -2,6 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.*;
+import com.fabiocondo.repository.filter.CompetitionFilter;
 import com.fabiocondo.service.impl.CompetitionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,8 +37,18 @@ public class CompetitionController {
     }
 
     @GetMapping("/filter")
+    public Page<Competition> filter(CompetitionFilter competitionFilter, Pageable pageable) {
+        return competitionService.filter(competitionFilter, pageable);
+    }
+
+    @GetMapping("/findAll")
     public ResponseEntity<Page<Competition>> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(competitionService.findAll(searchParam, pageable));
+    }
+
+    @GetMapping("/by-question/{questionId}")
+    public Page<Competition> getQuizzesByQuestionId(@PathVariable("questionId") Long questionId, Pageable pageable) throws QuizNotFoundException {
+        return competitionService.getQuizzesByQuestionId(questionId, pageable);
     }
 
     @GetMapping("/{id}")

@@ -1,10 +1,8 @@
 package com.fabiocondo.repository;
 
-import com.fabiocondo.domain.Competition;
-import com.fabiocondo.domain.Question;
-import com.fabiocondo.domain.Topic;
-import com.fabiocondo.domain.User;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.CompetitionStatus;
+import com.fabiocondo.repository.query.CompetitionRepositoryQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface CompetitionRepository extends JpaRepository<Competition, Long> {
+public interface CompetitionRepository extends JpaRepository<Competition, Long>, CompetitionRepositoryQuery {
     @Query("SELECT c FROM Competition c WHERE c.title LIKE %:searchParam%")
     public Page<Competition> findAll(@Param("searchParam") String searchParam, Pageable pageable);
 
@@ -41,6 +39,8 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long> 
     Competition findByIdWithWinners(@Param("id") Long competitionId);
 
     long countByQuestions(Question question);
+
+    public Page<Competition> findAllByQuestions(Question question, Pageable pageable);
 
 }
 

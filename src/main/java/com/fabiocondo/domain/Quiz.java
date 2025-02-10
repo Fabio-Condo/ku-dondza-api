@@ -21,7 +21,7 @@ public class Quiz {
 
     private String quizId;
 
-    private String description;
+    private String title; //description
 
     @Enumerated(EnumType.STRING)
     private DifficultyLevel difficultyLevel;
@@ -71,12 +71,12 @@ public class Quiz {
         this.quizId = quizId;
     }
 
-    public String getDescription() {
-        return description;
+    public String getTitle() {
+        return title;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public DifficultyLevel getDifficultyLevel() {

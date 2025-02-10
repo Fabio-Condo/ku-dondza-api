@@ -2,6 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.QuizService;
 import org.springframework.data.domain.Page;
@@ -57,7 +58,7 @@ public class QuizController {
     @PostMapping
     public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz,
                                            @RequestParam Set<Long> questionIds,
-                                           @RequestParam Set<Long> userAnswerIds) {
+                                           @RequestParam Set<Long> userAnswerIds) throws UserNotFoundException {
 
         Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, questionIds, userAnswerIds);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedQuiz);

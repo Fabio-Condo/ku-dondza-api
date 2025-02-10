@@ -1,13 +1,16 @@
 package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.Answer;
+import com.fabiocondo.domain.Notification;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
 import com.fabiocondo.repository.filter.QuizFilter;
+import com.fabiocondo.service.NotificationService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,12 +31,15 @@ public class QuizService {
     private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
+    private final NotificationService notificationService;
 
 
-    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, AnswerRepository answerRepository) {
+
+    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, AnswerRepository answerRepository, NotificationService notificationService) {
         this.quizRepository = quizRepository;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
+        this.notificationService = notificationService;
     }
 
     public Quiz findById(Long id) throws QuizNotFoundException {
@@ -66,7 +72,7 @@ public class QuizService {
     }
 
     @Transactional
-    public Quiz saveQuizWithQuestions(Quiz quiz, Set<Long> questionIds, Set<Long> userAnswerIds) {
+    public Quiz saveQuizWithQuestions(Quiz quiz, Set<Long> questionIds, Set<Long> userAnswerIds) throws UserNotFoundException {
 
         if (quiz == null) {
             throw new IllegalArgumentException("O objeto Quiz não pode ser nulo.");
@@ -88,7 +94,15 @@ public class QuizService {
         quiz.setQuestions(questions);
         quiz.setAnswers(answers);
 
-        return quizRepository.save(quiz);
+        Quiz savedQuiz = quizRepository.save(quiz);
+
+        Notification notification = notificationService.createNotification(
+                1L, // Dono do post
+                "Quiz criado com sucesso!",
+                "LIKE"
+        );
+
+        return savedQuiz;
     }
 
     public void delete(Long id) throws QuizNotFoundException {

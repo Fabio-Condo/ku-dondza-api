@@ -3,6 +3,7 @@ package com.fabiocondo.repository;
 import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
+import com.fabiocondo.domain.User;
 import com.fabiocondo.repository.query.QuizRepositoryQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,5 +40,7 @@ public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositor
     long countByQuestions(Question question);
 
     public Page<Quiz> findAllByQuestions(Question question, Pageable pageable);
+
+    long countByUser(User user);
 
 }

@@ -42,5 +42,7 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long>,
 
     public Page<Competition> findAllByQuestions(Question question, Pageable pageable);
 
+    long countByParticipants(User user);
+
 }
 

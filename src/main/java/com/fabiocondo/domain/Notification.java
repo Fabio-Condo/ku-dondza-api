@@ -1,5 +1,6 @@
 package com.fabiocondo.domain;
 
+import com.fabiocondo.enumeration.NotificationType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -16,15 +17,30 @@ public class Notification {
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIgnoreProperties(value={"hibernateLazyInitializer"})
-    private User user; // Relacionado ao usuário que receberá a notificação
+    private User user; // Quem recebe a notificação
+
+    @ManyToOne
+    @JoinColumn(name = "sender_id")
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer"})
+    private User sender; // Quem realizou a ação
 
     private String message;
 
-    private String type; // Exemplo: "LIKE", "COMMENT", "FRIEND_REQUEST"
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
 
-    @Column(name = "is_read") // Alterado de 'read' para 'is_read'
+    @Column(name = "reference_id")
+    private Long referenceId; // ID do post, comentário ou grupo relacionado à notificação
+
+    @Column(name = "is_read")
     private boolean isRead;
-    private LocalDateTime createdAt = LocalDateTime.now();
+
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     // Getters e Setters
 
@@ -45,6 +61,14 @@ public class Notification {
         this.user = user;
     }
 
+    public User getSender() {
+        return sender;
+    }
+
+    public void setSender(User sender) {
+        this.sender = sender;
+    }
+
     public String getMessage() {
         return message;
     }
@@ -53,12 +77,20 @@ public class Notification {
         this.message = message;
     }
 
-    public String getType() {
+    public NotificationType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(NotificationType type) {
         this.type = type;
+    }
+
+    public Long getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(Long referenceId) {
+        this.referenceId = referenceId;
     }
 
     public boolean isRead() {
@@ -77,4 +109,3 @@ public class Notification {
         this.createdAt = createdAt;
     }
 }
-

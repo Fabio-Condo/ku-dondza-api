@@ -2,13 +2,13 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.CompetitionStatus;
-import com.fabiocondo.enumeration.RankingPosition;
 import com.fabiocondo.exception.domain.CompetitionCannotBeFinishedException;
 import com.fabiocondo.exception.domain.CompetitionNotFoundException;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.*;
 import com.fabiocondo.repository.filter.CompetitionFilter;
+import com.fabiocondo.service.NotificationService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +30,15 @@ public class CompetitionService {
     private final QuestionRepository questionRepository;
     private final TopicRepository topicRepository;
     private final SubmissionRepository submissionRepository;
+    private final NotificationService notificationService;
 
-    public CompetitionService(CompetitionRepository competitionRepository, UserRepository userRepository, QuestionRepository questionRepository, TopicRepository topicRepository, SubmissionRepository submissionRepository) {
+    public CompetitionService(CompetitionRepository competitionRepository, UserRepository userRepository, QuestionRepository questionRepository, TopicRepository topicRepository, SubmissionRepository submissionRepository, NotificationService notificationService) {
         this.competitionRepository = competitionRepository;
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
         this.topicRepository = topicRepository;
         this.submissionRepository = submissionRepository;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -68,12 +70,12 @@ public class CompetitionService {
 
         Competition existingCompetition = getCompetitionById(id);
 
-        //if(!existingCompetition.getSubmissions().isEmpty()) {
-        //    throw new IllegalArgumentException("A Competition não pode ser actualizada. Contém submissões.");
-        //}
-        //if (existingCompetition.getStatus().equals(CompetitionStatus.ONGOING) || existingCompetition.getStatus().equals(CompetitionStatus.FINISHED)) {
-        //    throw new IllegalArgumentException("A Competition não pode ser actualizada. Está em andamento ou finalizada.");
-        //}
+        if(!existingCompetition.getSubmissions().isEmpty()) {
+            throw new IllegalArgumentException("A Competition não pode ser actualizada. Contém submissões.");
+        }
+        if (existingCompetition.getStatus().equals(CompetitionStatus.ONGOING) || existingCompetition.getStatus().equals(CompetitionStatus.FINISHED)) {
+            throw new IllegalArgumentException("A Competition não pode ser actualizada. Está em andamento ou finalizada.");
+        }
 
         if (generateQuestions) {
             if (topicIds == null || topicIds.isEmpty()) {
@@ -241,6 +243,7 @@ public class CompetitionService {
         return competition.getParticipationRequests().contains(user);
     }
 
+    @Transactional
     public void initCompetition(Long competitionId) throws CompetitionNotFoundException, CompetitionCannotBeFinishedException {
         Competition competition = getCompetitionById(competitionId);
 
@@ -253,6 +256,9 @@ public class CompetitionService {
         competition.setStatus(CompetitionStatus.ONGOING);
         competition.setStartedAt(new Date());
         competitionRepository.save(competition);
+
+        // Notifique os participantes
+        notificationService.notifyCompetitionStarted(competition.getId());
     }
 
     @Transactional
@@ -271,6 +277,9 @@ public class CompetitionService {
 
         // Definir os vencedores
         defineWinners(competitionId);
+
+        // Notifique os participantes
+        notificationService.notifyCompetitionFinished(competition.getId());
     }
 
     @Transactional

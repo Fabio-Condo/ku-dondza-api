@@ -1,11 +1,9 @@
 package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.Answer;
-import com.fabiocondo.domain.Notification;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
-import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
@@ -31,15 +29,12 @@ public class QuizService {
     private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
-    private final NotificationService notificationService;
 
 
-
-    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, AnswerRepository answerRepository, NotificationService notificationService) {
+    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, AnswerRepository answerRepository) {
         this.quizRepository = quizRepository;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
-        this.notificationService = notificationService;
     }
 
     public Quiz findById(Long id) throws QuizNotFoundException {
@@ -72,7 +67,7 @@ public class QuizService {
     }
 
     @Transactional
-    public Quiz saveQuizWithQuestions(Quiz quiz, Set<Long> questionIds, Set<Long> userAnswerIds) throws UserNotFoundException {
+    public Quiz saveQuizWithQuestions(Quiz quiz, Set<Long> questionIds, Set<Long> userAnswerIds) {
 
         if (quiz == null) {
             throw new IllegalArgumentException("O objeto Quiz não pode ser nulo.");
@@ -94,15 +89,7 @@ public class QuizService {
         quiz.setQuestions(questions);
         quiz.setAnswers(answers);
 
-        Quiz savedQuiz = quizRepository.save(quiz);
-
-        Notification notification = notificationService.createNotification(
-                1L, // Dono do post
-                "Quiz criado com sucesso!",
-                "LIKE"
-        );
-
-        return savedQuiz;
+        return quizRepository.save(quiz);
     }
 
     public void delete(Long id) throws QuizNotFoundException {

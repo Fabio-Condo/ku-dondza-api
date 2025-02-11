@@ -3,10 +3,11 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.Notification;
 import com.fabiocondo.exception.domain.NotificationNotFoundException;
 import com.fabiocondo.service.NotificationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/notifications")
@@ -19,8 +20,8 @@ public class NotificationController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<Notification>> getUserNotifications(@PathVariable Long userId) {
-        return ResponseEntity.ok(notificationService.getUserNotifications(userId));
+    public ResponseEntity<Page<Notification>> getUserNotifications(@PathVariable Long userId, Pageable pageable) {
+        return ResponseEntity.ok(notificationService.getUserNotifications(userId, pageable));
     }
 
     @PostMapping("/mark-as-read/{id}")

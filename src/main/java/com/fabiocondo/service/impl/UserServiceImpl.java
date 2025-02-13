@@ -9,6 +9,7 @@ import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.*;
 import com.fabiocondo.security.service.EmailService;
 import com.fabiocondo.security.service.LoginAttemptService;
+import com.fabiocondo.service.NotificationService;
 import com.fabiocondo.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -54,9 +55,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final SubjectRepository subjectRepository;
     private final OnlineCourseRepository onlineCourseRepository;
     private final OnlineCourseContentRepository onlineCourseContentRepository;
+    private final NotificationService notificationService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, PostRepository postRepository, BlogRepository blogRepository, SubjectRepository subjectRepository, OnlineCourseRepository onlineCourseRepository, OnlineCourseContentRepository onlineCourseContentRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, PostRepository postRepository, BlogRepository blogRepository, SubjectRepository subjectRepository, OnlineCourseRepository onlineCourseRepository, OnlineCourseContentRepository onlineCourseContentRepository, NotificationService notificationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
@@ -67,6 +69,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.subjectRepository = subjectRepository;
         this.onlineCourseRepository = onlineCourseRepository;
         this.onlineCourseContentRepository = onlineCourseContentRepository;
+        this.notificationService = notificationService;
     }
 
     public Page<User> searchUsers(String query, Pageable pageable) {
@@ -494,10 +497,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    @Transactional
     public void sendFriendRequest(User friend) throws UserNotFoundException {
         User user = getAuthenticatedUser();
         User passedUser = findById(friend.getId());
         passedUser.getFriendRequests().add(user); // Saving the request in user I passed
+        notificationService.createFriendRequestNotification(user.getId(), passedUser.getId());
         userRepository.save(passedUser);
     }
 
@@ -509,6 +514,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.getFriends().add(friend);
         friend.getFriends().add(user);
         userRepository.saveAll(Arrays.asList(user, friend));
+        notificationService.createFriendAcceptNotification(friend.getId(), user.getId());
         return friend;
     }
 

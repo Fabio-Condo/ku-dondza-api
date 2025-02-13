@@ -15,11 +15,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.fabiocondo.constant.UserImplConstant.FOUND_USER_BY_USERNAME;
+import static com.fabiocondo.constant.UserImplConstant.NO_USER_FOUND_BY_USERNAME;
 
 @Service
 public class CompetitionService {
@@ -42,7 +47,7 @@ public class CompetitionService {
     }
 
     @Transactional
-    public Competition createCompetition(Competition competition, Set<Long> topicIds) {
+    public Competition createCompetition(Competition competition, Set<Long> topicIds) throws UserNotFoundException {
 
         if (topicIds == null || topicIds.isEmpty()) {
             throw new IllegalArgumentException("A Competition deve ter pelo menos um tópico associado.");
@@ -61,6 +66,8 @@ public class CompetitionService {
         competition.setCompetitionId(generateCompetitionId());
         competition.setStatus(CompetitionStatus.PLANNING);
         competition.getPrizes().forEach(prize -> prize.setCompetition(competition));
+
+        competition.getAdministrators().add(getAuthenticatedUser());
 
         return competitionRepository.save(competition);
     }
@@ -207,6 +214,7 @@ public class CompetitionService {
                 .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
         Competition competition = getCompetitionById(competitionId);
         competition.getParticipationRequests().add(user);
+        notificationService.createParticipationRequestNotification(getAuthenticatedUser().getId(), competition.getId());
         competitionRepository.save(competition);
     }
 
@@ -344,6 +352,17 @@ public class CompetitionService {
 
     private String generateCompetitionId() {
         return RandomStringUtils.randomAlphanumeric(10);
+    }
+
+    public User getAuthenticatedUser() throws UserNotFoundException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        User user = userRepository.findUserByUsername(username);
+        if(user == null){
+            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
+        }
+        logger.info(FOUND_USER_BY_USERNAME + username);
+        return userRepository.findUserByUsername(username);
     }
 }
 

@@ -16,13 +16,18 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties(value={"hibernateLazyInitializer"})
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer", "bio", "email", "fileName", "profileCoverImageUrl", "fileNameCoverImage", "lastLoginDateDisplay", "userType", "joinDate", "userType", "role", "authorities", "lastLoginDate", "active", "notLocked"})
     private User user; // Quem recebe a notificação
 
     @ManyToOne
     @JoinColumn(name = "sender_id")
-    @JsonIgnoreProperties(value={"hibernateLazyInitializer"})
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer", "bio", "email", "fileName", "profileCoverImageUrl", "fileNameCoverImage", "lastLoginDateDisplay", "userType", "joinDate", "userType", "role", "authorities", "lastLoginDate", "active", "notLocked"})
     private User sender; // Quem realizou a ação
+
+    @JsonIgnoreProperties({"subject", "difficultyLevel", "status", "prizes", "prizes", "startedAt", "endedAt", "winners"})
+    @ManyToOne
+    @JoinColumn(name = "competition_id")
+    private Competition competition;
 
     private String message;
 
@@ -67,6 +72,14 @@ public class Notification {
 
     public void setSender(User sender) {
         this.sender = sender;
+    }
+
+    public Competition getCompetition() {
+        return competition;
+    }
+
+    public void setCompetition(Competition competition) {
+        this.competition = competition;
     }
 
     public String getMessage() {

@@ -24,7 +24,7 @@ public class CompetitionController {
 
     @PostMapping
     public ResponseEntity<Competition> createCompetition(@RequestBody Competition competition,
-                                                         @RequestParam Set<Long> topicIds) {
+                                                         @RequestParam Set<Long> topicIds) throws UserNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(competitionService.createCompetition(competition, topicIds));
     }
 

@@ -39,9 +39,9 @@ public class QuestionService {
                 .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + id));
     }
 
-    public Question findQuestionByQuestionId(String institutionId) throws QuestionNotFoundException {
-        return questionRepository.findQuestionByQuestionId(institutionId)
-                .orElseThrow(() -> new QuestionNotFoundException("No institution found by id: " + institutionId));
+    public Question findQuestionByQuestionId(String questionId) throws QuestionNotFoundException {
+        return questionRepository.findQuestionByQuestionId(questionId)
+                .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
     }
 
     public Page<Question> filter(QuestionFilter questionFilter, Pageable pageable) {
@@ -56,7 +56,8 @@ public class QuestionService {
         if (topicIds == null || topicIds.isEmpty()) {
             throw new IllegalArgumentException("O Quiz deve ter pelo menos um tópico associado.");
         } else {
-            return questionRepository.findByTopicIdInAndDifficultyLevel(topicIds, difficultyLevel);
+            //return questionRepository.findByTopicIdInAndDifficultyLevel(topicIds, difficultyLevel);
+            return questionRepository.findRandomQuestionsByTopicsAndDifficulty(topicIds, difficultyLevel);
         }
     }
 

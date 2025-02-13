@@ -19,10 +19,10 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Quest
     @Query("SELECT q FROM Question q WHERE q.topic.id IN :topicIds")
     Set<Question> findByTopicIdIn(@Param("topicIds") Set<Long> topicIds);
 
-    @Query("SELECT q FROM Question q WHERE q.topic.id IN :topicIds AND q.difficultyLevel = :difficultyLevel")
-    Set<Question> findByTopicIdInAndDifficultyLevel(
-            @Param("topicIds") Set<Long> topicIds,
-            @Param("difficultyLevel") DifficultyLevel difficultyLevel);
+    //@Query("SELECT q FROM Question q WHERE q.topic.id IN :topicIds AND q.difficultyLevel = :difficultyLevel")
+    //Set<Question> findByTopicIdInAndDifficultyLevel(
+    //        @Param("topicIds") Set<Long> topicIds,
+    //        @Param("difficultyLevel") DifficultyLevel difficultyLevel);
 
     Optional<Question> findQuestionByQuestionId(String questionId);
 }

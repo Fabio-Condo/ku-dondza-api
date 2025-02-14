@@ -83,6 +83,18 @@ public class NotificationService {
     }
 
     @Async
+    public void createCompetitionParticipantRemovedNotification(Long userId, Long competitionId) throws UserNotFoundException, CompetitionNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("No User found by id: " + userId));
+
+        Competition competition = competitionRepository.findById(competitionId)
+                .orElseThrow(() -> new CompetitionNotFoundException("No Competition found by id: " + competitionId));
+
+        String message = "Você foi removido da competição '" + competition.getTitle() + "'.";
+        createNotification(user, null, competition, message, NotificationType.COMPETITION_PARTICIPANT_REMOVED);
+    }
+
+    @Async
     public void createCompetitionInviteNotification(Long senderId, Long receiverId, Long competitionId) throws UserNotFoundException, CompetitionNotFoundException {
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new UserNotFoundException("No User found by id: " + senderId));
@@ -95,6 +107,18 @@ public class NotificationService {
 
         String message = sender.getFirstName() + " " + sender.getLastName() + " convidou você para participar da competição '" + competition.getTitle() + "'.";
         createNotification(receiver, sender, competition, message, NotificationType.COMPETITION_INVITE);
+    }
+
+    @Async
+    public void createCompetitionDisqualifiedNotification(Long userId, Long competitionId) throws UserNotFoundException, CompetitionNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("No User found by id: " + userId));
+
+        Competition competition = competitionRepository.findById(competitionId)
+                .orElseThrow(() -> new CompetitionNotFoundException("No Competition found by id: " + competitionId));
+
+        String message = "Você foi desclassificado da competição '" + competition.getTitle() + "'.";
+        createNotification(user, null, competition, message, NotificationType.COMPETITION_DISQUALIFIED);
     }
 
     @Async
@@ -119,6 +143,18 @@ public class NotificationService {
 
         String message = receiver.getFirstName() + " aceitou seu pedido de amizade.";
         createNotification(sender, receiver, null, message, NotificationType.FRIEND_ACCEPTED);
+    }
+
+    @Async
+    public void createFriendAcceptNotificationForReceiver(Long senderId, Long receiverId) throws UserNotFoundException {
+        User sender = userRepository.findById(senderId)
+                .orElseThrow(() -> new UserNotFoundException("No User found by id: " + senderId));
+
+        User receiver = userRepository.findById(receiverId)
+                .orElseThrow(() -> new UserNotFoundException("No User found by id: " + receiverId));
+
+        String message = "Agora você e " + sender.getFirstName() + " são amigos!";
+        createNotification(receiver, sender, null, message, NotificationType.FRIEND_ACCEPTED_RECEIVER);
     }
 
     @Async

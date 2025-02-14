@@ -14,7 +14,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -34,11 +36,24 @@ public class NotificationService {
         return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
     }
 
+    public long countUnreadNotifications(Long userId) {
+        return notificationRepository.countByUserIdAndIsReadFalse(userId);
+    }
+
     public void markAsRead(Long notificationId) throws NotificationNotFoundException {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new NotificationNotFoundException("No Notification found by id: " + notificationId));
         notification.setRead(true);
         notificationRepository.save(notification);
+    }
+
+    @Transactional
+    public void markAllNotificationsAsRead(Long userId) {
+        List<Notification> unreadNotifications = notificationRepository.findByUserIdAndIsReadFalse(userId);
+        for (Notification notification : unreadNotifications) {
+            notification.setRead(true);
+        }
+        notificationRepository.saveAll(unreadNotifications);
     }
 
     @Async

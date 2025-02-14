@@ -268,7 +268,7 @@ public class CompetitionService {
         competitionRepository.save(competition);
 
         // Notifique os participantes
-        notificationService.notifyCompetitionStarted(competition.getId());
+        notificationService.createCompetitionStartedNotification(competition.getId());
     }
 
     @Transactional
@@ -289,7 +289,7 @@ public class CompetitionService {
         defineWinners(competitionId);
 
         // Notifique os participantes
-        notificationService.notifyCompetitionFinished(competition.getId());
+        notificationService.createCompetitionFinishedNotification(competition.getId());
     }
 
     @Transactional

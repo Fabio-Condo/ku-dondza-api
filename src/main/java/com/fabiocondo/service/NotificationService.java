@@ -15,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.Set;
 
 @Service
@@ -58,33 +57,33 @@ public class NotificationService {
     }
 
     @Async // Uso de @Async Para não bloquear a execução principal ao enviar as notificações
-    public void notifyCompetitionStarted(Long competitionId) throws CompetitionNotFoundException {
+    public void createCompetitionStartedNotification(Long competitionId) throws CompetitionNotFoundException {
         Competition competition = competitionRepository.findById(competitionId)
                 .orElseThrow(() -> new CompetitionNotFoundException("No Competition found by id: " + competitionId));
 
-        Set<User> usuarios = competition.getParticipants(); // Notifica todos os participantes
+        Set<User> participants = competition.getParticipants(); // Notifica todos os participantes
 
-        for (User user : usuarios) {
+        for (User participant : participants) {
             String message = "A competição '" + competition.getTitle() + "' está iniciada! Participe agora.";
-            createNotification(user, null, competition, message, NotificationType.COMPETITION_STARTED);
+            createNotification(participant, null, competition, message, NotificationType.COMPETITION_STARTED);
         }
     }
 
     @Async
-    public void notifyCompetitionFinished(Long competitionId) throws CompetitionNotFoundException {
+    public void createCompetitionFinishedNotification(Long competitionId) throws CompetitionNotFoundException {
         Competition competition = competitionRepository.findById(competitionId)
                 .orElseThrow(() -> new CompetitionNotFoundException("No Competition found by id: " + competitionId));
 
-        Set<User> usuarios = competition.getParticipants(); // Notifica todos os participantes
+        Set<User> participants = competition.getParticipants(); // Notifica todos os participantes
 
-        for (User user : usuarios) {
+        for (User participant : participants) {
             String message = "A competição '" + competition.getTitle() + "' está finalizada!.";
-            createNotification(user, null, competition, message, NotificationType.COMPETITION_FINISHED);
+            createNotification(participant, null, competition, message, NotificationType.COMPETITION_FINISHED);
         }
     }
 
     @Async
-    public void notifyCompetitionInvite(Long senderId, Long receiverId, Long competitionId) throws UserNotFoundException, CompetitionNotFoundException {
+    public void createCompetitionInviteNotification(Long senderId, Long receiverId, Long competitionId) throws UserNotFoundException, CompetitionNotFoundException {
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new UserNotFoundException("No User found by id: " + senderId));
 
@@ -99,19 +98,7 @@ public class NotificationService {
     }
 
     @Async
-    public Notification createPostLikeNotification(Long senderId, Long postOwnerId, Long postId) throws UserNotFoundException {
-        User sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new UserNotFoundException("No User found by id: " + senderId));
-
-        User postOwner = userRepository.findById(postOwnerId)
-                .orElseThrow(() -> new UserNotFoundException("No User found by id: " + postOwnerId));
-
-        String message = sender.getFirstName() + " curtiu seu post.";
-        return createNotification(postOwner, sender, null, message, NotificationType.POST_LIKE);
-    }
-
-    @Async
-    public Notification createFriendRequestNotification(Long senderId, Long receiverId) throws UserNotFoundException {
+    public void createFriendRequestNotification(Long senderId, Long receiverId) throws UserNotFoundException {
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new UserNotFoundException("No User found by id: " + senderId));
 
@@ -119,11 +106,11 @@ public class NotificationService {
                 .orElseThrow(() -> new UserNotFoundException("No User found by id: " + receiverId));
 
         String message = sender.getFirstName() + " enviou um pedido de amizade.";
-        return createNotification(receiver, sender, null, message, NotificationType.FRIEND_REQUEST);
+        createNotification(receiver, sender, null, message, NotificationType.FRIEND_REQUEST);
     }
 
     @Async
-    public Notification createFriendAcceptNotification(Long senderId, Long receiverId) throws UserNotFoundException {
+    public void createFriendAcceptNotification(Long senderId, Long receiverId) throws UserNotFoundException {
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new UserNotFoundException("No User found by id: " + senderId));
 
@@ -131,11 +118,23 @@ public class NotificationService {
                 .orElseThrow(() -> new UserNotFoundException("No User found by id: " + receiverId));
 
         String message = receiver.getFirstName() + " aceitou seu pedido de amizade.";
-        return createNotification(sender, receiver, null, message, NotificationType.FRIEND_ACCEPTED);
+        createNotification(sender, receiver, null, message, NotificationType.FRIEND_ACCEPTED);
     }
 
     @Async
-    public Notification createPostCommentNotification(Long senderId, Long postOwnerId, Long postId) throws UserNotFoundException {
+    public void createPostLikeNotification(Long senderId, Long postOwnerId, Long postId) throws UserNotFoundException {
+        User sender = userRepository.findById(senderId)
+                .orElseThrow(() -> new UserNotFoundException("No User found by id: " + senderId));
+
+        User postOwner = userRepository.findById(postOwnerId)
+                .orElseThrow(() -> new UserNotFoundException("No User found by id: " + postOwnerId));
+
+        String message = sender.getFirstName() + " curtiu seu post.";
+        createNotification(postOwner, sender, null, message, NotificationType.POST_LIKE);
+    }
+
+    @Async
+    public void createPostCommentNotification(Long senderId, Long postOwnerId, Long postId) throws UserNotFoundException {
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new UserNotFoundException("No User found by id: " + senderId));
 
@@ -143,11 +142,11 @@ public class NotificationService {
                 .orElseThrow(() -> new UserNotFoundException("No User found by id: " + postOwnerId));
 
         String message = sender.getFirstName() + " comentou no seu post.";
-        return createNotification(postOwner, sender, null, message, NotificationType.POST_COMMENT);
+        createNotification(postOwner, sender, null, message, NotificationType.POST_COMMENT);
     }
 
     @Async
-    public Notification createMentionNotification(Long senderId, Long mentionedUserId, Long referenceId, boolean isPost) throws UserNotFoundException {
+    public void createMentionNotification(Long senderId, Long mentionedUserId, Long referenceId, boolean isPost) throws UserNotFoundException {
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new UserNotFoundException("No User found by id: " + senderId));
 
@@ -155,16 +154,16 @@ public class NotificationService {
                 .orElseThrow(() -> new UserNotFoundException("No User found by id: " + mentionedUserId));
 
         String message = sender.getFirstName() + " mencionou você em um " + (isPost ? "post" : "comentário") + ".";
-        return createNotification(mentionedUser, sender, null, message, NotificationType.MENTION);
+        createNotification(mentionedUser, sender, null, message, NotificationType.MENTION);
     }
 
-    private Notification createNotification(User user, User sender, Competition competition, String message, NotificationType type) {
+    private void createNotification(User user, User sender, Competition competition, String message, NotificationType type) {
         Notification notification = new Notification();
         notification.setUser(user);
         notification.setSender(sender);
         notification.setCompetition(competition);
         notification.setMessage(message);
         notification.setType(type);
-        return notificationRepository.save(notification);
+        notificationRepository.save(notification);
     }
 }

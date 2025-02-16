@@ -1,4 +1,4 @@
-package com.fabiocondo.service;
+package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.Competition;
 import com.fabiocondo.domain.Notification;
@@ -122,6 +122,21 @@ public class NotificationService {
 
         String message = sender.getFirstName() + " " + sender.getLastName() + " convidou você para participar da competição '" + competition.getTitle() + "'.";
         createNotification(receiver, sender, competition, message, NotificationType.COMPETITION_INVITE);
+    }
+
+    @Async
+    public void createCompetitionInviteAcceptNotification(Long senderId, Long receiverId, Long competitionId) throws UserNotFoundException, CompetitionNotFoundException {
+        User sender = userRepository.findById(senderId)
+                .orElseThrow(() -> new UserNotFoundException("No User found by id: " + senderId));
+
+        User receiver = userRepository.findById(receiverId)
+                .orElseThrow(() -> new UserNotFoundException("No User found by id: " + receiverId));
+
+        Competition competition = competitionRepository.findById(competitionId)
+                .orElseThrow(() -> new CompetitionNotFoundException("No Competition found by id: " + competitionId));
+
+        String message = receiver.getFirstName() + " aceitou seu pedido de participação na competição '" + competition.getTitle() + "'.";
+        createNotification(sender, receiver, competition, message, NotificationType.COMPETITION_INVITE_ACCEPTED);
     }
 
     @Async

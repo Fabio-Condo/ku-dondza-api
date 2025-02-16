@@ -50,6 +50,15 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(ParticipationInviteNotFoundException.class)
+    public ResponseEntity<HttpResponse> participationInviteNotFoundException(ParticipationInviteNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(UserInvitedException.class)
+    public ResponseEntity<HttpResponse> userInvitedException(UserInvitedException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<HttpResponse> userNotFoundException(UserNotFoundException exception) {

@@ -16,15 +16,15 @@ public class Notification {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties(value={"hibernateLazyInitializer", "bio", "email", "fileName", "profileCoverImageUrl", "fileNameCoverImage", "lastLoginDateDisplay", "userType", "joinDate", "userType", "role", "authorities", "lastLoginDate", "active", "notLocked"})
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer", "bio", "email", "fileName", "profileCoverImageUrl", "fileNameCoverImage", "lastLoginDateDisplay", "joinDate", "userType", "role", "authorities", "lastLoginDate", "active", "notLocked"})
     private User user; // Quem recebe a notificação
 
     @ManyToOne
     @JoinColumn(name = "sender_id")
-    @JsonIgnoreProperties(value={"hibernateLazyInitializer", "bio", "email", "fileName", "profileCoverImageUrl", "fileNameCoverImage", "lastLoginDateDisplay", "userType", "joinDate", "userType", "role", "authorities", "lastLoginDate", "active", "notLocked"})
+    @JsonIgnoreProperties(value={"hibernateLazyInitializer", "bio", "email", "fileName", "profileCoverImageUrl", "fileNameCoverImage", "lastLoginDateDisplay", "joinDate", "userType", "role", "authorities", "lastLoginDate", "active", "notLocked"})
     private User sender; // Quem realizou a ação
 
-    @JsonIgnoreProperties({"subject", "difficultyLevel", "status", "prizes", "prizes", "startedAt", "endedAt", "winners"})
+    @JsonIgnoreProperties({"subject", "difficultyLevel", "status", "prizes", "startedAt", "endedAt", "winners"})
     @ManyToOne
     @JoinColumn(name = "competition_id")
     private Competition competition;

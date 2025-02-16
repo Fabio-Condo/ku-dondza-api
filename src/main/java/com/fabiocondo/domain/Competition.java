@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,11 +29,9 @@ public class Competition {
     @Enumerated(EnumType.STRING)
     private CompetitionStatus status;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date startedAt;
+    private LocalDateTime startedAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date endedAt;
+    private LocalDateTime endedAt;
 
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
@@ -134,19 +132,19 @@ public class Competition {
         this.status = status;
     }
 
-    public Date getStartedAt() {
+    public LocalDateTime getStartedAt() {
         return startedAt;
     }
 
-    public void setStartedAt(Date startedAt) {
+    public void setStartedAt(LocalDateTime startedAt) {
         this.startedAt = startedAt;
     }
 
-    public Date getEndedAt() {
+    public LocalDateTime getEndedAt() {
         return endedAt;
     }
 
-    public void setEndedAt(Date endedAt) {
+    public void setEndedAt(LocalDateTime endedAt) {
         this.endedAt = endedAt;
     }
 

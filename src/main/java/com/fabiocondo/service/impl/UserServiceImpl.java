@@ -9,7 +9,6 @@ import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.*;
 import com.fabiocondo.security.service.EmailService;
 import com.fabiocondo.security.service.LoginAttemptService;
-import com.fabiocondo.service.NotificationService;
 import com.fabiocondo.service.UserService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -515,6 +514,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         friend.getFriends().add(user);
         userRepository.saveAll(Arrays.asList(user, friend));
         notificationService.createFriendAcceptNotification(friend.getId(), user.getId());
+        notificationService.createFriendAcceptNotificationForReceiver(friend.getId(), user.getId());
         return friend;
     }
 

@@ -2,7 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.Notification;
 import com.fabiocondo.exception.domain.NotificationNotFoundException;
-import com.fabiocondo.service.NotificationService;
+import com.fabiocondo.service.impl.NotificationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;

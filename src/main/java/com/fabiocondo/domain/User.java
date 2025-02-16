@@ -136,6 +136,11 @@ public class User implements Serializable {
     @ManyToMany(mappedBy = "participants")
     private List<Competition> competitions;
 
+    //@JsonIgnore
+    @JsonIgnoreProperties({"user", "sender"})
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ParticipationInvite> participationInvites;
+
     @JsonIgnore
     @ManyToMany(mappedBy = "members")
     private List<Group> groups;
@@ -400,6 +405,14 @@ public class User implements Serializable {
 
     public void setCompetitions(List<Competition> competitions) {
         this.competitions = competitions;
+    }
+
+    public Set<ParticipationInvite> getParticipationInvites() {
+        return participationInvites;
+    }
+
+    public void setParticipationInvites(Set<ParticipationInvite> participationInvites) {
+        this.participationInvites = participationInvites;
     }
 
     public List<Group> getGroups() {

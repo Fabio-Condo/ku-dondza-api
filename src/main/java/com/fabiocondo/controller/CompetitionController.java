@@ -116,6 +116,17 @@ public class CompetitionController {
         return ResponseEntity.status(HttpStatus.OK).body(competitionService.countQuestionsByCompetitionId(competitionId));
     }
 
+    @PostMapping("/{competitionId}/send-participation-invite/{userId}")
+    public ResponseEntity<?> sendParticipationInvite(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException, CompetitionNotFoundException, UserInvitedException {
+        competitionService.sendParticipationInvite(competitionId, userId);
+        return response(HttpStatus.OK, "Participation invite sent successfully");
+    }
+
+    @PostMapping("/{competitionId}/accept-participation-invite/{userId}")
+    public Competition acceptParticipationInvite(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException, CompetitionNotFoundException, ParticipationInviteNotFoundException {
+        return competitionService.acceptParticipationInvite(competitionId, userId);
+    }
+
     @PostMapping("/{competitionId}/send-participation-request/{userId}")
     public void sendParticipationRequest(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException, CompetitionNotFoundException {
         competitionService.sendParticipationRequest(competitionId, userId);

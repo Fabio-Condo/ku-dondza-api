@@ -2,13 +2,9 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.CompetitionStatus;
-import com.fabiocondo.exception.domain.CompetitionCannotBeFinishedException;
-import com.fabiocondo.exception.domain.CompetitionNotFoundException;
-import com.fabiocondo.exception.domain.QuizNotFoundException;
-import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.*;
 import com.fabiocondo.repository.filter.CompetitionFilter;
-import com.fabiocondo.service.NotificationService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,14 +32,16 @@ public class CompetitionService {
     private final QuestionRepository questionRepository;
     private final TopicRepository topicRepository;
     private final SubmissionRepository submissionRepository;
+    private final ParticipationInviteRepository participationInviteRepository;
     private final NotificationService notificationService;
 
-    public CompetitionService(CompetitionRepository competitionRepository, UserRepository userRepository, QuestionRepository questionRepository, TopicRepository topicRepository, SubmissionRepository submissionRepository, NotificationService notificationService) {
+    public CompetitionService(CompetitionRepository competitionRepository, UserRepository userRepository, QuestionRepository questionRepository, TopicRepository topicRepository, SubmissionRepository submissionRepository, ParticipationInviteRepository participationInviteRepository, NotificationService notificationService) {
         this.competitionRepository = competitionRepository;
         this.userRepository = userRepository;
         this.questionRepository = questionRepository;
         this.topicRepository = topicRepository;
         this.submissionRepository = submissionRepository;
+        this.participationInviteRepository = participationInviteRepository;
         this.notificationService = notificationService;
     }
 
@@ -211,6 +210,40 @@ public class CompetitionService {
         return competitionRepository.countQuestionsByCompetitionId(competitionId);
     }
 
+    @Transactional
+    public void sendParticipationInvite(Long competitionId, Long userId) throws UserNotFoundException, CompetitionNotFoundException, UserInvitedException {
+        if(participationInviteRepository.existsByCompetitionIdAndUserId(competitionId, userId)){
+            throw new UserInvitedException("User already invited");
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
+        Competition competition = getCompetitionById(competitionId);
+        ParticipationInvite participationInvite = new ParticipationInvite(LocalDateTime.now(), competition, getAuthenticatedUser(), user);
+        user.getParticipationInvites().add(participationInvite);
+        userRepository.save(user);
+        notificationService.createCompetitionInviteNotification(getAuthenticatedUser().getId(), userId, competitionId);
+    }
+
+    @Transactional
+    public Competition acceptParticipationInvite(Long competitionId, Long userId) throws UserNotFoundException, CompetitionNotFoundException, ParticipationInviteNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
+        //User currentUser = getAuthenticatedUser();
+
+        Competition competition = getCompetitionById(competitionId);
+        ParticipationInvite participationInvite = participationInviteRepository.findByCompetitionIdAndUserId(competition.getId(), user.getId())
+                .orElseThrow(() -> new ParticipationInviteNotFoundException("No participation invite found by userId: " + userId));
+
+        user.getParticipationInvites().remove(participationInvite);
+        competition.getParticipationRequests().add(user);
+
+        userRepository.save(user);
+        competitionRepository.save(competition);
+        notificationService.createCompetitionInviteAcceptNotification(participationInvite.getSender().getId(), participationInvite.getUser().getId(), competitionId);
+
+        return competition;
+    }
+
     public void sendParticipationRequest(Long competitionId, Long userId) throws UserNotFoundException, CompetitionNotFoundException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
@@ -264,7 +297,7 @@ public class CompetitionService {
 
         // Atualiza o status
         competition.setStatus(CompetitionStatus.ONGOING);
-        competition.setStartedAt(new Date());
+        competition.setStartedAt(LocalDateTime.now());
         competitionRepository.save(competition);
 
         // Notifique os participantes
@@ -282,7 +315,7 @@ public class CompetitionService {
 
         // Atualiza o status
         competition.setStatus(CompetitionStatus.FINISHED);
-        competition.setEndedAt(new Date());
+        competition.setEndedAt(LocalDateTime.now());
         competitionRepository.save(competition);
 
         // Definir os vencedores
@@ -345,7 +378,7 @@ public class CompetitionService {
 
         for (Competition competition : ongoingCompetitions) {
             // Verificar se já passou o tempo de término
-            if (competition.getEndedAt().before(new Date())) {
+            if (competition.getEndedAt().isBefore(LocalDateTime.now())) {
                 // Finalizar a competição
                 finishCompetition(competition.getId());
             }

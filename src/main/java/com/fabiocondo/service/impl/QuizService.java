@@ -8,7 +8,6 @@ import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
 import com.fabiocondo.repository.filter.QuizFilter;
-import com.fabiocondo.service.NotificationService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

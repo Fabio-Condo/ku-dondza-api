@@ -42,6 +42,11 @@ public class Question {
     @Valid
     @JsonIgnoreProperties("question")
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MathExpression> mathExpressions; // Se for math
+
+    @Valid
+    @JsonIgnoreProperties("question")
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers;
 
     public Question() {
@@ -117,6 +122,14 @@ public class Question {
 
     public void setTopic(Topic topic) {
         this.topic = topic;
+    }
+
+    public List<MathExpression> getMathExpressions() {
+        return mathExpressions;
+    }
+
+    public void setMathExpressions(List<MathExpression> mathExpressions) {
+        this.mathExpressions = mathExpressions;
     }
 
     public List<Answer> getAnswers() {

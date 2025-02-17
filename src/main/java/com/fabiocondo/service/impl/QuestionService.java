@@ -64,6 +64,7 @@ public class QuestionService {
     public Question save(Question question) {
         question.setQuestionId(generateQuestionId());
         question.getAnswers().forEach(answer -> answer.setQuestion(question));
+        question.getMathExpressions().forEach(mathExpression -> mathExpression.setQuestion(question));
         logger.info("Saving question: " + question.getText());
         return questionRepository.save(question);
     }
@@ -76,7 +77,11 @@ public class QuestionService {
         existQuestion.getAnswers().addAll(question.getAnswers());
         existQuestion.getAnswers().forEach(answer -> answer.setQuestion(existQuestion));
 
-        BeanUtils.copyProperties(question, existQuestion, "answers");
+        existQuestion.getMathExpressions().clear();
+        existQuestion.getMathExpressions().addAll(question.getMathExpressions());
+        existQuestion.getMathExpressions().forEach(mathExpression -> mathExpression.setQuestion(existQuestion));
+
+        BeanUtils.copyProperties(question, existQuestion, "answers", "mathExpressions");
         logger.info("Updating question: " + existQuestion.getText());
         return questionRepository.save(existQuestion);
     }

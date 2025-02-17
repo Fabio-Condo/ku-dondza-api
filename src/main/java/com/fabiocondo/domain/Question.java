@@ -23,8 +23,6 @@ public class Question {
     @Enumerated(EnumType.STRING)
     private DifficultyLevel difficultyLevel;
 
-    private String mathExpression; // Para desenho de gráficos de funções, lineares, quadráticas, logarítmicas, etc
-
     @Lob // Large Object
     private String text;
 
@@ -82,14 +80,6 @@ public class Question {
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public String getMathExpression() {
-        return mathExpression;
-    }
-
-    public void setMathExpression(String mathExpression) {
-        this.mathExpression = mathExpression;
     }
 
     public String getSolution() {

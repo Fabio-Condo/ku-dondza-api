@@ -1,5 +1,6 @@
 package com.fabiocondo.domain;
 
+import com.fabiocondo.enumeration.Plan;
 import com.fabiocondo.enumeration.UserType;
 import com.fasterxml.jackson.annotation.*;
 
@@ -59,6 +60,9 @@ public class User implements Serializable {
     private boolean isActive;
 
     private boolean isNotLocked;
+
+    @Enumerated(EnumType.STRING)
+    private Plan plan; //FREE or PREMIUM
 
     @JsonIgnore
     @ManyToMany
@@ -333,6 +337,14 @@ public class User implements Serializable {
 
     public void setNotLocked(boolean notLocked) {
         isNotLocked = notLocked;
+    }
+
+    public Plan getPlan() {
+        return plan;
+    }
+
+    public void setPlan(Plan plan) {
+        this.plan = plan;
     }
 
     public Set<Blog> getSavedBlogPosts() {

@@ -29,6 +29,8 @@ public class Question {
     @Lob // Large Object
     private String solution;
 
+    private Integer timeLimit; // Tempo em segundos
+
     private String fileName;
 
     private String urlFile;
@@ -80,6 +82,14 @@ public class Question {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public Integer getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(Integer timeLimit) {
+        this.timeLimit = timeLimit;
     }
 
     public String getSolution() {

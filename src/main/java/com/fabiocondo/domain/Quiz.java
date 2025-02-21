@@ -29,6 +29,8 @@ public class Quiz {
     @Temporal(TemporalType.TIMESTAMP)
     private Date submittedAt;
 
+    private Integer timeSpent;// Tempo gasto em segundos
+
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
@@ -93,6 +95,14 @@ public class Quiz {
 
     public void setSubmittedAt(Date submittedAt) {
         this.submittedAt = submittedAt;
+    }
+
+    public Integer getTimeSpent() {
+        return timeSpent;
+    }
+
+    public void setTimeSpent(Integer timeSpent) {
+        this.timeSpent = timeSpent;
     }
 
     public Subject getSubject() { return subject; }

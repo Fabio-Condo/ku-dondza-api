@@ -43,7 +43,7 @@ public class NotificationController {
     // Nã é uma boa abordagem, depois mudar e user redis
     // A cada 10 segundos, o servidor faz uma consulta ao banco, mesmo que o usuário não receba novas notificações.
     //Solução: Usar um cache (Redis) para armazenar a contagem e atualizá-la apenas quando novas notificações chegarem.
-    @GetMapping("/unread-count")
+    //@GetMapping("/unread-count")
     public Flux<ServerSentEvent<Long>> getUnreadNotificationsCount(@RequestParam Long userId) {
         return Flux.interval(Duration.ofSeconds(10))
 

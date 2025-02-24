@@ -46,9 +46,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
     }
 
     @Override
-    public Set<Question> findRandomQuestionsByTopicsAndDifficulty(Set<Long> topicIds, DifficultyLevel difficultyLevel) {
-
-        int limitPerTopic = 2; // Numero de questões por tópico
+    public Set<Question> findRandomQuestionsByTopicsAndDifficulty(Set<Long> topicIds, DifficultyLevel difficultyLevel, int limitPerTopic) {
 
         // Essa query utiliza CTE e ROW_NUMBER para particionar as questões por tópico,
         // ordenando aleatoriamente (usando RAND() para MySQL; se for PostgreSQL, substitua por RANDOM())

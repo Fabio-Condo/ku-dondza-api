@@ -4,7 +4,7 @@ public enum DifficultyLevel {
     EASY,
     MEDIUM,
     HARD,
-    VERY_HARD,
-    EXPERT;
+//    VERY_HARD,
+//    EXPERT;
 }
 

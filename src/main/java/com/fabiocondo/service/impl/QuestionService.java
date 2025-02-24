@@ -7,7 +7,6 @@ import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.filter.QuestionFilter;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -19,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class QuestionService {
@@ -52,17 +52,17 @@ public class QuestionService {
         return questionRepository.findAll();
     }
 
-    public Set<Question> getQuestionsByTopics(Set<Long> topicIds, DifficultyLevel difficultyLevel) {
+    public Set<Question> getQuestionsByTopics(Set<Long> topicIds, DifficultyLevel difficultyLevel, int limitPerTopic) {
         if (topicIds == null || topicIds.isEmpty()) {
             throw new IllegalArgumentException("O Quiz deve ter pelo menos um tópico associado.");
         } else {
             //return questionRepository.findByTopicIdInAndDifficultyLevel(topicIds, difficultyLevel);
-            return questionRepository.findRandomQuestionsByTopicsAndDifficulty(topicIds, difficultyLevel);
+            return questionRepository.findRandomQuestionsByTopicsAndDifficulty(topicIds, difficultyLevel, limitPerTopic);
         }
     }
 
     public Question save(Question question) {
-        question.setQuestionId(generateQuestionId());
+        question.setQuestionId(UUID.randomUUID().toString());
         question.getAnswers().forEach(answer -> answer.setQuestion(question));
         question.getMathExpressions().forEach(mathExpression -> mathExpression.setQuestion(question));
         logger.info("Saving question: " + question.getText());
@@ -71,7 +71,6 @@ public class QuestionService {
 
     public Question update(Question question, Long id) throws QuestionNotFoundException {
         Question existQuestion = findById(id);
-        existQuestion.setQuestionId(generateQuestionId());
 
         existQuestion.getAnswers().clear();
         existQuestion.getAnswers().addAll(question.getAnswers());
@@ -120,7 +119,4 @@ public class QuestionService {
         return question;
     }
 
-    private String generateQuestionId() {
-        return RandomStringUtils.randomAlphanumeric(10);
-    }
 }

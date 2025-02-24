@@ -9,7 +9,6 @@ import com.fabiocondo.exception.domain.InstituicaoNotFoundException;
 import com.fabiocondo.repository.InstitutionRepository;
 import com.fabiocondo.repository.filter.InstitutionFilter;
 import com.fabiocondo.service.InstitutionService;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class InstitutionServiceImpl implements InstitutionService {
@@ -64,7 +64,7 @@ public class InstitutionServiceImpl implements InstitutionService {
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         Institution institution = new Institution();
-        institution.setInstitutionId(generateInstitutionId());
+        institution.setInstitutionId(UUID.randomUUID().toString());
         institution.setName(name);
         institution.setAcronym(acronym);
         institution.setType(type);
@@ -122,7 +122,4 @@ public class InstitutionServiceImpl implements InstitutionService {
         return institutionRepository.count();
     }
 
-    private String generateInstitutionId() {
-        return RandomStringUtils.randomAlphanumeric(10);
-    }
 }

@@ -11,7 +11,7 @@ public class QuizFilter {
 
     private String searchParam;
 
-    private String quizOrderBy;
+    private String sort;
 
     private String title;
 
@@ -30,9 +30,9 @@ public class QuizFilter {
         this.searchParam = searchParam;
     }
 
-    public String getQuizOrderBy() { return quizOrderBy; }
+    public String getSort() { return sort; }
 
-    public void setQuizOrderBy(String quizOrderBy) { this.quizOrderBy = quizOrderBy; }
+    public void setSort(String sort) { this.sort = sort; }
 
     public String getTitle() {
         return title;

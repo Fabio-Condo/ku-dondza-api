@@ -60,7 +60,7 @@ public class CompetitionService {
 
         //Set<Question> questions = questionRepository.findByTopicIdIn(topicIds);
         //Set<Question> questions = questionRepository.findByTopicIdInAndDifficultyLevel(topicIds, competition.getDifficultyLevel());
-        Set<Question> questions = questionRepository.findRandomQuestionsByTopicsAndDifficulty(topicIds, competition.getDifficultyLevel());
+        Set<Question> questions = questionRepository.findRandomQuestionsByTopicsAndDifficulty(topicIds, competition.getDifficultyLevel(), 2);
         competition.setQuestions(questions);
 
         competition.setCompetitionId(generateCompetitionId());
@@ -100,7 +100,7 @@ public class CompetitionService {
 
             //Set<Question> questions = questionRepository.findByTopicIdIn(topicIds);
             //Set<Question> questions = questionRepository.findByTopicIdInAndDifficultyLevel(topicIds, competition.getDifficultyLevel());
-            Set<Question> questions = questionRepository.findRandomQuestionsByTopicsAndDifficulty(topicIds, competition.getDifficultyLevel());
+            Set<Question> questions = questionRepository.findRandomQuestionsByTopicsAndDifficulty(topicIds, competition.getDifficultyLevel(), 2);
             existingCompetition.setQuestions(questions);
             existingCompetition.setDifficultyLevel(competition.getDifficultyLevel());
         }

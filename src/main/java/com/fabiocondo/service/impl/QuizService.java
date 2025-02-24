@@ -8,7 +8,6 @@ import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
 import com.fabiocondo.repository.filter.QuizFilter;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -16,10 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class QuizService {
@@ -83,7 +79,7 @@ public class QuizService {
             throw new IllegalArgumentException("Uma ou mais questões não foram encontradas no banco de dados.");
         }
 
-        quiz.setQuizId(generateQuizId());
+        quiz.setQuizId(UUID.randomUUID().toString());
         quiz.setSubmittedAt(new Date());
         quiz.setQuestions(questions);
         quiz.setAnswers(answers);
@@ -113,10 +109,6 @@ public class QuizService {
     public List<Answer> getUserSubmittedAnswersByQuizId(Long quizId) throws QuizNotFoundException {
         Quiz quiz = findById(quizId);
         return quizRepository.findAnswersByQuizId(quiz.getId());
-    }
-
-    private String generateQuizId() {
-        return RandomStringUtils.randomAlphanumeric(10);
     }
 
 }

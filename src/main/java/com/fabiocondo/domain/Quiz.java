@@ -26,6 +26,8 @@ public class Quiz {
     @Enumerated(EnumType.STRING)
     private DifficultyLevel difficultyLevel;
 
+    private int limitPerTopic;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date submittedAt;
 
@@ -87,6 +89,14 @@ public class Quiz {
 
     public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
         this.difficultyLevel = difficultyLevel;
+    }
+
+    public int getLimitPerTopic() {
+        return limitPerTopic;
+    }
+
+    public void setLimitPerTopic(int limitPerTopic) {
+        this.limitPerTopic = limitPerTopic;
     }
 
     public Date getSubmittedAt() {

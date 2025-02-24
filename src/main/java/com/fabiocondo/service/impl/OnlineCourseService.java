@@ -3,15 +3,11 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.OnlineCourse;
-import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.CourseNotFoundException;
-import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.OnlineCourseRepository;
-import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.filter.OnlineCourseFilter;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -19,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.UUID;
 
 @Service
 public class OnlineCourseService {
@@ -29,15 +27,12 @@ public class OnlineCourseService {
 
     private final OnlineCourseRepository onlineCourseRepository;
 
-    private final QuestionRepository questionRepository;
-
     private final UserServiceImpl userService;
 
     private final AmazonS3Service amazonS3Service;
 
-    public OnlineCourseService(OnlineCourseRepository onlineCourseRepository, QuestionRepository questionRepository, UserServiceImpl userService, AmazonS3Service amazonS3Service) {
+    public OnlineCourseService(OnlineCourseRepository onlineCourseRepository, UserServiceImpl userService, AmazonS3Service amazonS3Service) {
         this.onlineCourseRepository = onlineCourseRepository;
-        this.questionRepository = questionRepository;
         this.userService = userService;
         this.amazonS3Service = amazonS3Service;
     }
@@ -69,7 +64,7 @@ public class OnlineCourseService {
 
         OnlineCourse course = new OnlineCourse();
         course.setName(name);
-        course.setOnlineCourseId(generateOnlineCourseId());
+        course.setOnlineCourseId(UUID.randomUUID().toString());
         course.setDescription(description);
         course.setLunchDate(lunchDate);
         course.setInstrutor(instrutor);
@@ -138,7 +133,4 @@ public class OnlineCourseService {
         return onlineCourseRepository.countOnlineCourseStudentsByCourseId(courseId);
     }
 
-    private String generateOnlineCourseId() {
-        return RandomStringUtils.randomAlphanumeric(10);
-    }
 }

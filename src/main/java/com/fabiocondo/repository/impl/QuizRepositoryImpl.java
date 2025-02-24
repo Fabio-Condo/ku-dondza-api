@@ -108,10 +108,16 @@ public class QuizRepositoryImpl implements QuizRepositoryQuery {
     }
 
     public void getSortOrder(QuizFilter quizFilter, CriteriaBuilder builder, CriteriaQuery<Quiz> criteria, Root<Quiz> root){
-        if(Objects.equals(quizFilter.getQuizOrderBy(), "subject,asc")){
+        if(Objects.equals(quizFilter.getSort(), "id,asc")){
+            criteria.orderBy(builder.asc(root.get("id")));
+        }
+        if(Objects.equals(quizFilter.getSort(), "id,desc")){
+            criteria.orderBy(builder.desc(root.get("id")));
+        }
+        if(Objects.equals(quizFilter.getSort(), "subject,asc")){
             criteria.orderBy(builder.asc(root.get("subject")));
         }
-        if(Objects.equals(quizFilter.getQuizOrderBy(), "subject,desc")){
+        if(Objects.equals(quizFilter.getSort(), "subject,desc")){
             criteria.orderBy(builder.desc(root.get("subject")));
         }
     }

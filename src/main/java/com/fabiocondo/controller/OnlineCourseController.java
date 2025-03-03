@@ -1,8 +1,7 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
-import com.fabiocondo.exception.domain.CourseNotFoundException;
-import com.fabiocondo.exception.domain.QuestionNotFoundException;
+import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.filter.OnlineCourseFilter;
 import com.fabiocondo.service.impl.OnlineCourseService;
@@ -24,12 +23,12 @@ public class OnlineCourseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OnlineCourse> findById(@PathVariable("id") Long id) throws CourseNotFoundException {
+    public ResponseEntity<OnlineCourse> findById(@PathVariable("id") Long id) throws OnlineCourseNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.findById(id));
     }
 
     @GetMapping("/find-by-courseId/{onlineCourseId}")
-    public ResponseEntity<OnlineCourse> findOnlineCourseByOnlineCourseId(@PathVariable("onlineCourseId") String onlineCourseId) throws CourseNotFoundException {
+    public ResponseEntity<OnlineCourse> findOnlineCourseByOnlineCourseId(@PathVariable("onlineCourseId") String onlineCourseId) throws OnlineCourseNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.findOnlineCourseByOnlineCourseId(onlineCourseId));
     }
 
@@ -59,13 +58,13 @@ public class OnlineCourseController {
                                                @RequestParam("description") String description,
                                                @RequestParam("lunchDate") String lunchDate,
                                                @RequestParam("instrutorId") Long instrutorId,
-                                               @RequestParam(value = "file", required = false) MultipartFile file) throws CourseNotFoundException, UserNotFoundException {
+                                               @RequestParam(value = "file", required = false) MultipartFile file) throws UserNotFoundException, OnlineCourseNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.update(id, name, description, lunchDate, instrutorId, file));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws CourseNotFoundException {
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws OnlineCourseNotFoundException {
         onlineCourseService.delete(id);
         return response(HttpStatus.OK, "Course deleted successfully");
     }
@@ -76,12 +75,12 @@ public class OnlineCourseController {
     }
 
     @PutMapping("/{id}/requirements/update")
-    public ResponseEntity<OnlineCourse> updateRequirements(@PathVariable("id") Long id, @RequestBody OnlineCourse course) throws CourseNotFoundException {
+    public ResponseEntity<OnlineCourse> updateRequirements(@PathVariable("id") Long id, @RequestBody OnlineCourse course) throws OnlineCourseNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.updateRequirements(id, course));
     }
 
     @GetMapping("/{courseId}/students")
-    public Page<User> getStudentsByCourseId(@PathVariable Long courseId, Pageable pageable) throws CourseNotFoundException {
+    public Page<User> getStudentsByCourseId(@PathVariable Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
         return onlineCourseService.getStudentsByCourseId(courseId, pageable);
     }
 

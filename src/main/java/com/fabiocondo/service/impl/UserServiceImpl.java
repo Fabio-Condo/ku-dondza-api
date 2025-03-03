@@ -49,26 +49,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final LoginAttemptService loginAttemptService;
     private final EmailService emailService;
     private final AmazonS3Service amazonS3Service;
-    private final PostRepository postRepository;
-    private final BlogRepository blogRepository;
     private final SubjectRepository subjectRepository;
     private final OnlineCourseRepository onlineCourseRepository;
     private final OnlineCourseContentRepository onlineCourseContentRepository;
-    private final NotificationService notificationService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, PostRepository postRepository, BlogRepository blogRepository, SubjectRepository subjectRepository, OnlineCourseRepository onlineCourseRepository, OnlineCourseContentRepository onlineCourseContentRepository, NotificationService notificationService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, OnlineCourseRepository onlineCourseRepository, OnlineCourseContentRepository onlineCourseContentRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
         this.amazonS3Service = amazonS3Service;
-        this.postRepository = postRepository;
-        this.blogRepository = blogRepository;
         this.subjectRepository = subjectRepository;
         this.onlineCourseRepository = onlineCourseRepository;
         this.onlineCourseContentRepository = onlineCourseContentRepository;
-        this.notificationService = notificationService;
     }
 
     public Page<User> searchUsers(String query, Pageable pageable) {
@@ -297,7 +291,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateProfileImage(String username, MultipartFile profileImage) throws UsernameExistException, EmailExistException, IOException, UserNotFoundException {
+    public User updateProfileImage(String username, MultipartFile profileImage) throws UsernameExistException, EmailExistException, UserNotFoundException {
         User user = validateNewUsernameAndEmail(username, null, null);
         //saveProfileImage(user, profileImage);
         return user;
@@ -366,206 +360,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public Set<Blog> getSavedBlogs(Long userId) throws UserNotFoundException {
-        User user = findById(userId);
-        if (user == null) {
-            throw new UserNotFoundException("No user found by id: " + userId);
-        }
-        return user.getSavedBlogPosts();
-    }
-
-    @Override
-    public User addBlogToSavedBlogPosts(Long userId, Long blogId) throws UserNotFoundException, BlogNotFoundException {
-        User user = findById(userId);
-        Optional<Blog> optionalBlog= blogRepository.findById(blogId);
-        if (!optionalBlog.isPresent()){
-            throw new BlogNotFoundException("No blog found by id: " + blogId);
-        }
-        user.getSavedBlogPosts().add(optionalBlog.get());
-        return userRepository.save(user);
-    }
-
-    @Override
-    public User removeBlogFromSavedBlogPosts(Long userId, Long blogId) throws UserNotFoundException, BlogNotFoundException {
-        User user = findById(userId);
-        Optional<Blog> optionalBlog= blogRepository.findById(blogId);
-        if (!optionalBlog.isPresent()) {
-            throw new BlogNotFoundException("No blog found by id: " + blogId);
-        }
-        user.getSavedBlogPosts().remove(optionalBlog.get());
-        return userRepository.save(user);
-    }
-
-    @Override
-    public boolean checkIfUserSavedBlog(Long userId, Long blogId) {
-        User user = userRepository.findById(userId).orElse(null);
-        Optional<Blog> post = blogRepository.findById(blogId);
-
-        if (user == null || !post.isPresent()) {
-            return false;
-        }
-        return user.getSavedBlogPosts().contains(post.get());
-    }
-
-    @Override
-    public long countSavedBlogsByUser(Long userId) throws UserNotFoundException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("No user found with ID: " + userId));
-        return user.getSavedBlogPosts().size();
-    }
-
-    @Override
-    public User addPostToSavedPosts(Long userId, Long postId) throws PostNotFoundException, UserNotFoundException {
-        User user = findById(userId);
-       Optional<Post> optionalPost = postRepository.findById(postId);
-       if (!optionalPost.isPresent()){
-           throw new PostNotFoundException("No post found by id: " + postId);
-       }
-        user.getSavedPosts().add(optionalPost.get());
-        return userRepository.save(user);
-    }
-
-    @Override
-    public User removePostFromSavedPosts(Long userId, Long postId) throws PostNotFoundException, UserNotFoundException {
-        User user = findById(userId);
-        Optional<Post> optionalPost = postRepository.findById(postId);
-        if (!optionalPost.isPresent()) {
-            throw new PostNotFoundException("No post found by id: " + postId);
-        }
-        user.getSavedPosts().remove(optionalPost.get());
-        return userRepository.save(user);
-    }
-
-    @Override
-    public Set<Post> getSavedPosts(Long userId) throws UserNotFoundException {
-        User user = findById(userId);
-        if (user == null) {
-            throw new UserNotFoundException("No user found by id: " + userId);
-        }
-        return user.getSavedPosts();
-    }
-
-    @Override
-    public Page<Post> findSavedPostsByUserId(Long userId, Pageable pageable) throws UserNotFoundException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("No user found with ID: " + userId));
-        return userRepository.findSavedPostsByUserId(user.getId(), pageable);
-    }
-
-    @Override
-    public long countSavedPostsByUser(Long userId) throws UserNotFoundException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("No user found with ID: " + userId));
-        return user.getSavedPosts().size();
-    }
-
-    @Override
-    public boolean checkIfUserSavedPost(Long userId, Long postId) {
-        User user = userRepository.findById(userId).orElse(null);
-        Optional<Post> post = postRepository.findById(postId);
-
-        if (user == null || !post.isPresent()) {
-            return false;
-        }
-        return user.getSavedPosts().contains(post.get());
-    }
-
-    @Override
-    public Set<User> getFriendRequests() throws UserNotFoundException {
-        User user = getAuthenticatedUser();
-        return user.getFriendRequests();
-    }
-
-    @Override
-    public Page<User> getCurrentFriendRequests(Pageable pageable) throws UserNotFoundException {
-        User user = getAuthenticatedUser();
-        return userRepository.findFriendRequestsByUserId(user.getId(), pageable);
-    }
-
-    @Override
-    public Page<User> getFriends(Long userId, Pageable pageable) throws UserNotFoundException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("No user found with ID: " + userId));
-        return userRepository.findFriendsByUserId(user.getId(), pageable);
-    }
-
-    @Override
-    public Page<User> getCurrentUserFriends(Pageable pageable) throws UserNotFoundException {
-        User user = getAuthenticatedUser();
-        return userRepository.findFriendsByUserId(user.getId(), pageable);
-    }
-
-    @Override
-    @Transactional
-    public void sendFriendRequest(User friend) throws UserNotFoundException {
-        User user = getAuthenticatedUser();
-        User passedUser = findById(friend.getId());
-        passedUser.getFriendRequests().add(user); // Saving the request in user I passed
-        notificationService.createFriendRequestNotification(user.getId(), passedUser.getId());
-        userRepository.save(passedUser);
-    }
-
-    @Override
-    public User acceptFriendRequest(Long friendId) throws UserNotFoundException {
-        User user = getAuthenticatedUser();
-        User friend = findById(friendId);
-        user.getFriendRequests().remove(friend);
-        user.getFriends().add(friend);
-        friend.getFriends().add(user);
-        userRepository.saveAll(Arrays.asList(user, friend));
-        notificationService.createFriendAcceptNotification(friend.getId(), user.getId());
-        notificationService.createFriendAcceptNotificationForReceiver(friend.getId(), user.getId());
-        return friend;
-    }
-
-    @Override
-    public void rejectFriendRequest(Long friendId) throws UserNotFoundException {
-        User user = getAuthenticatedUser();
-        User friend = findById(friendId);
-        user.getFriendRequests().remove(friend);
-        userRepository.save(user);
-    }
-
-    @Override
-    public Set<User> getFriends() throws UserNotFoundException {
-        User user = getAuthenticatedUser();
-        return user.getFriends();
-    }
-
-    @Override
-    public void removeFriend(Long friendId) throws UserNotFoundException {
-        User user = getAuthenticatedUser();
-        User friend = findById(friendId);
-        user.getFriends().remove(friend);
-        friend.getFriends().remove(user);
-        userRepository.saveAll(Arrays.asList(user, friend));
-    }
-
-    @Override
-    public boolean checkFriendship(Long friendId) throws UserNotFoundException {
-        User user = getAuthenticatedUser();
-        User friend = userRepository.findById(friendId).orElse(null);
-
-        if (user == null || friend == null) {
-            return false; // Se um dos usuários não existir, retorna falso
-        }
-
-        return user.isFriend(friend); // Chama o método isFriend da classe User
-    }
-
-    @Override
-    public boolean checkIfSentFriendRequest(Long receptorUserId, Long emissorUserId) throws UserNotFoundException {
-        User user = findById(receptorUserId);
-        User friend = userRepository.findById(emissorUserId).orElse(null);
-
-        if (user == null || friend == null) {
-            return false; // Se um dos usuários não existir, retorna falso
-        }
-
-        return user.checkIfSentFriendRequest(friend); // Chama o método isFriend da classe User
-    }
-
-    @Override
     public User addContentToMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException {
         User user = findById(userId);
         Optional<OnlineCourseContent> optionalModule = onlineCourseContentRepository.findById(onlineCourseContentId);
@@ -622,28 +416,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
-        User user = findById(userId);
-        Optional<OnlineCourse> optionalCourse = onlineCourseRepository.findById(onlineCourseId);
-        if (!optionalCourse.isPresent()){
-            throw new CourseNotFoundException("No online course not found by id: " + onlineCourseId);
-        }
-        user.getSubscribedOnlineCourses().add(optionalCourse.get());
-        return userRepository.save(user);
-    }
-
-    @Override
-    public User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
-        User user = findById(userId);
-        Optional<OnlineCourse> optionalCourse = onlineCourseRepository.findById(onlineCourseId);
-        if (!optionalCourse.isPresent()) {
-            throw new CourseNotFoundException("No online course not found by id: " + onlineCourseId);
-        }
-        user.getSubscribedOnlineCourses().remove(optionalCourse.get());
-        return userRepository.save(user);
-    }
-
-    @Override
     public boolean doesUserSubscribedOnlineCourse(Long userId, Long onlineCourseId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null) {
@@ -654,27 +426,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             return false;
         }
         return user.getSubscribedOnlineCourses().contains(course.get());
-    }
-
-    @Override
-    public Page<Group> getGroupsByUserId(Long userId, Pageable pageable) throws UserNotFoundException {
-        User user = findById(userId);
-        return userRepository.findGroupsByUserId(user.getId(), pageable);
-    }
-
-    @Override
-    public long countGroupsByUserId(Long userId) {
-        return userRepository.countGroupsByUserId(userId);
-    }
-
-    @Override
-    public long countFriendsByUserId(Long userId){
-        return userRepository.countFriendsByUserId(userId );
-    }
-
-    @Override
-    public long countFriendRequestsByUserId(Long userId){
-        return userRepository.countFriendRequestsByUserId(userId );
     }
 
     private User validateNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistException, EmailExistException {

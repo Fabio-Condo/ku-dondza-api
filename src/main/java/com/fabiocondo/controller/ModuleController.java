@@ -3,8 +3,8 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Module;
 import com.fabiocondo.exception.domain.CourseContentNotFoundException;
-import com.fabiocondo.exception.domain.CourseNotFoundException;
-import com.fabiocondo.exception.domain.TemaNotFoundException;
+import com.fabiocondo.exception.domain.ModuleNotFoundException;
+import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
 import com.fabiocondo.service.impl.ModuleService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +26,7 @@ public class ModuleController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Module> findById(@PathVariable("id") Long id) throws TemaNotFoundException {
+    public ResponseEntity<Module> findById(@PathVariable("id") Long id) throws ModuleNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(moduleService.findById(id));
     }
 
@@ -49,7 +49,7 @@ public class ModuleController {
     @PostMapping
     public ResponseEntity<Module> save(@RequestParam("name") String name,
                                        @RequestParam("onlineCourseId") Long onlineCourseId,
-                                       @RequestParam("position") Integer position) throws CourseNotFoundException, TemaNotFoundException {
+                                       @RequestParam("position") Integer position) throws ModuleNotFoundException, OnlineCourseNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(moduleService.save(name, onlineCourseId, position));
     }
@@ -58,13 +58,13 @@ public class ModuleController {
     public ResponseEntity<Module> update(@RequestParam("id") Long id,
                                          @RequestParam("name") String name,
                                          @RequestParam("onlineCourseId") Long onlineCourseId,
-                                         @RequestParam("position") Integer position) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
+                                         @RequestParam("position") Integer position) throws CourseContentNotFoundException, ModuleNotFoundException, OnlineCourseNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(moduleService.update(id, name, onlineCourseId, position));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws TemaNotFoundException {
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws ModuleNotFoundException {
         moduleService.delete(id);
         return response(HttpStatus.OK, "Module deleted successfully");
     }

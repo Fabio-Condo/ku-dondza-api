@@ -41,10 +41,6 @@ public interface UserService {
 
     void updatePropertyNotLocked(String username, Boolean notLocked) throws UsernameNotFoundException;
 
-    boolean checkFriendship(Long friendId) throws UserNotFoundException;
-
-    boolean checkIfSentFriendRequest(Long receptorUserId, Long emissorUserId) throws UserNotFoundException;
-
     User addContentToMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException;
 
     User removeContentFromMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException;
@@ -55,19 +51,7 @@ public interface UserService {
 
     long countSubscribedOnlineCoursesByUserId(Long userId);
 
-    User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException;
-
-    User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException;
-
     boolean doesUserSubscribedOnlineCourse(Long userId, Long onlineCourseId);
-
-    Page<Group> getGroupsByUserId(Long userId, Pageable pageable) throws UserNotFoundException;
-
-    long countGroupsByUserId(Long userId);
-
-    long countFriendsByUserId(Long userId);
-
-    long countFriendRequestsByUserId(Long userId);
 
     User findUserByUsername(String username);
 
@@ -87,43 +71,4 @@ public interface UserService {
 
     User removeInterestFromUserInterests(Long userId, Long postId) throws SubjectNotFoundException, UserNotFoundException;
 
-    Set<Blog> getSavedBlogs(Long userId) throws UserNotFoundException;
-
-    User addBlogToSavedBlogPosts(Long userId, Long blogId) throws UserNotFoundException, BlogNotFoundException;
-
-    User removeBlogFromSavedBlogPosts(Long userId, Long blogId) throws UserNotFoundException, BlogNotFoundException;
-
-    boolean checkIfUserSavedBlog(Long userId, Long blogId);
-
-    long countSavedBlogsByUser(Long userId) throws UserNotFoundException;
-
-    User addPostToSavedPosts(Long userId, Long postId) throws PostNotFoundException, UserNotFoundException;
-
-    User removePostFromSavedPosts(Long userId, Long postId) throws PostNotFoundException, UserNotFoundException;
-
-    Set<Post> getSavedPosts(Long id) throws UserNotFoundException;
-
-    Page<Post> findSavedPostsByUserId(Long userId, Pageable pageable) throws UserNotFoundException;
-
-    long countSavedPostsByUser(Long userId) throws UserNotFoundException;
-
-    boolean checkIfUserSavedPost(Long userId, Long postId);
-
-    Set<User> getFriendRequests() throws UserNotFoundException;
-
-    Page<User> getCurrentFriendRequests(Pageable pageable) throws UserNotFoundException;
-
-    Page<User> getFriends(Long userId, Pageable pageable) throws UserNotFoundException;
-
-    Page<User> getCurrentUserFriends(Pageable pageable) throws UserNotFoundException;
-
-    void sendFriendRequest(User friend) throws UserNotFoundException;
-
-    User acceptFriendRequest(Long friendId) throws UserNotFoundException;
-
-    void rejectFriendRequest(Long friendId) throws UserNotFoundException;
-
-    Set<User> getFriends() throws UserNotFoundException;
-
-    void removeFriend(Long friendId) throws UserNotFoundException;
 }

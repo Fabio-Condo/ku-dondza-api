@@ -6,8 +6,7 @@ import com.fabiocondo.domain.Module; // Importação explícita
 import com.fabiocondo.domain.OnlineCourseContent; // Importação explícita
 import com.fabiocondo.enumeration.ContentType;
 import com.fabiocondo.exception.domain.CourseContentNotFoundException;
-import com.fabiocondo.exception.domain.CourseNotFoundException;
-import com.fabiocondo.exception.domain.TemaNotFoundException;
+import com.fabiocondo.exception.domain.ModuleNotFoundException;
 import com.fabiocondo.repository.OnlineCourseContentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,7 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.findAll(pageable);
     }
 
-    public OnlineCourseContent save(String description, ContentType contentType, Long moduleId, Integer position, MultipartFile file) throws CourseNotFoundException, TemaNotFoundException {
+    public OnlineCourseContent save(String description, ContentType contentType, Long moduleId, Integer position, MultipartFile file) throws ModuleNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
@@ -64,7 +63,7 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.save(content);
     }
 
-    public OnlineCourseContent update(Long id, String description, ContentType contentType, Long moduleId, Integer position, MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
+    public OnlineCourseContent update(Long id, String description, ContentType contentType, Long moduleId, Integer position, MultipartFile file) throws CourseContentNotFoundException, ModuleNotFoundException {
         com.fabiocondo.domain.Module module = moduleService.findById(moduleId); // Nome totalmente qualificado
 
         OnlineCourseContent existContent = findById(id);

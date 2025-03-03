@@ -1,7 +1,7 @@
 package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.*;
-import com.fabiocondo.exception.domain.CourseNotFoundException;
+import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.OnlineCourseLikeRepository;
 import org.springframework.data.domain.Page;
@@ -24,7 +24,7 @@ public class OnlineCourseLikeService {
         this.userService = userService;
     }
 
-    public OnlineCourseLike toggleLike(Long onlineCourseId) throws UserNotFoundException, CourseNotFoundException {
+    public OnlineCourseLike toggleLike(Long onlineCourseId) throws UserNotFoundException, OnlineCourseNotFoundException {
         OnlineCourse onlineCourse = onlineCourseService.findById(onlineCourseId);
         User user = userService.getAuthenticatedUser();
         Optional<OnlineCourseLike> existingLike = onlineCourseLikeRepository.findByOnlineCourseAndUser(onlineCourse, user);

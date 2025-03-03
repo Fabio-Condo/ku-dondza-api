@@ -1,6 +1,5 @@
 package com.fabiocondo.service;
 
-import com.fabiocondo.domain.Course;
 import com.fabiocondo.domain.Subject;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import org.springframework.data.domain.Page;

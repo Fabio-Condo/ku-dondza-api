@@ -4,8 +4,7 @@ import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.OnlineCourseContent;
 import com.fabiocondo.enumeration.ContentType;
 import com.fabiocondo.exception.domain.CourseContentNotFoundException;
-import com.fabiocondo.exception.domain.CourseNotFoundException;
-import com.fabiocondo.exception.domain.TemaNotFoundException;
+import com.fabiocondo.exception.domain.ModuleNotFoundException;
 import com.fabiocondo.service.impl.OnlineCourseContentService;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
@@ -33,7 +32,7 @@ public class OnlineCourseContentController {
                                                     @RequestParam("contentType") ContentType contentType,
                                                     @RequestParam("moduleId") Long moduleId,
                                                     @RequestParam("position") Integer position,
-                                                    @RequestParam("file") MultipartFile file) throws CourseNotFoundException, TemaNotFoundException {
+                                                    @RequestParam("file") MultipartFile file) throws ModuleNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.save(description, contentType, moduleId, position, file));
     }
@@ -44,7 +43,7 @@ public class OnlineCourseContentController {
                                                       @RequestParam("contentType") ContentType contentType,
                                                       @RequestParam("moduleId") Long moduleId,
                                                       @RequestParam("position") Integer position,
-                                                      @RequestParam(value = "file", required = false) MultipartFile file) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
+                                                      @RequestParam(value = "file", required = false) MultipartFile file) throws CourseContentNotFoundException, ModuleNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.update(id, description, contentType, moduleId, position, file));
     }

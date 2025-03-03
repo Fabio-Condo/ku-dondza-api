@@ -2,7 +2,6 @@ package com.fabiocondo.controller;
 
 
 import com.fabiocondo.domain.*;
-import com.fabiocondo.enumeration.ExamType;
 import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.security.utility.JWTTokenProvider;
@@ -198,132 +197,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.removeInterestFromUserInterests(userId, interestId));
     }
 
-    @GetMapping("/{userId}/savedBlogs/list")
-    public ResponseEntity<Set<Blog>> getSavedBlogs(@PathVariable Long userId) throws UserNotFoundException {
-        Set<Blog> savedBlogs = userService.getSavedBlogs(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(savedBlogs);
-    }
-
-    @PostMapping("/{userId}/savedBlogs/{blogId}")
-    public ResponseEntity<User> addBlogToSavedBlogPosts(@PathVariable Long userId, @PathVariable Long blogId) throws UserNotFoundException, BlogNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.addBlogToSavedBlogPosts(userId, blogId));
-    }
-
-    @DeleteMapping("/{userId}/savedBlogs/{blogId}")
-    public ResponseEntity<User> removeBlogFromSavedBlogPosts(@PathVariable Long userId, @PathVariable Long blogId) throws UserNotFoundException, BlogNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.removeBlogFromSavedBlogPosts(userId, blogId));
-    }
-
-    @GetMapping("/{userId}/savedBlogs/contains/{blogId}")
-    public ResponseEntity<Boolean> checkIfUserSavedBlog(@PathVariable Long userId, @PathVariable Long blogId) {
-        boolean doesContain = userService.checkIfUserSavedBlog(userId, blogId);
-        return ResponseEntity.status(HttpStatus.OK).body(doesContain);
-    }
-
-    @GetMapping("/{userId}/savedBlogs/count")
-    public long countSavedBlogs(@PathVariable Long userId) throws UserNotFoundException {
-        return userService.countSavedBlogsByUser(userId);
-    }
-
-    @PostMapping("/{userId}/savedPosts/{postId}")
-    public ResponseEntity<User> addPostToSavedPosts(@PathVariable Long userId, @PathVariable Long postId) throws PostNotFoundException, UserNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.addPostToSavedPosts(userId, postId));
-    }
-
-    @DeleteMapping("/{userId}/savedPosts/{postId}")
-    public ResponseEntity<User> removePostFromSavedPosts(@PathVariable Long userId, @PathVariable Long postId) throws PostNotFoundException, UserNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.removePostFromSavedPosts(userId, postId));
-    }
-
-    @GetMapping("/{userId}/savedPosts/list")
-    public ResponseEntity<Set<Post>> getSavedPosts(@PathVariable Long userId) throws UserNotFoundException {
-        Set<Post> savedPosts = userService.getSavedPosts(userId);
-        return ResponseEntity.status(HttpStatus.OK).body(savedPosts);
-    }
-
-    @GetMapping("/{userId}/savedPosts")
-    public Page<Post> findSavedPostsByUserId(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
-        return userService.findSavedPostsByUserId(userId, pageable);
-    }
-
-    @GetMapping("/{userId}/savedPosts/count")
-    public long countSavedPosts(@PathVariable Long userId) throws UserNotFoundException {
-        return userService.countSavedPostsByUser(userId);
-    }
-
-    @GetMapping("/{userId}/savedPosts/contains/{postId}")
-    public ResponseEntity<Boolean> checkIfUserSavedPost(@PathVariable Long userId, @PathVariable Long postId) {
-        boolean doesContain = userService.checkIfUserSavedPost(userId, postId);
-        return ResponseEntity.status(HttpStatus.OK).body(doesContain);
-    }
-
-    @GetMapping("/friend-requests")
-    public ResponseEntity<Set<User>> getFriendRequests() throws UserNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getFriendRequests());
-    }
-
-    @GetMapping("/current-user-friend-requests")
-    public ResponseEntity<Page<User>> getCurrentFriendRequests(Pageable pageable) throws UserNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getCurrentFriendRequests(pageable));
-    }
-
-    @PostMapping("/send-friend-request")
-    public void sendFriendRequest(@RequestBody User friend) throws UserNotFoundException {
-        userService.sendFriendRequest(friend);
-    }
-
-    @PostMapping("/accept-friend-requests/{friendId}")
-    public User acceptFriendRequest(@PathVariable Long friendId) throws UserNotFoundException {
-        return userService.acceptFriendRequest(friendId);
-    }
-
-    @DeleteMapping("/reject-friend-requests/{friendId}")
-    public void rejectFriendRequest(@PathVariable Long friendId) throws UserNotFoundException {
-        userService.rejectFriendRequest(friendId);
-    }
-
-    @GetMapping("/{userId}/friend-requests/total")
-    public ResponseEntity<Long> countFriendRequestsByUserId(@PathVariable Long userId){
-        return ResponseEntity.status(HttpStatus.OK).body(userService.countFriendRequestsByUserId(userId));
-    }
-
-    @GetMapping("/friends")
-    public Set<User> getFriends() throws UserNotFoundException {
-        return userService.getFriends();
-    }
-
-    @GetMapping("/current-user-friends")
-    public Page<User> getCurrentUserFriends(Pageable pageable) throws UserNotFoundException {
-        return userService.getCurrentUserFriends(pageable);
-    }
-
-    @GetMapping("/{userId}/friends")
-    public Page<User> getFriendsById(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
-        return userService.getFriends(userId, pageable);
-    }
-
-    @GetMapping("/{userId}/friends/total")
-    public ResponseEntity<Long> countFriendsByUserId(@PathVariable Long userId){
-        return ResponseEntity.status(HttpStatus.OK).body(userService.countFriendsByUserId(userId));
-    }
-
-    @DeleteMapping("/friends/{friendId}")
-    public void removeFriend(@PathVariable Long friendId) throws UserNotFoundException {
-        userService.removeFriend(friendId);
-    }
-
-    @GetMapping("/friends/{friendId}")
-    public ResponseEntity<Boolean> checkFriendship(@PathVariable Long friendId) throws UserNotFoundException {
-        boolean areFriends = userService.checkFriendship(friendId);
-        return ResponseEntity.ok(areFriends);
-    }
-
-    @GetMapping("/{receptorUserId}/requests/{emissorUserId}")
-    public ResponseEntity<Boolean> checkIfSentFriendRequest(@PathVariable Long receptorUserId, @PathVariable Long emissorUserId) throws UserNotFoundException {
-        boolean sentFriendRequest = userService.checkIfSentFriendRequest(receptorUserId, emissorUserId);
-        return ResponseEntity.ok(sentFriendRequest);
-    }
-
     @GetMapping("/{userId}/subscribedOnlineCourses")
     public Page<OnlineCourse> getSubscribedOnlineCoursesByUserId(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
         return userService.getSubscribedOnlineCoursesByUserId(userId, pageable);
@@ -334,30 +207,10 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.countSubscribedOnlineCoursesByUserId(userId));
     }
 
-    @PostMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")
-    public ResponseEntity<User> addCourseToSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.addCourseToSubscribedOnlineCourses(userId, onlineCourseId));
-    }
-
-    @DeleteMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")
-    public ResponseEntity<User> removeCourseFromSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.removeCourseFromSubscribedOnlineCourses(userId, onlineCourseId));
-    }
-
     @GetMapping("/{userId}/subscribedOnlineCourses/contains/{onlineCourseId}")
     public ResponseEntity<Boolean> doesUserSubscribedOnlineCourse(@PathVariable Long userId, @PathVariable Long onlineCourseId) {
         boolean doesContain = userService.doesUserSubscribedOnlineCourse(userId, onlineCourseId);
         return ResponseEntity.status(HttpStatus.OK).body(doesContain);
-    }
-
-    @GetMapping("/{userId}/groups")
-    public Page<Group> getGroupsByUserId(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
-        return userService.getGroupsByUserId(userId, pageable);
-    }
-
-    @GetMapping("/{userId}/groups/total")
-    public ResponseEntity<Long> countGroupsByUserId(@PathVariable Long userId){
-        return ResponseEntity.status(HttpStatus.OK).body(userService.countGroupsByUserId(userId));
     }
 
     @PostMapping("/{userId}/marked-course-content/{onlineCourseContentId}")

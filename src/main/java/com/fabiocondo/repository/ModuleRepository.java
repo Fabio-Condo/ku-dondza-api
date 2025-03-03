@@ -1,6 +1,5 @@
 package com.fabiocondo.repository;
 
-import com.fabiocondo.domain.Like;
 import com.fabiocondo.domain.Module;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -45,16 +45,6 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
-    @ExceptionHandler(NotificationNotFoundException.class)
-    public ResponseEntity<HttpResponse> notificationNotFoundException(NotificationNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
-    @ExceptionHandler(ParticipationInviteNotFoundException.class)
-    public ResponseEntity<HttpResponse> participationInviteNotFoundException(ParticipationInviteNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
     @ExceptionHandler(UserInvitedException.class)
     public ResponseEntity<HttpResponse> userInvitedException(UserInvitedException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
@@ -65,28 +55,18 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
-    @ExceptionHandler(CompetitionNotFoundException.class)
-    public ResponseEntity<HttpResponse> competitionNotFoundException(CompetitionNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
-    @ExceptionHandler(SubmissionNotFoundException.class)
-    public ResponseEntity<HttpResponse> submissionNotFoundException(SubmissionNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
-    @ExceptionHandler(GroupNotFoundException.class)
-    public ResponseEntity<HttpResponse> groupNotFoundException(GroupNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
     @ExceptionHandler(TopicNotFoundException.class)
     public ResponseEntity<HttpResponse> topicNotFoundException(TopicNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
-    @ExceptionHandler(TemaNotFoundException.class)
-    public ResponseEntity<HttpResponse> temaNotFoundException(TemaNotFoundException exception) {
+    @ExceptionHandler(ModuleNotFoundException.class)
+    public ResponseEntity<HttpResponse> moduleNotFoundException(ModuleNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(OnlineCourseNotFoundException.class)
+    public ResponseEntity<HttpResponse> onlineCourseNotFoundException(OnlineCourseNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
@@ -105,48 +85,13 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
-    @ExceptionHandler(PollOptionNotFoundException.class)
-    public ResponseEntity<HttpResponse> postOptionNotFoundException(PollOptionNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
-    @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<HttpResponse> postNotFoundException(PostNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
-    @ExceptionHandler(CommentNotFoundException.class)
-    public ResponseEntity<HttpResponse> commentNotFoundException(CommentNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
-    @ExceptionHandler(ExamNotFoundException.class)
-    public ResponseEntity<HttpResponse> exameNotFoundException(ExamNotFoundException exception) {
+    @ExceptionHandler(UserCourseNotFoundException.class)
+    public ResponseEntity<HttpResponse> userCourseNotFoundException(UserCourseNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
     @ExceptionHandler(BookNotFoundException.class)
     public ResponseEntity<HttpResponse> bookNotFoundException(BookNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
-    @ExceptionHandler(BlogNotFoundException.class)
-    public ResponseEntity<HttpResponse> blogNotFoundException(BlogNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
-    @ExceptionHandler(InstituicaoNotFoundException.class)
-    public ResponseEntity<HttpResponse> instituicaoNotFoundException(InstituicaoNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
-    @ExceptionHandler(CourseNotFoundException.class)
-    public ResponseEntity<HttpResponse> courseNotFoundException(CourseNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
-    @ExceptionHandler(UserCourseNotFoundException.class)
-    public ResponseEntity<HttpResponse> userCourseNotFoundException(UserCourseNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
@@ -160,18 +105,8 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
-    @ExceptionHandler(ModuleNotFoundException.class)
-    public ResponseEntity<HttpResponse> moduleNotFoundException(ModuleNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
     @ExceptionHandler(CombinationExistException.class)
     public ResponseEntity<HttpResponse> combinationExistException(CombinationExistException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
-    @ExceptionHandler(CompetitionCannotBeFinishedException.class)
-    public ResponseEntity<HttpResponse> competitionCannotBeFinishedException(CompetitionCannotBeFinishedException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 

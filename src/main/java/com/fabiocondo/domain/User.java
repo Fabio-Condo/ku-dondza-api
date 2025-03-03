@@ -65,42 +65,6 @@ public class User implements Serializable {
     private Plan plan; //FREE or PREMIUM
 
     @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-            name = "saved_blog_posts",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "blog_id")
-    )
-    private Set<Blog> savedBlogPosts;
-
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-            name = "saved_posts",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "post_id")
-    )
-    private Set<Post> savedPosts;
-
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-            name = "friendship",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "friend_id")
-    )
-    private Set<User> friends = new HashSet<>();
-
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-            name = "friend_request",
-            joinColumns = @JoinColumn(name = "to_user_id"),
-            inverseJoinColumns = @JoinColumn(name = "from_user_id")
-    )
-    private Set<User> friendRequests = new HashSet<>();
-
-    @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
             name = "user_subject_interest",
@@ -108,15 +72,6 @@ public class User implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "subject_id")
     )
     private Set<Subject> subjectsInterests = new HashSet<>();
-
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-            name = "user_course",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "course_id")
-    )
-    private Set<Course> courses = new HashSet<>();
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
@@ -135,19 +90,6 @@ public class User implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "online_course_content_id")
     )
     private Set<OnlineCourseContent> markedCourseContents = new HashSet<>(); // marcado como assistidos
-
-    @JsonIgnore
-    @ManyToMany(mappedBy = "participants")
-    private List<Competition> competitions;
-
-    //@JsonIgnore
-    @JsonIgnoreProperties({"user", "sender"})
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ParticipationInvite> participationInvites;
-
-    @JsonIgnore
-    @ManyToMany(mappedBy = "members")
-    private List<Group> groups;
 
     public User(){}
 
@@ -169,14 +111,6 @@ public class User implements Serializable {
         this.authorities = authorities;
         this.isActive = isActive;
         this.isNotLocked = isNotLocked;
-    }
-
-    public boolean isFriend(User user) {
-        return user != null && this.friends.contains(user);
-    }
-
-    public boolean checkIfSentFriendRequest(User user) {
-        return user != null && this.friendRequests.contains(user);
     }
 
     public Long getId() {
@@ -347,52 +281,12 @@ public class User implements Serializable {
         this.plan = plan;
     }
 
-    public Set<Blog> getSavedBlogPosts() {
-        return savedBlogPosts;
-    }
-
-    public void setSavedBlogPosts(Set<Blog> savedBlogPosts) {
-        this.savedBlogPosts = savedBlogPosts;
-    }
-
-    public Set<Post> getSavedPosts() {
-        return savedPosts;
-    }
-
-    public void setSavedPosts(Set<Post> savedPosts) {
-        this.savedPosts = savedPosts;
-    }
-
-    public Set<User> getFriends() {
-        return friends;
-    }
-
-    public void setFriends(Set<User> friends) {
-        this.friends = friends;
-    }
-
-    public Set<User> getFriendRequests() {
-        return friendRequests;
-    }
-
-    public void setFriendRequests(Set<User> friendRequests) {
-        this.friendRequests = friendRequests;
-    }
-
     public Set<Subject> getSubjectsInterests() {
         return subjectsInterests;
     }
 
     public void setSubjectsInterests(Set<Subject> subjectsInterests) {
         this.subjectsInterests = subjectsInterests;
-    }
-
-    public Set<Course> getCourses() {
-        return courses;
-    }
-
-    public void setCourses(Set<Course> courses) {
-        this.courses = courses;
     }
 
     public Set<OnlineCourse> getSubscribedOnlineCourses() {
@@ -411,27 +305,4 @@ public class User implements Serializable {
         this.markedCourseContents = markedCourseContents;
     }
 
-    public List<Competition> getCompetitions() {
-        return competitions;
-    }
-
-    public void setCompetitions(List<Competition> competitions) {
-        this.competitions = competitions;
-    }
-
-    public Set<ParticipationInvite> getParticipationInvites() {
-        return participationInvites;
-    }
-
-    public void setParticipationInvites(Set<ParticipationInvite> participationInvites) {
-        this.participationInvites = participationInvites;
-    }
-
-    public List<Group> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(List<Group> groups) {
-        this.groups = groups;
-    }
 }

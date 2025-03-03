@@ -1,7 +1,7 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.OnlineCourseLike;
-import com.fabiocondo.exception.domain.CourseNotFoundException;
+import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.OnlineCourseLikeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class OnlineCourseLikeController {
     private OnlineCourseLikeService onlineCourseLikeService;
 
     @PostMapping("/course/{onlineCourseId}")
-    public ResponseEntity<OnlineCourseLike> toggleLike(@PathVariable Long onlineCourseId) throws UserNotFoundException, CourseNotFoundException {
+    public ResponseEntity<OnlineCourseLike> toggleLike(@PathVariable Long onlineCourseId) throws UserNotFoundException, OnlineCourseNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseLikeService.toggleLike(onlineCourseId));
     }
 

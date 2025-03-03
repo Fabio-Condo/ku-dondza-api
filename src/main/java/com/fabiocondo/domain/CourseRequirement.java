@@ -14,17 +14,12 @@ public class CourseRequirement {
     @NotEmpty
     private String designation;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id")
-    private Course course;
-
     public CourseRequirement() {
     }
 
-    public CourseRequirement(Long id, String designation, Course course) {
+    public CourseRequirement(Long id, String designation) {
         this.id = id;
         this.designation = designation;
-        this.course = course;
     }
 
     public Long getId() {
@@ -41,13 +36,5 @@ public class CourseRequirement {
 
     public void setDesignation(String designation) {
         this.designation = designation;
-    }
-
-    public Course getCourse() {
-        return course;
-    }
-
-    public void setCourse(Course course) {
-        this.course = course;
     }
 }

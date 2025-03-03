@@ -27,35 +27,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE u.firstName LIKE %:query% OR u.lastName LIKE %:query%")
     Page<User> searchByQuery(@Param("query") String query, Pageable pageable);
 
-    @Query("SELECT u.savedPosts FROM User u WHERE u.id = :userId")
-    Page<Post> findSavedPostsByUser(Long userId, Pageable pageable);
-
-    @Query("SELECT sp FROM User u JOIN u.savedPosts sp WHERE u.id = :userId")
-    Page<Post> findSavedPostsByUserId(@Param("userId") Long userId, Pageable pageable);
-
-    @Query("SELECT fr FROM User u JOIN u.friends fr WHERE u.id = :userId")
-    Page<User> findFriendsByUserId(@Param("userId") Long userId, Pageable pageable);
-
-    @Query("SELECT COUNT(f) FROM User u JOIN u.friends f WHERE u.id = :userId")
-    Long countFriendsByUserId(@Param("userId") Long userId);
-
-    @Query("SELECT fr FROM User u JOIN u.friendRequests fr WHERE u.id = :userId")
-    Page<User> findFriendRequestsByUserId(@Param("userId") Long userId, Pageable pageable);
-
-    @Query("SELECT COUNT(fr) FROM User u JOIN u.friendRequests fr WHERE u.id = :userId")
-    Long countFriendRequestsByUserId(@Param("userId") Long userId);
-
     @Query("SELECT oc FROM User u JOIN u.subscribedOnlineCourses oc WHERE u.id = :userId")
     Page<OnlineCourse> findSubscribedOnlineCoursesByUserId(@Param("userId") Long userId, Pageable pageable);
 
     @Query("SELECT COUNT(oc) FROM User u JOIN u.subscribedOnlineCourses oc WHERE u.id = :userId")
     Long countSubscribedOnlineCoursesByUserId(@Param("userId") Long userId);
-
-    @Query("SELECT g FROM User u JOIN u.groups g WHERE u.id = :userId")
-    Page<Group> findGroupsByUserId(@Param("userId") Long userId, Pageable pageable);
-
-    @Query("SELECT COUNT(g) FROM User u JOIN u.groups g WHERE u.id = :userId")
-    Long countGroupsByUserId(@Param("userId") Long userId);
 
     public long countByIsActiveTrue();
 

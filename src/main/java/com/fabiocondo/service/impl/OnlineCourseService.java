@@ -4,7 +4,7 @@ import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.OnlineCourse;
 import com.fabiocondo.domain.User;
-import com.fabiocondo.exception.domain.CourseNotFoundException;
+import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.OnlineCourseRepository;
 import com.fabiocondo.repository.filter.OnlineCourseFilter;
@@ -37,15 +37,15 @@ public class OnlineCourseService {
         this.amazonS3Service = amazonS3Service;
     }
 
-    public OnlineCourse findById(Long id) throws CourseNotFoundException {
+    public OnlineCourse findById(Long id) throws OnlineCourseNotFoundException {
         logger.info("Getting course by id: " + id);
         return onlineCourseRepository.findById(id)
-                .orElseThrow(() -> new CourseNotFoundException("No course found by id: " + id));
+                .orElseThrow(() -> new OnlineCourseNotFoundException("No course found by id: " + id));
     }
 
-    public OnlineCourse findOnlineCourseByOnlineCourseId(String onlineCourseId) throws CourseNotFoundException {
+    public OnlineCourse findOnlineCourseByOnlineCourseId(String onlineCourseId) throws OnlineCourseNotFoundException {
         return onlineCourseRepository.findOnlineCourseByOnlineCourseId(onlineCourseId)
-                .orElseThrow(() -> new CourseNotFoundException("No course found by id: " + onlineCourseId));
+                .orElseThrow(() -> new OnlineCourseNotFoundException("No course found by id: " + onlineCourseId));
     }
 
     public Page<OnlineCourse> findAll(String searchParam, Pageable pageable) {
@@ -75,7 +75,7 @@ public class OnlineCourseService {
         return onlineCourseRepository.save(course);
     }
 
-    public OnlineCourse update(Long id, String name, String description, String lunchDate, Long instrutorId, MultipartFile file) throws CourseNotFoundException, UserNotFoundException {
+    public OnlineCourse update(Long id, String name, String description, String lunchDate, Long instrutorId, MultipartFile file) throws UserNotFoundException, OnlineCourseNotFoundException {
         User instrutor = userService.findById(instrutorId);
 
         OnlineCourse existCourse = findById(id);
@@ -99,7 +99,7 @@ public class OnlineCourseService {
         return onlineCourseRepository.save(existCourse);
     }
 
-    public void delete(Long id) throws CourseNotFoundException {
+    public void delete(Long id) throws OnlineCourseNotFoundException {
         OnlineCourse existCourse = findById(id);
         logger.info("Deleting course: " + existCourse.getDescription());
         onlineCourseRepository.deleteById(id);
@@ -114,7 +114,7 @@ public class OnlineCourseService {
         return onlineCourseRepository.count();
     }
 
-    public OnlineCourse updateRequirements(Long id, OnlineCourse course) throws CourseNotFoundException {
+    public OnlineCourse updateRequirements(Long id, OnlineCourse course) throws OnlineCourseNotFoundException {
         OnlineCourse existCourse = findById(id);
         existCourse.getRequirements().clear();
         existCourse.getRequirements().addAll(course.getRequirements());
@@ -124,7 +124,7 @@ public class OnlineCourseService {
         return onlineCourseRepository.save(existCourse);
     }
 
-    public Page<User> getStudentsByCourseId(Long courseId, Pageable pageable) throws CourseNotFoundException {
+    public Page<User> getStudentsByCourseId(Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
         OnlineCourse existCourse = findById(courseId);
         return onlineCourseRepository.findStudentsByCourseId(existCourse.getId(), pageable);
     }

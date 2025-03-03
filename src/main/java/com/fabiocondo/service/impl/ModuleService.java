@@ -3,8 +3,8 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.domain.Module;
 import com.fabiocondo.domain.OnlineCourse;
 import com.fabiocondo.exception.domain.CourseContentNotFoundException;
-import com.fabiocondo.exception.domain.CourseNotFoundException;
-import com.fabiocondo.exception.domain.TemaNotFoundException;
+import com.fabiocondo.exception.domain.ModuleNotFoundException;
+import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
 import com.fabiocondo.repository.TemaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +26,10 @@ public class ModuleService {
         this.onlineCourseService = onlineCourseService;
     }
 
-    public Module findById(Long id) throws TemaNotFoundException {
+    public Module findById(Long id) throws ModuleNotFoundException {
         logger.info("Getting module by id: " + id);
         return temaRepository.findById(id)
-                .orElseThrow(() -> new TemaNotFoundException("No module found by id: " + id));
+                .orElseThrow(() -> new ModuleNotFoundException("No module found by id: " + id));
     }
 
     public List<Module> findByOnlineCourseId(Long courseId) {
@@ -44,7 +44,7 @@ public class ModuleService {
         return temaRepository.findAll();
     }
 
-    public Module save(String name, Long onlineCourseId, Integer position) throws CourseNotFoundException, TemaNotFoundException {
+    public Module save(String name, Long onlineCourseId, Integer position) throws ModuleNotFoundException, OnlineCourseNotFoundException {
         OnlineCourse onlineCourse = onlineCourseService.findById(onlineCourseId);
         Module module = new Module();
         module.setName(name);
@@ -54,7 +54,7 @@ public class ModuleService {
         return temaRepository.save(module);
     }
 
-    public Module update(Long id, String name, Long onlineCourseId, Integer position) throws CourseContentNotFoundException, CourseNotFoundException, TemaNotFoundException {
+    public Module update(Long id, String name, Long onlineCourseId, Integer position) throws CourseContentNotFoundException, ModuleNotFoundException, OnlineCourseNotFoundException {
         OnlineCourse onlineCourse = onlineCourseService.findById(onlineCourseId);
         Module existModule = findById(id);
         existModule.setOnlineCourse(onlineCourse);
@@ -64,7 +64,7 @@ public class ModuleService {
         return temaRepository.save(existModule);
     }
 
-    public void delete(Long id) throws TemaNotFoundException {
+    public void delete(Long id) throws ModuleNotFoundException {
         Module existModule = findById(id);
         temaRepository.deleteById(existModule.getId());
     }

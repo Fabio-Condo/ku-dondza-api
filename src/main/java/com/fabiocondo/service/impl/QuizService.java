@@ -3,6 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
+import com.fabiocondo.domain.Topic;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
@@ -110,5 +111,19 @@ public class QuizService {
         Quiz quiz = findById(quizId);
         return quizRepository.findAnswersByQuizId(quiz.getId());
     }
+
+    public Set<Topic> getTopicsByQuizId(Long quizId) throws QuizNotFoundException {
+        Quiz quiz = findById(quizId);
+        Set<Topic> topics = new HashSet<>();
+
+        quiz.getQuestions().forEach(question -> {
+            if (question.getTopic() != null) {
+                topics.add(question.getTopic());
+            }
+        });
+
+        return topics;
+    }
+
 
 }

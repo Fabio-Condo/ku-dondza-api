@@ -90,6 +90,12 @@ public class QuizController {
         return quizService.getUserSubmittedAnswersByQuizId(quizId);
     }
 
+    @GetMapping("/{quizId}/topics")
+    public ResponseEntity<Set<Topic>> getTopicsByQuizId(@PathVariable Long quizId) throws QuizNotFoundException {
+        Set<Topic> topics = quizService.getTopicsByQuizId(quizId);
+        return ResponseEntity.ok(topics);
+    }
+
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(
                 new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(), message),

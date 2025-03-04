@@ -100,27 +100,6 @@ public class QuizMapper {
         return quizDTO;
     }
 
-    public double calculateAccuracyRate(Quiz quiz) {
-        Set<Question> questions = quiz.getQuestions();
-
-        int correctAnswers = 0;
-
-        for (Question question : questions) {
-            Set<Answer> userAnswers = quiz.getAnswers();
-
-            for (Answer userAnswer : userAnswers) {
-                if (userAnswer.getQuestion().equals(question) && userAnswer.isCorrect()) {
-                    correctAnswers++;
-                    break;
-                }
-            }
-        }
-
-        double accuracyRate = (double) correctAnswers / questions.size() * 100;
-
-        return accuracyRate;
-    }
-
     // Converter lista paginada de Quiz para DTO
     public Page<QuizDTO> domainPageToDTOPage(Page<Quiz> quizzes, Pageable pageable) {
         return new PageImpl<>(quizzes.stream()

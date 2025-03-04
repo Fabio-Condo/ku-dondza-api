@@ -207,6 +207,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.countSubscribedOnlineCoursesByUserId(userId));
     }
 
+    @PostMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")
+    public ResponseEntity<User> addCourseToSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws UserNotFoundException, OnlineCourseNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.addCourseToSubscribedOnlineCourses(userId, onlineCourseId));
+    }
+
+    @DeleteMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")
+    public ResponseEntity<User> removeCourseFromSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws UserNotFoundException, OnlineCourseNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.removeCourseFromSubscribedOnlineCourses(userId, onlineCourseId));
+    }
+
     @GetMapping("/{userId}/subscribedOnlineCourses/contains/{onlineCourseId}")
     public ResponseEntity<Boolean> doesUserSubscribedOnlineCourse(@PathVariable Long userId, @PathVariable Long onlineCourseId) {
         boolean doesContain = userService.doesUserSubscribedOnlineCourse(userId, onlineCourseId);

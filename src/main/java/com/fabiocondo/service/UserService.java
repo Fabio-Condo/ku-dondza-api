@@ -51,6 +51,10 @@ public interface UserService {
 
     long countSubscribedOnlineCoursesByUserId(Long userId);
 
+    User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException;
+
+    User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException;
+
     boolean doesUserSubscribedOnlineCourse(Long userId, Long onlineCourseId);
 
     User findUserByUsername(String username);

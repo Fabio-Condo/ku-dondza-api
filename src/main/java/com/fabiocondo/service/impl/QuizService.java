@@ -44,16 +44,8 @@ public class QuizService {
                 .orElseThrow(() -> new QuizNotFoundException("No quiz found by id: " + quizId));
     }
 
-    public Page<Quiz> findAll(String searchParam, Pageable pageable) {
-        return quizRepository.findAll(searchParam, pageable);
-    }
-
     public Page<Quiz> filter(QuizFilter quizFilter, Pageable pageable) {
         return quizRepository.filter(quizFilter, pageable);
-    }
-
-    public List<Quiz> findAll() {
-        return quizRepository.findAll();
     }
 
     public Page<Quiz> getQuizzesByQuestionId(Long questionId, Pageable pageable) throws QuizNotFoundException {
@@ -98,32 +90,8 @@ public class QuizService {
         return quizRepository.countByUserId(userId);
     }
 
-    public List<Question> getQuestionsByQuizId(Long quizId) throws QuizNotFoundException {
-        Quiz quiz = findById(quizId);
-        return quizRepository.findQuestionsByQuizId(quiz.getId());
-    }
-
     public long countQuestionsByQuizId(Long quizId){
         return quizRepository.countQuestionsByQuizId(quizId);
     }
-
-    public List<Answer> getUserSubmittedAnswersByQuizId(Long quizId) throws QuizNotFoundException {
-        Quiz quiz = findById(quizId);
-        return quizRepository.findAnswersByQuizId(quiz.getId());
-    }
-
-    public Set<Topic> getTopicsByQuizId(Long quizId) throws QuizNotFoundException {
-        Quiz quiz = findById(quizId);
-        Set<Topic> topics = new HashSet<>();
-
-        quiz.getQuestions().forEach(question -> {
-            if (question.getTopic() != null) {
-                topics.add(question.getTopic());
-            }
-        });
-
-        return topics;
-    }
-
 
 }

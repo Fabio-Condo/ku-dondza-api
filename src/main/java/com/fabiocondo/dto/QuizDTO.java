@@ -1,7 +1,7 @@
-package com.fabiocondo.domain;
+package com.fabiocondo.dto;
 
+import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.DifficultyLevel;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -9,9 +9,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
-@Table(name = "quiz")
-public class Quiz {
+public class QuizDTO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,32 +31,22 @@ public class Quiz {
 
     private Integer timeSpent;// Tempo gasto em segundos
 
-    @ManyToOne
-    @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-            name = "quiz_questions",
-            joinColumns = @JoinColumn(name = "quiz_id"),
-            inverseJoinColumns = @JoinColumn(name = "question_id")
-    )
     private Set<Question> questions = new HashSet<>();
 
-    @JsonIgnore
-    @ManyToMany
-    @JoinTable(
-            name = "quiz_answers",
-            joinColumns = @JoinColumn(name = "quiz_id"),
-            inverseJoinColumns = @JoinColumn(name = "answer_id")
-    )
-    private Set<Answer> answers = new HashSet<>(); // capturar as respostas
+    private Set<Answer> answers = new HashSet<>();
 
+    private Set<Topic> topics = new HashSet<>();
+
+    private Long totalQuestions;
+
+    private double accuracyRate;
+
+
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -139,7 +127,31 @@ public class Quiz {
         this.answers = answers;
     }
 
-    // Métodos para calcular total de acertos e erros considerando as respostas fornecidas
+    public Set<Topic> getTopics() {
+        return topics;
+    }
+
+    public void setTopics(Set<Topic> topics) {
+        this.topics = topics;
+    }
+
+    public Long getTotalQuestions() {
+        return totalQuestions;
+    }
+
+    public void setTotalQuestions(Long totalQuestions) {
+        this.totalQuestions = totalQuestions;
+    }
+
+    public double getAccuracyRate() {
+        return accuracyRate;
+    }
+
+    public void setAccuracyRate(double accuracyRate) {
+        this.accuracyRate = accuracyRate;
+    }
+
+// Métodos para calcular total de acertos e erros considerando as respostas fornecidas
     //public int getTotalAcertos() {
     //    int acertos = 0;
         // Percorre as perguntas e verifica se as respostas fornecidas pelo usuário estão corretas

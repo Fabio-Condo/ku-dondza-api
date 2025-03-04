@@ -1,8 +1,9 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
+import com.fabiocondo.dto.QuizDTO;
+import com.fabiocondo.dtoConverter.QuizMapper;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
-import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.QuizService;
 import org.springframework.data.domain.Page;
@@ -20,8 +21,11 @@ public class QuizController {
 
     private final QuizService quizService;
 
-    public QuizController(QuizService quizService) {
+    private final QuizMapper quizMapper;
+
+    public QuizController(QuizService quizService, QuizMapper quizMapper) {
         this.quizService = quizService;
+        this.quizMapper = quizMapper;
     }
 
     @GetMapping("/{id}")
@@ -30,24 +34,14 @@ public class QuizController {
     }
 
     @GetMapping("/find-by-quizId/{quizId}")
-    public ResponseEntity<Quiz> findQuizByQuizId(@PathVariable("quizId") String quizId) throws QuizNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(quizService.findQuizByQuizId(quizId));
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<Quiz>> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(quizService.findAll(searchParam, pageable));
+    public ResponseEntity<QuizDTO> findQuizByQuizId(@PathVariable("quizId") String quizId) throws QuizNotFoundException {
+        Quiz quiz = quizService.findQuizByQuizId(quizId);
+        return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(quiz));
     }
 
     @GetMapping("/filter")
-    public Page<Quiz> filter(QuizFilter quizFilter, Pageable pageable) {
-        return quizService.filter(quizFilter, pageable);
-    }
-
-    @GetMapping("/findAll")
-    public ResponseEntity<List<Quiz>> findAll() {
-        List<Quiz> quizzes = quizService.findAll();
-        return ResponseEntity.ok(quizzes);
+    public Page<QuizDTO> filter(QuizFilter quizFilter, Pageable pageable) {
+        return quizMapper.domainPageToDTOPage(quizService.filter(quizFilter, pageable), pageable);
     }
 
     @GetMapping("/by-question/{questionId}")
@@ -58,7 +52,7 @@ public class QuizController {
     @PostMapping
     public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz,
                                            @RequestParam Set<Long> questionIds,
-                                           @RequestParam Set<Long> userAnswerIds) throws UserNotFoundException {
+                                           @RequestParam Set<Long> userAnswerIds) {
 
         Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, questionIds, userAnswerIds);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedQuiz);
@@ -75,25 +69,9 @@ public class QuizController {
         return ResponseEntity.status(HttpStatus.OK).body(quizService.countByUserId(userId));
     }
 
-    @GetMapping("/{quizId}/questions")
-    public List<Question> getQuestionsByQuizId(@PathVariable Long quizId) throws QuizNotFoundException {
-        return quizService.getQuestionsByQuizId(quizId);
-    }
-
     @GetMapping("/{quizId}/questions/total")
     public ResponseEntity<Long> countQuestionsByQuizId(@PathVariable Long quizId){
         return ResponseEntity.status(HttpStatus.OK).body(quizService.countQuestionsByQuizId(quizId));
-    }
-
-    @GetMapping("/{quizId}/submitted-answers")
-    public List<Answer> getUserSubmittedAnswersByQuizId(@PathVariable Long quizId) throws QuizNotFoundException {
-        return quizService.getUserSubmittedAnswersByQuizId(quizId);
-    }
-
-    @GetMapping("/{quizId}/topics")
-    public ResponseEntity<Set<Topic>> getTopicsByQuizId(@PathVariable Long quizId) throws QuizNotFoundException {
-        Set<Topic> topics = quizService.getTopicsByQuizId(quizId);
-        return ResponseEntity.ok(topics);
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

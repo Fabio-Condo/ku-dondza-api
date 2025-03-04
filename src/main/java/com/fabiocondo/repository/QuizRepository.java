@@ -13,16 +13,17 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositoryQuery {
     @Query("SELECT q FROM Quiz q WHERE q.title LIKE %:searchParam%")
     public Page<Quiz> findAll(@Param("searchParam") String searchParam, Pageable pageable);
 
     @Query("SELECT usa FROM Quiz qz JOIN qz.answers usa WHERE qz.id = :quizId")
-    List<Answer> findAnswersByQuizId(@Param("quizId") Long quizId);
+    Set<Answer> findAnswersByQuizId(@Param("quizId") Long quizId);
 
     @Query("SELECT qts FROM Quiz qz JOIN qz.questions qts WHERE qz.id = :quizId")
-    List<Question> findQuestionsByQuizId(@Param("quizId") Long quizId);
+    Set<Question> findQuestionsByQuizId_v2(@Param("quizId") Long quizId);
 
     @Query("SELECT COUNT(qts) FROM Quiz qz JOIN qz.questions qts WHERE qz.id = :quizId")
     Long countQuestionsByQuizId(@Param("quizId") Long quizId);

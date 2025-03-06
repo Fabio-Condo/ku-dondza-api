@@ -1,6 +1,8 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
+import com.fabiocondo.dto.OnlineCourseDTO;
+import com.fabiocondo.dtoConverter.OnlineCourseMapper;
 import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.filter.OnlineCourseFilter;
@@ -17,9 +19,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class OnlineCourseController {
 
     public OnlineCourseService onlineCourseService;
+    private final OnlineCourseMapper onlineCourseMapper;
 
-    public OnlineCourseController(OnlineCourseService onlineCourseService) {
+
+    public OnlineCourseController(OnlineCourseService onlineCourseService, OnlineCourseMapper onlineCourseMapper) {
         this.onlineCourseService = onlineCourseService;
+        this.onlineCourseMapper = onlineCourseMapper;
     }
 
     @GetMapping("/{id}")
@@ -28,8 +33,9 @@ public class OnlineCourseController {
     }
 
     @GetMapping("/find-by-courseId/{onlineCourseId}")
-    public ResponseEntity<OnlineCourse> findOnlineCourseByOnlineCourseId(@PathVariable("onlineCourseId") String onlineCourseId) throws OnlineCourseNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.findOnlineCourseByOnlineCourseId(onlineCourseId));
+    public ResponseEntity<OnlineCourseDTO> findOnlineCourseByOnlineCourseId(@PathVariable("onlineCourseId") String onlineCourseId) throws OnlineCourseNotFoundException {
+        OnlineCourse onlineCourse = onlineCourseService.findOnlineCourseByOnlineCourseId(onlineCourseId);
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseMapper.domainToDTO_WithModules(onlineCourse));
     }
 
     @GetMapping("/findAll")
@@ -69,11 +75,6 @@ public class OnlineCourseController {
         return response(HttpStatus.OK, "Course deleted successfully");
     }
 
-    @GetMapping("/total")
-    public ResponseEntity<Long> getTotal() {
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.getTotal());
-    }
-
     @PutMapping("/{id}/requirements/update")
     public ResponseEntity<OnlineCourse> updateRequirements(@PathVariable("id") Long id, @RequestBody OnlineCourse course) throws OnlineCourseNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.updateRequirements(id, course));
@@ -82,11 +83,6 @@ public class OnlineCourseController {
     @GetMapping("/{courseId}/students")
     public Page<User> getStudentsByCourseId(@PathVariable Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
         return onlineCourseService.getStudentsByCourseId(courseId, pageable);
-    }
-
-    @GetMapping("/{courseId}/students/total")
-    public ResponseEntity<Long> countOnlineCourseStudentsByCourseId(@PathVariable Long courseId){
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.countOnlineCourseStudentsByCourseId(courseId));
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

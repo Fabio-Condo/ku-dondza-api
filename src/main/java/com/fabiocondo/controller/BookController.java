@@ -88,11 +88,6 @@ public class BookController {
                 .body(resource);
     }
 
-    @GetMapping("/total")
-    public ResponseEntity<Long> getTotal(){
-        return ResponseEntity.status(HttpStatus.OK).body(bookService.getTotal());
-    }
-
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(
                 new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(), message),

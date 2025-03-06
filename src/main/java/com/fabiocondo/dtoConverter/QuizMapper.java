@@ -95,8 +95,10 @@ public class QuizMapper {
         quizDTO.setTimeSpent(quiz.getTimeSpent());
         quizDTO.setSubject(quiz.getSubject());
         quizDTO.setUser(quiz.getUser());
-        quizDTO.setQuestions(quizRepository.findQuestionsByQuizId_v2(quiz.getId()));
-        quizDTO.setAnswers(quizRepository.findAnswersByQuizId(quiz.getId()));
+        quizDTO.setQuestions(quiz.getQuestions()); //
+        quizDTO.setAnswers(quiz.getAnswers());
+        //quizDTO.setQuestions(quizRepository.findQuestionsByQuizId_v2(quiz.getId()));
+        //quizDTO.setAnswers(quizRepository.findAnswersByQuizId(quiz.getId()));
         return quizDTO;
     }
 

@@ -11,10 +11,6 @@ import java.util.Set;
 
 public class QuizDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, updatable=false)
-    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
     private String quizId;

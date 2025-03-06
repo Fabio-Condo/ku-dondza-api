@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -62,11 +61,6 @@ public class QuizController {
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws QuizNotFoundException {
         quizService.delete(id);
         return response(HttpStatus.OK, "Quiz deleted successfully");
-    }
-
-    @GetMapping("/total")
-    public ResponseEntity<Long> getTotalByUser(@RequestParam Long userId){
-        return ResponseEntity.status(HttpStatus.OK).body(quizService.countByUserId(userId));
     }
 
     @GetMapping("/{quizId}/questions/total")

@@ -30,11 +30,6 @@ public class ModuleController {
         return ResponseEntity.status(HttpStatus.OK).body(moduleService.findById(id));
     }
 
-    @GetMapping("/findByCourseId")
-    public ResponseEntity<List<Module>> findByOnlineCourseId(@RequestParam Long courseId) {
-        return ResponseEntity.status(HttpStatus.OK).body(moduleService.findByOnlineCourseId(courseId));
-    }
-
     @GetMapping
     public ResponseEntity<Page<Module>> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(moduleService.findAll(searchParam, pageable));

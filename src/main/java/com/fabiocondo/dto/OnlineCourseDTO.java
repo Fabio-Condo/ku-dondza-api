@@ -1,21 +1,18 @@
-package com.fabiocondo.domain;
+package com.fabiocondo.dto;
 
+import com.fabiocondo.domain.Module;
+import com.fabiocondo.domain.OnlineCourseRequirement;
+import com.fabiocondo.domain.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-@Entity
-@Table(name = "online_course")
-public class OnlineCourse {
+public class OnlineCourseDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String onlineCourseId;
@@ -30,29 +27,18 @@ public class OnlineCourse {
 
     private String lunchDate;
 
-    @ManyToOne
-    @JsonIgnoreProperties({"subscribedOnlineCourses"})
-    @JoinColumn(name = "user_id")
     private User instrutor;
 
-    @Valid
-    @JsonIgnoreProperties("course")
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OnlineCourseRequirement> requirements;
 
-    //@JsonIgnoreProperties({"onlineCourse"})
-    @JsonIgnore
-    @OneToMany(mappedBy = "onlineCourse", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Module> modules = new ArrayList<>();
+    private List<Module> modules = new ArrayList<>(); // Mesmo com JsonIgnore na class model, se nao colocar aqui, sera serealizado
 
-    @JsonIgnore
-    @ManyToMany(mappedBy = "subscribedOnlineCourses")
-    private List<User> students;
+    //private List<User> students;
 
     // Constructors
-    public OnlineCourse() {}
+    public OnlineCourseDTO() {}
 
-    public OnlineCourse(String name, String description, String coverImageUrl, String lunchDate) {
+    public OnlineCourseDTO(String name, String description, String coverImageUrl, String lunchDate) {
         this.name = name;
         this.description = description;
         this.coverImageUrl = coverImageUrl;
@@ -141,12 +127,12 @@ public class OnlineCourse {
         this.requirements = requirements;
     }
 
-    public List<User> getStudents() {
-        return students;
-    }
+    //public List<User> getStudents() {
+    //    return students;
+    //}
 
-    public void setStudents(List<User> students) {
-        this.students = students;
-    }
+    //public void setStudents(List<User> students) {
+    //    this.students = students;
+    //}
 }
 

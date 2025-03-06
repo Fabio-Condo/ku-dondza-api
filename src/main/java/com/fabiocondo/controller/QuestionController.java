@@ -73,11 +73,6 @@ public class QuestionController {
         return response(HttpStatus.OK, "Question deleted successfully");
     }
 
-    @GetMapping("/total")
-    public ResponseEntity<Long> getTotal(){
-        return ResponseEntity.status(HttpStatus.OK).body(questionService.getTotal());
-    }
-
     @PostMapping("/{questionId}/question-image") // remover
     public ResponseEntity<Question> updateQuestionImage(@PathVariable Long questionId, @RequestParam("file") MultipartFile file) throws IOException, QuestionNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.updateQuestionImage(questionId, file));

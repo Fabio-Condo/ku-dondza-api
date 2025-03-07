@@ -437,19 +437,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.save(user);
     }
 
-    @Override
-    public boolean doesUserSubscribedOnlineCourse(Long userId, Long onlineCourseId) {
-        User user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            return false;
-        }
-        Optional<OnlineCourse> course = onlineCourseRepository.findById(onlineCourseId);
-        if (!course.isPresent()) {
-            return false;
-        }
-        return user.getSubscribedOnlineCourses().contains(course.get());
-    }
-
     private User validateNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistException, EmailExistException {
         User userByNewUsername = findUserByUsername(newUsername);
         User userByNewEmail = findUserByEmail(newEmail);

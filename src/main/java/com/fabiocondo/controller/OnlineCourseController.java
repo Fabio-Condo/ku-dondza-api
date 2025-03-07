@@ -33,7 +33,7 @@ public class OnlineCourseController {
     }
 
     @GetMapping("/find-by-courseId/{onlineCourseId}")
-    public ResponseEntity<OnlineCourseDTO> findOnlineCourseByOnlineCourseId(@PathVariable("onlineCourseId") String onlineCourseId) throws OnlineCourseNotFoundException {
+    public ResponseEntity<OnlineCourseDTO> findOnlineCourseByOnlineCourseId(@PathVariable("onlineCourseId") String onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException {
         OnlineCourse onlineCourse = onlineCourseService.findOnlineCourseByOnlineCourseId(onlineCourseId);
         return ResponseEntity.status(HttpStatus.OK).body(onlineCourseMapper.domainToDTO_WithModules(onlineCourse));
     }

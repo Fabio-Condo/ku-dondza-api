@@ -3,11 +3,7 @@ package com.fabiocondo.dto;
 import com.fabiocondo.domain.Module;
 import com.fabiocondo.domain.OnlineCourseRequirement;
 import com.fabiocondo.domain.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.*;
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +29,7 @@ public class OnlineCourseDTO {
 
     private List<Module> modules = new ArrayList<>(); // Mesmo com JsonIgnore na class model, se nao colocar aqui, sera serealizado
 
-    //private List<User> students;
+    private boolean isCurrentUserSubscribed;
 
     // Constructors
     public OnlineCourseDTO() {}
@@ -127,12 +123,13 @@ public class OnlineCourseDTO {
         this.requirements = requirements;
     }
 
-    //public List<User> getStudents() {
-    //    return students;
-    //}
+    public boolean isCurrentUserSubscribed() {
+        return isCurrentUserSubscribed;
+    }
 
-    //public void setStudents(List<User> students) {
-    //    this.students = students;
-    //}
+    public void setCurrentUserSubscribed(boolean currentUserSubscribed) {
+        isCurrentUserSubscribed = currentUserSubscribed;
+    }
+
 }
 

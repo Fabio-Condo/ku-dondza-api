@@ -55,8 +55,6 @@ public interface UserService {
 
     User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException;
 
-    boolean doesUserSubscribedOnlineCourse(Long userId, Long onlineCourseId);
-
     User findUserByUsername(String username);
 
     User findUserByUserId(String userId);

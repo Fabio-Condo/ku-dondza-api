@@ -14,6 +14,11 @@ services:
       - "33066:3306"
     networks:
       - kudondza-network
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "1"
+#          memory: "2GB"
 
   kudondza-api:
     image: fabiocondo/kudondza-api # Usar imagem do seu Docker Hub
@@ -26,6 +31,11 @@ services:
     depends_on:
       - kudondza-mysql
       - kudondza-redis
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "0.7"
+#          memory: "1.5GB"
 
   kudondza-proxy:
     build: ./nginx
@@ -36,6 +46,11 @@ services:
       - kudondza-network
     depends_on:
       - kudondza-api
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "0.5"
+#          memory: "512MB"
 
   kudondza-redis:
     image: redis:latest
@@ -43,6 +58,12 @@ services:
       - "6379:6379"
     networks:
       - kudondza-network
+ #   deploy:
+ #     resources:
+ #       limits:
+ #         cpus: "0.5"
+ #         memory: "512MB"
+
 
 
   # Se quiser usar a imagem que seta no docker hub

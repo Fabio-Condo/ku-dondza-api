@@ -1,5 +1,6 @@
 package com.fabiocondo;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
@@ -28,7 +29,8 @@ public class KuDondzaApi {
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:4200",
-                "http://kudondza-frontend-app.s3-website-us-east-1.amazonaws.com"
+                "http://kudondza-frontend-app.s3-website-us-east-1.amazonaws.com",
+                "http://100.29.33.126:4200"
         ));
         corsConfiguration.setAllowedHeaders(Arrays.asList("Origin", "Access-Control-Allow-Origin", "Content-Type",
                 "Accept", "Jwt-Token", "Authorization", "Origin, Accept", "X-Requested-With",

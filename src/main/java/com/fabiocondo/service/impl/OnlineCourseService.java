@@ -44,12 +44,6 @@ public class OnlineCourseService {
     }
 
     public OnlineCourse findOnlineCourseByOnlineCourseId(String onlineCourseId) throws OnlineCourseNotFoundException {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
         return onlineCourseRepository.findOnlineCourseByOnlineCourseId(onlineCourseId)
                 .orElseThrow(() -> new OnlineCourseNotFoundException("No course found by id: " + onlineCourseId));
     }
@@ -59,12 +53,6 @@ public class OnlineCourseService {
     }
 
     public Page<OnlineCourse> filter(OnlineCourseFilter onlineCourseFilter, Pageable pageable) {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
         return onlineCourseRepository.filter(onlineCourseFilter, pageable);
     }
 

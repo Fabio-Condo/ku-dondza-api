@@ -49,12 +49,6 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Page<Book> filter(BookFilter bookFilter, Pageable pageable) {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
         return bookRepository.filter(bookFilter, pageable);
     }
 

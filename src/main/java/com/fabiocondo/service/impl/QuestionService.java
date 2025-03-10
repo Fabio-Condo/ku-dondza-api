@@ -40,23 +40,11 @@ public class QuestionService {
     }
 
     public Question findQuestionByQuestionId(String questionId) throws QuestionNotFoundException {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
         return questionRepository.findQuestionByQuestionId(questionId)
                 .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
     }
 
     public Page<Question> filter(QuestionFilter questionFilter, Pageable pageable) {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
         return questionRepository.filter(questionFilter, pageable);
     }
 
@@ -65,12 +53,6 @@ public class QuestionService {
     }
 
     public Set<Question> getQuestionsByTopics(Set<Long> topicIds, DifficultyLevel difficultyLevel, int limitPerTopic) {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
         if (topicIds == null || topicIds.isEmpty()) {
             throw new IllegalArgumentException("O Quiz deve ter pelo menos um tópico associado.");
         } else {

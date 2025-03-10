@@ -39,23 +39,11 @@ public class QuizService {
     }
 
     public Quiz findQuizByQuizId(String quizId) throws QuizNotFoundException {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
         return quizRepository.findQuizByQuizId(quizId)
                 .orElseThrow(() -> new QuizNotFoundException("No quiz found by id: " + quizId));
     }
 
     public Page<Quiz> filter(QuizFilter quizFilter, Pageable pageable) {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
         return quizRepository.filter(quizFilter, pageable);
     }
 
@@ -67,13 +55,6 @@ public class QuizService {
 
     @Transactional
     public Quiz saveQuizWithQuestions(Quiz quiz, Set<Long> questionIds, Set<Long> userAnswerIds) {
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
 
         if (quiz == null) {
             throw new IllegalArgumentException("O objeto Quiz não pode ser nulo.");
@@ -105,12 +86,6 @@ public class QuizService {
     }
 
     public long countByUserId(Long userId){
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
         return quizRepository.countByUserId(userId);
     }
 

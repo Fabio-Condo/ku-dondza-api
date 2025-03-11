@@ -64,7 +64,6 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private Plan plan; //FREE or PREMIUM
 
-    @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
             name = "user_subject_interest",

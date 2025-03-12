@@ -29,7 +29,7 @@ public class KuDondzaApi {
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:4200",
-                "http://kudondza-frontend-app.s3-website-us-east-1.amazonaws.com",
+                "http://frontend-deploy-bucket-test.s3-website-us-east-1.amazonaws.com",
                 "http://100.29.33.126:4200"
         ));
         corsConfiguration.setAllowedHeaders(Arrays.asList("Origin", "Access-Control-Allow-Origin", "Content-Type",

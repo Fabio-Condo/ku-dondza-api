@@ -20,9 +20,9 @@ public interface BookService {
 
     List<Book> findAll();
 
-    Book save(String name, String description, Long subjectId, MultipartFile file) throws SubjectNotFoundException;
+    Book save(String name, String description, String author, Long subjectId, MultipartFile file) throws SubjectNotFoundException;
 
-    Book update(Long id, String name, String description, Long subjectId, MultipartFile file) throws BookNotFoundException, SubjectNotFoundException;
+    Book update(Long id, String name, String description, String author, Long subjectId, MultipartFile file) throws BookNotFoundException, SubjectNotFoundException;
 
     void delete(Long id) throws BookNotFoundException;
 

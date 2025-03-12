@@ -53,20 +53,22 @@ public class BookController {
     @PostMapping
     public ResponseEntity<Book> save(@RequestParam("name") String name,
                                      @RequestParam("description") String description,
+                                     @RequestParam("author") String author,
                                      @RequestParam("subjectId") Long subjectId,
                                      @RequestParam("file") MultipartFile file) throws SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(bookService.save(name, description, subjectId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(bookService.save(name, description, author, subjectId, file));
     }
 
     @PutMapping
     public ResponseEntity<Book> update(@RequestParam("id") Long id,
                                        @RequestParam("name") String name,
                                        @RequestParam("description") String description,
+                                       @RequestParam("author") String author,
                                        @RequestParam("subjectId") Long subjectId,
                                        @RequestParam(value = "file", required = false) MultipartFile file) throws SubjectNotFoundException, BookNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(bookService.update(id, name, description, subjectId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(bookService.update(id, name, description, author, subjectId, file));
     }
 
     @DeleteMapping("/{id}")

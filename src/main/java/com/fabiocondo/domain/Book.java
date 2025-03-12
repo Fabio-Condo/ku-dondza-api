@@ -18,6 +18,8 @@ public class Book {
 
     private String description;
 
+    private String author;
+
     private String fileName;
 
     private String urlFile;
@@ -31,10 +33,11 @@ public class Book {
     public Book() {
     }
 
-    public Book(Long id, String name, String description, String fileName, String urlFile, Long totalDownloadNumber, Subject subject) {
+    public Book(Long id, String name, String description, String author, String fileName, String urlFile, Long totalDownloadNumber, Subject subject) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.author = author;
         this.fileName = fileName;
         this.urlFile = urlFile;
         this.totalDownloadNumber = totalDownloadNumber;
@@ -63,6 +66,14 @@ public class Book {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getFileName() {

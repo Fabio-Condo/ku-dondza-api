@@ -2,7 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.QuizDTO;
-import com.fabiocondo.dtoConverter.QuizMapper;
+import com.fabiocondo.dtoMapper.QuizMapper;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.QuizService;

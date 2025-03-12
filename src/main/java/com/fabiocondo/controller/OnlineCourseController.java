@@ -2,7 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.OnlineCourseDTO;
-import com.fabiocondo.dtoConverter.OnlineCourseMapper;
+import com.fabiocondo.dtoMapper.OnlineCourseMapper;
 import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.filter.OnlineCourseFilter;

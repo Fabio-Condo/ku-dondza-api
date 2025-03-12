@@ -14,6 +14,8 @@ public class BookFilter {
 
     private String description;
 
+    private String author;
+
     public String getSearchParam() {
         return searchParam;
     }
@@ -52,5 +54,13 @@ public class BookFilter {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 }

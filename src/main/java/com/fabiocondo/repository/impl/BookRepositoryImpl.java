@@ -85,7 +85,9 @@ public class BookRepositoryImpl implements BookRepositoryQuery {
                     builder.lower(root.get("description")), "%" + bookFilter.getSearchParam().toLowerCase() + "%");
             Predicate name = builder.like(
                     builder.lower(root.get("name")), "%" + bookFilter.getSearchParam().toLowerCase() + "%");
-            predicates.add(builder.or(subject, description, name));
+            Predicate author = builder.like(
+                    builder.lower(root.get("author")), "%" + bookFilter.getSearchParam().toLowerCase() + "%");
+            predicates.add(builder.or(subject, description, name, author));
         }
 
         if(!ObjectUtils.isEmpty(bookFilter.getName())) {
@@ -95,6 +97,10 @@ public class BookRepositoryImpl implements BookRepositoryQuery {
         if(!ObjectUtils.isEmpty(bookFilter.getDescription())) {
             predicates.add(builder.like(
                     builder.lower(root.get("description")), "%" + bookFilter.getDescription().toLowerCase() + "%"));
+        }
+        if(!ObjectUtils.isEmpty(bookFilter.getAuthor())) {
+            predicates.add(builder.like(
+                    builder.lower(root.get("author")), "%" + bookFilter.getAuthor().toLowerCase() + "%"));
         }
         if(!ObjectUtils.isEmpty(bookFilter.getSubject())) {
             predicates.add(builder.equal(

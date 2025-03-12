@@ -7,7 +7,7 @@ public class QuestionFilter {
 
     private String searchParam;
 
-    private String questionOrderBy;
+    private String sort;
 
     private Subject subject;
 
@@ -23,12 +23,12 @@ public class QuestionFilter {
         this.searchParam = searchParam;
     }
 
-    public String getQuestionOrderBy() {
-        return questionOrderBy;
+    public String getSort() {
+        return sort;
     }
 
-    public void setQuestionOrderBy(String questionOrderBy) {
-        this.questionOrderBy = questionOrderBy;
+    public void setSort(String sort) {
+        this.sort = sort;
     }
 
     public Subject getSubject() {

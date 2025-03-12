@@ -125,10 +125,16 @@ public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
     }
 
     public void getSortOrder(QuestionFilter questionFilter, CriteriaBuilder builder, CriteriaQuery<Question> criteria, Root<Question> root){
-        if(Objects.equals(questionFilter.getQuestionOrderBy(), "subject,asc")){
+        if(Objects.equals(questionFilter.getSort(), "id,asc")){
+            criteria.orderBy(builder.asc(root.get("id")));
+        }
+        if(Objects.equals(questionFilter.getSort(), "id,desc")){
+            criteria.orderBy(builder.desc(root.get("id")));
+        }
+        if(Objects.equals(questionFilter.getSort(), "subject,asc")){
             criteria.orderBy(builder.asc(root.get("subject")));
         }
-        if(Objects.equals(questionFilter.getQuestionOrderBy(), "subject,desc")){
+        if(Objects.equals(questionFilter.getSort(), "subject,desc")){
             criteria.orderBy(builder.desc(root.get("subject")));
         }
     }

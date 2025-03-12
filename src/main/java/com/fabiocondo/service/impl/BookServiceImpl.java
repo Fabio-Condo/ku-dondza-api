@@ -63,7 +63,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book save(String name, String description, Long subjectId, MultipartFile file) throws SubjectNotFoundException {
+    public Book save(String name, String description, String author, Long subjectId, MultipartFile file) throws SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
@@ -73,6 +73,7 @@ public class BookServiceImpl implements BookService {
         book.setSubject(subject);
         book.setName(name);
         book.setDescription(description);
+        book.setAuthor(author);
         book.setTotalDownloadNumber(0L);
         book.setUrlFile(s3UploadResponse.getFileUrl());
         book.setFileName(file.getOriginalFilename());
@@ -82,13 +83,14 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book update(Long id, String name, String description, Long subjectId, MultipartFile file) throws BookNotFoundException, SubjectNotFoundException {
+    public Book update(Long id, String name, String description, String author, Long subjectId, MultipartFile file) throws BookNotFoundException, SubjectNotFoundException {
         Subject subject = subjectServiceImpl.findById(subjectId);
         logger.info("Name: " + name);
         Book existBook = findById(id);
         existBook.setSubject(subject);
         existBook.setName(name);
         existBook.setDescription(description);
+        existBook.setAuthor(author);
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {

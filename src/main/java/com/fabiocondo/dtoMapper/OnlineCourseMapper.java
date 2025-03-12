@@ -1,4 +1,4 @@
-package com.fabiocondo.dtoConverter;
+package com.fabiocondo.dtoMapper;
 
 import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.OnlineCourseDTO;

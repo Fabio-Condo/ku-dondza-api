@@ -55,7 +55,9 @@ public class TopicService {
 //            Thread.currentThread().interrupt();
 //            throw new RuntimeException("A operação foi interrompida", e);
 //        }
-        return topicRepository.findBySubjectIdOrderByNameAsc(subjectId);
+
+        return topicRepository.findBySubjectIdAndIsReadyForQuizTrueOrderByNameAsc(subjectId);
+        //return topicRepository.findBySubjectIdOrderByNameAsc(subjectId);
     }
 
     public void delete(Long id) throws TopicNotFoundException {

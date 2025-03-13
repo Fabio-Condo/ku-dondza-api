@@ -19,6 +19,8 @@ public class Topic {
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
+    private boolean isReadyForQuiz;
+
     public Topic() {
     }
 
@@ -51,5 +53,13 @@ public class Topic {
 
     public void setSubject(Subject subject) {
         this.subject = subject;
+    }
+
+    public boolean isReadyForQuiz() {
+        return isReadyForQuiz;
+    }
+
+    public void setReadyForQuiz(boolean readyForQuiz) {
+        isReadyForQuiz = readyForQuiz;
     }
 }

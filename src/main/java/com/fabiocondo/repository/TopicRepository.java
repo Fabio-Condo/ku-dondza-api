@@ -7,4 +7,7 @@ import java.util.List;
 
 public interface TopicRepository extends JpaRepository<Topic, Long> {
     List<Topic> findBySubjectIdOrderByNameAsc(Long subjectId);
+
+    List<Topic> findBySubjectIdAndIsReadyForQuizTrueOrderByNameAsc(Long subjectId);
+
 }

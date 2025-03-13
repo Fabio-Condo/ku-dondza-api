@@ -7,8 +7,8 @@ aws:
   #secretKey: 1i/ZOIphuipqSmauMsB0HOJ/gAOniTqtKTS40GJu
 
   # user: kudondza-user-production
-  accessKeyId: AKIAW3MECWUYMZWWMU4J
-  secretKey: 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
+  accessKeyId: AKIAW3MECWUYOLFKX2OE
+  secretKey: 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
 
   region.static: us-east-1
 

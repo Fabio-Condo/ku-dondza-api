@@ -3,6 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
+import com.fabiocondo.enumeration.Plan;
 import com.fabiocondo.enumeration.Role;
 import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
@@ -100,6 +101,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, MessagingException, UsernameExistException, EmailExistException {
         validateNewUsernameAndEmail(EMPTY, username, email);
         User user = new User();
+        user.setPlan(Plan.PREMIUM);
         user.setUserId(generateUserId());
         String password = generatePassword();
         user.setFirstName(firstName);

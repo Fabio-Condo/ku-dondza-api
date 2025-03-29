@@ -6,7 +6,16 @@ import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.security.utility.JWTTokenProvider;
 import com.fabiocondo.service.UserService;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.gson.GsonFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +46,8 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final JWTTokenProvider jwtTokenProvider;
+    private static final String CLIENT_ID = "170476897572-k758vjru9e2qqa707qhb5ns2kaaegquc.apps.googleusercontent.com";
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     public UserController(AuthenticationManager authenticationManager, UserService userService, JWTTokenProvider jwtTokenProvider) {
@@ -52,9 +65,67 @@ public class UserController {
         return new ResponseEntity<>(loginUser, jwtHeader, OK);
     }
 
+    @PostMapping("/auth/google")
+    public ResponseEntity<?> processGoogleLogin(@RequestBody String idTokenString) {
+        logger.info("Token recebido: " + idTokenString);
+
+        JsonFactory jsonFactory = GsonFactory.getDefaultInstance();  // Usando GsonFactory
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), jsonFactory)
+                .setAudience(Collections.singletonList(CLIENT_ID))
+                .build();
+
+        try {
+
+            GoogleIdToken idToken = verifier.verify(extractIdToken(idTokenString));
+            if (idToken != null) {
+                GoogleIdToken.Payload payload = idToken.getPayload();
+
+                String email = payload.getEmail();
+                String name = (String) payload.get("name");
+                String pictureUrl = (String) payload.get("picture");
+
+                // Buscar usuário pelo email
+                User loginUser = userService.findUserByEmail(email);
+
+                // Caso o usuário não exista, crie um novo
+                if (loginUser == null) {
+                    loginUser = userService.register(name, "", "", email, pictureUrl);
+                }
+
+                // Gerar token JWT para o usuário
+                UserPrincipal userPrincipal = new UserPrincipal(loginUser);
+                HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
+
+                // Garantir que o token JWT está no cabeçalho
+                if (jwtHeader == null || jwtHeader.isEmpty()) {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("Erro ao gerar token JWT");
+                }
+
+                return new ResponseEntity<>(loginUser, jwtHeader, OK);
+            } else {
+                return ResponseEntity.badRequest().body(null);  // Token inválido
+            }
+        } catch (GeneralSecurityException | IOException e) {
+            logger.error("Erro ao verificar o token: ", e);
+            return ResponseEntity.internalServerError().body(null);  // Erro ao verificar o token
+        } catch (JSONException | EmailExistException | UserNotFoundException | MessagingException |
+                 UsernameExistException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String extractIdToken(String jsonString) throws JSONException {
+        // Converte a string JSON em um objeto JSONObject
+        JSONObject jsonObject = new JSONObject(jsonString);
+
+        // Extrai o valor do idToken
+        return jsonObject.getString("idToken");
+    }
+
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        User newUser = userService.register(user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail());
+        User newUser = userService.register(user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail(), null);
         return ResponseEntity.status(HttpStatus.OK).body(newUser);
     }
 

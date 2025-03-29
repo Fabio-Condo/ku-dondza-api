@@ -10,7 +10,7 @@ aws:
   accessKeyId: AKIAW3MECWUYOLFKX2OE
   secretKey: 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
 
-  region.static: us-east-1
+  region.static: us-east-2
 
 openai:
   api-key: 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
@@ -44,6 +44,15 @@ spring:
   web:
     resources:
       add-mappings: false
+
+  #security:
+  #  oauth2:
+  #    client:
+  #      registration:
+  #        google:
+  #          client-id: SEU_CLIENT_ID
+  #          client-secret: SEU_CLIENT_SECRET
+  #          scope: profile, email
 
   #redis:
   #  host: localhost

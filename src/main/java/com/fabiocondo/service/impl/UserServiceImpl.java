@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, MessagingException, UsernameExistException, EmailExistException {
+    public User register(String firstName, String lastName, String username, String email, String profileImageUrl) throws UserNotFoundException, MessagingException, UsernameExistException, EmailExistException {
         validateNewUsernameAndEmail(EMPTY, username, email);
         User user = new User();
         user.setPlan(Plan.PREMIUM);
@@ -108,6 +108,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setLastName(lastName);
         user.setUsername(username);
         user.setEmail(email);
+        user.setProfileImageUrl(profileImageUrl);
         user.setJoinDate(new Date());
         user.setPassword(encodePassword(password));
         user.setActive(true);

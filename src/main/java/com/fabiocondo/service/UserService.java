@@ -17,7 +17,7 @@ public interface UserService {
 
     List<User> getAllInstrutores();
 
-    User register(String firstName, String lastName, String username, String email) throws UserNotFoundException, MessagingException, UsernameExistException, EmailExistException;
+    User register(String firstName, String lastName, String username, String email, String profileImageUrl) throws UserNotFoundException, MessagingException, UsernameExistException, EmailExistException;
 
     User updateUserProfile(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String newBio, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException;
 

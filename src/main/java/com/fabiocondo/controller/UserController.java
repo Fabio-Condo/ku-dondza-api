@@ -83,6 +83,9 @@ public class UserController {
                 String email = payload.getEmail();
                 String name = (String) payload.get("name");
                 String pictureUrl = (String) payload.get("picture");
+                String locale = (String) payload.get("locale");
+                String familyName = (String) payload.get("family_name");
+                String givenName = (String) payload.get("given_name");
 
                 // Buscar usuário pelo email
                 User loginUser = userService.findUserByEmail(email);
@@ -95,12 +98,6 @@ public class UserController {
                 // Gerar token JWT para o usuário
                 UserPrincipal userPrincipal = new UserPrincipal(loginUser);
                 HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
-
-                // Garantir que o token JWT está no cabeçalho
-                if (jwtHeader == null || jwtHeader.isEmpty()) {
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body("Erro ao gerar token JWT");
-                }
 
                 return new ResponseEntity<>(loginUser, jwtHeader, OK);
             } else {

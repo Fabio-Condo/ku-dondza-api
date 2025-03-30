@@ -24,6 +24,10 @@ public class Book {
 
     private String urlFile;
 
+    private String coverImageFileName;
+
+    private String urlCoverImage;
+
     private Long totalDownloadNumber;
 
     @ManyToOne
@@ -39,7 +43,7 @@ public class Book {
         this.description = description;
         this.author = author;
         this.fileName = fileName;
-        this.urlFile = urlFile;
+        this.urlCoverImage = urlFile;
         this.totalDownloadNumber = totalDownloadNumber;
         this.subject = subject;
     }
@@ -90,6 +94,22 @@ public class Book {
 
     public void setUrlFile(String urlFile) {
         this.urlFile = urlFile;
+    }
+
+    public String getCoverImageFileName() {
+        return coverImageFileName;
+    }
+
+    public void setCoverImageFileName(String coverImageFileName) {
+        this.coverImageFileName = coverImageFileName;
+    }
+
+    public String getUrlCoverImage() {
+        return urlCoverImage;
+    }
+
+    public void setUrlCoverImage(String urlCoverImage) {
+        this.urlCoverImage = urlCoverImage;
     }
 
     public Long getTotalDownloadNumber() {

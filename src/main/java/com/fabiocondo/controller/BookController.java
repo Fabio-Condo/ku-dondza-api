@@ -55,9 +55,10 @@ public class BookController {
                                      @RequestParam("description") String description,
                                      @RequestParam("author") String author,
                                      @RequestParam("subjectId") Long subjectId,
+                                     @RequestParam(value = "coverImageFile", required = false) MultipartFile coverImageFile,
                                      @RequestParam("file") MultipartFile file) throws SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(bookService.save(name, description, author, subjectId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(bookService.save(name, description, author, subjectId, coverImageFile, file));
     }
 
     @PutMapping
@@ -66,9 +67,10 @@ public class BookController {
                                        @RequestParam("description") String description,
                                        @RequestParam("author") String author,
                                        @RequestParam("subjectId") Long subjectId,
+                                       @RequestParam(value = "coverImageFile", required = false) MultipartFile coverImageFile,
                                        @RequestParam(value = "file", required = false) MultipartFile file) throws SubjectNotFoundException, BookNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(bookService.update(id, name, description, author, subjectId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(bookService.update(id, name, description, author, subjectId, coverImageFile, file));
     }
 
     @DeleteMapping("/{id}")

@@ -98,14 +98,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User register(String firstName, String lastName, String username, String email, String profileImageUrl) throws UserNotFoundException, MessagingException, UsernameExistException, EmailExistException {
+    public User register(String fullName, String username, String email, String profileImageUrl) throws UserNotFoundException, MessagingException, UsernameExistException, EmailExistException {
         validateNewUsernameAndEmail(EMPTY, username, email);
         User user = new User();
         user.setPlan(Plan.PREMIUM);
         user.setUserId(generateUserId());
         String password = generatePassword();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
+        user.setFullName(fullName);
         user.setUsername(username);
         user.setEmail(email);
         user.setProfileImageUrl(profileImageUrl);
@@ -117,12 +116,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setAuthorities(ROLE_SUPER_ADMIN.getAuthorities());
         userRepository.save(user);
         logger.info("New user password (register): " + password);
-        emailService.sendNewPasswordEmail(firstName, username, password, email);
+        emailService.sendNewPasswordEmail(fullName, username, password, email);
         return user;
     }
 
     @Override
-    public User addNewUser(String firstName, String lastName, String username, String email, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
+    public User addNewUser(String firstName, String username, String email, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
         validateNewUsernameAndEmail(EMPTY, username, email);
 
         logger.info("Uploading file: " + profileImage.getOriginalFilename());
@@ -132,8 +131,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = new User();
         String password = generatePassword();
         user.setUserId(generateUserId());
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
+        user.setFullName(firstName);
         user.setJoinDate(new Date());
         user.setUsername(username);
         user.setEmail(email);
@@ -153,11 +151,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateUser(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException {
+    public User updateUser(String currentUsername, String newFullName, String newUsername, String newEmail, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException {
         User currentUser = validateNewUsernameAndEmail(currentUsername, newUsername, newEmail);
         // Adicionar funcao que diminue o tamanho da imagem
-        currentUser.setFirstName(newFirstName);
-        currentUser.setLastName(newLastName);
+        currentUser.setFullName(newFullName);
         currentUser.setUsername(newUsername);
         currentUser.setEmail(newEmail);
         //currentUser.setActive(isActive);
@@ -184,11 +181,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateUserProfile(String currentUsername, String newFirstName, String newLastName, String newUsername, String newEmail, String newBio, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException {
+    public User updateUserProfile(String currentUsername, String newFullName, String newUsername, String newEmail, String newBio, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException {
         User currentUser = validateNewUsernameAndEmail(currentUsername, newUsername, newEmail);
         // Adicionar funcao que diminue o tamanho da imagem
-        currentUser.setFirstName(newFirstName);
-        currentUser.setLastName(newLastName);
+        currentUser.setFullName(newFullName);
         currentUser.setUsername(newUsername);
         currentUser.setEmail(newEmail);
         currentUser.setBio(newBio);
@@ -216,7 +212,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public User update(User user, Long id) throws UserNotFoundException {
         User existUser = findById(id);
         BeanUtils.copyProperties(user, existUser, "id", "password");
-        logger.info("Updating user: " + user.getFirstName());
+        logger.info("Updating user: " + user.getFullName());
         return userRepository.save(existUser);
     }
 
@@ -284,7 +280,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setPassword(encodePassword(password));
         userRepository.save(user);
         logger.info("New user password: " + password);
-        emailService.sendNewPasswordEmail(user.getFirstName(), user.getUsername(), password, user.getEmail());
+        emailService.sendNewPasswordEmail(user.getFullName(), user.getUsername(), password, user.getEmail());
     }
 
     @Override
@@ -304,7 +300,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void updatePropertyActive(String username, Boolean active) {
         User userSaved = findUserByUsername(username);
         userSaved.setActive(active);
-        logger.info("Updating user: " + userSaved.getFirstName());
+        logger.info("Updating user: " + userSaved.getFullName());
         userRepository.save(userSaved);
     }
 
@@ -312,7 +308,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public void updatePropertyNotLocked(String username, Boolean notLocked) {
         User userSaved = findUserByUsername(username);
         userSaved.setNotLocked(notLocked);
-        logger.info("Updating user: " + userSaved.getFirstName());
+        logger.info("Updating user: " + userSaved.getFullName());
         userRepository.save(userSaved);
     }
 

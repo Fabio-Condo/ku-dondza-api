@@ -21,10 +21,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByUserType(UserType userType);
 
-    @Query("SELECT u FROM User u WHERE u.firstName LIKE %:searchParam% OR u.lastName LIKE %:searchParam% OR u.username LIKE %:searchParam% OR u.role LIKE %:searchParam%")
+    @Query("SELECT u FROM User u WHERE u.fullName LIKE %:searchParam% OR u.username LIKE %:searchParam% OR u.role LIKE %:searchParam%")
     public Page<User> findByAnyProperty(@Param("searchParam") String searchParam, Pageable pageable);
 
-    @Query("SELECT u FROM User u WHERE u.firstName LIKE %:query% OR u.lastName LIKE %:query%")
+    @Query("SELECT u FROM User u WHERE u.fullName LIKE %:query%")
     Page<User> searchByQuery(@Param("query") String query, Pageable pageable);
 
     @Query("SELECT oc FROM User u JOIN u.subscribedOnlineCourses oc WHERE u.id = :userId")

@@ -63,9 +63,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book save(String name, String description, String author, Long subjectId, MultipartFile file) throws SubjectNotFoundException {
+    public Book save(String name, String description, String author, Long subjectId, MultipartFile coverImageFile, MultipartFile file) throws SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+        S3UploadResponse s3UploadResponseCoverImageFile = amazonS3Service.uploadFile(coverImageFile, BUCKET_NAME);
+
 
         Subject subject = subjectServiceImpl.findById(subjectId);
 
@@ -77,13 +79,15 @@ public class BookServiceImpl implements BookService {
         book.setTotalDownloadNumber(0L);
         book.setUrlFile(s3UploadResponse.getFileUrl());
         book.setFileName(file.getOriginalFilename());
+        book.setUrlCoverImage(s3UploadResponseCoverImageFile.getFileUrl());
+        book.setCoverImageFileName(coverImageFile.getOriginalFilename());
 
         logger.info("Saving new book: " + book.getDescription());
         return bookRepository.save(book);
     }
 
     @Override
-    public Book update(Long id, String name, String description, String author, Long subjectId, MultipartFile file) throws BookNotFoundException, SubjectNotFoundException {
+    public Book update(Long id, String name, String description, String author, Long subjectId, MultipartFile coverImageFile, MultipartFile file) throws BookNotFoundException, SubjectNotFoundException {
         Subject subject = subjectServiceImpl.findById(subjectId);
         logger.info("Name: " + name);
         Book existBook = findById(id);
@@ -101,6 +105,17 @@ public class BookServiceImpl implements BookService {
             S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
             existBook.setUrlFile(s3UploadResponse.getFileUrl());
             existBook.setFileName(file.getOriginalFilename());
+        }
+
+        // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
+        if (coverImageFile != null) {
+            if (existBook.getCoverImageFileName() != null) {
+                logger.info("Deleting file: " + existBook.getCoverImageFileName());
+                amazonS3Service.deleteFile(existBook.getCoverImageFileName(), BUCKET_NAME);
+            }
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(coverImageFile, BUCKET_NAME);
+            existBook.setUrlCoverImage(s3UploadResponse.getFileUrl());
+            existBook.setCoverImageFileName(coverImageFile.getOriginalFilename());
         }
 
         logger.info("Saving new book: " + existBook.getDescription());

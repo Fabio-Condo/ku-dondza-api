@@ -89,7 +89,7 @@ public class UserController {
 
                 // Caso o usuário não exista, crie um novo
                 if (loginUser == null) {
-                    loginUser = userService.register(name, "", "", email, pictureUrl);
+                    loginUser = userService.register(name,  "", email, pictureUrl);
                 }
 
                 // Gerar token JWT para o usuário
@@ -125,13 +125,12 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        User newUser = userService.register(user.getFirstName(), user.getLastName(), user.getUsername(), user.getEmail(), null);
+        User newUser = userService.register(user.getFullName(), user.getUsername(), user.getEmail(), null);
         return ResponseEntity.status(HttpStatus.OK).body(newUser);
     }
 
     @PostMapping("/add")
-    public ResponseEntity<User> addNewUser(@RequestParam("firstName") String firstName,
-                                           @RequestParam("lastName") String lastName,
+    public ResponseEntity<User> addNewUser(@RequestParam("fullName") String fullName,
                                            @RequestParam("username") String username,
                                            @RequestParam("email") String email,
                                            @RequestParam("userType") UserType userType,
@@ -139,14 +138,13 @@ public class UserController {
                                            @RequestParam("isActive") String isActive,
                                            @RequestParam("isNonLocked") String isNonLocked,
                                            @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        User newUser = userService.addNewUser(firstName, lastName, username,email, role, userType, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
+        User newUser = userService.addNewUser(fullName, username,email, role, userType, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
         return ResponseEntity.status(HttpStatus.OK).body(newUser);
     }
 
     @PutMapping("/update")
     public ResponseEntity<User> update(@RequestParam("currentUsername") String currentUsername,
-                                       @RequestParam("firstName") String firstName,
-                                       @RequestParam("lastName") String lastName,
+                                       @RequestParam("fullName") String fullName,
                                        @RequestParam("username") String username,
                                        @RequestParam("email") String email,
                                        @RequestParam("userType") UserType userType,
@@ -154,14 +152,13 @@ public class UserController {
                                        @RequestParam("isActive") String isActive,
                                        @RequestParam("isNonLocked") String isNonLocked,
                                        @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
-        User updatedUser = userService.updateUser(currentUsername, firstName, lastName, username,email, role, userType, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
+        User updatedUser = userService.updateUser(currentUsername, fullName, username,email, role, userType, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 
     @PutMapping("/update-user-profile")
     public ResponseEntity<User> updateUserProfile(@RequestParam("currentUsername") String currentUsername,
-                                       @RequestParam("firstName") String firstName,
-                                       @RequestParam("lastName") String lastName,
+                                       @RequestParam("fullName") String fullName,
                                        @RequestParam("username") String username,
                                        @RequestParam("email") String email,
                                        @RequestParam("bio") String bio,
@@ -169,7 +166,7 @@ public class UserController {
                                        @RequestParam("isActive") String isActive,
                                        @RequestParam("isNonLocked") String isNonLocked,
                                        @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
-        User updatedUser = userService.updateUserProfile(currentUsername, firstName, lastName, username,email, bio, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
+        User updatedUser = userService.updateUserProfile(currentUsername, fullName, username,email, bio, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 

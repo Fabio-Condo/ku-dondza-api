@@ -69,18 +69,23 @@ public class UserController {
     public ResponseEntity<?> processGoogleLogin(@RequestBody String idTokenString) {
         logger.info("Token recebido: " + idTokenString);
 
-        JsonFactory jsonFactory = GsonFactory.getDefaultInstance();  // Usando GsonFactory
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), jsonFactory)
-                .setAudience(Collections.singletonList(CLIENT_ID))
-                .build();
-
         try {
+
+            JsonFactory jsonFactory = GsonFactory.getDefaultInstance();  // Usando GsonFactory
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), jsonFactory)
+                    .setAudience(Collections.singletonList(CLIENT_ID))
+                    .build();
 
             GoogleIdToken idToken = verifier.verify(extractIdToken(idTokenString));
             if (idToken != null) {
                 GoogleIdToken.Payload payload = idToken.getPayload();
 
+                // Print user identifier
+                String userId = payload.getSubject();
+                logger.info("User ID: " + userId);
+
                 String email = payload.getEmail();
+                boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
                 String name = (String) payload.get("name");
                 String pictureUrl = (String) payload.get("picture");
                 String locale = (String) payload.get("locale");

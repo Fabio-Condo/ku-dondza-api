@@ -1,11 +1,12 @@
 package com.fabiocondo.domain;
 
 import com.fabiocondo.enumeration.AuthProvider;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "external_auth")
+@Table(name = "external_auth_method")
 public class ExternalAuthMethod {
 
     @Id
@@ -19,6 +20,7 @@ public class ExternalAuthMethod {
     private String providerId; // ID do Google, Facebook, etc. (opcional)
 
     @ManyToOne
+    @JsonIgnoreProperties({"externalAuthMethods"})
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

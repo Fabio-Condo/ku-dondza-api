@@ -44,7 +44,7 @@ public class ExternalAuthMethodService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        Set<ExternalAuthMethod> methods = user.getExternalAuths();
+        Set<ExternalAuthMethod> methods = user.getExternalAuthMethods();
 
         if (methods.size() == 1) {
             throw new RuntimeException("Não é possível remover o único método de autenticação");

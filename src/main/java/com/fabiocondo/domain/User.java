@@ -273,11 +273,11 @@ public class User implements Serializable {
         this.plan = plan;
     }
 
-    public Set<ExternalAuthMethod> getExternalAuths() {
+    public Set<ExternalAuthMethod> getExternalAuthMethods() {
         return externalAuthMethods;
     }
 
-    public void setExternalAuths(Set<ExternalAuthMethod> externalAuthMethods) {
+    public void setExternalAuthMethods(Set<ExternalAuthMethod> externalAuthMethods) {
         this.externalAuthMethods = externalAuthMethods;
     }
 

@@ -62,6 +62,10 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private Plan plan; //FREE or PREMIUM
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<ExternalAuthMethod> externalAuthMethods = new HashSet<>();
+
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
             name = "user_subject_interest",
@@ -267,6 +271,14 @@ public class User implements Serializable {
 
     public void setPlan(Plan plan) {
         this.plan = plan;
+    }
+
+    public Set<ExternalAuthMethod> getExternalAuths() {
+        return externalAuthMethods;
+    }
+
+    public void setExternalAuths(Set<ExternalAuthMethod> externalAuthMethods) {
+        this.externalAuthMethods = externalAuthMethods;
     }
 
     public Set<Subject> getSubjectsInterests() {

@@ -5,16 +5,18 @@ import com.fabiocondo.enumeration.AuthProvider;
 import com.fabiocondo.repository.ExternalAuthMethodRepository;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.security.utility.JWTTokenProvider;
+import com.fabiocondo.service.AuthService;
 import com.fabiocondo.service.UserService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,19 +32,19 @@ import java.util.Optional;
 import static com.fabiocondo.constant.SecurityConstant.JWT_TOKEN_HEADER;
 
 @Service
-public class AuthService {
+public class AuthServiceImpl implements AuthService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final UserService userService;
     private final UserRepository userRepository;
     private final ExternalAuthMethodRepository externalAuthMethodRepository;
-
     private final AuthenticationManager authenticationManager;
     private final JWTTokenProvider jwtTokenProvider;
     private static final String CLIENT_ID = "170476897572-k758vjru9e2qqa707qhb5ns2kaaegquc.apps.googleusercontent.com";
 
 
-    public AuthService(UserService userService, UserRepository userRepository, ExternalAuthMethodRepository externalAuthMethodRepository, AuthenticationManager authenticationManager, JWTTokenProvider jwtTokenProvider) {
+    @Autowired
+    public AuthServiceImpl(UserService userService, UserRepository userRepository, ExternalAuthMethodRepository externalAuthMethodRepository, AuthenticationManager authenticationManager, JWTTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.externalAuthMethodRepository = externalAuthMethodRepository;
@@ -50,6 +52,7 @@ public class AuthService {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    @Override
     public ResponseEntity<User> authenticateWithUsernameAndPassword(User user) {
         authenticate(user.getUsername(), user.getPassword());
         User loginUser = userService.findUserByUsername(user.getUsername());
@@ -58,6 +61,7 @@ public class AuthService {
         return new ResponseEntity<>(loginUser, jwtHeader, HttpStatus.OK);
     }
 
+    @Override
     public ResponseEntity<?> authenticateWithGoogle(String idTokenString) {
         try {
             GoogleIdToken idToken = verifyGoogleToken(idTokenString);

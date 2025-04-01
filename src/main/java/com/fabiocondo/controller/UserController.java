@@ -4,7 +4,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
-import com.fabiocondo.service.impl.AuthService;
+import com.fabiocondo.service.impl.AuthServiceImpl;
 import com.fabiocondo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -34,7 +34,7 @@ public class UserController {
     private final UserService userService;
 
     @Autowired
-    public UserController(AuthenticationManager authenticationManager, UserService userService, AuthService authService) {
+    public UserController(AuthenticationManager authenticationManager, UserService userService, AuthServiceImpl authServiceImpl) {
         this.authenticationManager = authenticationManager;
         this.userService = userService;
     }

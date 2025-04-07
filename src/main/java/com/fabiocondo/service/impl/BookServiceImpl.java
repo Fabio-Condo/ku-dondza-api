@@ -68,7 +68,6 @@ public class BookServiceImpl implements BookService {
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
         S3UploadResponse s3UploadResponseCoverImageFile = amazonS3Service.uploadFile(coverImageFile, BUCKET_NAME);
 
-
         Subject subject = subjectServiceImpl.findById(subjectId);
 
         Book book = new Book();

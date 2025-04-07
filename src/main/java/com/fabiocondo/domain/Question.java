@@ -27,6 +27,8 @@ public class Question {
     private String text;
 
     @Lob // Large Object
+    private String tip;
+    @Lob // Large Object
     private String solution;
 
     private Integer timeLimit; // Tempo em segundos
@@ -90,6 +92,14 @@ public class Question {
 
     public void setTimeLimit(Integer timeLimit) {
         this.timeLimit = timeLimit;
+    }
+
+    public String getTip() {
+        return tip;
+    }
+
+    public void setTip(String tip) {
+        this.tip = tip;
     }
 
     public String getSolution() {

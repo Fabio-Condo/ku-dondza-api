@@ -43,7 +43,6 @@ public class OnlineCourseMapper {
         onlineCourse.setCoverImageUrl(onlineCourseDTO.getCoverImageUrl());
         onlineCourse.setLunchDate(onlineCourseDTO.getLunchDate());
         onlineCourse.setInstrutor(onlineCourseDTO.getInstrutor());
-        onlineCourse.setRequirements(onlineCourseDTO.getRequirements());
         return onlineCourse;
     }
 
@@ -57,7 +56,6 @@ public class OnlineCourseMapper {
         onlineCourseDTO.setCoverImageUrl(onlineCourse.getCoverImageUrl());
         onlineCourseDTO.setLunchDate(onlineCourse.getLunchDate());
         onlineCourseDTO.setInstrutor(onlineCourse.getInstrutor());
-        onlineCourseDTO.setRequirements(onlineCourse.getRequirements());
         onlineCourseDTO.setModules(onlineCourse.getModules());
         onlineCourseDTO.setCurrentUserSubscribed(checkIfCurrentUserSubscribed(onlineCourse.getId()));
         return onlineCourseDTO;
@@ -74,7 +72,6 @@ public class OnlineCourseMapper {
         onlineCourseDTO.setCoverImageUrl(onlineCourse.getCoverImageUrl());
         onlineCourseDTO.setLunchDate(onlineCourse.getLunchDate());
         onlineCourseDTO.setInstrutor(onlineCourse.getInstrutor());
-        onlineCourseDTO.setRequirements(onlineCourse.getRequirements());
         return onlineCourseDTO;
     }
 

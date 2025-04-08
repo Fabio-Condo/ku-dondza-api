@@ -1,7 +1,6 @@
 package com.fabiocondo.dto;
 
 import com.fabiocondo.domain.Module;
-import com.fabiocondo.domain.OnlineCourseRequirement;
 import com.fabiocondo.domain.User;
 
 import java.util.ArrayList;
@@ -24,8 +23,6 @@ public class OnlineCourseDTO {
     private String lunchDate;
 
     private User instrutor;
-
-    private List<OnlineCourseRequirement> requirements;
 
     private List<Module> modules = new ArrayList<>(); // Mesmo com JsonIgnore na class model, se nao colocar aqui, sera serealizado
 
@@ -113,14 +110,6 @@ public class OnlineCourseDTO {
 
     public void setInstrutor(User instrutor) {
         this.instrutor = instrutor;
-    }
-
-    public List<OnlineCourseRequirement> getRequirements() {
-        return requirements;
-    }
-
-    public void setRequirements(List<OnlineCourseRequirement> requirements) {
-        this.requirements = requirements;
     }
 
     public boolean isCurrentUserSubscribed() {

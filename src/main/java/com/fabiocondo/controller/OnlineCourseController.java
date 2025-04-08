@@ -75,11 +75,6 @@ public class OnlineCourseController {
         return response(HttpStatus.OK, "Course deleted successfully");
     }
 
-    @PutMapping("/{id}/requirements/update")
-    public ResponseEntity<OnlineCourse> updateRequirements(@PathVariable("id") Long id, @RequestBody OnlineCourse course) throws OnlineCourseNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseService.updateRequirements(id, course));
-    }
-
     @GetMapping("/{courseId}/students")
     public Page<User> getStudentsByCourseId(@PathVariable Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
         return onlineCourseService.getStudentsByCourseId(courseId, pageable);

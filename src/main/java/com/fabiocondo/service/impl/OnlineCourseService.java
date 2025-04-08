@@ -114,16 +114,6 @@ public class OnlineCourseService {
         return onlineCourseRepository.count();
     }
 
-    public OnlineCourse updateRequirements(Long id, OnlineCourse course) throws OnlineCourseNotFoundException {
-        OnlineCourse existCourse = findById(id);
-        existCourse.getRequirements().clear();
-        existCourse.getRequirements().addAll(course.getRequirements());
-        existCourse.getRequirements().forEach(requirement -> requirement.setCourse(existCourse));
-        BeanUtils.copyProperties(course, existCourse, "id", "requirements", "modules", "questions");
-        logger.info("Updating course: " + course.getName());
-        return onlineCourseRepository.save(existCourse);
-    }
-
     public Page<User> getStudentsByCourseId(Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
         OnlineCourse existCourse = findById(courseId);
         return onlineCourseRepository.findStudentsByCourseId(existCourse.getId(), pageable);

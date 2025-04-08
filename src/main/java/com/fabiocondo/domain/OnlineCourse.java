@@ -35,11 +35,6 @@ public class OnlineCourse {
     @JoinColumn(name = "user_id")
     private User instrutor;
 
-    @Valid
-    @JsonIgnoreProperties("course")
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OnlineCourseRequirement> requirements;
-
     //@JsonIgnoreProperties({"onlineCourse"})
     @JsonIgnore
     @OneToMany(mappedBy = "onlineCourse", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -131,14 +126,6 @@ public class OnlineCourse {
 
     public void setInstrutor(User instrutor) {
         this.instrutor = instrutor;
-    }
-
-    public List<OnlineCourseRequirement> getRequirements() {
-        return requirements;
-    }
-
-    public void setRequirements(List<OnlineCourseRequirement> requirements) {
-        this.requirements = requirements;
     }
 
     public List<User> getStudents() {

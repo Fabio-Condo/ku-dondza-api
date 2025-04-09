@@ -58,7 +58,7 @@ public interface UserService {
 
     User findUserByUsername(String username);
 
-    User findUserByUserId(String userId);
+    User findUserByUserId(String userId) throws UserNotFoundException;
 
     User findUserByEmail(String email);
 

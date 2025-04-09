@@ -468,8 +468,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User findUserByUserId(String userId) {
-        return userRepository.findUserByUserId(userId);
+    public User findUserByUserId(String userId) throws UserNotFoundException {
+        return userRepository.findUserByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
     }
 
     @Override

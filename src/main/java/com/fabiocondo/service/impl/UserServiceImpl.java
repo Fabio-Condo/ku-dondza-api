@@ -36,6 +36,7 @@ import java.util.*;
 
 import static com.fabiocondo.constant.UserImplConstant.*;
 import static com.fabiocondo.enumeration.Role.ROLE_SUPER_ADMIN;
+import static com.fabiocondo.enumeration.Role.ROLE_USER;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 @Service
@@ -112,8 +113,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setPassword(encodePassword(password));
         user.setActive(true);
         user.setNotLocked(true);
-        user.setRole(ROLE_SUPER_ADMIN.name());
-        user.setAuthorities(ROLE_SUPER_ADMIN.getAuthorities());
+        user.setRole(ROLE_USER.name());
+        user.setAuthorities(ROLE_USER.getAuthorities());
         userRepository.save(user);
         logger.info("New user password (register): " + password);
         emailService.sendNewPasswordEmail(fullName, username, password, email);

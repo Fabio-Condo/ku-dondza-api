@@ -63,6 +63,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<?> authenticateWithGoogle(String idTokenString) {
+        logger.info("Passando daqui...");
         try {
             GoogleIdToken idToken = verifyGoogleToken(idTokenString);
             if (idToken == null) {
@@ -92,7 +93,7 @@ public class AuthServiceImpl implements AuthService {
                     loginUser = existingUser;
                 } else {
                     // 🔹 3️⃣ Criar novo usuário e associar o método Google
-                    loginUser = userService.register(name, "", email, pictureUrl);
+                    loginUser = userService.register(name, email, email, pictureUrl);
                 }
 
                 // 🔹 4️⃣ Salvar método de autenticação Google para o usuário

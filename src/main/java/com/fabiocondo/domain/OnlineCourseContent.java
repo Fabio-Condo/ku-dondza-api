@@ -17,6 +17,8 @@ public class OnlineCourseContent { // Conteúdo do module - Depois renomear
     @Enumerated(EnumType.STRING)
     private ContentType contentType;
 
+    private String time;
+
     private String fileName;
 
     private String urlFile; // URL for storing the location of the video or file in the bucket
@@ -30,9 +32,10 @@ public class OnlineCourseContent { // Conteúdo do module - Depois renomear
     // Constructors
     public OnlineCourseContent() {}
 
-    public OnlineCourseContent(String description, ContentType contentType, String fileName, String urlFile) {
+    public OnlineCourseContent(String description, ContentType contentType, String time, String fileName, String urlFile) {
         this.description = description;
         this.contentType = contentType;
+        this.time = time;
         this.fileName = fileName;
         this.urlFile = urlFile;
     }
@@ -60,6 +63,14 @@ public class OnlineCourseContent { // Conteúdo do module - Depois renomear
 
     public void setContentType(ContentType contentType) {
         this.contentType = contentType;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public String getFileName() {

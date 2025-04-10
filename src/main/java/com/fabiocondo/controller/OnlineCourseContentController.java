@@ -30,22 +30,24 @@ public class OnlineCourseContentController {
     @PostMapping
     public ResponseEntity<OnlineCourseContent> save(@RequestParam("description") String description,
                                                     @RequestParam("contentType") ContentType contentType,
+                                                    @RequestParam("time") String time,
                                                     @RequestParam("moduleId") Long moduleId,
                                                     @RequestParam("position") Integer position,
                                                     @RequestParam("file") MultipartFile file) throws ModuleNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.save(description, contentType, moduleId, position, file));
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.save(description, contentType, time, moduleId, position, file));
     }
 
     @PutMapping
     public ResponseEntity<OnlineCourseContent> update(@RequestParam("id") Long id,
                                                       @RequestParam("description") String description,
                                                       @RequestParam("contentType") ContentType contentType,
+                                                      @RequestParam("time") String time,
                                                       @RequestParam("moduleId") Long moduleId,
                                                       @RequestParam("position") Integer position,
                                                       @RequestParam(value = "file", required = false) MultipartFile file) throws CourseContentNotFoundException, ModuleNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.update(id, description, contentType, moduleId, position, file));
+        return ResponseEntity.status(HttpStatus.OK).body(onlineCourseContentService.update(id, description, contentType, time, moduleId, position, file));
     }
 
     @GetMapping("/findByModuleId")

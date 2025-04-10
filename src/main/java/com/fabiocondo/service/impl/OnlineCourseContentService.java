@@ -45,7 +45,7 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.findAll(pageable);
     }
 
-    public OnlineCourseContent save(String description, ContentType contentType, Long moduleId, Integer position, MultipartFile file) throws ModuleNotFoundException {
+    public OnlineCourseContent save(String description, ContentType contentType, String time, Long moduleId, Integer position, MultipartFile file) throws ModuleNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
@@ -55,6 +55,7 @@ public class OnlineCourseContentService {
         content.setModule(module);
         content.setDescription(description);
         content.setContentType(contentType);
+        content.setTime(time);
         content.setPosition(position);
         content.setUrlFile(s3UploadResponse.getFileUrl());
         content.setFileName(file.getOriginalFilename());
@@ -63,13 +64,14 @@ public class OnlineCourseContentService {
         return onlineCourseContentRepository.save(content);
     }
 
-    public OnlineCourseContent update(Long id, String description, ContentType contentType, Long moduleId, Integer position, MultipartFile file) throws CourseContentNotFoundException, ModuleNotFoundException {
+    public OnlineCourseContent update(Long id, String description, ContentType contentType, String time, Long moduleId, Integer position, MultipartFile file) throws CourseContentNotFoundException, ModuleNotFoundException {
         com.fabiocondo.domain.Module module = moduleService.findById(moduleId); // Nome totalmente qualificado
 
         OnlineCourseContent existContent = findById(id);
         existContent.setModule(module);
         existContent.setDescription(description);
         existContent.setContentType(contentType);
+        existContent.setTime(time);
         existContent.setPosition(position);
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {

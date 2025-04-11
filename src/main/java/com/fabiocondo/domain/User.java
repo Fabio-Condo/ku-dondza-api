@@ -24,14 +24,12 @@ public class User implements Serializable {
 
     private String fullName;
 
-    private String username;
+    private String email;
 
     private String bio;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-
-    private String email;
 
     private String profileImageUrl;
 
@@ -94,14 +92,13 @@ public class User implements Serializable {
 
     public User(){}
 
-    public User(Long id, String userId, String fullName, String username, String bio, String password, String email, String profileImageUrl, String fileName, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, boolean isActive, boolean isNotLocked) {
+    public User(Long id, String userId, String fullName, String email, String bio, String password, String profileImageUrl, String fileName, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, boolean isActive, boolean isNotLocked) {
         this.id = id;
         this.userId = userId;
         this.fullName = fullName;
-        this.username = username;
+        this.email = email;
         this.bio = bio;
         this.password = password;
-        this.email = email;
         this.profileImageUrl = profileImageUrl;
         this.fileName = fileName;
         this.lastLoginDate = lastLoginDate;
@@ -137,12 +134,12 @@ public class User implements Serializable {
         this.fullName = fullName;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getBio() {
@@ -159,14 +156,6 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getProfileImageUrl() {

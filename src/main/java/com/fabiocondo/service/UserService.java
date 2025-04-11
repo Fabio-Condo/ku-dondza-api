@@ -5,7 +5,7 @@ import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+//import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
@@ -18,29 +18,29 @@ public interface UserService {
 
     List<User> getAllInstrutores();
 
-    User register(String firstName, String username, String email, String profileImageUrl) throws UserNotFoundException, MessagingException, UsernameExistException, EmailExistException;
+    User register(String fullName, String email, String profileImageUrl) throws UserNotFoundException, MessagingException, EmailExistException;
 
-    User updateUserProfile(String currentUsername, String fullName, String newUsername, String newEmail, String newBio, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException;
+    User updateUserProfile(String currentEmail, String fullName, String newEmail, String newBio, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException;
 
-    User addNewUser(String fullName, String username, String email, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException;
+    User addNewUser(String fullName, String email, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, MessagingException;
 
-    User updateUser(String currentUsername, String fullName, String newUsername, String newEmail, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException;
+    User updateUser(String currentEmail, String fullName, String newEmail, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException;
 
     User update(User user, Long id) throws UserNotFoundException;
 
-    User updateUserProfilePhoto(String currentUsername, MultipartFile profileImage) throws IOException;
+    User updateUserProfilePhoto(String currentEmail, MultipartFile profileImage) throws IOException;
 
-    User updateUserProfileCoverPhoto(String currentUsername, MultipartFile profileImage) throws IOException;
+    User updateUserProfileCoverPhoto(String currentEmail, MultipartFile profileImage) throws IOException;
 
     void resetPassword(String email) throws MessagingException, EmailNotFoundException;
 
-    void deleteUser(String username) throws IOException;
+    void deleteUser(String email) throws IOException;
 
-    User updateProfileImage(String username, MultipartFile profileImage) throws UsernameExistException, EmailExistException, IOException, UserNotFoundException;
+    User updateProfileImage(String email, MultipartFile profileImage) throws EmailExistException, IOException, UserNotFoundException;
 
-    void updatePropertyActive(String username, Boolean active) throws UsernameNotFoundException;
+    void updatePropertyActive(String email, Boolean active) throws EmailNotFoundException;
 
-    void updatePropertyNotLocked(String username, Boolean notLocked) throws UsernameNotFoundException;
+    void updatePropertyNotLocked(String email, Boolean notLocked) throws EmailNotFoundException;
 
     User addContentToMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException;
 
@@ -56,7 +56,7 @@ public interface UserService {
 
     User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException;
 
-    User findUserByUsername(String username);
+    //User findUserByUsername(String email);
 
     User findUserByUserId(String userId) throws UserNotFoundException;
 

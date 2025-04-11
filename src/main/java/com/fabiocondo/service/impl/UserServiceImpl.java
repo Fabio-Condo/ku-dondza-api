@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.fabiocondo.constant.UserImplConstant.*;
-import static com.fabiocondo.enumeration.Role.ROLE_SUPER_ADMIN;
 import static com.fabiocondo.enumeration.Role.ROLE_USER;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
@@ -77,18 +76,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findUserByUsername(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findUserByEmail(email);
         if (user == null) {
-            logger.error(NO_USER_FOUND_BY_USERNAME + username);
-            throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
+            logger.error(NO_USER_FOUND_BY_EMAIL + email);
+            throw new UsernameNotFoundException(NO_USER_FOUND_BY_EMAIL + email);
         } else {
             validateLoginAttempt(user);
             user.setLastLoginDateDisplay(user.getLastLoginDate());
             user.setLastLoginDate(new Date());
             userRepository.save(user);
             UserPrincipal userPrincipal = new UserPrincipal(user);
-            logger.info(FOUND_USER_BY_USERNAME + username);
+            logger.info(FOUND_USER_BY_EMAIL + email);
             return userPrincipal;
         }
     }
@@ -99,14 +98,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User register(String fullName, String username, String email, String profileImageUrl) throws UserNotFoundException, MessagingException, UsernameExistException, EmailExistException {
-        validateNewUsernameAndEmail(EMPTY, username, email);
+    public User register(String fullName, String email,  String profileImageUrl) throws UserNotFoundException, MessagingException, EmailExistException {
+        validateNewEmail(EMPTY, email);
         User user = new User();
         user.setPlan(Plan.PREMIUM);
         user.setUserId(generateUserId());
         String password = generatePassword();
         user.setFullName(fullName);
-        user.setUsername(username);
         user.setEmail(email);
         user.setProfileImageUrl(profileImageUrl);
         user.setJoinDate(new Date());
@@ -117,13 +115,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setAuthorities(ROLE_USER.getAuthorities());
         userRepository.save(user);
         logger.info("New user password (register): " + password);
-        emailService.sendNewPasswordEmail(fullName, username, password, email);
+        emailService.sendNewPasswordEmail(fullName, email, password);
         return user;
     }
 
     @Override
-    public User addNewUser(String firstName, String username, String email, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        validateNewUsernameAndEmail(EMPTY, username, email);
+    public User addNewUser(String firstName, String email, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, MessagingException {
+        validateNewEmail(EMPTY, email);
 
         logger.info("Uploading file: " + profileImage.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
@@ -134,7 +132,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setUserId(generateUserId());
         user.setFullName(firstName);
         user.setJoinDate(new Date());
-        user.setUsername(username);
         user.setEmail(email);
         user.setPassword(encodePassword(password));
         //user.setActive(isActive);
@@ -146,17 +143,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setAuthorities(getRoleEnumName(role).getAuthorities());
         user.setProfileImageUrl(s3UploadResponse.getFileUrl());
         userRepository.save(user);
-        emailService.sendNewPasswordEmail(firstName, username, password, email);
+        emailService.sendNewPasswordEmail(firstName, email, password);
         logger.info("New user password: " + password);
         return user;
     }
 
     @Override
-    public User updateUser(String currentUsername, String newFullName, String newUsername, String newEmail, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException {
-        User currentUser = validateNewUsernameAndEmail(currentUsername, newUsername, newEmail);
+    public User updateUser(String currentEmail, String newFullName, String newEmail, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException {
+        User currentUser = validateNewEmail(currentEmail, newEmail);
         // Adicionar funcao que diminue o tamanho da imagem
         currentUser.setFullName(newFullName);
-        currentUser.setUsername(newUsername);
         currentUser.setEmail(newEmail);
         //currentUser.setActive(isActive);
         //currentUser.setNotLocked(isNonLocked);
@@ -182,11 +178,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateUserProfile(String currentUsername, String newFullName, String newUsername, String newEmail, String newBio, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException {
-        User currentUser = validateNewUsernameAndEmail(currentUsername, newUsername, newEmail);
+    public User updateUserProfile(String currentEmail, String newFullName, String newEmail, String newBio, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException {
+        User currentUser = validateNewEmail(currentEmail, newEmail);
         // Adicionar funcao que diminue o tamanho da imagem
         currentUser.setFullName(newFullName);
-        currentUser.setUsername(newUsername);
         currentUser.setEmail(newEmail);
         currentUser.setBio(newBio);
         currentUser.setActive(isActive);
@@ -218,12 +213,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateUserProfilePhoto(String currentUsername, MultipartFile profileImage) throws IOException {
+    public User updateUserProfilePhoto(String currentEmail, MultipartFile profileImage) throws IOException {
         // Adicionar funcao que diminue o tamanho da imagem
 
-        User currentUser = userRepository.findUserByUsername(currentUsername);
+        User currentUser = userRepository.findUserByEmail(currentEmail);
         if (currentUser == null) {
-            throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME + currentUsername);
+            throw new UsernameNotFoundException(NO_USER_FOUND_BY_EMAIL + currentEmail);
         }
 
         if (profileImage == null || profileImage.isEmpty()) {
@@ -245,12 +240,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateUserProfileCoverPhoto(String currentUsername, MultipartFile coverImage) throws IOException {
+    public User updateUserProfileCoverPhoto(String currentEmail, MultipartFile coverImage) throws IOException {
         // Adicionar funcao que diminue o tamanho da imagem
 
-        User currentUser = userRepository.findUserByUsername(currentUsername);
+        User currentUser = userRepository.findUserByEmail(currentEmail);
         if (currentUser == null) {
-            throw new UsernameNotFoundException(NO_USER_FOUND_BY_USERNAME + currentUsername);
+            throw new UsernameNotFoundException(NO_USER_FOUND_BY_EMAIL + currentEmail);
         }
 
         if (coverImage == null || coverImage.isEmpty()) {
@@ -281,33 +276,33 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setPassword(encodePassword(password));
         userRepository.save(user);
         logger.info("New user password: " + password);
-        emailService.sendNewPasswordEmail(user.getFullName(), user.getUsername(), password, user.getEmail());
+        emailService.sendNewPasswordEmail(user.getFullName(), user.getEmail(), password);
     }
 
     @Override
-    public void deleteUser(String username) {
-        User user = userRepository.findUserByUsername(username);
+    public void deleteUser(String email) {
+        User user = userRepository.findUserByEmail(email);
         userRepository.deleteById(user.getId());
     }
 
     @Override
-    public User updateProfileImage(String username, MultipartFile profileImage) throws UsernameExistException, EmailExistException, UserNotFoundException {
-        User user = validateNewUsernameAndEmail(username, null, null);
+    public User updateProfileImage(String email, MultipartFile profileImage) throws EmailExistException, UserNotFoundException {
+        User user = validateNewEmail(email, null);
         //saveProfileImage(user, profileImage);
         return user;
     }
 
     @Override
-    public void updatePropertyActive(String username, Boolean active) {
-        User userSaved = findUserByUsername(username);
+    public void updatePropertyActive(String email, Boolean active) {
+        User userSaved = findUserByEmail(email);
         userSaved.setActive(active);
         logger.info("Updating user: " + userSaved.getFullName());
         userRepository.save(userSaved);
     }
 
     @Override
-    public void updatePropertyNotLocked(String username, Boolean notLocked) {
-        User userSaved = findUserByUsername(username);
+    public void updatePropertyNotLocked(String email, Boolean notLocked) {
+        User userSaved = findUserByEmail(email);
         userSaved.setNotLocked(notLocked);
         logger.info("Updating user: " + userSaved.getFullName());
         userRepository.save(userSaved);
@@ -394,13 +389,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private void validateLoginAttempt(User user) {
         if(user.isNotLocked()) {
-            if(loginAttemptService.hasExceededMaxAttempts(user.getUsername())) {
+            if(loginAttemptService.hasExceededMaxAttempts(user.getEmail())) {
                 user.setNotLocked(false);
             } else {
                 user.setNotLocked(true);
             }
         } else {
-            loginAttemptService.evictUserFromLoginAttemptCache(user.getUsername());
+            loginAttemptService.evictUserFromLoginAttemptCache(user.getEmail());
         }
     }
 
@@ -437,35 +432,23 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.save(user);
     }
 
-    private User validateNewUsernameAndEmail(String currentUsername, String newUsername, String newEmail) throws UserNotFoundException, UsernameExistException, EmailExistException {
-        User userByNewUsername = findUserByUsername(newUsername);
+    private User validateNewEmail(String currentEmail, String newEmail) throws UserNotFoundException, EmailExistException {
         User userByNewEmail = findUserByEmail(newEmail);
-        if(StringUtils.isNotBlank(currentUsername)) {
-            User currentUser = findUserByUsername(currentUsername);
+        if(StringUtils.isNotBlank(currentEmail)) {
+            User currentUser = findUserByEmail(currentEmail);
             if(currentUser == null) {
-                throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + currentUsername);
-            }
-            if(userByNewUsername != null && !currentUser.getId().equals(userByNewUsername.getId())) {
-                throw new UsernameExistException(USERNAME_ALREADY_EXISTS);
+                throw new UserNotFoundException(NO_USER_FOUND_BY_EMAIL + currentEmail);
             }
             if(userByNewEmail != null && !currentUser.getId().equals(userByNewEmail.getId())) {
                 throw new EmailExistException(EMAIL_ALREADY_EXISTS);
             }
             return currentUser;
         } else {
-            if(userByNewUsername != null) {
-                throw new UsernameExistException(USERNAME_ALREADY_EXISTS);
-            }
             if(userByNewEmail != null) {
                 throw new EmailExistException(EMAIL_ALREADY_EXISTS);
             }
             return null;
         }
-    }
-
-    @Override
-    public User findUserByUsername(String username) {
-        return userRepository.findUserByUsername(username);
     }
 
     @Override
@@ -503,12 +486,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public User getAuthenticatedUser() throws UserNotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        User user = userRepository.findUserByUsername(username);
+        User user = userRepository.findUserByEmail(username);
         if(user == null){
-            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
+            throw new UserNotFoundException(NO_USER_FOUND_BY_EMAIL + username);
         }
-        logger.info(FOUND_USER_BY_USERNAME + username);
-        return userRepository.findUserByUsername(username);
+        logger.info(FOUND_USER_BY_EMAIL + username);
+        return userRepository.findUserByEmail(username);
     }
 
 }

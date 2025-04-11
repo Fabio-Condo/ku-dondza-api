@@ -13,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,49 +38,46 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        User newUser = userService.register(user.getFullName(), user.getUsername(), user.getEmail(), null);
+    public ResponseEntity<User> register(@RequestBody User user) throws UserNotFoundException, EmailExistException, MessagingException {
+        User newUser = userService.register(user.getFullName(), user.getEmail(), null);
         return ResponseEntity.status(HttpStatus.OK).body(newUser);
     }
 
     @PostMapping("/add")
     public ResponseEntity<User> addNewUser(@RequestParam("fullName") String fullName,
-                                           @RequestParam("username") String username,
                                            @RequestParam("email") String email,
                                            @RequestParam("userType") UserType userType,
                                            @RequestParam("role") String role,
                                            @RequestParam("isActive") String isActive,
                                            @RequestParam("isNonLocked") String isNonLocked,
-                                           @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, MessagingException {
-        User newUser = userService.addNewUser(fullName, username,email, role, userType, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
+                                           @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, EmailExistException, MessagingException {
+        User newUser = userService.addNewUser(fullName,email, role, userType, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
         return ResponseEntity.status(HttpStatus.OK).body(newUser);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<User> update(@RequestParam("currentUsername") String currentUsername,
+    public ResponseEntity<User> update(@RequestParam("currentEmail") String currentEmail,
                                        @RequestParam("fullName") String fullName,
-                                       @RequestParam("username") String username,
                                        @RequestParam("email") String email,
                                        @RequestParam("userType") UserType userType,
                                        @RequestParam("role") String role,
                                        @RequestParam("isActive") String isActive,
                                        @RequestParam("isNonLocked") String isNonLocked,
-                                       @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
-        User updatedUser = userService.updateUser(currentUsername, fullName, username,email, role, userType, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
+                                       @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, EmailExistException, IOException, NotAnImageFileException {
+        User updatedUser = userService.updateUser(currentEmail, fullName, email, role, userType, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 
     @PutMapping("/update-user-profile")
-    public ResponseEntity<User> updateUserProfile(@RequestParam("currentUsername") String currentUsername,
+    public ResponseEntity<User> updateUserProfile(@RequestParam("currentEmail") String currentEmail,
                                        @RequestParam("fullName") String fullName,
-                                       @RequestParam("username") String username,
                                        @RequestParam("email") String email,
                                        @RequestParam("bio") String bio,
                                        @RequestParam("role") String role,
                                        @RequestParam("isActive") String isActive,
                                        @RequestParam("isNonLocked") String isNonLocked,
-                                       @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException, NotAnImageFileException {
-        User updatedUser = userService.updateUserProfile(currentUsername, fullName, username,email, bio, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
+                                       @RequestParam(value = "profileImage", required = false) MultipartFile profileImage) throws UserNotFoundException, EmailExistException, IOException, NotAnImageFileException {
+        User updatedUser = userService.updateUserProfile(currentEmail, fullName, email, bio, role, Boolean.parseBoolean(isNonLocked), Boolean.parseBoolean(isActive), profileImage);
         return ResponseEntity.status(HttpStatus.OK).body(updatedUser);
     }
 
@@ -101,9 +96,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserProfileCoverPhoto(userId, file));
     }
     
-    @GetMapping("/find/{username}")
-    public ResponseEntity<User> getUser(@PathVariable("username") String username) {
-        User user = userService.findUserByUsername(username);
+    @GetMapping("/find/{email}")
+    public ResponseEntity<User> getUser(@PathVariable("email") String email) {
+        User user = userService.findUserByEmail(email);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
@@ -140,29 +135,29 @@ public class UserController {
         return response(OK, EMAIL_SENT + email);
     }
 
-    @DeleteMapping("/delete/{username}")
+    @DeleteMapping("/delete/{email}")
     @PreAuthorize("hasAnyAuthority('user:delete')")
-    public ResponseEntity<HttpResponse> deleteUser(@PathVariable("username") String username) throws IOException {
-        userService.deleteUser(username);
+    public ResponseEntity<HttpResponse> deleteUser(@PathVariable("email") String email) throws IOException {
+        userService.deleteUser(email);
         return response(OK, USER_DELETED_SUCCESSFULLY);
     }
 
     @PostMapping("/updateProfileImage")
-    public ResponseEntity<User> updateProfileImage(@RequestParam("username") String username, @RequestParam(value = "profileImage") MultipartFile profileImage) throws UserNotFoundException, UsernameExistException, EmailExistException, IOException {
-        User user = userService.updateProfileImage(username, profileImage);
+    public ResponseEntity<User> updateProfileImage(@RequestParam("email") String email, @RequestParam(value = "profileImage") MultipartFile profileImage) throws UserNotFoundException, EmailExistException, IOException {
+        User user = userService.updateProfileImage(email, profileImage);
         return ResponseEntity.status(HttpStatus.OK).body(user);
     }
 
-    @PutMapping("/{newUsername}/active-user")
+    @PutMapping("/{newEmail}/active-user")
     @PreAuthorize("hasAnyAuthority('user:update')")
-    public void updatePropertyActive(@PathVariable("newUsername") String newUsername, @RequestBody Boolean active) throws UsernameNotFoundException {
-        userService.updatePropertyActive(newUsername, active);
+    public void updatePropertyActive(@PathVariable("newEmail") String newEmail, @RequestBody Boolean active) throws EmailNotFoundException {
+        userService.updatePropertyActive(newEmail, active);
     }
 
-    @PutMapping("/{newUsername}/notLocked-user")
+    @PutMapping("/{newEmail}/notLocked-user")
     @PreAuthorize("hasAnyAuthority('user:update')")
-    public void updatePropertyNotLocked(@PathVariable("newUsername") String newUsername, @RequestBody Boolean notLocked) throws UsernameNotFoundException {
-        userService.updatePropertyNotLocked(newUsername, notLocked);
+    public void updatePropertyNotLocked(@PathVariable("newEmail") String newEmail, @RequestBody Boolean notLocked) throws EmailNotFoundException {
+        userService.updatePropertyNotLocked(newEmail, notLocked);
     }
 
     @GetMapping("/{userId}/interests")
@@ -220,9 +215,5 @@ public class UserController {
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(),
                 message), httpStatus);
-    }
-
-    private void authenticate(String username, String password) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
     }
 }

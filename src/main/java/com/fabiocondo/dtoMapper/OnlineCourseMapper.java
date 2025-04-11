@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.fabiocondo.constant.UserImplConstant.FOUND_USER_BY_USERNAME;
 import static com.fabiocondo.constant.UserImplConstant.NO_USER_FOUND_BY_USERNAME;
 
 @Component
@@ -90,11 +89,11 @@ public class OnlineCourseMapper {
     public User getAuthenticatedUser() throws UserNotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        User user = userRepository.findUserByUsername(username);
+        User user = userRepository.findUserByEmail(username);
         if(user == null){
             throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
         }
-        return userRepository.findUserByUsername(username);
+        return userRepository.findUserByEmail(username);
     }
 
     // Converter lista paginada de Quiz para DTO

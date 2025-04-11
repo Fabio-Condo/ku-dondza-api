@@ -14,15 +14,13 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findUserByUsername(String username);
+    User findUserByEmail(String username);
 
     Optional<User> findUserByUserId(String userId);
 
-    User findUserByEmail(String email);
-
     List<User> findByUserType(UserType userType);
 
-    @Query("SELECT u FROM User u WHERE u.fullName LIKE %:searchParam% OR u.username LIKE %:searchParam% OR u.role LIKE %:searchParam%")
+    @Query("SELECT u FROM User u WHERE u.fullName LIKE %:searchParam% OR u.email LIKE %:searchParam% OR u.role LIKE %:searchParam%")
     public Page<User> findByAnyProperty(@Param("searchParam") String searchParam, Pageable pageable);
 
     @Query("SELECT u FROM User u WHERE u.fullName LIKE %:query%")

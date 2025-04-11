@@ -18,18 +18,18 @@ import static javax.mail.Message.RecipientType.TO;
 @Service
 public class EmailService {
 
-    public void sendNewPasswordEmail(String firstName, String username, String password, String email) throws MessagingException {
-        Message message = createEmail(firstName, username, password, email);
+    public void sendNewPasswordEmail(String firstName, String username, String password) throws MessagingException {
+        Message message = createEmail(firstName, username, password);
         SMTPTransport smtpTransport = (SMTPTransport) getEmailSession().getTransport(SIMPLE_MAIL_TRANSFER_PROTOCOL);
         smtpTransport.connect(GMAIL_SMTP_SERVER, USERNAME, PASSWORD);
         smtpTransport.sendMessage(message, message.getAllRecipients());
         smtpTransport.close();
     }
 
-    private Message createEmail(String firstName, String username, String password, String email) throws MessagingException {
+    private Message createEmail(String firstName, String username, String password) throws MessagingException {
         Message message = new MimeMessage(getEmailSession());
         message.setFrom(new InternetAddress(FROM_EMAIL));
-        message.setRecipients(TO, InternetAddress.parse(email, false));
+        message.setRecipients(TO, InternetAddress.parse(username, false));
         message.setRecipients(CC, InternetAddress.parse(CC_EMAIL, false));
         message.setSubject(EMAIL_SUBJECT);
         message.setText("Olá " + firstName + ", \n \n Username: "  + username + "\n \n E o seu novo password é: " + password + "\n \n My Admin App Support Team");

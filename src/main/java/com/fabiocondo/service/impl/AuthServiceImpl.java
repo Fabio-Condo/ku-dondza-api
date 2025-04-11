@@ -54,8 +54,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResponseEntity<User> authenticateWithUsernameAndPassword(User user) {
-        authenticate(user.getUsername(), user.getPassword());
-        User loginUser = userService.findUserByUsername(user.getUsername());
+        authenticate(user.getEmail(), user.getPassword());
+        User loginUser = userService.findUserByEmail(user.getEmail());
         UserPrincipal userPrincipal = new UserPrincipal(loginUser);
         HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
         return new ResponseEntity<>(loginUser, jwtHeader, HttpStatus.OK);
@@ -93,7 +93,7 @@ public class AuthServiceImpl implements AuthService {
                     loginUser = existingUser;
                 } else {
                     // 🔹 3️⃣ Criar novo usuário e associar o método Google
-                    loginUser = userService.register(name, email, email, pictureUrl);
+                    loginUser = userService.register(name, email, pictureUrl);
                 }
 
                 // 🔹 4️⃣ Salvar método de autenticação Google para o usuário

@@ -28,9 +28,9 @@ public interface UserService {
 
     User update(User user, Long id) throws UserNotFoundException;
 
-    User updateUserProfilePhoto(String currentEmail, MultipartFile profileImage) throws IOException;
+    User updateUserProfilePhoto(String currentEmail, MultipartFile profileImage) throws IOException, EmailNotFoundException;
 
-    User updateUserProfileCoverPhoto(String currentEmail, MultipartFile profileImage) throws IOException;
+    User updateUserProfileCoverPhoto(String currentEmail, MultipartFile profileImage) throws IOException, EmailNotFoundException;
 
     void resetPassword(String email) throws MessagingException, EmailNotFoundException;
 

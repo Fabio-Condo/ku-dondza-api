@@ -213,12 +213,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateUserProfilePhoto(String currentEmail, MultipartFile profileImage) throws IOException {
+    public User updateUserProfilePhoto(String currentEmail, MultipartFile profileImage) throws IOException, EmailNotFoundException {
         // Adicionar funcao que diminue o tamanho da imagem
 
         User currentUser = userRepository.findUserByEmail(currentEmail);
         if (currentUser == null) {
-            throw new UsernameNotFoundException(NO_USER_FOUND_BY_EMAIL + currentEmail);
+            throw new EmailNotFoundException(NO_USER_FOUND_BY_EMAIL + currentEmail);
+
         }
 
         if (profileImage == null || profileImage.isEmpty()) {
@@ -240,12 +241,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateUserProfileCoverPhoto(String currentEmail, MultipartFile coverImage) throws IOException {
+    public User updateUserProfileCoverPhoto(String currentEmail, MultipartFile coverImage) throws IOException, EmailNotFoundException {
         // Adicionar funcao que diminue o tamanho da imagem
 
         User currentUser = userRepository.findUserByEmail(currentEmail);
         if (currentUser == null) {
-            throw new UsernameNotFoundException(NO_USER_FOUND_BY_EMAIL + currentEmail);
+            throw new EmailNotFoundException(NO_USER_FOUND_BY_EMAIL + currentEmail);
         }
 
         if (coverImage == null || coverImage.isEmpty()) {

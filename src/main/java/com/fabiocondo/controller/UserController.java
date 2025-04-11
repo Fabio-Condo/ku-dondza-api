@@ -87,12 +87,12 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/profile-photo")
-    public ResponseEntity<User> updateProfilePhoto(@PathVariable String userId, @RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<User> updateProfilePhoto(@PathVariable String userId, @RequestParam("file") MultipartFile file) throws IOException, EmailNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserProfilePhoto(userId, file));
     }
 
     @PostMapping("/{userId}/cover-photo")
-    public ResponseEntity<User> updateUserProfileCoverPhoto(@PathVariable String userId, @RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<User> updateUserProfileCoverPhoto(@PathVariable String userId, @RequestParam("file") MultipartFile file) throws IOException, EmailNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUserProfileCoverPhoto(userId, file));
     }
     

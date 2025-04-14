@@ -4,6 +4,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
+import com.fabiocondo.repository.filter.UserFilter;
 import com.fabiocondo.service.impl.AuthServiceImpl;
 import com.fabiocondo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,9 +115,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(users);
     }
 
-    @GetMapping("/list/pageable")
-    public Page<User> findAll(@RequestParam(required = false, defaultValue = "") String searchParam, Pageable pageable) throws UserNotFoundException {
-        return userService.findAll(searchParam, pageable);
+    @GetMapping("/filter")
+    public Page<User> filter(UserFilter userFilter, Pageable pageable) {
+        return userService.filter(userFilter, pageable);
     }
 
     @GetMapping("/instrutores")

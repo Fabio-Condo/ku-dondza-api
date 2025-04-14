@@ -8,6 +8,7 @@ import com.fabiocondo.enumeration.Role;
 import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.*;
+import com.fabiocondo.repository.filter.UserFilter;
 import com.fabiocondo.security.service.EmailService;
 import com.fabiocondo.security.service.LoginAttemptService;
 import com.fabiocondo.service.UserService;
@@ -313,6 +314,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public Page<User> findAll(String searchParam, Pageable pageable) throws UserNotFoundException {
         return userRepository.findByAnyProperty(searchParam, pageable);
+    }
+
+    @Override
+    public Page<User> filter(UserFilter userFilter, Pageable pageable) {
+        return userRepository.filter(userFilter, pageable);
     }
 
     @Override

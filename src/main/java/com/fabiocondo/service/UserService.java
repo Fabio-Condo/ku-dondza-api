@@ -3,6 +3,7 @@ package com.fabiocondo.service;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
+import com.fabiocondo.repository.filter.UserFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 //import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -65,6 +66,8 @@ public interface UserService {
     List<User> getUsers();
 
     Page<User> findAll(String searchParam, Pageable pageable) throws UserNotFoundException;
+
+    Page<User> filter(UserFilter userFilter, Pageable pageable);
 
     long getTotal();
 

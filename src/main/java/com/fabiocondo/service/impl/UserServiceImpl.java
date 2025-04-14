@@ -102,6 +102,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         validateNewEmail(EMPTY, email);
         User user = new User();
         user.setPlan(Plan.PREMIUM);
+        user.setUserType(UserType.STUDENT);
         user.setUserId(generateUserId());
         String password = generatePassword();
         user.setFullName(fullName);

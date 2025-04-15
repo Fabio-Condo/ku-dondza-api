@@ -138,12 +138,12 @@ public class OnlineCourseService {
                 .count();
 
         // Calcular a taxa
-        double taxa = 0;
+        double rate = 0;
         if (!contents.isEmpty()) {
-            taxa = (double) totalMarked / contents.size() * 100;
+            rate = (double) totalMarked / contents.size() * 100;
         }
 
-        return taxa;
+        return rate;
     }
 
 }

@@ -2,6 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.OnlineCourseDTO;
+import com.fabiocondo.dto.UserDTO;
 import com.fabiocondo.dtoMapper.OnlineCourseMapper;
 import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
@@ -76,12 +77,12 @@ public class OnlineCourseController {
     }
 
     @GetMapping("/{courseId}/students")
-    public Page<User> getStudentsByCourseId(@PathVariable Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
+    public Page<UserDTO> getStudentsByCourseId(@PathVariable Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
         return onlineCourseService.getStudentsByCourseId(courseId, pageable);
     }
 
     @GetMapping("/{courseId}/progress/{userId}")
-    public double calculateUserProgressInCourse(@PathVariable Long courseId, @PathVariable Long userId) {
+    public double calculateUserProgressInCourse(@PathVariable Long courseId, @PathVariable Long userId) throws UserNotFoundException {
         return onlineCourseService.calculateUserProgressInCourse(userId, courseId);
     }
 

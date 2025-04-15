@@ -80,6 +80,11 @@ public class OnlineCourseController {
         return onlineCourseService.getStudentsByCourseId(courseId, pageable);
     }
 
+    @GetMapping("/{courseId}/progress/{userId}")
+    public double calculateUserProgressInCourse(@PathVariable Long courseId, @PathVariable Long userId) {
+        return onlineCourseService.calculateUserProgressInCourse(userId, courseId);
+    }
+
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(
                 new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(), message),

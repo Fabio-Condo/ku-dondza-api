@@ -3,19 +3,22 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.OnlineCourse;
+import com.fabiocondo.domain.OnlineCourseContent;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.repository.OnlineCourseContentRepository;
 import com.fabiocondo.repository.OnlineCourseRepository;
+import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.repository.filter.OnlineCourseFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,12 +30,18 @@ public class OnlineCourseService {
 
     private final OnlineCourseRepository onlineCourseRepository;
 
+    private final OnlineCourseContentRepository onlineCourseContentRepository;
+
+    private final UserRepository userRepository;
+
     private final UserServiceImpl userService;
 
     private final AmazonS3Service amazonS3Service;
 
-    public OnlineCourseService(OnlineCourseRepository onlineCourseRepository, UserServiceImpl userService, AmazonS3Service amazonS3Service) {
+    public OnlineCourseService(OnlineCourseRepository onlineCourseRepository, OnlineCourseContentRepository onlineCourseContentRepository, UserRepository userRepository, UserServiceImpl userService, AmazonS3Service amazonS3Service) {
         this.onlineCourseRepository = onlineCourseRepository;
+        this.onlineCourseContentRepository = onlineCourseContentRepository;
+        this.userRepository = userRepository;
         this.userService = userService;
         this.amazonS3Service = amazonS3Service;
     }
@@ -119,8 +128,22 @@ public class OnlineCourseService {
         return onlineCourseRepository.findStudentsByCourseId(existCourse.getId(), pageable);
     }
 
-    public long countOnlineCourseStudentsByCourseId(Long courseId){
-        return onlineCourseRepository.countOnlineCourseStudentsByCourseId(courseId);
+    public double calculateUserProgressInCourse(Long userId, Long courseId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        List<OnlineCourseContent> contents = onlineCourseContentRepository.findByModule_OnlineCourse_Id(courseId);
+
+        long totalMarked = user.getMarkedCourseContents().stream()
+                .filter(content -> contents.contains(content))
+                .count();
+
+        // Calcular a taxa
+        double taxa = 0;
+        if (!contents.isEmpty()) {
+            taxa = (double) totalMarked / contents.size() * 100;
+        }
+
+        return taxa;
     }
 
 }

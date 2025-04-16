@@ -15,11 +15,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
+import static com.fabiocondo.constant.UserImplConstant.NO_USER_FOUND_BY_USERNAME;
 
 @Service
 public class OnlineCourseService {
@@ -123,6 +128,18 @@ public class OnlineCourseService {
         return onlineCourseRepository.count();
     }
 
+    public boolean checkIfCurrentUserSubscribed(Long onlineCourseId) throws UserNotFoundException {
+        User user = getAuthenticatedUser();
+        if (user == null) {
+            return false;
+        }
+        Optional<OnlineCourse> course = onlineCourseRepository.findById(onlineCourseId);
+        if (!course.isPresent()) {
+            return false;
+        }
+        return user.getSubscribedOnlineCourses().contains(course.get());
+    }
+
     public Page<User> getStudentsByCourseId(Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
         OnlineCourse course = findById(courseId);
         return onlineCourseRepository.findStudentsByCourseId(course.getId(), pageable);
@@ -140,6 +157,16 @@ public class OnlineCourseService {
 
         if (contents.isEmpty()) return 0;
         return (double) totalMarked / contents.size() * 100;
+    }
+
+    public User getAuthenticatedUser() throws UserNotFoundException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        User user = userRepository.findUserByEmail(username);
+        if(user == null){
+            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
+        }
+        return userRepository.findUserByEmail(username);
     }
 
 }

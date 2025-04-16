@@ -3,6 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
+import com.fabiocondo.domain.Topic;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
@@ -91,6 +92,37 @@ public class QuizService {
 
     public long countQuestionsByQuizId(Long quizId){
         return quizRepository.countQuestionsByQuizId(quizId);
+    }
+
+    public Set<Topic> getTopics(Quiz quiz) {
+        Set<Topic> topics = new HashSet<>();
+        quiz.getQuestions().forEach(question -> {
+            if (question.getTopic() != null) {
+                topics.add(question.getTopic());
+            }
+        });
+        return topics;
+    }
+
+    public double calculateAccuracyRate(Quiz quiz) {
+        Set<Question> questions = quiz.getQuestions();
+        Set<Answer> userAnswers = quiz.getAnswers();
+        int correctAnswers = 0;
+
+        for (Question question : questions) {
+            for (Answer userAnswer : userAnswers) {
+                if (userAnswer.getQuestion().equals(question) && userAnswer.isCorrect()) {
+                    correctAnswers++;
+                    break; // encontrou a resposta correta para essa questão
+                }
+            }
+        }
+
+        if (questions.isEmpty()) {
+            return 0.0;
+        }
+
+        return (double) correctAnswers / questions.size() * 100;
     }
 
 }

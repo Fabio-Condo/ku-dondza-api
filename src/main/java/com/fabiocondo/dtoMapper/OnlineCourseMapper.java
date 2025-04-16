@@ -43,7 +43,7 @@ public class OnlineCourseMapper {
         onlineCourseDTO.setCoverImageUrl(onlineCourse.getCoverImageUrl());
         onlineCourseDTO.setLunchDate(onlineCourse.getLunchDate());
         onlineCourseDTO.setInstrutor(onlineCourse.getInstrutor());
-        onlineCourseDTO.setModules(onlineCourse.getModules());
+        onlineCourseDTO.setModules(onlineCourse.getModules()); // Em cada modulo percorrer os contents e verificar se user atual autenticado, marcou o content
         onlineCourseDTO.setCurrentUserSubscribed(onlineCourseService.checkIfCurrentUserSubscribed(onlineCourse.getId()));
         return onlineCourseDTO;
     }

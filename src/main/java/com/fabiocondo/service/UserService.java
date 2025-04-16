@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public interface UserService {
@@ -55,11 +54,7 @@ public interface UserService {
 
     long countSubscribedOnlineCoursesByUserId(Long userId);
 
-    User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException;
-
-    User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException;
-
-    //User findUserByUsername(String email);
+    User toggleCourseSubscription(Long userId, Long onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException;
 
     User findUserByUserId(String userId) throws UserNotFoundException;
 

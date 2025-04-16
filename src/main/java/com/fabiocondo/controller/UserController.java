@@ -188,13 +188,8 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")
-    public ResponseEntity<User> addCourseToSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws UserNotFoundException, OnlineCourseNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.addCourseToSubscribedOnlineCourses(userId, onlineCourseId));
-    }
-
-    @DeleteMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")
-    public ResponseEntity<User> removeCourseFromSubscribedOnlineCourses(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws UserNotFoundException, OnlineCourseNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.removeCourseFromSubscribedOnlineCourses(userId, onlineCourseId));
+    public ResponseEntity<User> toggleCourseSubscription(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws UserNotFoundException, OnlineCourseNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.toggleCourseSubscription(userId, onlineCourseId));
     }
 
     @PutMapping("/{userId}/marked-contents/{contentId}/toggle")

@@ -415,24 +415,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User addCourseToSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException {
+    public User toggleCourseSubscription(Long userId, Long onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException {
         User user = findById(userId);
         Optional<OnlineCourse> optionalCourse = onlineCourseRepository.findById(onlineCourseId);
         if (!optionalCourse.isPresent()){
             throw new OnlineCourseNotFoundException("No online course not found by id: " + onlineCourseId);
         }
         user.getSubscribedOnlineCourses().add(optionalCourse.get());
-        return userRepository.save(user);
-    }
-
-    @Override
-    public User removeCourseFromSubscribedOnlineCourses(Long userId, Long onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException {
-        User user = findById(userId);
-        Optional<OnlineCourse> optionalCourse = onlineCourseRepository.findById(onlineCourseId);
-        if (!optionalCourse.isPresent()) {
-            throw new OnlineCourseNotFoundException("No online course not found by id: " + onlineCourseId);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("A operação foi interrompida", e);
         }
-        user.getSubscribedOnlineCourses().remove(optionalCourse.get());
         return userRepository.save(user);
     }
 

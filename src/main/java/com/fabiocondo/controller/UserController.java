@@ -197,14 +197,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.removeCourseFromSubscribedOnlineCourses(userId, onlineCourseId));
     }
 
-    @PostMapping("/{userId}/marked-course-content/{onlineCourseContentId}")
-    public ResponseEntity<User> addContentToMarkedCourseContents(@PathVariable Long userId, @PathVariable Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.addContentToMarkedCourseContents(userId, onlineCourseContentId));
-    }
-
-    @DeleteMapping("/{userId}/marked-course-content/{onlineCourseContentId}")
-    public ResponseEntity<User> removeContentFromMarkedCourseContents(@PathVariable Long userId, @PathVariable Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.removeContentFromMarkedCourseContents(userId, onlineCourseContentId));
+    @PutMapping("/{userId}/marked-contents/{contentId}/toggle")
+    public ResponseEntity<User> toggleMarkedContent(@PathVariable Long userId, @PathVariable Long contentId) throws UserNotFoundException, CourseContentNotFoundException {
+        return ResponseEntity.status(OK).body(userService.toggleContentMarkedStatus(userId, contentId));
     }
 
     @GetMapping("/{userId}/marked-course-content/contains/{onlineCourseContentId}")

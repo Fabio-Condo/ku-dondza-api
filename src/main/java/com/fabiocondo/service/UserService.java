@@ -43,9 +43,11 @@ public interface UserService {
 
     void updatePropertyNotLocked(String email, Boolean notLocked) throws EmailNotFoundException;
 
-    User addContentToMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException;
+    User toggleContentMarkedStatus(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException;
 
-    User removeContentFromMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException;
+    //User addContentToMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException;
+
+    //User removeContentFromMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException;
 
     boolean checkIfMarkedCourseContent(Long userId, Long onlineCourseContentId);
 

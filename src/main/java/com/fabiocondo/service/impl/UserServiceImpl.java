@@ -363,24 +363,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User addContentToMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException {
+    public User toggleContentMarkedStatus(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException {
         User user = findById(userId);
-        Optional<OnlineCourseContent> optionalModule = onlineCourseContentRepository.findById(onlineCourseContentId);
-        if (!optionalModule.isPresent()){
-            throw new CourseContentNotFoundException("No Course Content found by id: " + onlineCourseContentId);
-        }
-        user.getMarkedCourseContents().add(optionalModule.get());
-        return userRepository.save(user);
-    }
 
-    @Override
-    public User removeContentFromMarkedCourseContents(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException {
-        User user = findById(userId);
-        Optional<OnlineCourseContent> optionalModule = onlineCourseContentRepository.findById(onlineCourseContentId);
-        if (!optionalModule.isPresent()){
-            throw new CourseContentNotFoundException("No Course Content found by id: " + onlineCourseContentId);
+        OnlineCourseContent content = onlineCourseContentRepository.findById(onlineCourseContentId)
+                .orElseThrow(() -> new CourseContentNotFoundException("No Course Content found by id: " + onlineCourseContentId));
+
+        Set<OnlineCourseContent> markedContents = user.getMarkedCourseContents();
+
+        if (markedContents.contains(content)) {
+            markedContents.remove(content);
+        } else {
+            markedContents.add(content);
         }
-        user.getMarkedCourseContents().remove(optionalModule.get());
+
         return userRepository.save(user);
     }
 

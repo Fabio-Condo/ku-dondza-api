@@ -380,17 +380,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.save(user);
     }
 
-    @Override
-    public boolean checkIfMarkedCourseContent(Long userId, Long onlineCourseContentId) {
-        User user = userRepository.findById(userId).orElse(null);
-        Optional<OnlineCourseContent> optionalModule = onlineCourseContentRepository.findById(onlineCourseContentId);
-
-        if (user == null || !optionalModule.isPresent()) {
-            return false;
-        }
-        return user.getMarkedCourseContents().contains(optionalModule.get());
-    }
-
     private void validateLoginAttempt(User user) {
         if(user.isNotLocked()) {
             if(loginAttemptService.hasExceededMaxAttempts(user.getEmail())) {
@@ -422,12 +411,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new OnlineCourseNotFoundException("No online course not found by id: " + onlineCourseId);
         }
         user.getSubscribedOnlineCourses().add(optionalCourse.get());
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
         return userRepository.save(user);
     }
 

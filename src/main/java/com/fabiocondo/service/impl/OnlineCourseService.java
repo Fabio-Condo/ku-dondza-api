@@ -2,6 +2,7 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
+import com.fabiocondo.domain.Module;
 import com.fabiocondo.domain.OnlineCourse;
 import com.fabiocondo.domain.OnlineCourseContent;
 import com.fabiocondo.domain.User;
@@ -22,7 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.fabiocondo.constant.UserImplConstant.NO_USER_FOUND_BY_USERNAME;
 
@@ -57,9 +60,22 @@ public class OnlineCourseService {
                 .orElseThrow(() -> new OnlineCourseNotFoundException("No course found by id: " + id));
     }
 
-    public OnlineCourse findOnlineCourseByOnlineCourseId(String onlineCourseId) throws OnlineCourseNotFoundException {
-        return onlineCourseRepository.findOnlineCourseByOnlineCourseId(onlineCourseId)
+    public OnlineCourse findOnlineCourseByOnlineCourseId(String onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException {
+        OnlineCourse onlineCourse = onlineCourseRepository.findOnlineCourseByOnlineCourseId(onlineCourseId)
                 .orElseThrow(() -> new OnlineCourseNotFoundException("No course found by id: " + onlineCourseId));
+
+        User user = getAuthenticatedUser();
+
+        Set<Long> markedIds = user.getMarkedCourseContents().stream()
+                .map(OnlineCourseContent::getId)
+                .collect(Collectors.toSet());
+
+        for (Module module : onlineCourse.getModules()) {
+            for (OnlineCourseContent content : module.getCourseContents()) {
+                content.setMarkedByUser(markedIds.contains(content.getId()));
+            }
+        }
+        return onlineCourse;
     }
 
     public Page<OnlineCourse> findAll(String searchParam, Pageable pageable) {

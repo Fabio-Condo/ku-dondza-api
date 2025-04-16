@@ -29,6 +29,9 @@ public class OnlineCourseContent { // Conteúdo do module - Depois renomear
 
     private Integer position; // Novo campo para controlar a posição do conteúdo
 
+    @Transient // Nao salvar na bd
+    private boolean markedByUser;
+
     // Constructors
     public OnlineCourseContent() {}
 
@@ -103,6 +106,14 @@ public class OnlineCourseContent { // Conteúdo do module - Depois renomear
 
     public void setPosition(Integer position) {
         this.position = position;
+    }
+
+    public boolean isMarkedByUser() {
+        return markedByUser;
+    }
+
+    public void setMarkedByUser(boolean markedByUser) {
+        this.markedByUser = markedByUser;
     }
 }
 

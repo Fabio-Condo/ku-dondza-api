@@ -197,12 +197,6 @@ public class UserController {
         return ResponseEntity.status(OK).body(userService.toggleContentMarkedStatus(userId, contentId));
     }
 
-    @GetMapping("/{userId}/marked-course-content/contains/{onlineCourseContentId}")
-    public ResponseEntity<Boolean> checkIfMarkedCourseContent(@PathVariable Long userId, @PathVariable Long onlineCourseContentId) {
-        boolean markedCourseContent = userService.checkIfMarkedCourseContent(userId, onlineCourseContentId);
-        return ResponseEntity.ok(markedCourseContent);
-    }
-
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(),
                 message), httpStatus);

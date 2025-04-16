@@ -5,8 +5,6 @@ import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.OnlineCourse;
 import com.fabiocondo.domain.OnlineCourseContent;
 import com.fabiocondo.domain.User;
-import com.fabiocondo.dto.UserDTO;
-import com.fabiocondo.dtoMapper.UserMapper;
 import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.OnlineCourseContentRepository;
@@ -38,16 +36,13 @@ public class OnlineCourseService {
 
     private final UserServiceImpl userService;
 
-    private final UserMapper userMapper;
-
     private final AmazonS3Service amazonS3Service;
 
-    public OnlineCourseService(OnlineCourseRepository onlineCourseRepository, OnlineCourseContentRepository onlineCourseContentRepository, UserRepository userRepository, UserServiceImpl userService, UserMapper userMapper, AmazonS3Service amazonS3Service) {
+    public OnlineCourseService(OnlineCourseRepository onlineCourseRepository, OnlineCourseContentRepository onlineCourseContentRepository, UserRepository userRepository, UserServiceImpl userService, AmazonS3Service amazonS3Service) {
         this.onlineCourseRepository = onlineCourseRepository;
         this.onlineCourseContentRepository = onlineCourseContentRepository;
         this.userRepository = userRepository;
         this.userService = userService;
-        this.userMapper = userMapper;
         this.amazonS3Service = amazonS3Service;
     }
 
@@ -128,40 +123,23 @@ public class OnlineCourseService {
         return onlineCourseRepository.count();
     }
 
-    public Page<UserDTO> getStudentsByCourseId(Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
-        OnlineCourse existCourse = findById(courseId);
-        Page<User> students = onlineCourseRepository.findStudentsByCourseId(existCourse.getId(), pageable);
-        Page<UserDTO> userDTOs = userMapper.domainPageToDTOPage(students, pageable);
-
-        userDTOs.forEach(userDTO -> {
-            try {
-                double rate = calculateUserProgressInCourse(userDTO.getId(), courseId);
-                userDTO.setMarkedContentRate(rate);
-            } catch (UserNotFoundException e) {
-                userDTO.setMarkedContentRate(0);
-            }
-        });
-
-        return userDTOs;
+    public Page<User> getStudentsByCourseId(Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
+        OnlineCourse course = findById(courseId);
+        return onlineCourseRepository.findStudentsByCourseId(course.getId(), pageable);
     }
 
-
     public double calculateUserProgressInCourse(Long userId, Long courseId) throws UserNotFoundException {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
 
         List<OnlineCourseContent> contents = onlineCourseContentRepository.findByModule_OnlineCourse_Id(courseId);
 
         long totalMarked = user.getMarkedCourseContents().stream()
-                .filter(content -> contents.contains(content))
+                .filter(contents::contains)
                 .count();
 
-        // Calcular a taxa
-        double rate = 0;
-        if (!contents.isEmpty()) {
-            rate = (double) totalMarked / contents.size() * 100;
-        }
-
-        return rate;
+        if (contents.isEmpty()) return 0;
+        return (double) totalMarked / contents.size() * 100;
     }
 
 }

@@ -4,6 +4,7 @@ import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.OnlineCourseDTO;
 import com.fabiocondo.dto.UserDTO;
 import com.fabiocondo.dtoMapper.OnlineCourseMapper;
+import com.fabiocondo.dtoMapper.UserMapper;
 import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.filter.OnlineCourseFilter;
@@ -21,11 +22,13 @@ public class OnlineCourseController {
 
     public OnlineCourseService onlineCourseService;
     private final OnlineCourseMapper onlineCourseMapper;
+    private final UserMapper userMapper;
 
 
-    public OnlineCourseController(OnlineCourseService onlineCourseService, OnlineCourseMapper onlineCourseMapper) {
+    public OnlineCourseController(OnlineCourseService onlineCourseService, OnlineCourseMapper onlineCourseMapper, UserMapper userMapper) {
         this.onlineCourseService = onlineCourseService;
         this.onlineCourseMapper = onlineCourseMapper;
+        this.userMapper = userMapper;
     }
 
     @GetMapping("/{id}")
@@ -77,9 +80,22 @@ public class OnlineCourseController {
     }
 
     @GetMapping("/{courseId}/students")
-    public Page<UserDTO> getStudentsByCourseId(@PathVariable Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
-        return onlineCourseService.getStudentsByCourseId(courseId, pageable);
+    public ResponseEntity<Page<UserDTO>> getStudentsByCourseId(@PathVariable Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
+        Page<User> students = onlineCourseService.getStudentsByCourseId(courseId, pageable);
+        Page<UserDTO> userDTOs = userMapper.domainPageToDTOPage(students, pageable);
+
+        userDTOs.forEach(dto -> {
+            try {
+                double progress = onlineCourseService.calculateUserProgressInCourse(dto.getId(), courseId);
+                dto.setMarkedContentRate(progress);
+            } catch (UserNotFoundException e) {
+                dto.setMarkedContentRate(0);
+            }
+        });
+
+        return ResponseEntity.ok(userDTOs);
     }
+
 
     @GetMapping("/{courseId}/progress/{userId}")
     public double calculateUserProgressInCourse(@PathVariable Long courseId, @PathVariable Long userId) throws UserNotFoundException {

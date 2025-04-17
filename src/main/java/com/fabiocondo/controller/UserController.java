@@ -182,18 +182,8 @@ public class UserController {
         return userService.getSubscribedOnlineCoursesByUserId(userId, pageable);
     }
 
-    @GetMapping("/{userId}/subscribedOnlineCourses/total")
-    public ResponseEntity<Long> countSubscribedOnlineCoursesByUserId(@PathVariable Long userId){
-        return ResponseEntity.status(HttpStatus.OK).body(userService.countSubscribedOnlineCoursesByUserId(userId));
-    }
-
-    @PostMapping("/{userId}/subscribedOnlineCourses/{onlineCourseId}")
-    public ResponseEntity<User> toggleCourseSubscription(@PathVariable Long userId, @PathVariable Long onlineCourseId) throws UserNotFoundException, OnlineCourseNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.toggleCourseSubscription(userId, onlineCourseId));
-    }
-
     @PutMapping("/{userId}/marked-contents/{contentId}/toggle")
-    public ResponseEntity<User> toggleMarkedContent(@PathVariable Long userId, @PathVariable Long contentId) throws UserNotFoundException, CourseContentNotFoundException {
+    public ResponseEntity<User> toggleMarkedContent(@PathVariable Long userId, @PathVariable Long contentId) throws UserNotFoundException, ContentNotFoundException {
         return ResponseEntity.status(OK).body(userService.toggleContentMarkedStatus(userId, contentId));
     }
 

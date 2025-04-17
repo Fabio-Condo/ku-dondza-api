@@ -2,9 +2,9 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.Module;
 import com.fabiocondo.domain.Course;
-import com.fabiocondo.exception.domain.CourseContentNotFoundException;
+import com.fabiocondo.exception.domain.ContentNotFoundException;
 import com.fabiocondo.exception.domain.ModuleNotFoundException;
-import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
+import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.repository.ModuleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class ModuleService {
         return moduleRepository.findAll();
     }
 
-    public Module save(String name, Long onlineCourseId, Integer position) throws ModuleNotFoundException, OnlineCourseNotFoundException {
+    public Module save(String name, Long onlineCourseId, Integer position) throws ModuleNotFoundException, CourseNotFoundException {
         Course course = courseService.findById(onlineCourseId);
         Module module = new Module();
         module.setName(name);
@@ -54,7 +54,7 @@ public class ModuleService {
         return moduleRepository.save(module);
     }
 
-    public Module update(Long id, String name, Long onlineCourseId, Integer position) throws CourseContentNotFoundException, ModuleNotFoundException, OnlineCourseNotFoundException {
+    public Module update(Long id, String name, Long onlineCourseId, Integer position) throws ContentNotFoundException, ModuleNotFoundException, CourseNotFoundException {
         Course course = courseService.findById(onlineCourseId);
         Module existModule = findById(id);
         existModule.setCourse(course);

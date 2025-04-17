@@ -6,7 +6,7 @@ import com.fabiocondo.domain.Course;
 import com.fabiocondo.domain.Module;
 import com.fabiocondo.domain.Content;
 import com.fabiocondo.domain.User;
-import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
+import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.ContentRepository;
 import com.fabiocondo.repository.CourseRepository;
@@ -54,15 +54,15 @@ public class CourseService {
         this.amazonS3Service = amazonS3Service;
     }
 
-    public Course findById(Long id) throws OnlineCourseNotFoundException {
+    public Course findById(Long id) throws CourseNotFoundException {
         logger.info("Getting course by id: " + id);
         return courseRepository.findById(id)
-                .orElseThrow(() -> new OnlineCourseNotFoundException("No course found by id: " + id));
+                .orElseThrow(() -> new CourseNotFoundException("No course found by id: " + id));
     }
 
-    public Course findOnlineCourseByOnlineCourseId(String onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException {
+    public Course findOnlineCourseByOnlineCourseId(String onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
         Course course = courseRepository.findOnlineCourseByOnlineCourseId(onlineCourseId)
-                .orElseThrow(() -> new OnlineCourseNotFoundException("No course found by id: " + onlineCourseId));
+                .orElseThrow(() -> new CourseNotFoundException("No course found by id: " + onlineCourseId));
 
         User user = getAuthenticatedUser();
 
@@ -105,7 +105,7 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    public Course update(Long id, String name, String description, String lunchDate, Long instrutorId, MultipartFile file) throws UserNotFoundException, OnlineCourseNotFoundException {
+    public Course update(Long id, String name, String description, String lunchDate, Long instrutorId, MultipartFile file) throws UserNotFoundException, CourseNotFoundException {
         User instrutor = userService.findById(instrutorId);
 
         Course existCourse = findById(id);
@@ -129,7 +129,7 @@ public class CourseService {
         return courseRepository.save(existCourse);
     }
 
-    public void delete(Long id) throws OnlineCourseNotFoundException {
+    public void delete(Long id) throws CourseNotFoundException {
         Course existCourse = findById(id);
         logger.info("Deleting course: " + existCourse.getDescription());
         courseRepository.deleteById(id);
@@ -156,7 +156,7 @@ public class CourseService {
         return user.getSubscribedCourses().contains(course.get());
     }
 
-    public Page<User> getStudentsByCourseId(Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
+    public Page<User> getStudentsByCourseId(Long courseId, Pageable pageable) throws CourseNotFoundException {
         Course course = findById(courseId);
         return courseRepository.findStudentsByCourseId(course.getId(), pageable);
     }

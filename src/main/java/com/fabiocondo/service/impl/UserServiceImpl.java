@@ -363,11 +363,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User toggleContentMarkedStatus(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException {
+    public User toggleContentMarkedStatus(Long userId, Long onlineCourseContentId) throws UserNotFoundException, ContentNotFoundException {
         User user = findById(userId);
 
         Content content = contentRepository.findById(onlineCourseContentId)
-                .orElseThrow(() -> new CourseContentNotFoundException("No Course Content found by id: " + onlineCourseContentId));
+                .orElseThrow(() -> new ContentNotFoundException("No Course Content found by id: " + onlineCourseContentId));
 
         Set<Content> markedContents = user.getMarkedContents();
 
@@ -396,22 +396,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public Page<Course> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException {
         User user = findById(userId);
         return userRepository.findSubscribedCoursesByUserId(user.getId(), pageable);
-    }
-
-    @Override
-    public long countSubscribedOnlineCoursesByUserId(Long userId) {
-        return userRepository.countSubscribedCoursesByUserId(userId);
-    }
-
-    @Override
-    public User toggleCourseSubscription(Long userId, Long onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException {
-        User user = findById(userId);
-        Optional<Course> optionalCourse = courseRepository.findById(onlineCourseId);
-        if (!optionalCourse.isPresent()){
-            throw new OnlineCourseNotFoundException("No online course not found by id: " + onlineCourseId);
-        }
-        user.getSubscribedCourses().add(optionalCourse.get());
-        return userRepository.save(user);
     }
 
     private User validateNewEmail(String currentEmail, String newEmail) throws UserNotFoundException, EmailExistException {

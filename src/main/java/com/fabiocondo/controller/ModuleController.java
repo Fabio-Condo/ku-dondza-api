@@ -2,9 +2,9 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Module;
-import com.fabiocondo.exception.domain.CourseContentNotFoundException;
+import com.fabiocondo.exception.domain.ContentNotFoundException;
 import com.fabiocondo.exception.domain.ModuleNotFoundException;
-import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
+import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.service.impl.ModuleService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +44,7 @@ public class ModuleController {
     @PostMapping
     public ResponseEntity<Module> save(@RequestParam("name") String name,
                                        @RequestParam("onlineCourseId") Long onlineCourseId,
-                                       @RequestParam("position") Integer position) throws ModuleNotFoundException, OnlineCourseNotFoundException {
+                                       @RequestParam("position") Integer position) throws ModuleNotFoundException, CourseNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(moduleService.save(name, onlineCourseId, position));
     }
@@ -53,7 +53,7 @@ public class ModuleController {
     public ResponseEntity<Module> update(@RequestParam("id") Long id,
                                          @RequestParam("name") String name,
                                          @RequestParam("onlineCourseId") Long onlineCourseId,
-                                         @RequestParam("position") Integer position) throws CourseContentNotFoundException, ModuleNotFoundException, OnlineCourseNotFoundException {
+                                         @RequestParam("position") Integer position) throws ContentNotFoundException, ModuleNotFoundException, CourseNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(moduleService.update(id, name, onlineCourseId, position));
     }

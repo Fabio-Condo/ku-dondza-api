@@ -3,7 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Content;
 import com.fabiocondo.enumeration.ContentType;
-import com.fabiocondo.exception.domain.CourseContentNotFoundException;
+import com.fabiocondo.exception.domain.ContentNotFoundException;
 import com.fabiocondo.exception.domain.ModuleNotFoundException;
 import com.fabiocondo.service.impl.ContentService;
 import org.springframework.core.io.ByteArrayResource;
@@ -45,7 +45,7 @@ public class ContentController {
                                           @RequestParam("time") String time,
                                           @RequestParam("moduleId") Long moduleId,
                                           @RequestParam("position") Integer position,
-                                          @RequestParam(value = "file", required = false) MultipartFile file) throws CourseContentNotFoundException, ModuleNotFoundException {
+                                          @RequestParam(value = "file", required = false) MultipartFile file) throws ContentNotFoundException, ModuleNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(contentService.update(id, description, contentType, time, moduleId, position, file));
     }
@@ -56,13 +56,13 @@ public class ContentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws CourseContentNotFoundException {
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws ContentNotFoundException {
         contentService.delete(id);
         return response(HttpStatus.OK, "Content deleted successfully");
     }
 
     @GetMapping("/download/{id}/{fileName}")
-    public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable Long id, @PathVariable String fileName) throws CourseContentNotFoundException {
+    public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable Long id, @PathVariable String fileName) throws ContentNotFoundException {
         byte[] data = contentService.downloadFile(id, fileName);
         ByteArrayResource resource = new ByteArrayResource(data);
 

@@ -42,13 +42,9 @@ public interface UserService {
 
     void updatePropertyNotLocked(String email, Boolean notLocked) throws EmailNotFoundException;
 
-    User toggleContentMarkedStatus(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException;
+    User toggleContentMarkedStatus(Long userId, Long onlineCourseContentId) throws UserNotFoundException, ContentNotFoundException;
 
     Page<Course> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException;
-
-    long countSubscribedOnlineCoursesByUserId(Long userId);
-
-    User toggleCourseSubscription(Long userId, Long onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException;
 
     User findUserByUserId(String userId) throws UserNotFoundException;
 

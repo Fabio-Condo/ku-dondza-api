@@ -5,7 +5,7 @@ import com.fabiocondo.dto.CourseDTO;
 import com.fabiocondo.dto.UserDTO;
 import com.fabiocondo.dtoMapper.CourseMapper;
 import com.fabiocondo.dtoMapper.UserMapper;
-import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
+import com.fabiocondo.exception.domain.CourseNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.filter.CourseFilter;
 import com.fabiocondo.service.impl.CourseService;
@@ -32,12 +32,12 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Course> findById(@PathVariable("id") Long id) throws OnlineCourseNotFoundException {
+    public ResponseEntity<Course> findById(@PathVariable("id") Long id) throws CourseNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(courseService.findById(id));
     }
 
     @GetMapping("/find-by-courseId/{onlineCourseId}")
-    public ResponseEntity<CourseDTO> findOnlineCourseByOnlineCourseId(@PathVariable("onlineCourseId") String onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException {
+    public ResponseEntity<CourseDTO> findOnlineCourseByOnlineCourseId(@PathVariable("onlineCourseId") String onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
         Course course = courseService.findOnlineCourseByOnlineCourseId(onlineCourseId);
         return ResponseEntity.status(HttpStatus.OK).body(courseMapper.domainToDTO_WithModules(course));
     }
@@ -68,19 +68,19 @@ public class CourseController {
                                          @RequestParam("description") String description,
                                          @RequestParam("lunchDate") String lunchDate,
                                          @RequestParam("instrutorId") Long instrutorId,
-                                         @RequestParam(value = "file", required = false) MultipartFile file) throws UserNotFoundException, OnlineCourseNotFoundException {
+                                         @RequestParam(value = "file", required = false) MultipartFile file) throws UserNotFoundException, CourseNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(courseService.update(id, name, description, lunchDate, instrutorId, file));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws OnlineCourseNotFoundException {
+    public ResponseEntity<?> delete(@PathVariable("id") Long id) throws CourseNotFoundException {
         courseService.delete(id);
         return response(HttpStatus.OK, "Course deleted successfully");
     }
 
     @GetMapping("/{courseId}/students")
-    public ResponseEntity<Page<UserDTO>> getStudentsByCourseId(@PathVariable Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
+    public ResponseEntity<Page<UserDTO>> getStudentsByCourseId(@PathVariable Long courseId, Pageable pageable) throws CourseNotFoundException {
         Page<User> students = courseService.getStudentsByCourseId(courseId, pageable);
         Page<UserDTO> userDTOs = userMapper.domainPageToDTOPage(students, pageable);
 

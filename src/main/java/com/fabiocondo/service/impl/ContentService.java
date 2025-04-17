@@ -5,7 +5,7 @@ import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Module; // Importação explícita
 import com.fabiocondo.domain.Content; // Importação explícita
 import com.fabiocondo.enumeration.ContentType;
-import com.fabiocondo.exception.domain.CourseContentNotFoundException;
+import com.fabiocondo.exception.domain.ContentNotFoundException;
 import com.fabiocondo.exception.domain.ModuleNotFoundException;
 import com.fabiocondo.repository.ContentRepository;
 import org.slf4j.Logger;
@@ -35,10 +35,10 @@ public class ContentService {
         this.amazonS3Service = amazonS3Service;
     }
 
-    public Content findById(Long id) throws CourseContentNotFoundException {
+    public Content findById(Long id) throws ContentNotFoundException {
         logger.info("Getting course content by id: " + id);
         return contentRepository.findById(id)
-                .orElseThrow(() -> new CourseContentNotFoundException("No content found by id: " + id));
+                .orElseThrow(() -> new ContentNotFoundException("No content found by id: " + id));
     }
 
     public Page<Content> findAll(Pageable pageable) {
@@ -64,7 +64,7 @@ public class ContentService {
         return contentRepository.save(content);
     }
 
-    public Content update(Long id, String description, ContentType contentType, String time, Long moduleId, Integer position, MultipartFile file) throws CourseContentNotFoundException, ModuleNotFoundException {
+    public Content update(Long id, String description, ContentType contentType, String time, Long moduleId, Integer position, MultipartFile file) throws ContentNotFoundException, ModuleNotFoundException {
         com.fabiocondo.domain.Module module = moduleService.findById(moduleId); // Nome totalmente qualificado
 
         Content existContent = findById(id);
@@ -92,7 +92,7 @@ public class ContentService {
         return contentRepository.findByModuleId(moduleId, pageable);
     }
 
-    public void delete(Long id) throws CourseContentNotFoundException {
+    public void delete(Long id) throws ContentNotFoundException {
         Content existContent = findById(id);
         logger.info("Deleting content: " + existContent.getDescription());
         contentRepository.deleteById(id);
@@ -102,7 +102,7 @@ public class ContentService {
         }
     }
 
-    public byte[] downloadFile(Long id, @PathVariable String fileName) throws CourseContentNotFoundException {
+    public byte[] downloadFile(Long id, @PathVariable String fileName) throws ContentNotFoundException {
         Content existContent = findById(id);
         logger.info("Downloading file: " + existContent.getFileName());
         byte[] data = amazonS3Service.downloadFile(fileName, BUCKET_NAME);

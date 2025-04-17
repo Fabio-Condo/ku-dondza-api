@@ -26,7 +26,7 @@ public class Module {
     @JsonIgnoreProperties({"module"})
     @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("position ASC") // Ordena os conteúdos ao carregar
-    private List<Content> courseContents = new ArrayList<>();
+    private List<Content> contents = new ArrayList<>();
 
     private Integer position; // Novo campo para controlar a posição do conteúdo
 
@@ -57,12 +57,12 @@ public class Module {
         this.course = course;
     }
 
-    public List<Content> getCourseContents() {
-        return courseContents;
+    public List<Content> getContents() {
+        return contents;
     }
 
-    public void setCourseContents(List<Content> courseContents) {
-        this.courseContents = courseContents;
+    public void setContents(List<Content> contents) {
+        this.contents = contents;
     }
 
     public Integer getPosition() {

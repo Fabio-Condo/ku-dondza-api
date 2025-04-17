@@ -71,7 +71,7 @@ public class CourseService {
                 .collect(Collectors.toSet());
 
         for (Module module : course.getModules()) {
-            for (Content content : module.getCourseContents()) {
+            for (Content content : module.getContents()) {
                 content.setMarkedByUser(markedIds.contains(content.getId()));
             }
         }

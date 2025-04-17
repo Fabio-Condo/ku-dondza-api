@@ -52,19 +52,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final EmailService emailService;
     private final AmazonS3Service amazonS3Service;
     private final SubjectRepository subjectRepository;
-    private final OnlineCourseRepository onlineCourseRepository;
-    private final OnlineCourseContentRepository onlineCourseContentRepository;
+    private final CourseRepository courseRepository;
+    private final ContentRepository contentRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, OnlineCourseRepository onlineCourseRepository, OnlineCourseContentRepository onlineCourseContentRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, CourseRepository courseRepository, ContentRepository contentRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
         this.amazonS3Service = amazonS3Service;
         this.subjectRepository = subjectRepository;
-        this.onlineCourseRepository = onlineCourseRepository;
-        this.onlineCourseContentRepository = onlineCourseContentRepository;
+        this.courseRepository = courseRepository;
+        this.contentRepository = contentRepository;
     }
 
     public Page<User> searchUsers(String query, Pageable pageable) {
@@ -366,10 +366,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public User toggleContentMarkedStatus(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException {
         User user = findById(userId);
 
-        OnlineCourseContent content = onlineCourseContentRepository.findById(onlineCourseContentId)
+        Content content = contentRepository.findById(onlineCourseContentId)
                 .orElseThrow(() -> new CourseContentNotFoundException("No Course Content found by id: " + onlineCourseContentId));
 
-        Set<OnlineCourseContent> markedContents = user.getMarkedCourseContents();
+        Set<Content> markedContents = user.getMarkedContents();
 
         if (markedContents.contains(content)) {
             markedContents.remove(content);
@@ -393,24 +393,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public Page<OnlineCourse> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException {
+    public Page<Course> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException {
         User user = findById(userId);
-        return userRepository.findSubscribedOnlineCoursesByUserId(user.getId(), pageable);
+        return userRepository.findSubscribedCoursesByUserId(user.getId(), pageable);
     }
 
     @Override
     public long countSubscribedOnlineCoursesByUserId(Long userId) {
-        return userRepository.countSubscribedOnlineCoursesByUserId(userId);
+        return userRepository.countSubscribedCoursesByUserId(userId);
     }
 
     @Override
     public User toggleCourseSubscription(Long userId, Long onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException {
         User user = findById(userId);
-        Optional<OnlineCourse> optionalCourse = onlineCourseRepository.findById(onlineCourseId);
+        Optional<Course> optionalCourse = courseRepository.findById(onlineCourseId);
         if (!optionalCourse.isPresent()){
             throw new OnlineCourseNotFoundException("No online course not found by id: " + onlineCourseId);
         }
-        user.getSubscribedOnlineCourses().add(optionalCourse.get());
+        user.getSubscribedCourses().add(optionalCourse.get());
         return userRepository.save(user);
     }
 

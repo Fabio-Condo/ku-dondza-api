@@ -14,6 +14,6 @@ public interface ModuleRepository extends JpaRepository<Module, Long> {
     @Query("SELECT t FROM Module t WHERE t.name LIKE %:searchParam%")
     public Page<Module> findAll(@Param("searchParam") String searchParam, Pageable pageable);
 
-    public List<Module> findByOnlineCourseIdOrderByPositionAsc(Long courseId);
+    public List<Module> findByCourseIdOrderByPositionAsc(Long courseId);
 
 }

@@ -44,7 +44,7 @@ public interface UserService {
 
     User toggleContentMarkedStatus(Long userId, Long onlineCourseContentId) throws UserNotFoundException, CourseContentNotFoundException;
 
-    Page<OnlineCourse> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException;
+    Page<Course> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException;
 
     long countSubscribedOnlineCoursesByUserId(Long userId);
 

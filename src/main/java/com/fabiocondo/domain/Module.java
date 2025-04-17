@@ -20,13 +20,13 @@ public class Module {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "online_course_id")
-    private OnlineCourse onlineCourse;
+    @JoinColumn(name = "course_id")
+    private Course course;
 
     @JsonIgnoreProperties({"module"})
     @OneToMany(mappedBy = "module", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("position ASC") // Ordena os conteúdos ao carregar
-    private List<OnlineCourseContent> courseContents = new ArrayList<>();
+    private List<Content> courseContents = new ArrayList<>();
 
     private Integer position; // Novo campo para controlar a posição do conteúdo
 
@@ -49,19 +49,19 @@ public class Module {
         this.name = name;
     }
 
-    public OnlineCourse getOnlineCourse() {
-        return onlineCourse;
+    public Course getCourse() {
+        return course;
     }
 
-    public void setOnlineCourse(OnlineCourse onlineCourse) {
-        this.onlineCourse = onlineCourse;
+    public void setCourse(Course course) {
+        this.course = course;
     }
 
-    public List<OnlineCourseContent> getCourseContents() {
+    public List<Content> getCourseContents() {
         return courseContents;
     }
 
-    public void setCourseContents(List<OnlineCourseContent> courseContents) {
+    public void setCourseContents(List<Content> courseContents) {
         this.courseContents = courseContents;
     }
 

@@ -5,8 +5,8 @@ import com.fabiocondo.enumeration.ContentType;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "online_course_content")
-public class OnlineCourseContent { // Conteúdo do module - Depois renomear
+@Table(name = "content")
+public class Content { // Conteúdo do module - Depois renomear
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,9 +33,9 @@ public class OnlineCourseContent { // Conteúdo do module - Depois renomear
     private boolean markedByUser;
 
     // Constructors
-    public OnlineCourseContent() {}
+    public Content() {}
 
-    public OnlineCourseContent(String description, ContentType contentType, String time, String fileName, String urlFile) {
+    public Content(String description, ContentType contentType, String time, String fileName, String urlFile) {
         this.description = description;
         this.contentType = contentType;
         this.time = time;

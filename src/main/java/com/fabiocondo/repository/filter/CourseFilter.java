@@ -2,7 +2,7 @@ package com.fabiocondo.repository.filter;
 
 import com.fabiocondo.domain.User;
 
-public class OnlineCourseFilter {
+public class CourseFilter {
 
     private String searchParam;
 

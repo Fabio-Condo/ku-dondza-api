@@ -1,7 +1,7 @@
 package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.Module;
-import com.fabiocondo.domain.OnlineCourse;
+import com.fabiocondo.domain.Course;
 import com.fabiocondo.exception.domain.CourseContentNotFoundException;
 import com.fabiocondo.exception.domain.ModuleNotFoundException;
 import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
@@ -19,11 +19,11 @@ public class ModuleService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ModuleRepository moduleRepository;
-    private final OnlineCourseService onlineCourseService;
+    private final CourseService courseService;
 
-    public ModuleService(ModuleRepository moduleRepository, OnlineCourseService onlineCourseService) {
+    public ModuleService(ModuleRepository moduleRepository, CourseService courseService) {
         this.moduleRepository = moduleRepository;
-        this.onlineCourseService = onlineCourseService;
+        this.courseService = courseService;
     }
 
     public Module findById(Long id) throws ModuleNotFoundException {
@@ -33,7 +33,7 @@ public class ModuleService {
     }
 
     public List<Module> findByOnlineCourseId(Long courseId) {
-        return moduleRepository.findByOnlineCourseIdOrderByPositionAsc(courseId);
+        return moduleRepository.findByCourseIdOrderByPositionAsc(courseId);
     }
 
     public Page<Module> findAll(String searchParam, Pageable pageable) {
@@ -45,19 +45,19 @@ public class ModuleService {
     }
 
     public Module save(String name, Long onlineCourseId, Integer position) throws ModuleNotFoundException, OnlineCourseNotFoundException {
-        OnlineCourse onlineCourse = onlineCourseService.findById(onlineCourseId);
+        Course course = courseService.findById(onlineCourseId);
         Module module = new Module();
         module.setName(name);
-        module.setOnlineCourse(onlineCourse);
+        module.setCourse(course);
         module.setPosition(position);
         logger.info("Saving new module: " + module.getName());
         return moduleRepository.save(module);
     }
 
     public Module update(Long id, String name, Long onlineCourseId, Integer position) throws CourseContentNotFoundException, ModuleNotFoundException, OnlineCourseNotFoundException {
-        OnlineCourse onlineCourse = onlineCourseService.findById(onlineCourseId);
+        Course course = courseService.findById(onlineCourseId);
         Module existModule = findById(id);
-        existModule.setOnlineCourse(onlineCourse);
+        existModule.setCourse(course);
         existModule.setName(name);
         existModule.setPosition(position);
         logger.info("Updating module: " + existModule.getName());

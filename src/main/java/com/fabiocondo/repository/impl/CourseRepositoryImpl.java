@@ -1,8 +1,8 @@
 package com.fabiocondo.repository.impl;
 
-import com.fabiocondo.domain.OnlineCourse;
-import com.fabiocondo.repository.filter.OnlineCourseFilter;
-import com.fabiocondo.repository.query.OnlineCourseRepositoryQuery;
+import com.fabiocondo.domain.Course;
+import com.fabiocondo.repository.filter.CourseFilter;
+import com.fabiocondo.repository.query.CourseRepositoryQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -18,24 +18,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class OnlineCourseRepositoryImpl implements OnlineCourseRepositoryQuery {
+public class CourseRepositoryImpl implements CourseRepositoryQuery {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @PersistenceContext
     private EntityManager manager;
 
     @Override
-    public Page<OnlineCourse> filter(OnlineCourseFilter courseFilter, Pageable pageable) {
+    public Page<Course> filter(CourseFilter courseFilter, Pageable pageable) {
         CriteriaBuilder builder = manager.getCriteriaBuilder();
-        CriteriaQuery<OnlineCourse> criteria = builder.createQuery(OnlineCourse.class);
-        Root<OnlineCourse> root = criteria.from(OnlineCourse.class);
+        CriteriaQuery<Course> criteria = builder.createQuery(Course.class);
+        Root<Course> root = criteria.from(Course.class);
 
         getSortOrder(courseFilter, builder, criteria, root);
 
         Predicate[] predicates = createRestrictions(courseFilter, builder, root);
         criteria.where(predicates);
 
-        TypedQuery<OnlineCourse> query = manager.createQuery(criteria);
+        TypedQuery<Course> query = manager.createQuery(criteria);
         addRestrictionsPagination(query, pageable);
 
         return new PageImpl<>(query.getResultList(), pageable, total(courseFilter));
@@ -52,10 +52,10 @@ public class OnlineCourseRepositoryImpl implements OnlineCourseRepositoryQuery {
         logger.info("Current page: " + currentPage + " Total records by page: " + totalRecordsByPage + " First record page " + firstPageRecord);
     }
 
-    private Long total(OnlineCourseFilter courseFilter) {
+    private Long total(CourseFilter courseFilter) {
         CriteriaBuilder builder = manager.getCriteriaBuilder();
         CriteriaQuery<Long> criteria = builder.createQuery(Long.class);
-        Root<OnlineCourse> root = criteria.from(OnlineCourse.class);
+        Root<Course> root = criteria.from(Course.class);
 
         Predicate[] predicates = createRestrictions(courseFilter, builder, root);
         criteria.where(predicates);
@@ -64,7 +64,7 @@ public class OnlineCourseRepositoryImpl implements OnlineCourseRepositoryQuery {
         return manager.createQuery(criteria).getSingleResult();
     }
 
-    private Predicate[] createRestrictions(OnlineCourseFilter courseFilter, CriteriaBuilder builder, Root<OnlineCourse> root) {
+    private Predicate[] createRestrictions(CourseFilter courseFilter, CriteriaBuilder builder, Root<Course> root) {
         List<Predicate> predicates = new ArrayList<>();
 
         restrictions(courseFilter, predicates, builder, root);
@@ -72,7 +72,7 @@ public class OnlineCourseRepositoryImpl implements OnlineCourseRepositoryQuery {
         return predicates.toArray(new Predicate[predicates.size()]);
     }
 
-    public void restrictions(OnlineCourseFilter courseFilter, List<Predicate> predicates, CriteriaBuilder builder, Root<OnlineCourse> root){
+    public void restrictions(CourseFilter courseFilter, List<Predicate> predicates, CriteriaBuilder builder, Root<Course> root){
 
         if(!ObjectUtils.isEmpty(courseFilter.getSearchParam())) {
             Predicate name = builder.like(
@@ -97,9 +97,9 @@ public class OnlineCourseRepositoryImpl implements OnlineCourseRepositoryQuery {
         // buscar cursos do usuário inscrito
         if (courseFilter.getUser() != null) {
             // Subconsulta para verificar se o usuário está na lista de students
-            CriteriaQuery<OnlineCourse> criteriaQuery = builder.createQuery(OnlineCourse.class); // Cria uma nova CriteriaQuery
+            CriteriaQuery<Course> criteriaQuery = builder.createQuery(Course.class); // Cria uma nova CriteriaQuery
             Subquery<Long> subquery = criteriaQuery.subquery(Long.class);
-            Root<OnlineCourse> subRoot = subquery.from(OnlineCourse.class);
+            Root<Course> subRoot = subquery.from(Course.class);
             subquery.select(subRoot.get("id"));
             subquery.where(builder.equal(subRoot.join("students").get("id"), courseFilter.getUser().getId()));
 
@@ -108,7 +108,7 @@ public class OnlineCourseRepositoryImpl implements OnlineCourseRepositoryQuery {
         }
     }
 
-    public void getSortOrder(OnlineCourseFilter examFilter, CriteriaBuilder builder, CriteriaQuery<OnlineCourse> criteria, Root<OnlineCourse> root){
+    public void getSortOrder(CourseFilter examFilter, CriteriaBuilder builder, CriteriaQuery<Course> criteria, Root<Course> root){
         if(Objects.equals(examFilter.getCourseOrderBy(), "id,asc")){
             criteria.orderBy(builder.asc(root.get("id")));
         }

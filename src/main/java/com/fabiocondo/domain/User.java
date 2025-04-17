@@ -75,20 +75,20 @@ public class User implements Serializable {
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
-            name = "user_online_course",
+            name = "user_course",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "course_id")
     )
-    private Set<OnlineCourse> subscribedOnlineCourses = new HashSet<>();
+    private Set<Course> subscribedCourses = new HashSet<>();
 
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
-            name = "user_marked_online_course_content",
+            name = "user_marked_content",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "online_course_content_id")
+            inverseJoinColumns = @JoinColumn(name = "content_id")
     )
-    private Set<OnlineCourseContent> markedCourseContents = new HashSet<>(); // marcado como assistidos
+    private Set<Content> markedContents = new HashSet<>(); // marcado como assistidos
 
     public User(){}
 
@@ -278,20 +278,20 @@ public class User implements Serializable {
         this.subjectsInterests = subjectsInterests;
     }
 
-    public Set<OnlineCourse> getSubscribedOnlineCourses() {
-        return subscribedOnlineCourses;
+    public Set<Course> getSubscribedCourses() {
+        return subscribedCourses;
     }
 
-    public void setSubscribedOnlineCourses(Set<OnlineCourse> subscribedOnlineCourses) {
-        this.subscribedOnlineCourses = subscribedOnlineCourses;
+    public void setSubscribedCourses(Set<Course> subscribedCourses) {
+        this.subscribedCourses = subscribedCourses;
     }
 
-    public Set<OnlineCourseContent> getMarkedCourseContents() {
-        return markedCourseContents;
+    public Set<Content> getMarkedContents() {
+        return markedContents;
     }
 
-    public void setMarkedCourseContents(Set<OnlineCourseContent> markedCourseContents) {
-        this.markedCourseContents = markedCourseContents;
+    public void setMarkedContents(Set<Content> markedContents) {
+        this.markedContents = markedContents;
     }
 
 }

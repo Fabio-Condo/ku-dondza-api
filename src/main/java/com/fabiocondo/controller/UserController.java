@@ -178,7 +178,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/subscribedOnlineCourses")
-    public Page<OnlineCourse> getSubscribedOnlineCoursesByUserId(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
+    public Page<Course> getSubscribedOnlineCoursesByUserId(@PathVariable Long userId, Pageable pageable) throws UserNotFoundException {
         return userService.getSubscribedOnlineCoursesByUserId(userId, pageable);
     }
 

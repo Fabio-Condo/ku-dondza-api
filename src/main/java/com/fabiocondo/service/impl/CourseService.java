@@ -2,16 +2,16 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
+import com.fabiocondo.domain.Course;
 import com.fabiocondo.domain.Module;
-import com.fabiocondo.domain.OnlineCourse;
-import com.fabiocondo.domain.OnlineCourseContent;
+import com.fabiocondo.domain.Content;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.OnlineCourseNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
-import com.fabiocondo.repository.OnlineCourseContentRepository;
-import com.fabiocondo.repository.OnlineCourseRepository;
+import com.fabiocondo.repository.ContentRepository;
+import com.fabiocondo.repository.CourseRepository;
 import com.fabiocondo.repository.UserRepository;
-import com.fabiocondo.repository.filter.OnlineCourseFilter;
+import com.fabiocondo.repository.filter.CourseFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -30,15 +30,15 @@ import java.util.stream.Collectors;
 import static com.fabiocondo.constant.UserImplConstant.NO_USER_FOUND_BY_USERNAME;
 
 @Service
-public class OnlineCourseService {
+public class CourseService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final String BUCKET_NAME = "b-tests-bucket";
 
-    private final OnlineCourseRepository onlineCourseRepository;
+    private final CourseRepository courseRepository;
 
-    private final OnlineCourseContentRepository onlineCourseContentRepository;
+    private final ContentRepository contentRepository;
 
     private final UserRepository userRepository;
 
@@ -46,53 +46,53 @@ public class OnlineCourseService {
 
     private final AmazonS3Service amazonS3Service;
 
-    public OnlineCourseService(OnlineCourseRepository onlineCourseRepository, OnlineCourseContentRepository onlineCourseContentRepository, UserRepository userRepository, UserServiceImpl userService, AmazonS3Service amazonS3Service) {
-        this.onlineCourseRepository = onlineCourseRepository;
-        this.onlineCourseContentRepository = onlineCourseContentRepository;
+    public CourseService(CourseRepository courseRepository, ContentRepository contentRepository, UserRepository userRepository, UserServiceImpl userService, AmazonS3Service amazonS3Service) {
+        this.courseRepository = courseRepository;
+        this.contentRepository = contentRepository;
         this.userRepository = userRepository;
         this.userService = userService;
         this.amazonS3Service = amazonS3Service;
     }
 
-    public OnlineCourse findById(Long id) throws OnlineCourseNotFoundException {
+    public Course findById(Long id) throws OnlineCourseNotFoundException {
         logger.info("Getting course by id: " + id);
-        return onlineCourseRepository.findById(id)
+        return courseRepository.findById(id)
                 .orElseThrow(() -> new OnlineCourseNotFoundException("No course found by id: " + id));
     }
 
-    public OnlineCourse findOnlineCourseByOnlineCourseId(String onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException {
-        OnlineCourse onlineCourse = onlineCourseRepository.findOnlineCourseByOnlineCourseId(onlineCourseId)
+    public Course findOnlineCourseByOnlineCourseId(String onlineCourseId) throws OnlineCourseNotFoundException, UserNotFoundException {
+        Course course = courseRepository.findOnlineCourseByOnlineCourseId(onlineCourseId)
                 .orElseThrow(() -> new OnlineCourseNotFoundException("No course found by id: " + onlineCourseId));
 
         User user = getAuthenticatedUser();
 
-        Set<Long> markedIds = user.getMarkedCourseContents().stream()
-                .map(OnlineCourseContent::getId)
+        Set<Long> markedIds = user.getMarkedContents().stream()
+                .map(Content::getId)
                 .collect(Collectors.toSet());
 
-        for (Module module : onlineCourse.getModules()) {
-            for (OnlineCourseContent content : module.getCourseContents()) {
+        for (Module module : course.getModules()) {
+            for (Content content : module.getCourseContents()) {
                 content.setMarkedByUser(markedIds.contains(content.getId()));
             }
         }
-        return onlineCourse;
+        return course;
     }
 
-    public Page<OnlineCourse> findAll(String searchParam, Pageable pageable) {
-        return onlineCourseRepository.findAll(searchParam, pageable);
+    public Page<Course> findAll(String searchParam, Pageable pageable) {
+        return courseRepository.findAll(searchParam, pageable);
     }
 
-    public Page<OnlineCourse> filter(OnlineCourseFilter onlineCourseFilter, Pageable pageable) {
-        return onlineCourseRepository.filter(onlineCourseFilter, pageable);
+    public Page<Course> filter(CourseFilter courseFilter, Pageable pageable) {
+        return courseRepository.filter(courseFilter, pageable);
     }
 
-    public OnlineCourse save(String name, String description, String lunchDate, Long instrutorId, MultipartFile file) throws UserNotFoundException {
+    public Course save(String name, String description, String lunchDate, Long instrutorId, MultipartFile file) throws UserNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
         User instrutor = userService.findById(instrutorId);
 
-        OnlineCourse course = new OnlineCourse();
+        Course course = new Course();
         course.setName(name);
         course.setOnlineCourseId(UUID.randomUUID().toString());
         course.setDescription(description);
@@ -102,13 +102,13 @@ public class OnlineCourseService {
         course.setFileName(file.getOriginalFilename());
 
         logger.info("Saving new course: " + course.getDescription());
-        return onlineCourseRepository.save(course);
+        return courseRepository.save(course);
     }
 
-    public OnlineCourse update(Long id, String name, String description, String lunchDate, Long instrutorId, MultipartFile file) throws UserNotFoundException, OnlineCourseNotFoundException {
+    public Course update(Long id, String name, String description, String lunchDate, Long instrutorId, MultipartFile file) throws UserNotFoundException, OnlineCourseNotFoundException {
         User instrutor = userService.findById(instrutorId);
 
-        OnlineCourse existCourse = findById(id);
+        Course existCourse = findById(id);
         existCourse.setName(name);
         existCourse.setDescription(description);
         existCourse.setLunchDate(lunchDate);
@@ -126,13 +126,13 @@ public class OnlineCourseService {
         }
 
         logger.info("Saving new course: " + existCourse.getDescription());
-        return onlineCourseRepository.save(existCourse);
+        return courseRepository.save(existCourse);
     }
 
     public void delete(Long id) throws OnlineCourseNotFoundException {
-        OnlineCourse existCourse = findById(id);
+        Course existCourse = findById(id);
         logger.info("Deleting course: " + existCourse.getDescription());
-        onlineCourseRepository.deleteById(id);
+        courseRepository.deleteById(id);
         if (existCourse.getFileName() != null) {
             logger.info("Deleting file: " + existCourse.getFileName());
             amazonS3Service.deleteFile(existCourse.getFileName(), BUCKET_NAME);
@@ -140,8 +140,8 @@ public class OnlineCourseService {
     }
 
     public long getTotal(){
-        logger.info("Total course: " + onlineCourseRepository.count());
-        return onlineCourseRepository.count();
+        logger.info("Total course: " + courseRepository.count());
+        return courseRepository.count();
     }
 
     public boolean checkIfCurrentUserSubscribed(Long onlineCourseId) throws UserNotFoundException {
@@ -149,25 +149,25 @@ public class OnlineCourseService {
         if (user == null) {
             return false;
         }
-        Optional<OnlineCourse> course = onlineCourseRepository.findById(onlineCourseId);
+        Optional<Course> course = courseRepository.findById(onlineCourseId);
         if (!course.isPresent()) {
             return false;
         }
-        return user.getSubscribedOnlineCourses().contains(course.get());
+        return user.getSubscribedCourses().contains(course.get());
     }
 
     public Page<User> getStudentsByCourseId(Long courseId, Pageable pageable) throws OnlineCourseNotFoundException {
-        OnlineCourse course = findById(courseId);
-        return onlineCourseRepository.findStudentsByCourseId(course.getId(), pageable);
+        Course course = findById(courseId);
+        return courseRepository.findStudentsByCourseId(course.getId(), pageable);
     }
 
     public double calculateUserProgressInCourse(Long userId, Long courseId) throws UserNotFoundException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
 
-        List<OnlineCourseContent> contents = onlineCourseContentRepository.findByModule_OnlineCourse_Id(courseId);
+        List<Content> contents = contentRepository.findByModule_Course_Id(courseId);
 
-        long totalMarked = user.getMarkedCourseContents().stream()
+        long totalMarked = user.getMarkedContents().stream()
                 .filter(contents::contains)
                 .count();
 

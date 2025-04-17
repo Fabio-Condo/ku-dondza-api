@@ -1,13 +1,18 @@
-package com.fabiocondo.dto;
+package com.fabiocondo.domain;
 
-import com.fabiocondo.domain.Module;
-import com.fabiocondo.domain.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OnlineCourseDTO {
+@Entity
+@Table(name = "course")
+public class Course {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String onlineCourseId;
@@ -22,16 +27,24 @@ public class OnlineCourseDTO {
 
     private String lunchDate;
 
+    @ManyToOne
+    @JsonIgnoreProperties({"subscribedCourses"})
+    @JoinColumn(name = "user_id")
     private User instrutor;
 
-    private List<Module> modules = new ArrayList<>(); // Mesmo com JsonIgnore na class model, se nao colocar aqui, sera serealizado
+    //@JsonIgnoreProperties({"onlineCourse"})
+    @JsonIgnore
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Module> modules = new ArrayList<>();
 
-    private boolean isCurrentUserSubscribed;
+    @JsonIgnore
+    @ManyToMany(mappedBy = "subscribedCourses")
+    private List<User> students;
 
     // Constructors
-    public OnlineCourseDTO() {}
+    public Course() {}
 
-    public OnlineCourseDTO(String name, String description, String coverImageUrl, String lunchDate) {
+    public Course(String name, String description, String coverImageUrl, String lunchDate) {
         this.name = name;
         this.description = description;
         this.coverImageUrl = coverImageUrl;
@@ -112,13 +125,12 @@ public class OnlineCourseDTO {
         this.instrutor = instrutor;
     }
 
-    public boolean isCurrentUserSubscribed() {
-        return isCurrentUserSubscribed;
+    public List<User> getStudents() {
+        return students;
     }
 
-    public void setCurrentUserSubscribed(boolean currentUserSubscribed) {
-        isCurrentUserSubscribed = currentUserSubscribed;
+    public void setStudents(List<User> students) {
+        this.students = students;
     }
-
 }
 

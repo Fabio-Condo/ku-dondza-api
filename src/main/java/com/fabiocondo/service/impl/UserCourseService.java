@@ -57,7 +57,7 @@ public class UserCourseService {
         userCourseRepository.delete(userCourse);
     }
 
-    public Page<UserCourse> getCoursesWithDatesByUser(Long userId, Pageable pageable) {
+    public Page<UserCourse> getCoursesByUser(Long userId, Pageable pageable) {
         return userCourseRepository.findByUserId(userId, pageable);
     }
 
@@ -74,6 +74,7 @@ public class UserCourseService {
         }
         return userCourseRepository.existsByUserIdAndCourseId(userId, courseId);
     }
+}
 
     /*
 
@@ -88,4 +89,3 @@ public class UserCourseService {
     CONSTRAINT fk_course FOREIGN KEY (course_id) REFERENCES course (id) ON DELETE CASCADE
     );
     */
-}

@@ -31,7 +31,9 @@ public class Quiz {
     @Temporal(TemporalType.TIMESTAMP)
     private Date submittedAt;
 
-    private Integer timeSpent;// Tempo gasto em segundos
+    private Integer timeLimit; // Tempo atribuído em segundos
+
+    private Integer timeSpent; // Tempo gasto em segundos
 
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
@@ -105,6 +107,14 @@ public class Quiz {
 
     public void setSubmittedAt(Date submittedAt) {
         this.submittedAt = submittedAt;
+    }
+
+    public Integer getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(Integer timeLimit) {
+        this.timeLimit = timeLimit;
     }
 
     public Integer getTimeSpent() {

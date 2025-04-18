@@ -29,6 +29,7 @@ public class QuizMapper {
         quiz.setDifficultyLevel(quizDTO.getDifficultyLevel());
         quiz.setLimitPerTopic(quizDTO.getLimitPerTopic());
         quiz.setSubmittedAt(quizDTO.getSubmittedAt());
+        quiz.setTimeLimit(quizDTO.getTimeLimit());
         quiz.setTimeSpent(quizDTO.getTimeSpent());
         quiz.setSubject(quizDTO.getSubject());
         quiz.setUser(quizDTO.getUser());
@@ -45,6 +46,7 @@ public class QuizMapper {
         quizDTO.setDifficultyLevel(quiz.getDifficultyLevel());
         quizDTO.setLimitPerTopic(quiz.getLimitPerTopic());
         quizDTO.setSubmittedAt(quiz.getSubmittedAt());
+        quizDTO.setTimeLimit(quiz.getTimeLimit());
         quizDTO.setTimeSpent(quiz.getTimeSpent());
         quizDTO.setSubject(quiz.getSubject());
         quizDTO.setUser(quiz.getUser());
@@ -62,6 +64,7 @@ public class QuizMapper {
         quizDTO.setDifficultyLevel(quiz.getDifficultyLevel());
         quizDTO.setLimitPerTopic(quiz.getLimitPerTopic());
         quizDTO.setSubmittedAt(quiz.getSubmittedAt());
+        quizDTO.setTimeLimit(quiz.getTimeLimit());
         quizDTO.setTimeSpent(quiz.getTimeSpent());
         quizDTO.setSubject(quiz.getSubject());
         quizDTO.setUser(quiz.getUser());

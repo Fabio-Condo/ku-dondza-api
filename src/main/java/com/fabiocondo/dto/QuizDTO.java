@@ -25,7 +25,9 @@ public class QuizDTO {
     @Temporal(TemporalType.TIMESTAMP)
     private Date submittedAt;
 
-    private Integer timeSpent;// Tempo gasto em segundos
+    private Integer timeLimit; // Tempo atribuído em segundos
+
+    private Integer timeSpent; // Tempo gasto em segundos
 
     private Subject subject;
 
@@ -89,6 +91,14 @@ public class QuizDTO {
 
     public void setSubmittedAt(Date submittedAt) {
         this.submittedAt = submittedAt;
+    }
+
+    public Integer getTimeLimit() {
+        return timeLimit;
+    }
+
+    public void setTimeLimit(Integer timeLimit) {
+        this.timeLimit = timeLimit;
     }
 
     public Integer getTimeSpent() {

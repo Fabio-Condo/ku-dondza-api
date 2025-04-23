@@ -38,6 +38,21 @@ public class ExceptionHandling implements ErrorController {
     private static final String ENTITY_IN_USE = "Entity in use, can't be deleted";
 
 
+    @ExceptionHandler(OtpNotFoundException.class)
+    public ResponseEntity<HttpResponse> otpNotFoundException(OtpNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(OtpExpiredException.class)
+    public ResponseEntity<HttpResponse> otpExpiredException(OtpExpiredException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(InvalidOtpException.class)
+    public ResponseEntity<HttpResponse> invalidOtpException(InvalidOtpException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(EmailExistException.class)
     public ResponseEntity<HttpResponse> emailExistException(EmailExistException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());

@@ -11,23 +11,21 @@ public class OtpEntry {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private User user;
-
     @Column(nullable = false, length = 6)
     private String code;
 
     @Column(nullable = false)
     private LocalDateTime expiry;
 
+    private String email;
+
     public OtpEntry() {
     }
 
-    public OtpEntry(User user, String code, LocalDateTime expiry) {
-        this.user = user;
+    public OtpEntry(String code, LocalDateTime expiry, String email) {
         this.code = code;
         this.expiry = expiry;
+        this.email = email;
     }
 
     // Getters e Setters
@@ -38,14 +36,6 @@ public class OtpEntry {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public String getCode() {
@@ -66,6 +56,14 @@ public class OtpEntry {
 
     public boolean isExpired() {
         return expiry.isBefore(LocalDateTime.now());
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
 

@@ -2,8 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.User;
-import com.fabiocondo.exception.domain.BookNotFoundException;
-import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.service.AuthService;
 import com.fabiocondo.service.impl.OtpService;
 import org.springframework.http.HttpStatus;
@@ -43,6 +42,25 @@ public class AuthController {
     @PostMapping("/validate-otp")
     public ResponseEntity<?> otpLogin(@RequestParam String email, @RequestParam String otp) throws Exception {
         return otpService.validateOtp(email, otp);
+    }
+
+    @PostMapping("/start-registration")
+    public ResponseEntity<String> startRegistration(@RequestParam String fullName, @RequestParam String email) throws MessagingException {
+        try {
+            String otp = otpService.startRegistration(fullName, email);
+            return new ResponseEntity<>(otp, HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/complete-registration")
+    public ResponseEntity<?> completeRegistration(@RequestParam String fullName, @RequestParam String email, @RequestParam String otp) {
+        try {
+            return otpService.completeRegistration(fullName, email, otp);
+        } catch (OtpNotFoundException | OtpExpiredException | InvalidOtpException | UserNotFoundException | EmailExistException | MessagingException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

@@ -45,22 +45,14 @@ public class AuthController {
     }
 
     @PostMapping("/start-registration")
-    public ResponseEntity<String> startRegistration(@RequestParam String fullName, @RequestParam String email) throws MessagingException {
-        try {
-            String otp = otpService.startRegistration(fullName, email);
-            return new ResponseEntity<>(otp, HttpStatus.OK);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> startRegistration(@RequestParam String email) throws MessagingException {
+        String otp = otpService.startRegistration(email);
+        return response(HttpStatus.OK, "OTP gerado e enviado com sucesso!");
     }
 
     @PostMapping("/complete-registration")
-    public ResponseEntity<?> completeRegistration(@RequestParam String fullName, @RequestParam String email, @RequestParam String otp) {
-        try {
-            return otpService.completeRegistration(fullName, email, otp);
-        } catch (OtpNotFoundException | OtpExpiredException | InvalidOtpException | UserNotFoundException | EmailExistException | MessagingException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> completeRegistration(@RequestParam String fullName, @RequestParam String email, @RequestParam String otp) throws UserNotFoundException, OtpNotFoundException, EmailExistException, MessagingException, InvalidOtpException, OtpExpiredException {
+        return otpService.completeRegistration(fullName, email, otp);
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

@@ -105,7 +105,7 @@ public class OtpService {
     }
 
     @Transactional
-    public String startRegistration(String fullName, String email) throws MessagingException {
+    public String startRegistration(String email) throws MessagingException {
 
         // Verifica se já existe um usuário com esse email
         User existingUser = userRepository.findUserByEmail(email);
@@ -132,7 +132,7 @@ public class OtpService {
         otpRepository.save(entry);
 
         // Envia email com o OTP
-        emailService.sendNewPasswordEmail(fullName, email, otp);
+        emailService.sendNewPasswordEmail(null, email, otp);
 
         return otp;
     }

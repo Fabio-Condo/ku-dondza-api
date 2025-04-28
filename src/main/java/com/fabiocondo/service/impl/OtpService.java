@@ -17,11 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Random;
 
 import static com.fabiocondo.constant.SecurityConstant.JWT_TOKEN_HEADER;
-import static com.fabiocondo.enumeration.Role.ROLE_USER;
 
 @Service
 public class OtpService {

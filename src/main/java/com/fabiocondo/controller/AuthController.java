@@ -45,7 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("/start-registration")
-    public ResponseEntity<?> startRegistration(@RequestParam String email) throws MessagingException {
+    public ResponseEntity<?> startRegistration(@RequestParam String email) throws MessagingException, UsernameExistException {
         String otp = otpService.startRegistration(email);
         return response(HttpStatus.OK, "OTP gerado e enviado com sucesso!");
     }

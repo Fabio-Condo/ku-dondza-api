@@ -103,12 +103,12 @@ public class OtpService {
     }
 
     @Transactional
-    public String startRegistration(String email) throws MessagingException {
+    public String startRegistration(String email) throws MessagingException, UsernameExistException {
 
         // Verifica se já existe um usuário com esse email
         User existingUser = userRepository.findUserByEmail(email);
         if (existingUser != null) {
-            throw new IllegalStateException("Já existe um usuário registrado com este email.");
+            throw new UsernameExistException("Já existe um usuário com este email. Por favor, faça login!");
         }
 
         // Remove OTP antigo (se existir)

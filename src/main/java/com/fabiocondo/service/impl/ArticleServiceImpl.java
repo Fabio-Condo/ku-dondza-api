@@ -53,6 +53,12 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Page<Article> filter(ArticleFilter articleFilter, Pageable pageable) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("A operação foi interrompida", e);
+        }
         return articleRepository.filter(articleFilter, pageable);
     }
 

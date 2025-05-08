@@ -1,14 +1,18 @@
 package com.fabiocondo.repository.filter;
 
-import com.fabiocondo.domain.Subject;
+import com.fabiocondo.enumeration.CategoryType;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 public class ArticleFilter {
 
     private String searchParam;
 
-    private String articleOrderBy;
+    @Enumerated(EnumType.STRING)
+    private CategoryType category;
 
-    private Subject subject;
+    private String articleOrderBy;
 
     private String title;
 
@@ -28,19 +32,19 @@ public class ArticleFilter {
         this.articleOrderBy = articleOrderBy;
     }
 
-    public Subject getSubject() {
-        return subject;
-    }
-
-    public void setSubject(Subject subject) {
-        this.subject = subject;
-    }
-
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public CategoryType getCategory() {
+        return category;
+    }
+
+    public void setCategory(CategoryType category) {
+        this.category = category;
     }
 }

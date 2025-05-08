@@ -79,11 +79,9 @@ public class ArticleRepositoryImpl implements ArticleRepositoryQuery {
     public void restrictions(ArticleFilter articleFilter, List<Predicate> predicates, CriteriaBuilder builder, Root<Article> root){
 
         if(!ObjectUtils.isEmpty(articleFilter.getSearchParam())) {
-            Predicate subject = builder.like(
-                    builder.lower(root.get("subject").get("name")), "%" + articleFilter.getSearchParam().toLowerCase() + "%");
             Predicate title = builder.like(
                     builder.lower(root.get("title")), "%" + articleFilter.getSearchParam().toLowerCase() + "%");
-            predicates.add(builder.or(subject, title));
+            predicates.add(builder.or(title));
         }
 
         if(!ObjectUtils.isEmpty(articleFilter.getTitle())) {
@@ -91,9 +89,9 @@ public class ArticleRepositoryImpl implements ArticleRepositoryQuery {
                     builder.lower(root.get("title")), "%" + articleFilter.getTitle().toLowerCase() + "%"));
         }
 
-        if(!ObjectUtils.isEmpty(articleFilter.getSubject())) {
+        if(!ObjectUtils.isEmpty(articleFilter.getCategory())) {
             predicates.add(builder.equal(
-                    builder.lower(root.get("subject").get("id")), articleFilter.getSubject().getId()));
+                    builder.lower(root.get("category")), articleFilter.getCategory()));
         }
     }
 

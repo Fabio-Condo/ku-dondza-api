@@ -2,6 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.Article;
 import com.fabiocondo.domain.HttpResponse;
+import com.fabiocondo.enumeration.CategoryType;
 import com.fabiocondo.exception.domain.ArticleNotFoundException;
 import com.fabiocondo.exception.domain.BookNotFoundException;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
@@ -42,18 +43,22 @@ public class ArticleController {
     @PostMapping
     public ResponseEntity<Article> save(@RequestParam("title") String title,
                                         @RequestParam("content") String content,
+                                        @RequestParam("category") CategoryType category,
+                                        @RequestParam("readingTimeMinutes") int readingTimeMinutes,
                                         @RequestParam("file") MultipartFile file) throws SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(articleService.save(title, content, file));
+        return ResponseEntity.status(HttpStatus.OK).body(articleService.save(title, content, category, readingTimeMinutes, file));
     }
 
     @PutMapping
     public ResponseEntity<Article> update(@RequestParam("id") Long id,
                                           @RequestParam("title") String title,
                                           @RequestParam("content") String content,
+                                          @RequestParam("category") CategoryType category,
+                                          @RequestParam("readingTimeMinutes") int readingTimeMinutes,
                                           @RequestParam(value = "file", required = false) MultipartFile file) throws SubjectNotFoundException, ArticleNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(articleService.update(id, title, content, file));
+        return ResponseEntity.status(HttpStatus.OK).body(articleService.update(id, title, content, category, readingTimeMinutes, file));
     }
 
     @DeleteMapping("/{id}")

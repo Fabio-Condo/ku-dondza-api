@@ -5,8 +5,8 @@ public class EmailConstant {
     public static final String USERNAME = "fabioenosse59@gmail.com";
     public static final String PASSWORD = "rqreanrjkbvrtgjn";
     public static final String FROM_EMAIL = "fabioenosse59@gmail.com";
-    public static final String CC_EMAIL = "fabio.condo@sciafrica.net";
-    public static final String EMAIL_SUBJECT = "SCI Warehouse, New Password";
+    public static final String CC_EMAIL = "fabioenossecondo@gmail.com";
+    public static final String EMAIL_SUBJECT = "Eduka +, New Password";
     public static final String GMAIL_SMTP_SERVER = "smtp.gmail.com";
     public static final String SMTP_HOST = "mail.smtp.host";
     public static final String SMTP_AUTH = "mail.smtp.auth";

@@ -3,7 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Article;
-import com.fabiocondo.domain.Subject;
+import com.fabiocondo.enumeration.CategoryType;
 import com.fabiocondo.exception.domain.ArticleNotFoundException;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.repository.ArticleRepository;
@@ -31,13 +31,10 @@ public class ArticleServiceImpl implements ArticleService {
 
     private final AmazonS3Service amazonS3Service;
 
-    private final SubjectServiceImpl subjectServiceImpl;
-
     @Autowired
-    public ArticleServiceImpl(ArticleRepository articleRepository, AmazonS3Service amazonS3Service, SubjectServiceImpl subjectServiceImpl) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, AmazonS3Service amazonS3Service) {
         this.articleRepository = articleRepository;
         this.amazonS3Service = amazonS3Service;
-        this.subjectServiceImpl = subjectServiceImpl;
     }
 
     @Override
@@ -60,7 +57,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article save(String title, String content, MultipartFile file) throws SubjectNotFoundException {
+    public Article save(String title, String content, CategoryType category, int readingTimeMinutes, MultipartFile file) throws SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
 
@@ -68,6 +65,8 @@ public class ArticleServiceImpl implements ArticleService {
         article.setArticleId(generateArticleIdId());
         article.setTitle(title);
         article.setContent(content);
+        article.setCategory(category);
+        article.setReadingTimeMinutes(readingTimeMinutes);
         article.setDate(new Date());
         //article.setUrlFile(s3UploadResponse.getFileUrl());
         article.setFileName(file.getOriginalFilename());
@@ -77,10 +76,12 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article update(Long id, String title, String content, MultipartFile file) throws ArticleNotFoundException, SubjectNotFoundException {
+    public Article update(Long id, String title, String content, CategoryType category, int readingTimeMinutes, MultipartFile file) throws ArticleNotFoundException, SubjectNotFoundException {
         Article existArticle = findById(id);
         existArticle.setTitle(title);
         existArticle.setContent(content);
+        existArticle.setCategory(category);
+        existArticle.setReadingTimeMinutes(readingTimeMinutes);
         existArticle.setLastUpdated(new Date());
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo

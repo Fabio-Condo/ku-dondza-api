@@ -1,7 +1,7 @@
 package com.fabiocondo.dto;
 
 public class SearchResultDTO {
-    private String type;    // Tipo do resultado (e.g., "User", "Post")
+    private String type;    // Tipo do resultado (e.g., "User", "Article")
     private String content; // Conteúdo do resultado (e.g., nome do usuário, conteúdo do post)
     private String urlFile;
     private String id;

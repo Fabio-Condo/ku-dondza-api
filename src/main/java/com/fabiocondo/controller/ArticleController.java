@@ -2,11 +2,13 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.Article;
 import com.fabiocondo.domain.HttpResponse;
+import com.fabiocondo.dto.ArticleDTO;
+import com.fabiocondo.dto.QuizDTO;
+import com.fabiocondo.dtoMapper.ArticleMapper;
 import com.fabiocondo.enumeration.CategoryType;
-import com.fabiocondo.exception.domain.ArticleNotFoundException;
-import com.fabiocondo.exception.domain.BookNotFoundException;
-import com.fabiocondo.exception.domain.SubjectNotFoundException;
+import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.filter.ArticleFilter;
+import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.ArticleServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,14 +22,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class ArticleController {
 
     public ArticleServiceImpl articleService;
+    private final ArticleMapper articleMapper;
 
-    public ArticleController(ArticleServiceImpl articleService) {
+    public ArticleController(ArticleServiceImpl articleService, ArticleMapper articleMapper) {
         this.articleService = articleService;
+        this.articleMapper = articleMapper;
     }
 
     @GetMapping("/filter")
-    public Page<Article> filter(ArticleFilter articleFilter, Pageable pageable) {
-        return articleService.filter(articleFilter, pageable);
+    public Page<ArticleDTO> filter(ArticleFilter articleFilter, Pageable pageable) {
+        return articleMapper.domainPageToDTOPage(articleService.filter(articleFilter, pageable), pageable);
     }
 
     @GetMapping("/{id}")
@@ -36,8 +40,9 @@ public class ArticleController {
     }
 
     @GetMapping("/find-by-articleId/{articleId}")
-    public ResponseEntity<Article> findArticleByArticleId(@PathVariable("articleId") String articleId) throws ArticleNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(articleService.findArticleByArticleId(articleId));
+    public ResponseEntity<ArticleDTO> findArticleByArticleId(@PathVariable("articleId") String articleId) throws ArticleNotFoundException, UserNotFoundException {
+        Article article = articleService.findArticleByArticleId(articleId);
+        return ResponseEntity.status(HttpStatus.OK).body(articleMapper.domainToDTO(article));
     }
 
     @PostMapping

@@ -3,9 +3,12 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Article;
+import com.fabiocondo.domain.Like;
+import com.fabiocondo.domain.User;
 import com.fabiocondo.enumeration.CategoryType;
 import com.fabiocondo.exception.domain.ArticleNotFoundException;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.ArticleRepository;
 import com.fabiocondo.repository.filter.ArticleFilter;
 import com.fabiocondo.service.ArticleService;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -31,10 +35,13 @@ public class ArticleServiceImpl implements ArticleService {
 
     private final AmazonS3Service amazonS3Service;
 
+    private final UserServiceImpl userService;
+
     @Autowired
-    public ArticleServiceImpl(ArticleRepository articleRepository, AmazonS3Service amazonS3Service) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, AmazonS3Service amazonS3Service, UserServiceImpl userService) {
         this.articleRepository = articleRepository;
         this.amazonS3Service = amazonS3Service;
+        this.userService = userService;
     }
 
     @Override
@@ -46,19 +53,12 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Article findArticleByArticleId(String articleId) throws ArticleNotFoundException {
-
         return articleRepository.findArticleByArticleId(articleId)
                 .orElseThrow(() -> new ArticleNotFoundException("No article found by id: " + articleId));
     }
 
     @Override
     public Page<Article> filter(ArticleFilter articleFilter, Pageable pageable) {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
         return articleRepository.filter(articleFilter, pageable);
     }
 

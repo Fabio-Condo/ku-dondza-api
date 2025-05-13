@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -44,7 +45,12 @@ public interface UserService {
 
     User toggleContentMarkedStatus(Long userId, Long onlineCourseContentId) throws UserNotFoundException, ContentNotFoundException;
 
+    @Transactional
+    Article toggleSaveArticle(Long userId, Long articleId) throws UserNotFoundException, ArticleNotFoundException;
+
     Page<Course> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException;
+
+    boolean checkIfSaved(Long articleId) throws UserNotFoundException, ArticleNotFoundException;
 
     User findUserByUserId(String userId) throws UserNotFoundException;
 

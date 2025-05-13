@@ -31,7 +31,10 @@ public class KuDondzaApi {
                 "http://localhost:4200",
                 "https://d2cwnz78eo1z5g.cloudfront.net",  // URL do CloudFront
                 "http://frontend-deploy-bucket-test.s3-website-us-east-1.amazonaws.com",
-                "http://100.29.33.126:4200"
+                "http://100.29.33.126:4200",
+                "http://192.168.11.45:4200",
+                "http://192.168.11.45",
+                "http://192.168.43.2"
         ));
         corsConfiguration.setAllowedHeaders(Arrays.asList("Origin", "Access-Control-Allow-Origin", "Content-Type",
                 "Accept", "Jwt-Token", "Authorization", "Origin, Accept", "X-Requested-With",

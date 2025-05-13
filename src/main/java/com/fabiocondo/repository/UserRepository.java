@@ -35,4 +35,7 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 
     public long countByIsActiveTrue();
 
+    @Query("SELECT a FROM User u JOIN u.savedArticles a WHERE u.id = :userId")
+    Page<Article> findSavedArticlesByUserId(@Param("userId") Long userId, Pageable pageable);
+
 }

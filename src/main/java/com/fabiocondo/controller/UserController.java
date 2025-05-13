@@ -29,12 +29,11 @@ import static org.springframework.http.HttpStatus.OK;
 @RestController
 @RequestMapping(path = { "/", "/user"})
 public class UserController {
-    private final AuthenticationManager authenticationManager;
+
     private final UserService userService;
 
     @Autowired
-    public UserController(AuthenticationManager authenticationManager, UserService userService, AuthServiceImpl authServiceImpl) {
-        this.authenticationManager = authenticationManager;
+    public UserController(UserService userService, AuthServiceImpl authServiceImpl) {
         this.userService = userService;
     }
 
@@ -180,6 +179,11 @@ public class UserController {
     @PutMapping("/{userId}/marked-contents/{contentId}/toggle")
     public ResponseEntity<User> toggleMarkedContent(@PathVariable Long userId, @PathVariable Long contentId) throws UserNotFoundException, ContentNotFoundException {
         return ResponseEntity.status(OK).body(userService.toggleContentMarkedStatus(userId, contentId));
+    }
+
+    @PutMapping("/{userId}/saved-articles/{articleId}/toggle")
+    public ResponseEntity<Article> toggleSaveArticle(@PathVariable Long userId, @PathVariable Long articleId) throws UserNotFoundException, ArticleNotFoundException {
+        return ResponseEntity.status(OK).body(userService.toggleSaveArticle(userId, articleId));
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

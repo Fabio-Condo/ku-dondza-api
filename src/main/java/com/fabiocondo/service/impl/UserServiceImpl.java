@@ -53,10 +53,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final AmazonS3Service amazonS3Service;
     private final SubjectRepository subjectRepository;
     private final CourseRepository courseRepository;
+    private final ArticleRepository articleRepository;
     private final ContentRepository contentRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, CourseRepository courseRepository, ContentRepository contentRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, CourseRepository courseRepository, ArticleRepository articleRepository, ContentRepository contentRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
@@ -64,6 +65,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.amazonS3Service = amazonS3Service;
         this.subjectRepository = subjectRepository;
         this.courseRepository = courseRepository;
+        this.articleRepository = articleRepository;
         this.contentRepository = contentRepository;
     }
 
@@ -380,6 +382,44 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return userRepository.save(user);
     }
 
+    @Override
+    public Page<Course> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException {
+        User user = findById(userId);
+        return userRepository.findSubscribedCoursesByUserId(user.getId(), pageable);
+    }
+
+    @Override
+    @Transactional
+    public Article toggleSaveArticle(Long userId, Long articleId) throws UserNotFoundException, ArticleNotFoundException {
+        User user = getAuthenticatedUser();
+
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new ArticleNotFoundException("Article not find"));
+
+        Set<Article> savedArticles = user.getSavedArticles();
+
+        if (savedArticles.contains(article)) {
+            savedArticles.remove(article);
+        } else {
+            savedArticles.add(article);
+        }
+
+        userRepository.save(user); // atualiza a relação
+
+        return article;
+    }
+
+    @Override
+    public boolean checkIfSaved(Long articleId) throws UserNotFoundException, ArticleNotFoundException {
+        User user = getAuthenticatedUser();
+
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new ArticleNotFoundException("Article not find"));
+
+        return user.getSavedArticles().contains(article);
+    }
+
+
     private void validateLoginAttempt(User user) {
         if(user.isNotLocked()) {
             if(loginAttemptService.hasExceededMaxAttempts(user.getEmail())) {
@@ -390,12 +430,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         } else {
             loginAttemptService.evictUserFromLoginAttemptCache(user.getEmail());
         }
-    }
-
-    @Override
-    public Page<Course> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException {
-        User user = findById(userId);
-        return userRepository.findSubscribedCoursesByUserId(user.getId(), pageable);
     }
 
     private User validateNewEmail(String currentEmail, String newEmail) throws UserNotFoundException, EmailExistException {

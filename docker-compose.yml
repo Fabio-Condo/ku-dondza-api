@@ -16,8 +16,8 @@ services:
       - kudondza-network
 
   kudondza-api:
-    image: kudondza-api  # Usar imagem local
-    #image: fabiocondo/kudondza-api # Usar imagem do seu Docker Hub
+    #image: kudondza-api  # Usar imagem local
+    image: fabiocondo/kudondza-api # Usar imagem do seu Docker Hub
     environment:
       DB_HOST: kudondza-mysql
       REDIS_HOST: kudondza-redis

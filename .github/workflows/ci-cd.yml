@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ 'main' ]  # Executa apenas na branch main
+    branches: [ 'refactor' ]  # Executa apenas na branch main
   pull_request:
-    branches: [ 'main' ]  # Executa apenas em pull requests para a branch main
+    branches: [ 'refactor' ]  # Executa apenas em pull requests para a branch main
 
 jobs:
   build:
@@ -34,21 +34,21 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Configure AWS CLI
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+      # - name: Configure AWS CLI
+      #   uses: aws-actions/configure-aws-credentials@v3
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-east-1
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+      # - name: Login to Amazon ECR
+      #   id: login-ecr
+      #   uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build and tag Docker image for ECR
-        run: |
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/ku-dondza-repo:latest .
+      # - name: Build and tag Docker image for ECR
+      #   run: |
+      #     docker build -t ${{ steps.login-ecr.outputs.registry }}/ku-dondza-repo:latest .
 
-      - name: Push Docker image to ECR
-        run: |
-          docker push ${{ steps.login-ecr.outputs.registry }}/ku-dondza-repo:latest
+      # - name: Push Docker image to ECR
+      #   run: |
+      #     docker push ${{ steps.login-ecr.outputs.registry }}/ku-dondza-repo:latest

@@ -14,14 +14,10 @@ services:
       - "33066:3306"
     networks:
       - kudondza-network
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: "1"
-#          memory: "2GB"
 
   kudondza-api:
-    image: fabiocondo/kudondza-api # Usar imagem do seu Docker Hub
+    image: kudondza-api  # Usar imagem local
+    #image: fabiocondo/kudondza-api # Usar imagem do seu Docker Hub
     environment:
       DB_HOST: kudondza-mysql
       REDIS_HOST: kudondza-redis
@@ -31,11 +27,6 @@ services:
     depends_on:
       - kudondza-mysql
       - kudondza-redis
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: "0.7"
-#          memory: "1.5GB"
 
   kudondza-proxy:
     build: ./nginx
@@ -46,11 +37,6 @@ services:
       - kudondza-network
     depends_on:
       - kudondza-api
-#    deploy:
-#      resources:
-#        limits:
-#          cpus: "0.5"
-#          memory: "512MB"
 
   kudondza-redis:
     image: redis:latest
@@ -58,17 +44,12 @@ services:
       - "6379:6379"
     networks:
       - kudondza-network
- #   deploy:
- #     resources:
- #       limits:
- #         cpus: "0.5"
- #         memory: "512MB"
 
 
 
   # Se quiser usar a imagem que seta no docker hub
-  # docker pull fabiocondo/warehouse-api
-  # docker-compose up --scale warehouse-api=3
+  # docker pull fabiocondo/kudondza-api
+  # docker-compose up --scale kudondza-api=3
 
   # Passo 1: Build da aplicacao  (3 comando que contem -Pdocker)
   # ./mvnw clean package

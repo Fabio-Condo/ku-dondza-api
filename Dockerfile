@@ -1,8 +1,8 @@
 #FROM openjdk
 #WORKDIR /app
-#COPY target/kudondza-0.0.1-SNAPSHOT.jar kudondza-0.0.1-SNAPSHOT.jar
+#COPY target/eduka-0.0.1-SNAPSHOT.jar eduka-0.0.1-SNAPSHOT.jar
 #EXPOSE 8080
-#ENTRYPOINT ["java","-jar","kudondza-0.0.1-SNAPSHOT.jar"]
+#ENTRYPOINT ["java","-jar","eduka-0.0.1-SNAPSHOT.jar"]
 
 # OU
 
@@ -26,4 +26,4 @@ CMD ["java", "-jar", "kudondza.jar"]
 
 # Passo 3: Criando uma network e conectando dois containers
 # docker network ls
-# docker network create --driver bridge kudondza-backend-network
+# docker network create --driver bridge eduka-backend-network

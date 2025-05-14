@@ -23,7 +23,7 @@ server:
 spring:
 
   profiles:
-    active: dev
+    active: stage
 
   jpa:
     properties:

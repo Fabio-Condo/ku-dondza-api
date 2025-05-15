@@ -18,21 +18,23 @@ import static javax.mail.Message.RecipientType.TO;
 @Service
 public class EmailService {
 
-    public void sendNewPasswordEmail(String firstName, String username, String password) throws MessagingException {
-        Message message = createEmail(firstName, username, password);
+    public void sendOtpCodeEmail(String email, String otpCode) throws MessagingException {
+        Message message = createEmail(email, otpCode);
         SMTPTransport smtpTransport = (SMTPTransport) getEmailSession().getTransport(SIMPLE_MAIL_TRANSFER_PROTOCOL);
         smtpTransport.connect(GMAIL_SMTP_SERVER, USERNAME, PASSWORD);
         smtpTransport.sendMessage(message, message.getAllRecipients());
         smtpTransport.close();
     }
 
-    private Message createEmail(String firstName, String username, String password) throws MessagingException {
+    private Message createEmail(String email, String otpCode) throws MessagingException {
         Message message = new MimeMessage(getEmailSession());
         message.setFrom(new InternetAddress(FROM_EMAIL));
-        message.setRecipients(TO, InternetAddress.parse(username, false));
+        message.setRecipients(TO, InternetAddress.parse(email, false));
         message.setRecipients(CC, InternetAddress.parse(CC_EMAIL, false));
         message.setSubject(EMAIL_SUBJECT);
-        message.setText("Olá " + firstName + ", \n \n Username: "  + username + "\n \n E o seu novo password é: " + password + "\n \n My Admin App Support Team");
+        //message.setText("Olá " + firstName + ", \n \n Username: "  + username + "\n \n E o seu novo password é: " + password + "\n \n My Admin App Support Team");
+        //message.setContent("<p>Olá <strong>" + firstName + "</strong>,</p><p>Seu novo password é: <strong>" + password + "</strong></p>", "text/html; charset=utf-8");
+        message.setContent(buildHtmlContent(otpCode), "text/html; charset=utf-8");
         message.setSentDate(new Date());
         message.saveChanges();
         return message;
@@ -46,5 +48,38 @@ public class EmailService {
         properties.put(SMTP_STARTTLS_ENABLE, true);
         properties.put(SMTP_STARTTLS_REQUIRED, true);
         return Session.getInstance(properties, null);
+    }
+
+    private String buildHtmlContent(String otpCode) {
+        return String.format(
+                "<!DOCTYPE html>" +
+                        "<html lang=\"pt\">" +
+                        "<head>" +
+                        "    <meta charset=\"UTF-8\">" +
+                        "    <style>" +
+                        "        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }" +
+                        "        .container { background-color: #ffffff; max-width: 600px; margin: 30px auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }" +
+                        "        h2 { color: #4c6ef5; text-align: center; }" +
+                        "        p { font-size: 16px; line-height: 1.5; color: #555; }" +
+                        "        .otp { background-color: #e8edff; padding: 15px; border-radius: 5px; margin-top: 20px; font-size: 24px; font-weight: bold; color: #4c6ef5; text-align: center; }" +
+                        "        .footer { margin-top: 30px; font-size: 13px; color: #999; text-align: center; }" +
+                        "    </style>" +
+                        "</head>" +
+                        "<body>" +
+                        "    <div class=\"container\">" +
+                        "        <h2>Verificação de Segurança – Eduka+</h2>" +
+                        "        <p>Recebemos uma solicitação para verificar sua identidade.</p>" +
+                        "        <p>Utilize o código abaixo para continuar com o processo:</p>" +
+                        "        <div class=\"otp\">%s</div>" +
+                        "        <p>Este código expira em 10 minutos. Se você não solicitou este código, ignore este e-mail.</p>" +
+                        "        <div class=\"footer\">" +
+                        "            Eduka+ • Suporte Técnico<br>" +
+                        "            Não responda a este e-mail." +
+                        "        </div>" +
+                        "    </div>" +
+                        "</body>" +
+                        "</html>",
+                otpCode
+        );
     }
 }

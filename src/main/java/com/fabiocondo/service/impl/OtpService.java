@@ -67,7 +67,7 @@ public class OtpService {
         otpRepository.save(entry);
 
         // Envia email
-        emailService.sendNewPasswordEmail(user.getFullName(), user.getEmail(), otp);
+        emailService.sendOtpCodeEmail(user.getEmail(), otp);
 
         return otp;
     }
@@ -130,7 +130,7 @@ public class OtpService {
         otpRepository.save(entry);
 
         // Envia email com o OTP
-        emailService.sendNewPasswordEmail(null, email, otp);
+        emailService.sendOtpCodeEmail(email, otp);
 
         return otp;
     }

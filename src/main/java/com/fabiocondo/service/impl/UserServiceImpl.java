@@ -147,7 +147,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setAuthorities(getRoleEnumName(role).getAuthorities());
         user.setProfileImageUrl(s3UploadResponse.getFileUrl());
         userRepository.save(user);
-        emailService.sendNewPasswordEmail(firstName, email, password);
+        emailService.sendOtpCodeEmail(email, password);
         logger.info("New user password: " + password);
         return user;
     }
@@ -281,7 +281,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setPassword(encodePassword(password));
         userRepository.save(user);
         logger.info("New user password: " + password);
-        emailService.sendNewPasswordEmail(user.getFullName(), user.getEmail(), password);
+        emailService.sendOtpCodeEmail(user.getEmail(), password);
     }
 
     @Override

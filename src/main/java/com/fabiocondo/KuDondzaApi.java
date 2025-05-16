@@ -35,7 +35,7 @@ public class KuDondzaApi {
                 "http://192.168.11.45:4200",
                 "http://192.168.11.45",
                 "http://192.168.43.2",
-                "http://168.231.87.25:4200"
+                "http://168.231.87.25"
         ));
         corsConfiguration.setAllowedHeaders(Arrays.asList("Origin", "Access-Control-Allow-Origin", "Content-Type",
                 "Accept", "Jwt-Token", "Authorization", "Origin, Accept", "X-Requested-With",

@@ -36,8 +36,9 @@ public class KuDondzaApi {
                 "http://192.168.11.45",
                 "http://192.168.43.2",
                 "http://168.231.87.25",
+                "http://www.dikahub.com",
                 "http://dikahub.com",
-                "http://www.dikahub.com"
+                "https://dikahub.com"
         ));
         corsConfiguration.setAllowedHeaders(Arrays.asList("Origin", "Access-Control-Allow-Origin", "Content-Type",
                 "Accept", "Jwt-Token", "Authorization", "Origin, Accept", "X-Requested-With",

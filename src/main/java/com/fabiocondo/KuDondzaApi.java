@@ -35,7 +35,10 @@ public class KuDondzaApi {
                 "http://192.168.11.45:4200",
                 "http://192.168.11.45",
                 "http://192.168.43.2",
+
                 "http://168.231.87.25",
+
+                "http://147.93.86.82",
                 "http://www.dikahub.com",
                 "http://dikahub.com",
                 "https://dikahub.com"

@@ -67,13 +67,13 @@ public class EmailService {
                         "</head>" +
                         "<body>" +
                         "    <div class=\"container\">" +
-                        "        <h2>Verificação de Segurança – Eduka+</h2>" +
+                        "        <h2>Verificação de Segurança – Dikahub</h2>" +
                         "        <p>Recebemos uma solicitação para verificar sua identidade.</p>" +
                         "        <p>Utilize o código abaixo para continuar com o processo:</p>" +
                         "        <div class=\"otp\">%s</div>" +
                         "        <p>Este código expira em 10 minutos. Se você não solicitou este código, ignore este e-mail.</p>" +
                         "        <div class=\"footer\">" +
-                        "            Eduka+ • Suporte Técnico<br>" +
+                        "            Dikahub • Suporte Técnico<br>" +
                         "            Não responda a este e-mail." +
                         "        </div>" +
                         "    </div>" +

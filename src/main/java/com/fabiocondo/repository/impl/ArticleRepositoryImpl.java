@@ -1,6 +1,8 @@
 package com.fabiocondo.repository.impl;
 
 import com.fabiocondo.domain.Article;
+import com.fabiocondo.domain.Course;
+import com.fabiocondo.domain.User;
 import com.fabiocondo.repository.filter.ArticleFilter;
 import com.fabiocondo.repository.query.ArticleRepositoryQuery;
 import org.slf4j.Logger;
@@ -13,10 +15,7 @@ import org.springframework.util.ObjectUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -92,6 +91,23 @@ public class ArticleRepositoryImpl implements ArticleRepositoryQuery {
         if(!ObjectUtils.isEmpty(articleFilter.getCategory())) {
             predicates.add(builder.equal(
                     builder.lower(root.get("category")), articleFilter.getCategory()));
+        }
+
+        // Filtro: artigos salvos por um usuário específico
+        if (articleFilter.getUserId() != null) {
+            // Criação da subquery
+            Subquery<Long> subquery = builder.createQuery().subquery(Long.class);
+            Root<User> userRoot = subquery.from(User.class);
+
+            // Referência à coleção savedArticles
+            Join<User, Article> savedArticlesJoin = userRoot.join("savedArticles");
+
+            // Subquery retorna os IDs dos artigos salvos por esse usuário
+            subquery.select(savedArticlesJoin.get("id"))
+                    .where(builder.equal(userRoot.get("id"), articleFilter.getUserId()));
+
+            // Restringe o artigo atual (root) aos IDs retornados na subquery
+            predicates.add(root.get("id").in(subquery));
         }
     }
 

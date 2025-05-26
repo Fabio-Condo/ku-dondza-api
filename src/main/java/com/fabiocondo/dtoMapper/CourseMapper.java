@@ -45,6 +45,7 @@ public class CourseMapper {
         courseDTO.setInstrutor(course.getInstrutor());
         courseDTO.setModules(course.getModules()); // Em cada modulo percorrer os contents e verificar se user atual autenticado, marcou o content
         courseDTO.setCurrentUserSubscribed(courseService.checkIfCurrentUserSubscribed(course.getId()));
+        courseDTO.setTotalStudents(courseService.getTotalStudentsByCourseId(course.getId()));
         return courseDTO;
     }
 

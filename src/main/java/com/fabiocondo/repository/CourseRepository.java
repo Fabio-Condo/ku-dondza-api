@@ -18,8 +18,8 @@ public interface CourseRepository extends JpaRepository<Course, Long>, CourseRep
     @Query("SELECT u FROM Course oc JOIN oc.students u WHERE oc.id = :courseId")
     Page<User> findStudentsByCourseId(@Param("courseId") Long courseId, Pageable pageable);
 
-    @Query("SELECT COUNT(u) FROM Course oc JOIN oc.students u WHERE oc.id = :courseId")
-    Long countOnlineCourseStudentsByCourseId(@Param("courseId") Long courseId);
+    @Query("SELECT COUNT(u) FROM Course c JOIN c.students u WHERE c.id = :courseId")
+    Long countStudentsByCourseId(@Param("courseId") Long courseId);
 
     Optional<Course> findOnlineCourseByOnlineCourseId(String onlineCourseId);
 }

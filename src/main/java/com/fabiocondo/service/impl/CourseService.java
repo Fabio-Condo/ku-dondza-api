@@ -144,6 +144,10 @@ public class CourseService {
         return courseRepository.count();
     }
 
+    public long getTotalStudentsByCourseId(Long courseId) {
+        return courseRepository.countStudentsByCourseId(courseId);
+    }
+
     public boolean checkIfCurrentUserSubscribed(Long onlineCourseId) throws UserNotFoundException {
         User user = getAuthenticatedUser();
         if (user == null) {

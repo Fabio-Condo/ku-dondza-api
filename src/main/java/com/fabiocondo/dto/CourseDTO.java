@@ -28,6 +28,8 @@ public class CourseDTO {
 
     private boolean isCurrentUserSubscribed;
 
+    private Long totalStudents;
+
     // Constructors
     public CourseDTO() {}
 
@@ -120,5 +122,12 @@ public class CourseDTO {
         isCurrentUserSubscribed = currentUserSubscribed;
     }
 
+    public Long getTotalStudents() {
+        return totalStudents;
+    }
+
+    public void setTotalStudents(Long totalStudents) {
+        this.totalStudents = totalStudents;
+    }
 }
 

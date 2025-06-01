@@ -60,23 +60,32 @@ public class CourseService {
                 .orElseThrow(() -> new CourseNotFoundException("No course found by id: " + id));
     }
 
-    public Course findOnlineCourseByOnlineCourseId(String onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
+    public Course findOnlineCourseByOnlineCourseId(String onlineCourseId, Long currentUserId)
+            throws CourseNotFoundException {
+
         Course course = courseRepository.findOnlineCourseByOnlineCourseId(onlineCourseId)
                 .orElseThrow(() -> new CourseNotFoundException("No course found by id: " + onlineCourseId));
 
-        User user = getAuthenticatedUser();
+        // Tenta buscar o usuário, mas continua normalmente se não existir
+        Optional<User> optionalUser = userRepository.findById(currentUserId);
 
-        Set<Long> markedIds = user.getMarkedContents().stream()
-                .map(Content::getId)
-                .collect(Collectors.toSet());
+        if (optionalUser.isPresent()) {
+            User currentUser = optionalUser.get();
 
-        for (Module module : course.getModules()) {
-            for (Content content : module.getContents()) {
-                content.setMarkedByUser(markedIds.contains(content.getId()));
+            Set<Long> markedIds = currentUser.getMarkedContents().stream()
+                    .map(Content::getId)
+                    .collect(Collectors.toSet());
+
+            for (Module module : course.getModules()) {
+                for (Content content : module.getContents()) {
+                    content.setMarkedByUser(markedIds.contains(content.getId()));
+                }
             }
         }
+
         return course;
     }
+
 
     public Page<Course> findAll(String searchParam, Pageable pageable) {
         return courseRepository.findAll(searchParam, pageable);
@@ -148,16 +157,16 @@ public class CourseService {
         return courseRepository.countStudentsByCourseId(courseId);
     }
 
-    public boolean checkIfCurrentUserSubscribed(Long onlineCourseId) throws UserNotFoundException {
-        User user = getAuthenticatedUser();
-        if (user == null) {
+    public boolean checkIfCurrentUserSubscribed(Long onlineCourseId, Long currentUserId) throws UserNotFoundException {
+        User currentUser = userRepository.findById(currentUserId).orElseThrow(null);
+        if (currentUser == null) {
             return false;
         }
         Optional<Course> course = courseRepository.findById(onlineCourseId);
         if (!course.isPresent()) {
             return false;
         }
-        return user.getSubscribedCourses().contains(course.get());
+        return currentUser.getSubscribedCourses().contains(course.get());
     }
 
     public Page<User> getStudentsByCourseId(Long courseId, Pageable pageable) throws CourseNotFoundException {
@@ -177,16 +186,6 @@ public class CourseService {
 
         if (contents.isEmpty()) return 0;
         return (double) totalMarked / contents.size() * 100;
-    }
-
-    public User getAuthenticatedUser() throws UserNotFoundException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        User user = userRepository.findUserByEmail(username);
-        if(user == null){
-            throw new UserNotFoundException(NO_USER_FOUND_BY_USERNAME + username);
-        }
-        return userRepository.findUserByEmail(username);
     }
 
 }

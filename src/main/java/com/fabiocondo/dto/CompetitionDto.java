@@ -1,11 +1,13 @@
 package com.fabiocondo.dto;
 
+import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Subject;
 import com.fabiocondo.domain.Topic;
 import com.fabiocondo.enumeration.DifficultyLevel;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 public class CompetitionDto {
@@ -38,6 +40,8 @@ public class CompetitionDto {
     private Long totalSubmissions;
 
     private Set<Topic> topics;
+
+    private Set<Question> questions = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -149,5 +153,13 @@ public class CompetitionDto {
 
     public void setTopics(Set<Topic> topics) {
         this.topics = topics;
+    }
+
+    public Set<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(Set<Question> questions) {
+        this.questions = questions;
     }
 }

@@ -4,6 +4,7 @@ import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.ArticleNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.LikeRepository;
+import com.fabiocondo.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,32 +18,35 @@ public class LikeService {
     private final ArticleServiceImpl articleService;
 
     private final UserServiceImpl userService;
+    private final UserRepository userRepository;
 
-    public LikeService(LikeRepository likeRepository, ArticleServiceImpl articleService, UserServiceImpl userService) {
+    public LikeService(LikeRepository likeRepository, ArticleServiceImpl articleService, UserServiceImpl userService, UserRepository userRepository) {
         this.likeRepository = likeRepository;
         this.articleService = articleService;
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
-    public Like toggleLike(Long articleId) throws ArticleNotFoundException, UserNotFoundException {
+    public Like toggleLike(Long articleId, Long currentUserId) throws ArticleNotFoundException, UserNotFoundException {
         Article article = articleService.findById(articleId);
-        User user = userService.getAuthenticatedUser();
-        Optional<Like> existingLike = likeRepository.findByArticleAndUser(article, user);
+        User currentUser = userRepository.findById(currentUserId).orElseThrow(null);
+        Optional<Like> existingLike = likeRepository.findByArticleAndUser(article, currentUser);
         if (existingLike.isPresent()) {
             likeRepository.delete(existingLike.get());
             return null;
         } else {
             Like like = new Like();
             like.setArticle(article);
-            like.setUser(user);
+            like.setUser(currentUser);
             likeRepository.save(like);
             return like;
         }
     }
 
-    public boolean isArticleLikedByUser(Long articleId) throws UserNotFoundException {
-        User user = userService.getAuthenticatedUser();
-        return likeRepository.existsByArticleIdAndUserId(articleId, user.getId());
+    public boolean isArticleLikedByUser(Long articleId, Long currentUserId) throws UserNotFoundException {
+        //User currentUser = userService.getAuthenticatedUser();
+        User currentUser = userRepository.findById(currentUserId).orElseThrow(null);
+        return likeRepository.existsByArticleIdAndUserId(articleId, currentUser.getId());
     }
 
     public Long countLikesByArticleId(Long articleId) {

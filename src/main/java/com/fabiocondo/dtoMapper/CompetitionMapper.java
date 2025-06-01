@@ -32,6 +32,26 @@ public class CompetitionMapper {
         return competition;
     }
 
+    public CompetitionDto domainToDTO_WithQuestions(Competition competition) {
+        CompetitionDto competitionDto = new CompetitionDto();
+        competitionDto.setId(competition.getId());
+        competitionDto.setCompetitionId(competition.getCompetitionId());
+        competitionDto.setActive(competition.isOpen());
+        competitionDto.setExpiry(competition.getExpiry());
+        competitionDto.setTitle(competition.getTitle());
+        competitionDto.setDifficultyLevel(competition.getDifficultyLevel());
+        competitionDto.setLimitPerTopic(competition.getLimitPerTopic());
+        competitionDto.setTimeLimit(competition.getTimeLimit());
+        competitionDto.setTimeSpent(competition.getTimeSpent());
+        competitionDto.setSubject(competition.getSubject());
+        competitionDto.setQuestions(competition.getQuestions());
+        competitionDto.setTopics(competitionService.getTopicsByCompetitionId(competition.getId()));
+        competitionDto.setTotalTopics((long) competitionDto.getTopics().size());
+        competitionDto.setTotalQuestions(competitionService.countQuestionsByCompetitionId(competition.getId()));
+        competitionDto.setTotalSubmissions(submissionService.countByCompetitionId(competition.getId()));
+        return competitionDto;
+    }
+
     public CompetitionDto domainToDTO(Competition competition) {
         CompetitionDto competitionDto = new CompetitionDto();
         competitionDto.setId(competition.getId());

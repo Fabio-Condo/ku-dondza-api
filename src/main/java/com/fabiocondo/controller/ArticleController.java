@@ -30,8 +30,8 @@ public class ArticleController {
     }
 
     @GetMapping("/filter")
-    public Page<ArticleDTO> filter(ArticleFilter articleFilter, Pageable pageable) {
-        return articleMapper.domainPageToDTOPage(articleService.filter(articleFilter, pageable), pageable);
+    public Page<ArticleDTO> filter(ArticleFilter articleFilter, @RequestParam("currentUserId") Long currentUserId, Pageable pageable) {
+        return articleMapper.domainPageToDTOPage(articleService.filter(articleFilter, pageable), currentUserId, pageable);
     }
 
     @GetMapping("/{id}")
@@ -40,9 +40,9 @@ public class ArticleController {
     }
 
     @GetMapping("/find-by-articleId/{articleId}")
-    public ResponseEntity<ArticleDTO> findArticleByArticleId(@PathVariable("articleId") String articleId) throws ArticleNotFoundException, UserNotFoundException {
+    public ResponseEntity<ArticleDTO> findArticleByArticleId(@PathVariable("articleId") String articleId, @RequestParam("currentUserId") Long currentUserId) throws ArticleNotFoundException, UserNotFoundException {
         Article article = articleService.findArticleByArticleId(articleId);
-        return ResponseEntity.status(HttpStatus.OK).body(articleMapper.domainToDTO(article));
+        return ResponseEntity.status(HttpStatus.OK).body(articleMapper.domainToDTO(article, currentUserId));
     }
 
     @PostMapping

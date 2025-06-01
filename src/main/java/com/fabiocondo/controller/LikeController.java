@@ -20,15 +20,9 @@ public class LikeController {
         this.likeService = likeService;
     }
 
-    @PostMapping("/articles/{articleId}")
-    public ResponseEntity<Like> toggleLike(@PathVariable Long articleId) throws UserNotFoundException, ArticleNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(likeService.toggleLike(articleId));
-    }
-
-    @GetMapping("/articles/{articleId}/check")
-    public ResponseEntity<Boolean> checkIfLiked(@PathVariable Long articleId) throws UserNotFoundException {
-        boolean liked = likeService.isArticleLikedByUser(articleId);
-        return ResponseEntity.ok(liked);
+    @PostMapping("/articles/{articleId}/users/{currentUserId}")
+    public ResponseEntity<Like> toggleLike(@PathVariable Long articleId, @PathVariable("currentUserId") Long currentUserId) throws UserNotFoundException, ArticleNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(likeService.toggleLike(articleId, currentUserId));
     }
 
     @GetMapping("/articles/{articleId}")

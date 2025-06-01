@@ -37,9 +37,9 @@ public class CourseController {
     }
 
     @GetMapping("/find-by-courseId/{onlineCourseId}")
-    public ResponseEntity<CourseDTO> findOnlineCourseByOnlineCourseId(@PathVariable("onlineCourseId") String onlineCourseId) throws CourseNotFoundException, UserNotFoundException {
-        Course course = courseService.findOnlineCourseByOnlineCourseId(onlineCourseId);
-        return ResponseEntity.status(HttpStatus.OK).body(courseMapper.domainToDTO_WithModules(course));
+    public ResponseEntity<CourseDTO> findOnlineCourseByOnlineCourseId(@PathVariable("onlineCourseId") String onlineCourseId, @RequestParam("currentUserId") Long currentUserId) throws CourseNotFoundException, UserNotFoundException {
+        Course course = courseService.findOnlineCourseByOnlineCourseId(onlineCourseId, currentUserId);
+        return ResponseEntity.status(HttpStatus.OK).body(courseMapper.domainToDTO_WithModules(course, currentUserId));
     }
 
     @GetMapping("/findAll")

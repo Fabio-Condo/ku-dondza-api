@@ -3,21 +3,26 @@ package com.fabiocondo.dtoMapper;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.CourseDTO;
 import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.impl.CourseService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 public class CourseMapper {
 
     private final CourseService courseService;
+    private final UserRepository userRepository;
 
-    public CourseMapper(CourseService courseService) {
+
+    public CourseMapper(CourseService courseService, UserRepository userRepository) {
         this.courseService = courseService;
+        this.userRepository = userRepository;
     }
 
     public Course dtoToDomainObject(CourseDTO courseDTO) {
@@ -33,7 +38,7 @@ public class CourseMapper {
         return course;
     }
 
-    public CourseDTO domainToDTO_WithModules(Course course) throws UserNotFoundException {
+    public CourseDTO domainToDTO_WithModules(Course course, Long currentUserId) throws UserNotFoundException {
         CourseDTO courseDTO = new CourseDTO();
         courseDTO.setId(course.getId());
         courseDTO.setOnlineCourseId(course.getOnlineCourseId());
@@ -44,7 +49,13 @@ public class CourseMapper {
         courseDTO.setLunchDate(course.getLunchDate());
         courseDTO.setInstrutor(course.getInstrutor());
         courseDTO.setModules(course.getModules()); // Em cada modulo percorrer os contents e verificar se user atual autenticado, marcou o content
-        courseDTO.setCurrentUserSubscribed(courseService.checkIfCurrentUserSubscribed(course.getId()));
+
+        Optional<User> currentUser = userRepository.findById(currentUserId);
+
+        if(currentUser.isPresent()){
+            courseDTO.setCurrentUserSubscribed(courseService.checkIfCurrentUserSubscribed(course.getId(), currentUserId));
+        }
+
         courseDTO.setTotalStudents(courseService.getTotalStudentsByCourseId(course.getId()));
         return courseDTO;
     }

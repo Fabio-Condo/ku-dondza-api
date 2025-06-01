@@ -183,6 +183,7 @@ public class UserController {
 
     @PutMapping("/{userId}/saved-articles/{articleId}/toggle")
     public ResponseEntity<Article> toggleSaveArticle(@PathVariable Long userId, @PathVariable Long articleId) throws UserNotFoundException, ArticleNotFoundException {
+        System.out.println("AAAAAAAAAAA ++++++++++ " + articleId);
         return ResponseEntity.status(OK).body(userService.toggleSaveArticle(userId, articleId));
     }
 

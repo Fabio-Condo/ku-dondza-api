@@ -391,12 +391,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     @Transactional
     public Article toggleSaveArticle(Long userId, Long articleId) throws UserNotFoundException, ArticleNotFoundException {
-        User user = getAuthenticatedUser();
+        User currentUser = userRepository.findById(userId).orElseThrow(null);
 
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new ArticleNotFoundException("Article not find"));
 
-        Set<Article> savedArticles = user.getSavedArticles();
+        Set<Article> savedArticles = currentUser.getSavedArticles();
 
         if (savedArticles.contains(article)) {
             savedArticles.remove(article);
@@ -404,21 +404,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             savedArticles.add(article);
         }
 
-        userRepository.save(user); // atualiza a relação
+        userRepository.save(currentUser); // atualiza a relação
 
         return article;
     }
 
     @Override
-    public boolean checkIfSaved(Long articleId) throws UserNotFoundException, ArticleNotFoundException {
-        User user = getAuthenticatedUser();
-
+    public boolean checkIfSaved(Long articleId, Long currentUserId) throws ArticleNotFoundException {
+        User currentUser = userRepository.findById(currentUserId).orElseThrow(null);
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new ArticleNotFoundException("Article not find"));
-
-        return user.getSavedArticles().contains(article);
+        return currentUser.getSavedArticles().contains(article);
     }
-
 
     private void validateLoginAttempt(User user) {
         if(user.isNotLocked()) {
@@ -481,17 +478,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public List<User> getUsers() {
         return userRepository.findAll();
-    }
-
-    public User getAuthenticatedUser() throws UserNotFoundException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-        User user = userRepository.findUserByEmail(username);
-        if(user == null){
-            throw new UserNotFoundException(NO_USER_FOUND_BY_EMAIL + username);
-        }
-        logger.info(FOUND_USER_BY_EMAIL + username);
-        return userRepository.findUserByEmail(username);
     }
 
 }

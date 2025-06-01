@@ -50,7 +50,9 @@ public interface UserService {
 
     Page<Course> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException;
 
-    boolean checkIfSaved(Long articleId) throws UserNotFoundException, ArticleNotFoundException;
+    //boolean checkIfSaved(Long articleId) throws UserNotFoundException, ArticleNotFoundException;
+
+    boolean checkIfSaved(Long articleId, Long currentUserId) throws UserNotFoundException, ArticleNotFoundException;
 
     User findUserByUserId(String userId) throws UserNotFoundException;
 

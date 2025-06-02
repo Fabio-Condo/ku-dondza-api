@@ -102,6 +102,16 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(ClosedSubmissionException.class)
+    public ResponseEntity<HttpResponse> closedSubmissionException(ClosedSubmissionException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(UserAlreadySubmittedException.class)
+    public ResponseEntity<HttpResponse> userAlreadySubmittedException(UserAlreadySubmittedException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(CompetitionNotFoundException.class)
     public ResponseEntity<HttpResponse> competitionNotFoundException(CompetitionNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());

@@ -70,7 +70,7 @@ public class ArticleMapper {
     }
 
     public Page<ArticleDTO> domainPageToDTOPage(Page<Article> articles, Long currentUserId, Pageable pageable) {
-        Optional<User> currentUser = userRepository.findById(currentUserId);
+        //Optional<User> currentUser = userRepository.findById(currentUserId);
 
         return new PageImpl<>(articles.stream()
                 .map(article -> {

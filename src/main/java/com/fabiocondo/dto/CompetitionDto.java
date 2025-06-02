@@ -39,6 +39,8 @@ public class CompetitionDto {
 
     private Long totalSubmissions;
 
+    private boolean currentUserHasSubmitted ;
+
     private Set<Topic> topics;
 
     private Set<Question> questions = new HashSet<>();
@@ -141,6 +143,14 @@ public class CompetitionDto {
 
     public Long getTotalSubmissions() {
         return totalSubmissions;
+    }
+
+    public boolean isCurrentUserHasSubmitted() {
+        return currentUserHasSubmitted;
+    }
+
+    public void setCurrentUserHasSubmitted(boolean currentUserHasSubmitted) {
+        this.currentUserHasSubmitted = currentUserHasSubmitted;
     }
 
     public void setTotalSubmissions(Long totalSubmissions) {

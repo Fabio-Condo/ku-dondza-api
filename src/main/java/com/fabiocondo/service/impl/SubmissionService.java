@@ -1,9 +1,7 @@
 package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.*;
-import com.fabiocondo.exception.domain.CompetitionNotFoundException;
-import com.fabiocondo.exception.domain.SubmissionNotFoundException;
-import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.CompetitionRepository;
 import com.fabiocondo.repository.SubmissionRepository;
@@ -60,16 +58,24 @@ public class SubmissionService {
     }
 
     @Transactional
-    public Submission create(Submission submission, Set<Long> userAnswerIds) throws CompetitionNotFoundException, UserNotFoundException {
+    public Submission create(Submission submission, Set<Long> userAnswerIds)
+            throws CompetitionNotFoundException, UserNotFoundException, UserAlreadySubmittedException, ClosedSubmissionException {
 
-        Competition competition = competitionRepository.findById(submission.getCompetition().getId())
+        Long competitionId = submission.getCompetition().getId();
+        Long userId = submission.getUser().getId();
+
+        if (hasUserAlreadySubmitted(competitionId, userId)) {
+            throw new UserAlreadySubmittedException("O usuário já submeteu uma resposta para esta competição.");
+        }
+
+        Competition competition = competitionRepository.findById(competitionId)
                 .orElseThrow(() -> new CompetitionNotFoundException("Competição não encontrada."));
 
-        User user = userRepository.findById(submission.getUser().getId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado."));
 
-        if (submissionRepository.existsByCompetitionAndUser(competition, user)) {
-            throw new IllegalStateException("O usuário já submeteu uma resposta para esta competição.");
+        if(!competition.isOpen()){
+            throw new ClosedSubmissionException("Competição encerrada.");
         }
 
         Set<Answer> answers = new HashSet<>(answerRepository.findAllById(userAnswerIds));
@@ -85,6 +91,17 @@ public class SubmissionService {
         return submissionRepository.save(submission);
     }
 
+    public boolean hasUserAlreadySubmitted(Long competitionId, Long userId) {
+        Optional<Competition> competitionOpt = competitionRepository.findById(competitionId);
+        Optional<User> userOpt = userRepository.findById(userId);
+
+        if (!competitionOpt.isPresent() || !userOpt.isPresent()) {
+            return false;
+        }
+
+        return submissionRepository.existsByCompetitionAndUser(competitionOpt.get(), userOpt.get());
+    }
+
     // Método para calcular o total de respostas corretas para uma submissão
     public long getTotalCorrectAnswersForSubmission(Long submissionId) {
         Submission submission = submissionRepository.findById(submissionId)
@@ -94,5 +111,31 @@ public class SubmissionService {
                 .filter(Answer::isCorrect) // Filtra as respostas corretas
                 .count(); // Conta as respostas corretas
     }
+
+    //@Transactional
+    //public Submission create(Submission submission, Set<Long> userAnswerIds) throws CompetitionNotFoundException, UserNotFoundException {
+
+    //    Competition competition = competitionRepository.findById(submission.getCompetition().getId())
+    //            .orElseThrow(() -> new CompetitionNotFoundException("Competição não encontrada."));
+
+    //    User user = userRepository.findById(submission.getUser().getId())
+    //            .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado."));
+
+    //    if (submissionRepository.existsByCompetitionAndUser(competition, user)) {
+    //        throw new IllegalStateException("O usuário já submeteu uma resposta para esta competição.");
+    //    }
+
+    //    Set<Answer> answers = new HashSet<>(answerRepository.findAllById(userAnswerIds));
+    //    if (answers.size() != userAnswerIds.size()) {
+    //        throw new IllegalArgumentException("Algumas respostas fornecidas são inválidas.");
+    //    }
+
+    //    submission.setUser(user);
+    //    submission.setCompetition(competition);
+    //    submission.setAnswers(answers);
+    //    submission.setSubmittedAt(new Date());
+
+    //    return submissionRepository.save(submission);
+    //}
 
 }

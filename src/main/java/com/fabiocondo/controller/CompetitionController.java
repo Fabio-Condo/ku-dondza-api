@@ -41,8 +41,8 @@ public class CompetitionController {
     }
 
     @GetMapping("/filter")
-    public Page<CompetitionDto> filter(CompetitionFilter competitionFilter, Pageable pageable) {
-        return competitionMapper.domainPageToDTOPage(competitionService.filter(competitionFilter, pageable), pageable);
+    public Page<CompetitionDto> filter(CompetitionFilter competitionFilter, @RequestParam("currentUserId") Long currentUserId, Pageable pageable) {
+        return competitionMapper.domainPageToDTOPage(competitionService.filter(competitionFilter, pageable), currentUserId, pageable);
     }
 
     @GetMapping("/findAll")
@@ -61,9 +61,9 @@ public class CompetitionController {
     }
 
     @GetMapping("/find-by-competitionId/{competitionId}")
-    public ResponseEntity<CompetitionDto> findCompetitionByCompetitionId(@PathVariable("competitionId") String competitionId) throws CompetitionNotFoundException {
+    public ResponseEntity<CompetitionDto> findCompetitionByCompetitionId(@PathVariable("competitionId") String competitionId, @RequestParam("currentUserId") Long currentUserId) throws CompetitionNotFoundException {
         Competition competition = competitionService.findCompetitionByCompetitionId(competitionId);
-        return ResponseEntity.status(HttpStatus.OK).body(competitionMapper.domainToDTO(competition));
+        return ResponseEntity.status(HttpStatus.OK).body(competitionMapper.domainToDTO(competition, currentUserId));
 
     }
 

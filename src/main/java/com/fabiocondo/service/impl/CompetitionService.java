@@ -4,7 +4,6 @@ import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.*;
 import com.fabiocondo.repository.filter.CompetitionFilter;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -21,21 +20,19 @@ public class CompetitionService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final CompetitionRepository competitionRepository;
-    private final UserRepository userRepository;
     private final QuestionRepository questionRepository;
     private final TopicRepository topicRepository;
     private final SubmissionRepository submissionRepository;
 
-    public CompetitionService(CompetitionRepository competitionRepository, UserRepository userRepository, QuestionRepository questionRepository, TopicRepository topicRepository, SubmissionRepository submissionRepository) {
+    public CompetitionService(CompetitionRepository competitionRepository, QuestionRepository questionRepository, TopicRepository topicRepository, SubmissionRepository submissionRepository) {
         this.competitionRepository = competitionRepository;
-        this.userRepository = userRepository;
         this.questionRepository = questionRepository;
         this.topicRepository = topicRepository;
         this.submissionRepository = submissionRepository;
     }
 
     @Transactional
-    public Competition createCompetition(Competition competition, Set<Long> topicIds) throws UserNotFoundException {
+    public Competition createCompetition(Competition competition, Set<Long> topicIds) {
 
         if (topicIds == null || topicIds.isEmpty()) {
             throw new IllegalArgumentException("A Competition deve ter pelo menos um tópico associado.");

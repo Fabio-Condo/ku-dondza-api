@@ -1,11 +1,15 @@
 package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.*;
+import com.fabiocondo.dto.RankingDTO;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.CompetitionRepository;
 import com.fabiocondo.repository.SubmissionRepository;
 import com.fabiocondo.repository.UserRepository;
+import com.fabiocondo.repository.filter.BookFilter;
+import com.fabiocondo.repository.filter.CompetitionFilter;
+import com.fabiocondo.repository.filter.SubmissionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -43,6 +47,14 @@ public class SubmissionService {
 
     public Optional<Submission> findSubmissionByUserAndCompetition(Long userId, Long competitionId) {
         return submissionRepository.findByUserIdAndCompetitionId(userId, competitionId);
+    }
+
+    public Page<Submission> filter(SubmissionFilter submissionFilter, Pageable pageable) {
+        return submissionRepository.filter(submissionFilter, pageable);
+    }
+
+    public Page<RankingDTO> getRanking(Long competitionId, Pageable pageable) {
+        return submissionRepository.getRanking(competitionId, pageable);
     }
 
     public Page<Submission> findAll(Pageable pageable) {

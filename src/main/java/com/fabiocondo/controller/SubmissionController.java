@@ -1,7 +1,9 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.Submission;
+import com.fabiocondo.dto.RankingDTO;
 import com.fabiocondo.exception.domain.*;
+import com.fabiocondo.repository.filter.SubmissionFilter;
 import com.fabiocondo.service.impl.SubmissionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,9 +29,19 @@ public class SubmissionController {
         return ResponseEntity.status(HttpStatus.OK).body(submissionService.findById(id));
     }
 
-    @GetMapping("/filter")
+    //@GetMapping("/filter")
     public ResponseEntity<Page<Submission>> findAll(Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(submissionService.findAll(pageable));
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Page<Submission>> filter(SubmissionFilter submissionFilter, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(submissionService.filter(submissionFilter, pageable));
+    }
+
+    @GetMapping("/competitions/{competitionId}/ranking")
+    public ResponseEntity<Page<RankingDTO>> getRanking(@PathVariable Long competitionId, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(submissionService.getRanking(competitionId, pageable));
     }
 
     @GetMapping("/{competitionId}/submissions")

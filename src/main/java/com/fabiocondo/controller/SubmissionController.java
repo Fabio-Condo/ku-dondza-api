@@ -29,7 +29,7 @@ public class SubmissionController {
         return ResponseEntity.status(HttpStatus.OK).body(submissionService.findById(id));
     }
 
-    //@GetMapping("/filter")
+    @GetMapping("/findAll")
     public ResponseEntity<Page<Submission>> findAll(Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(submissionService.findAll(pageable));
     }

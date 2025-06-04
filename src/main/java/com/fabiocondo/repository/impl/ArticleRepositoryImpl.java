@@ -1,7 +1,6 @@
 package com.fabiocondo.repository.impl;
 
 import com.fabiocondo.domain.Article;
-import com.fabiocondo.domain.Course;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.repository.filter.ArticleFilter;
 import com.fabiocondo.repository.query.ArticleRepositoryQuery;
@@ -112,10 +111,10 @@ public class ArticleRepositoryImpl implements ArticleRepositoryQuery {
     }
 
     public void getSortOrder(ArticleFilter articleFilter, CriteriaBuilder builder, CriteriaQuery<Article> criteria, Root<Article> root){
-        if(Objects.equals(articleFilter.getArticleOrderBy(), "subject,asc")){
+        if(Objects.equals(articleFilter.getSort(), "subject,asc")){
             criteria.orderBy(builder.asc(root.get("subject")));
         }
-        if(Objects.equals(articleFilter.getArticleOrderBy(), "subject,desc")){
+        if(Objects.equals(articleFilter.getSort(), "subject,desc")){
             criteria.orderBy(builder.desc(root.get("subject")));
         }
     }

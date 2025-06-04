@@ -6,7 +6,7 @@ public class BookFilter {
 
     private String searchParam;
 
-    private String blogOrderBy;
+    private String sort;
 
     private Subject subject;
 
@@ -24,12 +24,12 @@ public class BookFilter {
         this.searchParam = searchParam;
     }
 
-    public String getBlogOrderBy() {
-        return blogOrderBy;
+    public String getSort() {
+        return sort;
     }
 
-    public void setBlogOrderBy(String blogOrderBy) {
-        this.blogOrderBy = blogOrderBy;
+    public void setSort(String sort) {
+        this.sort = sort;
     }
 
     public Subject getSubject() {

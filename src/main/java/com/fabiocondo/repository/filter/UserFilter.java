@@ -9,7 +9,7 @@ public class UserFilter {
 
     private String searchParam;
 
-    private String userOrderBy;
+    private String sort;
 
     private String fullName;
 
@@ -28,12 +28,12 @@ public class UserFilter {
         this.searchParam = searchParam;
     }
 
-    public String getUserOrderBy() {
-        return userOrderBy;
+    public String getSort() {
+        return sort;
     }
 
-    public void setUserOrderBy(String userOrderBy) {
-        this.userOrderBy = userOrderBy;
+    public void setSort(String sort) {
+        this.sort = sort;
     }
 
 

@@ -1,6 +1,5 @@
 package com.fabiocondo.repository.filter;
 
-import com.fabiocondo.domain.User;
 import com.fabiocondo.enumeration.CategoryType;
 
 import javax.persistence.EnumType;
@@ -13,7 +12,7 @@ public class ArticleFilter {
     @Enumerated(EnumType.STRING)
     private CategoryType category;
 
-    private String articleOrderBy;
+    private String sort;
 
     private String title;
 
@@ -27,12 +26,12 @@ public class ArticleFilter {
         this.searchParam = searchParam;
     }
 
-    public String getArticleOrderBy() {
-        return articleOrderBy;
+    public String getSort() {
+        return sort;
     }
 
-    public void setArticleOrderBy(String articleOrderBy) {
-        this.articleOrderBy = articleOrderBy;
+    public void setSort(String sort) {
+        this.sort = sort;
     }
 
     public String getTitle() {

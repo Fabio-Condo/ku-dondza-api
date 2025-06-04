@@ -109,10 +109,10 @@ public class CourseRepositoryImpl implements CourseRepositoryQuery {
     }
 
     public void getSortOrder(CourseFilter examFilter, CriteriaBuilder builder, CriteriaQuery<Course> criteria, Root<Course> root){
-        if(Objects.equals(examFilter.getCourseOrderBy(), "id,asc")){
+        if(Objects.equals(examFilter.getSort(), "id,asc")){
             criteria.orderBy(builder.asc(root.get("id")));
         }
-        if(Objects.equals(examFilter.getCourseOrderBy(), "id,desc")){
+        if(Objects.equals(examFilter.getSort(), "id,desc")){
             criteria.orderBy(builder.desc(root.get("id")));
         }
     }

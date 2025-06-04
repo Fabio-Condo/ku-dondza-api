@@ -5,7 +5,7 @@ public class SubmissionFilter {
 
     private String searchParam;
 
-    private String submissionOrderBy;
+    private String sort;
 
     private String title;
 
@@ -21,12 +21,12 @@ public class SubmissionFilter {
         this.searchParam = searchParam;
     }
 
-    public String getSubmissionOrderBy() {
-        return submissionOrderBy;
+    public String getSort() {
+        return sort;
     }
 
-    public void setSubmissionOrderBy(String submissionOrderBy) {
-        this.submissionOrderBy = submissionOrderBy;
+    public void setSort(String sort) {
+        this.sort = sort;
     }
 
     public String getTitle() {

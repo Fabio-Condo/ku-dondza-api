@@ -120,10 +120,10 @@ public class SubmissionRepositoryImpl implements SubmissionRepositoryQuery {
     }
 
     public void getSortOrder(SubmissionFilter submissionFilter, CriteriaBuilder builder, CriteriaQuery<Submission> criteria, Root<Submission> root){
-        if(Objects.equals(submissionFilter.getSubmissionOrderBy(), "id,asc")){
+        if(Objects.equals(submissionFilter.getSort(), "id,asc")){
             criteria.orderBy(builder.asc(root.get("id")));
         }
-        if(Objects.equals(submissionFilter.getSubmissionOrderBy(), "id,desc")){
+        if(Objects.equals(submissionFilter.getSort(), "id,desc")){
             criteria.orderBy(builder.desc(root.get("id")));
         }
     }

@@ -103,11 +103,18 @@ public class CompetitionRepositoryImpl implements CompetitionRepositoryQuery {
     }
 
     public void getSortOrder(CompetitionFilter competitionFilter, CriteriaBuilder builder, CriteriaQuery<Competition> criteria, Root<Competition> root){
-        if(Objects.equals(competitionFilter.getCompetitionOrderBy(), "subject,asc")){
+        if(Objects.equals(competitionFilter.getSort(), "subject,asc")){
             criteria.orderBy(builder.asc(root.get("subject")));
         }
-        if(Objects.equals(competitionFilter.getCompetitionOrderBy(), "subject,desc")){
+        if(Objects.equals(competitionFilter.getSort(), "subject,desc")){
             criteria.orderBy(builder.desc(root.get("subject")));
+        }
+
+        if(Objects.equals(competitionFilter.getSort(), "id,asc")){
+            criteria.orderBy(builder.asc(root.get("id")));
+        }
+        if(Objects.equals(competitionFilter.getSort(), "id,desc")){
+            criteria.orderBy(builder.desc(root.get("id")));
         }
     }
 }

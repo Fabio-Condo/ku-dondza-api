@@ -109,10 +109,10 @@ public class BookRepositoryImpl implements BookRepositoryQuery {
     }
 
     public void getSortOrder(BookFilter bookFilter, CriteriaBuilder builder, CriteriaQuery<Book> criteria, Root<Book> root){
-        if(Objects.equals(bookFilter.getBlogOrderBy(), "subject,asc")){
+        if(Objects.equals(bookFilter.getSort(), "subject,asc")){
             criteria.orderBy(builder.asc(root.get("subject")));
         }
-        if(Objects.equals(bookFilter.getBlogOrderBy(), "subject,desc")){
+        if(Objects.equals(bookFilter.getSort(), "subject,desc")){
             criteria.orderBy(builder.desc(root.get("subject")));
         }
     }

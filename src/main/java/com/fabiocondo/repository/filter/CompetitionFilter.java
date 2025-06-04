@@ -10,7 +10,7 @@ public class CompetitionFilter {
 
     private String searchParam;
 
-    private String competitionOrderBy;
+    private String sort;
 
     private String title;
 
@@ -27,9 +27,9 @@ public class CompetitionFilter {
         this.searchParam = searchParam;
     }
 
-    public String getCompetitionOrderBy() { return competitionOrderBy; }
+    public String getSort() { return sort; }
 
-    public void setCompetitionOrderBy(String competitionOrderBy) { this.competitionOrderBy = competitionOrderBy; }
+    public void setSort(String sort) { this.sort = sort; }
 
     public String getTitle() {
         return title;

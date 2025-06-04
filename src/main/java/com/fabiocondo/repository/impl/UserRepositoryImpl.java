@@ -107,10 +107,10 @@ public class UserRepositoryImpl implements UserRepositoryQuery {
     }
 
     public void getSortOrder(UserFilter userFilter, CriteriaBuilder builder, CriteriaQuery<User> criteria, Root<User> root){
-        if(Objects.equals(userFilter.getUserOrderBy(), "id,asc")){
+        if(Objects.equals(userFilter.getSort(), "id,asc")){
             criteria.orderBy(builder.asc(root.get("id")));
         }
-        if(Objects.equals(userFilter.getUserOrderBy(), "id,desc")){
+        if(Objects.equals(userFilter.getSort(), "id,desc")){
             criteria.orderBy(builder.desc(root.get("id")));
         }
     }

@@ -6,7 +6,7 @@ public class CourseFilter {
 
     private String searchParam;
 
-    private String courseOrderBy;
+    private String sort;
 
     private String name;
 
@@ -22,12 +22,12 @@ public class CourseFilter {
         this.searchParam = searchParam;
     }
 
-    public String getCourseOrderBy() {
-        return courseOrderBy;
+    public String getSort() {
+        return sort;
     }
 
-    public void setCourseOrderBy(String courseOrderBy) {
-        this.courseOrderBy = courseOrderBy;
+    public void setSort(String sort) {
+        this.sort = sort;
     }
 
     public String getName() {

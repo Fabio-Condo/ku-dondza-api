@@ -20,7 +20,7 @@ public class CompetitionDto {
 
     private LocalDateTime expiry;
 
-    private boolean active = true;
+    private boolean isOpen;
 
     @Enumerated(EnumType.STRING)
     private DifficultyLevel difficultyLevel;
@@ -77,12 +77,12 @@ public class CompetitionDto {
         this.expiry = expiry;
     }
 
-    public boolean isActive() {
-        return active;
+    public boolean isOpen() {
+        return isOpen;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setOpen(boolean open) {
+        this.isOpen = open;
     }
 
     public DifficultyLevel getDifficultyLevel() {

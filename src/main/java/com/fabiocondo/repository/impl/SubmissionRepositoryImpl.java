@@ -49,12 +49,15 @@ public class SubmissionRepositoryImpl implements SubmissionRepositoryQuery {
                 "s.user.fullName, s.user.id, " +
                 "SUM(CASE WHEN a.isCorrect = true THEN 1 ELSE 0 END), " +
                 "COUNT(a), " +
-                "MIN(s.submittedAt)) " +
+                "MIN(s.submittedAt), " +
+                "s.user.profileImageUrl, " +
+                "s.user.userId) " +
                 "FROM Submission s " +
                 "LEFT JOIN s.answers a " +
                 "WHERE s.competition.id = :competitionId " +
-                "GROUP BY s.user.id, s.user.fullName " +
+                "GROUP BY s.user.id, s.user.fullName, s.user.profileImageUrl, s.user.userId " +
                 "ORDER BY SUM(CASE WHEN a.isCorrect = true THEN 1 ELSE 0 END) DESC, MIN(s.submittedAt) ASC";
+
 
         TypedQuery<RankingDTO> query = manager.createQuery(baseQuery, RankingDTO.class);
         query.setParameter("competitionId", competitionId);

@@ -28,16 +28,14 @@ public class CompetitionController {
 
     @PostMapping
     public ResponseEntity<Competition> createCompetition(@RequestBody Competition competition,
-                                                         @RequestParam Set<Long> topicIds) throws UserNotFoundException {
+                                                         @RequestParam Set<Long> topicIds) {
         return ResponseEntity.status(HttpStatus.OK).body(competitionService.createCompetition(competition, topicIds));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Competition> updateCompetition(@PathVariable("id") Long id,
-                                                         @RequestBody Competition competition,
-                                                         @RequestParam Set<Long> topicIds,
-                                                         @RequestParam Boolean generateQuestions) throws CompetitionNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(competitionService.updateCompetition(id, competition, topicIds, generateQuestions));
+                                                         @RequestBody Competition competition) throws CompetitionNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(competitionService.updateCompetition(id, competition));
     }
 
     @GetMapping("/filter")

@@ -52,38 +52,9 @@ public class CompetitionService {
     }
 
     @Transactional
-    public Competition updateCompetition(Long id, Competition competition, Set<Long> topicIds, Boolean generateQuestions) throws CompetitionNotFoundException {
-
+    public Competition updateCompetition(Long id, Competition competition) throws CompetitionNotFoundException {
         Competition existingCompetition = getCompetitionById(id);
-
-        if(!existingCompetition.getSubmissions().isEmpty()) {
-            throw new IllegalArgumentException("A Competition não pode ser actualizada. Contém submissões.");
-        }
-        //if (existingCompetition.getStatus().equals(CompetitionStatus.ONGOING) || existingCompetition.getStatus().equals(CompetitionStatus.FINISHED)) {
-        //    throw new IllegalArgumentException("A Competition não pode ser actualizada. Está em andamento ou finalizada.");
-        //}
-
-        if (generateQuestions) {
-            if (topicIds == null || topicIds.isEmpty()) {
-                throw new IllegalArgumentException("A Competition deve ter pelo menos um tópico associado.");
-            }
-
-            Set<Topic> topics = new HashSet<>(topicRepository.findAllById(topicIds));
-
-            if (topics.size() != topicIds.size()) {
-                throw new IllegalArgumentException("Um ou mais tópicos não foram encontrados no banco de dados.");
-            }
-
-            existingCompetition.getQuestions().clear();
-            competitionRepository.save(existingCompetition); // Garantir que a remoção seja persistida
-
-            Set<Question> questions = questionRepository.findRandomQuestionsByTopicsAndDifficulty(topicIds, competition.getDifficultyLevel(), 2);
-            existingCompetition.setQuestions(questions);
-            existingCompetition.setDifficultyLevel(competition.getDifficultyLevel());
-        }
-
-        BeanUtils.copyProperties(competition, existingCompetition, "id", "competitionId", "questions", "participants", "prizes", "submissions", "winners");
-
+        BeanUtils.copyProperties(competition, existingCompetition, "id", "competitionId", "expiry", "active", "difficultyLevel", "limitPerTopic", "timeLimit", "timeSpent", "subject", "questions", "submissions");
         return competitionRepository.save(existingCompetition);
     }
 

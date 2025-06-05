@@ -29,7 +29,7 @@ public class CompetitionMapper {
     public Competition dtoToDomainObject(CompetitionDto competitionDto) {
         Competition competition = new Competition();
         competition.setCompetitionId(competitionDto.getCompetitionId());
-        competition.setTitle(competitionDto.getTitle());
+        competition.setCompetitionType(competitionDto.getCompetitionType());
         competition.setDifficultyLevel(competitionDto.getDifficultyLevel());
         competition.setSubject(competitionDto.getSubject());
         return competition;
@@ -41,7 +41,7 @@ public class CompetitionMapper {
         competitionDto.setCompetitionId(competition.getCompetitionId());
         competitionDto.setOpen(competition.isOpen());
         competitionDto.setExpiry(competition.getExpiry());
-        competitionDto.setTitle(competition.getTitle());
+        competitionDto.setCompetitionType(competition.getCompetitionType());
         competitionDto.setDifficultyLevel(competition.getDifficultyLevel());
         competitionDto.setLimitPerTopic(competition.getLimitPerTopic());
         competitionDto.setTimeLimit(competition.getTimeLimit());
@@ -61,12 +61,13 @@ public class CompetitionMapper {
         competitionDto.setCompetitionId(competition.getCompetitionId());
         competitionDto.setOpen(competition.isOpen());
         competitionDto.setExpiry(competition.getExpiry());
-        competitionDto.setTitle(competition.getTitle());
+        competitionDto.setCompetitionType(competition.getCompetitionType());
         competitionDto.setDifficultyLevel(competition.getDifficultyLevel());
         competitionDto.setLimitPerTopic(competition.getLimitPerTopic());
         competitionDto.setTimeLimit(competition.getTimeLimit());
         competitionDto.setTimeSpent(competition.getTimeSpent());
         competitionDto.setSubject(competition.getSubject());
+        competitionDto.setCurrentUserAllowedToSubmit(submissionService.isUserAllowedToParticipate(competition.getId(), currentUserId));
         competitionDto.setCurrentUserHasSubmitted(submissionService.hasUserAlreadySubmitted(competition.getId() ,currentUserId));
         competitionDto.setTopics(competitionService.getTopicsByCompetitionId(competition.getId()));
         competitionDto.setTotalTopics((long) competitionDto.getTopics().size());

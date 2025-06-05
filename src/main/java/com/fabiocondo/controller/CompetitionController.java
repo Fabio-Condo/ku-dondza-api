@@ -8,6 +8,7 @@ import com.fabiocondo.repository.filter.CompetitionFilter;
 import com.fabiocondo.service.impl.CompetitionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -90,6 +91,11 @@ public class CompetitionController {
     @GetMapping("/{competitionId}/questions/total")
     public ResponseEntity<Long> countQuestionsByCompetitionId(@PathVariable Long competitionId){
         return ResponseEntity.status(HttpStatus.OK).body(competitionService.countQuestionsByCompetitionId(competitionId));
+    }
+
+    @GetMapping("/{competitionId}/allowed-users")
+    public ResponseEntity<Page<User>> getAllowedUsers(@PathVariable Long competitionId, Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK).body(competitionService.getAllowedUsers(competitionId, pageable));
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

@@ -51,7 +51,7 @@ public class SubmissionController {
 
     @PostMapping
     public ResponseEntity<Submission> create(@RequestBody Submission submission,
-                                           @RequestParam Set<Long> userAnswerIds) throws UserNotFoundException, CompetitionNotFoundException, UserAlreadySubmittedException, ClosedSubmissionException {
+                                           @RequestParam Set<Long> userAnswerIds) throws UserNotFoundException, CompetitionNotFoundException, UserAlreadySubmittedException, ClosedSubmissionException, CompetitionUserUnauthorizedExceptionException {
         return ResponseEntity.status(HttpStatus.OK).body(submissionService.create(submission, userAnswerIds));
     }
 

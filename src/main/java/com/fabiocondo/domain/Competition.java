@@ -1,5 +1,6 @@
 package com.fabiocondo.domain;
 
+import com.fabiocondo.enumeration.CompetitionType;
 import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -19,7 +20,8 @@ public class Competition {
 
     private String competitionId;
 
-    private String title;
+    @Enumerated(EnumType.STRING)
+    private CompetitionType competitionType;
 
     //@Column(nullable = false)
     private LocalDateTime expiry;
@@ -49,6 +51,15 @@ public class Competition {
     private Set<Question> questions = new HashSet<>();
 
     @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "competition_user",
+            joinColumns = @JoinColumn(name = "competition_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    List<User> allowedUsers;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("id ASC")
     private List<Submission> submissions;
@@ -56,9 +67,8 @@ public class Competition {
     public Competition() {
     }
 
-    public Competition(String competitionId, String title, LocalDateTime expiry, boolean active, DifficultyLevel difficultyLevel, int limitPerTopic, Integer timeLimit, Integer timeSpent, Subject subject) {
+    public Competition(String competitionId, LocalDateTime expiry, boolean active, DifficultyLevel difficultyLevel, int limitPerTopic, Integer timeLimit, Integer timeSpent, Subject subject) {
         this.competitionId = competitionId;
-        this.title = title;
         this.expiry = expiry;
         this.active = active;
         this.difficultyLevel = difficultyLevel;
@@ -88,12 +98,12 @@ public class Competition {
         this.competitionId = competitionId;
     }
 
-    public String getTitle() {
-        return title;
+    public CompetitionType getCompetitionType() {
+        return competitionType;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setCompetitionType(CompetitionType competitionType) {
+        this.competitionType = competitionType;
     }
 
     public LocalDateTime getExpiry() {
@@ -158,6 +168,14 @@ public class Competition {
 
     public void setQuestions(Set<Question> questions) {
         this.questions = questions;
+    }
+
+    public List<User> getAllowedUsers() {
+        return allowedUsers;
+    }
+
+    public void setAllowedUsers(List<User> allowedUsers) {
+        this.allowedUsers = allowedUsers;
     }
 
     public List<Submission> getSubmissions() {

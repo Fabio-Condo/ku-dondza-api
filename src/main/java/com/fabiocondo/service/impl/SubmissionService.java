@@ -2,6 +2,7 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.RankingDTO;
+import com.fabiocondo.enumeration.CompetitionType;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.CompetitionRepository;
@@ -71,7 +72,7 @@ public class SubmissionService {
 
     @Transactional
     public Submission create(Submission submission, Set<Long> userAnswerIds)
-            throws CompetitionNotFoundException, UserNotFoundException, UserAlreadySubmittedException, ClosedSubmissionException {
+            throws CompetitionNotFoundException, UserNotFoundException, UserAlreadySubmittedException, ClosedSubmissionException, CompetitionUserUnauthorizedExceptionException {
 
         Long competitionId = submission.getCompetition().getId();
         Long userId = submission.getUser().getId();
@@ -90,9 +91,15 @@ public class SubmissionService {
             throw new ClosedSubmissionException("Competição encerrada.");
         }
 
+        if (competition.getCompetitionType().requiresAuthorization()) {
+            if (!competition.getAllowedUsers().contains(user)) {
+                throw new CompetitionUserUnauthorizedExceptionException("Você não está autorizado a participar desta competição.");
+            }
+        }
+
         Set<Answer> answers = new HashSet<>(answerRepository.findAllById(userAnswerIds));
         if (answers.size() != userAnswerIds.size()) {
-            throw new IllegalArgumentException("Algumas respostas fornecidas são inválidas.");
+        //    throw new ClosedSubmissionException("Algumas respostas fornecidas são inválidas.");
         }
 
         submission.setUser(user);
@@ -101,6 +108,23 @@ public class SubmissionService {
         submission.setSubmittedAt(new Date());
 
         return submissionRepository.save(submission);
+    }
+
+    public boolean isUserAllowedToParticipate(Long competitionId, Long userId){
+        Optional<Competition> competitionOpt = competitionRepository.findById(competitionId);
+        Optional<User> userOpt = userRepository.findById(userId);
+
+        if (!competitionOpt.isPresent() || !userOpt.isPresent()) {
+            return false;
+        }
+
+        // Se o tipo da competição exige autorização, verifica a lista de permitidos
+        if (competitionOpt.get().getCompetitionType().requiresAuthorization()) {
+            return competitionOpt.get().getAllowedUsers() != null && competitionOpt.get().getAllowedUsers().contains(userOpt.get());
+        }
+
+        // Caso contrário, a participação é liberada
+        return true;
     }
 
     public boolean hasUserAlreadySubmitted(Long competitionId, Long userId) {

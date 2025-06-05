@@ -3,6 +3,7 @@ package com.fabiocondo.dto;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Subject;
 import com.fabiocondo.domain.Topic;
+import com.fabiocondo.enumeration.CompetitionType;
 import com.fabiocondo.enumeration.DifficultyLevel;
 
 import javax.persistence.*;
@@ -16,11 +17,12 @@ public class CompetitionDto {
 
     private String competitionId;
 
-    private String title;
-
     private LocalDateTime expiry;
 
     private boolean isOpen;
+
+    @Enumerated(EnumType.STRING)
+    private CompetitionType competitionType;
 
     @Enumerated(EnumType.STRING)
     private DifficultyLevel difficultyLevel;
@@ -38,6 +40,8 @@ public class CompetitionDto {
     private Long totalQuestions;
 
     private Long totalSubmissions;
+
+    private boolean currentUserAllowedToSubmit ;
 
     private boolean currentUserHasSubmitted ;
 
@@ -59,14 +63,6 @@ public class CompetitionDto {
 
     public void setCompetitionId(String competitionId) {
         this.competitionId = competitionId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public LocalDateTime getExpiry() {
@@ -91,6 +87,14 @@ public class CompetitionDto {
 
     public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
         this.difficultyLevel = difficultyLevel;
+    }
+
+    public CompetitionType getCompetitionType() {
+        return competitionType;
+    }
+
+    public void setCompetitionType(CompetitionType competitionType) {
+        this.competitionType = competitionType;
     }
 
     public int getLimitPerTopic() {
@@ -143,6 +147,14 @@ public class CompetitionDto {
 
     public Long getTotalSubmissions() {
         return totalSubmissions;
+    }
+
+    public boolean isCurrentUserAllowedToSubmit() {
+        return currentUserAllowedToSubmit;
+    }
+
+    public void setCurrentUserAllowedToSubmit(boolean currentUserAllowedToSubmit) {
+        this.currentUserAllowedToSubmit = currentUserAllowedToSubmit;
     }
 
     public boolean isCurrentUserHasSubmitted() {

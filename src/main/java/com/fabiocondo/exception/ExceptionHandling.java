@@ -102,6 +102,11 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(CompetitionUserUnauthorizedExceptionException.class)
+    public ResponseEntity<HttpResponse> competitionUserUnauthorizedExceptionException(CompetitionUserUnauthorizedExceptionException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(ClosedSubmissionException.class)
     public ResponseEntity<HttpResponse> closedSubmissionException(ClosedSubmissionException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());

@@ -118,5 +118,9 @@ public class CompetitionService {
     public long countQuestionsByCompetitionId(Long competitionId){
         return competitionRepository.countQuestionsByCompetitionId(competitionId);
     }
+
+    public Page<User> getAllowedUsers(Long competitionId, Pageable pageable) {
+        return competitionRepository.findAllowedUsersByCompetitionId(competitionId, pageable);
+    }
 }
 

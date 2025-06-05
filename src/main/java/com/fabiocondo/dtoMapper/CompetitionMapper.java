@@ -40,6 +40,7 @@ public class CompetitionMapper {
         competitionDto.setId(competition.getId());
         competitionDto.setCompetitionId(competition.getCompetitionId());
         competitionDto.setOpen(competition.isOpen());
+        competitionDto.setActive(competition.isActive());
         competitionDto.setExpiry(competition.getExpiry());
         competitionDto.setCompetitionType(competition.getCompetitionType());
         competitionDto.setDifficultyLevel(competition.getDifficultyLevel());
@@ -60,6 +61,7 @@ public class CompetitionMapper {
         competitionDto.setId(competition.getId());
         competitionDto.setCompetitionId(competition.getCompetitionId());
         competitionDto.setOpen(competition.isOpen());
+        competitionDto.setActive(competition.isActive());
         competitionDto.setExpiry(competition.getExpiry());
         competitionDto.setCompetitionType(competition.getCompetitionType());
         competitionDto.setDifficultyLevel(competition.getDifficultyLevel());

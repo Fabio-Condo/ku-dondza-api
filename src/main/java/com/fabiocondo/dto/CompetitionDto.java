@@ -19,6 +19,8 @@ public class CompetitionDto {
 
     private LocalDateTime expiry;
 
+    private boolean active = false;
+
     private boolean isOpen;
 
     @Enumerated(EnumType.STRING)
@@ -71,6 +73,14 @@ public class CompetitionDto {
 
     public void setExpiry(LocalDateTime expiry) {
         this.expiry = expiry;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public boolean isOpen() {

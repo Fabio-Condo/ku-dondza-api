@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ 'refactor' ]  # Executa apenas na branch main
+    branches: [ 'release/1.0.0' ]  # Executa apenas na branch main
   pull_request:
-    branches: [ 'refactor' ]  # Executa apenas em pull requests para a branch main
+    branches: [ 'release/1.0.0' ]  # Executa apenas em pull requests para a branch main
 
 jobs:
   build:

@@ -62,8 +62,7 @@ public class CompetitionController {
     @GetMapping("/find-by-competitionId/{competitionId}")
     public ResponseEntity<CompetitionDto> findCompetitionByCompetitionId(@PathVariable("competitionId") String competitionId, @RequestParam("currentUserId") Long currentUserId) throws CompetitionNotFoundException {
         Competition competition = competitionService.findCompetitionByCompetitionId(competitionId);
-        return ResponseEntity.status(HttpStatus.OK).body(competitionMapper.domainToDTO(competition, currentUserId));
-
+        return ResponseEntity.status(HttpStatus.OK).body(competitionMapper.domainToDTO_WithQuestions(competition, currentUserId));
     }
 
     @DeleteMapping("/{id}")

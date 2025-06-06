@@ -35,7 +35,7 @@ public class CompetitionMapper {
         return competition;
     }
 
-    public CompetitionDto domainToDTO_WithQuestions(Competition competition) {
+    public CompetitionDto domainToDTO_WithQuestions(Competition competition, Long currentUserId) {
         CompetitionDto competitionDto = new CompetitionDto();
         competitionDto.setId(competition.getId());
         competitionDto.setCompetitionId(competition.getCompetitionId());
@@ -49,8 +49,8 @@ public class CompetitionMapper {
         competitionDto.setTimeSpent(competition.getTimeSpent());
         competitionDto.setSubject(competition.getSubject());
         competitionDto.setQuestions(competition.getQuestions());
-        competitionDto.setTopics(competitionService.getTopicsByCompetitionId(competition.getId()));
-        competitionDto.setTotalTopics((long) competitionDto.getTopics().size());
+        competitionDto.setCurrentUserAllowedToSubmit(submissionService.isUserAllowedToParticipate(competition.getId(), currentUserId));
+        competitionDto.setCurrentUserHasSubmitted(submissionService.hasUserAlreadySubmitted(competition.getId() ,currentUserId));
         competitionDto.setTotalQuestions(competitionService.countQuestionsByCompetitionId(competition.getId()));
         competitionDto.setTotalSubmissions(submissionService.countByCompetitionId(competition.getId()));
         return competitionDto;

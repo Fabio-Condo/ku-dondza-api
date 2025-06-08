@@ -1,6 +1,7 @@
 package com.fabiocondo.repository.filter;
 
 import com.fabiocondo.domain.Subject;
+import com.fabiocondo.enumeration.CompetitionType;
 import com.fabiocondo.enumeration.DifficultyLevel;
 
 import javax.persistence.EnumType;
@@ -18,6 +19,9 @@ public class CompetitionFilter {
 
     @Enumerated(EnumType.STRING)
     private DifficultyLevel difficultyLevel;
+
+    @Enumerated(EnumType.STRING)
+    private CompetitionType competitionType;
 
     public String getSearchParam() {
         return searchParam;
@@ -49,5 +53,13 @@ public class CompetitionFilter {
 
     public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
         this.difficultyLevel = difficultyLevel;
+    }
+
+    public CompetitionType getCompetitionType() {
+        return competitionType;
+    }
+
+    public void setCompetitionType(CompetitionType competitionType) {
+        this.competitionType = competitionType;
     }
 }

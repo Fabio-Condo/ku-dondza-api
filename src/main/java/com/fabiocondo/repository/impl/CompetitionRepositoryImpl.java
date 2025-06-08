@@ -100,6 +100,11 @@ public class CompetitionRepositoryImpl implements CompetitionRepositoryQuery {
             predicates.add(builder.equal(
                     builder.lower(root.get("difficultyLevel")), competitionFilter.getDifficultyLevel()));
         }
+
+        if(!ObjectUtils.isEmpty(competitionFilter.getCompetitionType())) {
+            predicates.add(builder.equal(
+                    builder.lower(root.get("competitionType")), competitionFilter.getCompetitionType()));
+        }
     }
 
     public void getSortOrder(CompetitionFilter competitionFilter, CriteriaBuilder builder, CriteriaQuery<Competition> criteria, Root<Competition> root){

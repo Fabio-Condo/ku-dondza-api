@@ -22,13 +22,13 @@ public class CompetitionService {
     private final CompetitionRepository competitionRepository;
     private final QuestionRepository questionRepository;
     private final TopicRepository topicRepository;
-    private final SubmissionRepository submissionRepository;
+    private final UserRepository userRepository;
 
-    public CompetitionService(CompetitionRepository competitionRepository, QuestionRepository questionRepository, TopicRepository topicRepository, SubmissionRepository submissionRepository) {
+    public CompetitionService(CompetitionRepository competitionRepository, QuestionRepository questionRepository, TopicRepository topicRepository, UserRepository userRepository) {
         this.competitionRepository = competitionRepository;
         this.questionRepository = questionRepository;
         this.topicRepository = topicRepository;
-        this.submissionRepository = submissionRepository;
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -121,6 +121,38 @@ public class CompetitionService {
 
     public Page<User> getAllowedUsers(Long competitionId, Pageable pageable) {
         return competitionRepository.findAllowedUsersByCompetitionId(competitionId, pageable);
+    }
+
+    public User addAllowedUserToCompetition(Long competitionId, Long userId) throws UserNotFoundException, CompetitionNotFoundException {
+        Competition competition = getCompetitionById(competitionId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
+        competition.getAllowedUsers().add(user);
+        competitionRepository.save(competition);
+        return user;
+    }
+
+    public User removeAllowedUserFromCompetition(Long competitionId, Long userId) throws UserNotFoundException, CompetitionNotFoundException {
+        Competition competition = getCompetitionById(competitionId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
+        competition.getAllowedUsers().remove(user);
+        competitionRepository.save(competition);
+        return user;
+    }
+
+    public boolean checkIfIsAllowed(Long competitionId, Long userId) {
+        Competition competition = competitionRepository.findById(competitionId).orElse(null);
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null || competition == null) {
+            return false;
+        }
+        return competition.getAllowedUsers().contains(user);
+    }
+
+    public long countAllowedUsersBByCompetitionId(Long competitionId){
+        return competitionRepository.countAllowedUsersBByCompetitionId(competitionId);
     }
 }
 

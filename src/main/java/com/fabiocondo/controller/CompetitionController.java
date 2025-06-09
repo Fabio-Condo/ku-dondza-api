@@ -8,7 +8,6 @@ import com.fabiocondo.repository.filter.CompetitionFilter;
 import com.fabiocondo.service.impl.CompetitionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -95,6 +94,18 @@ public class CompetitionController {
     @GetMapping("/{competitionId}/allowed-users")
     public ResponseEntity<Page<User>> getAllowedUsers(@PathVariable Long competitionId, Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK).body(competitionService.getAllowedUsers(competitionId, pageable));
+    }
+
+    @PostMapping("/{competitionId}/allowed-users/{userId}")
+    public ResponseEntity<User> addAllowedUserToCompetition(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException, CompetitionNotFoundException {
+        User addedUser = competitionService.addAllowedUserToCompetition(competitionId, userId);
+        return addedUser != null ? ResponseEntity.ok(addedUser) : ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{competitionId}/allowed-users/{userId}")
+    public ResponseEntity<User> removeAllowedUserFromCompetition(@PathVariable Long competitionId, @PathVariable Long userId) throws UserNotFoundException, CompetitionNotFoundException {
+        User removedUser = competitionService.removeAllowedUserFromCompetition(competitionId, userId);
+        return removedUser != null ? ResponseEntity.ok(removedUser) : ResponseEntity.notFound().build();
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

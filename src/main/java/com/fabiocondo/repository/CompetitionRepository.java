@@ -29,4 +29,6 @@ public interface CompetitionRepository extends JpaRepository<Competition, Long>,
     @Query("SELECT u FROM Competition c JOIN c.allowedUsers u WHERE c.id = :competitionId")
     Page<User> findAllowedUsersByCompetitionId(@Param("competitionId") Long competitionId, Pageable pageable);
 
+    long countAllowedUsersBByCompetitionId(@Param("competitionId") Long competitionId);
+
 }

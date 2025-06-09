@@ -57,7 +57,7 @@ public class Competition {
             joinColumns = @JoinColumn(name = "competition_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    List<User> allowedUsers;
+    Set<User> allowedUsers = new HashSet<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -170,11 +170,11 @@ public class Competition {
         this.questions = questions;
     }
 
-    public List<User> getAllowedUsers() {
+    public Set<User> getAllowedUsers() {
         return allowedUsers;
     }
 
-    public void setAllowedUsers(List<User> allowedUsers) {
+    public void setAllowedUsers(Set<User> allowedUsers) {
         this.allowedUsers = allowedUsers;
     }
 

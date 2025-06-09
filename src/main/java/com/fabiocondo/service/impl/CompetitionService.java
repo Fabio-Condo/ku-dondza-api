@@ -54,7 +54,7 @@ public class CompetitionService {
     @Transactional
     public Competition updateCompetition(Long id, Competition competition) throws CompetitionNotFoundException {
             Competition existingCompetition = getCompetitionById(id);
-        BeanUtils.copyProperties(competition, existingCompetition, "id", "competitionId", "difficultyLevel", "limitPerTopic", "timeLimit", "timeSpent", "subject", "questions", "submissions");
+        BeanUtils.copyProperties(competition, existingCompetition, "id", "competitionId", "difficultyLevel", "limitPerTopic", "timeLimit", "timeSpent", "subject", "questions", "submissions", "allowedUsers");
         return competitionRepository.save(existingCompetition);
     }
 

@@ -55,7 +55,8 @@ public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
                 "    FROM question q " +
                 "    WHERE q.topic_id IN (:topicIds) AND q.difficulty_level = :difficultyLevel " +
                 ") " +
-                "SELECT * FROM ranked_questions WHERE rn <= :limitPerTopic";
+                "SELECT * FROM ranked_questions WHERE rn <= :limitPerTopic " +
+                "ORDER BY id ASC";
 
         Query query = manager.createNativeQuery(sql, Question.class);
         query.setParameter("topicIds", topicIds);
@@ -63,7 +64,7 @@ public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
         query.setParameter("limitPerTopic", limitPerTopic);
 
         List<Question> questions = query.getResultList();
-        return new HashSet<>(questions);
+        return new LinkedHashSet<>(questions); // Preserva a ordem
     }
 
     private void addRestrictionsPagination(TypedQuery<?> query, Pageable pageable) {
@@ -200,5 +201,27 @@ public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
 
         // Retornando o conjunto de questões limitadas por tópico e aleatoriamente selecionadas
         return result;
+    }
+
+
+    //@Override
+    public Set<Question> findRandomQuestionsByTopicsAndDifficulty3(Set<Long> topicIds, DifficultyLevel difficultyLevel, int limitPerTopic) {
+
+        // Essa query utiliza CTE e ROW_NUMBER para particionar as questões por tópico,
+        // ordenando aleatoriamente (usando RAND() para MySQL; se for PostgreSQL, substitua por RANDOM())
+        String sql = "WITH ranked_questions AS ( " +
+                "    SELECT q.*, ROW_NUMBER() OVER (PARTITION BY q.topic_id ORDER BY RAND()) as rn " +
+                "    FROM question q " +
+                "    WHERE q.topic_id IN (:topicIds) AND q.difficulty_level = :difficultyLevel " +
+                ") " +
+                "SELECT * FROM ranked_questions WHERE rn <= :limitPerTopic";
+
+        Query query = manager.createNativeQuery(sql, Question.class);
+        query.setParameter("topicIds", topicIds);
+        query.setParameter("difficultyLevel", difficultyLevel.name()); // ajuste conforme o mapeamento do enum
+        query.setParameter("limitPerTopic", limitPerTopic);
+
+        List<Question> questions = query.getResultList();
+        return new HashSet<>(questions);
     }
 }

@@ -48,6 +48,7 @@ public class Competition {
             joinColumns = @JoinColumn(name = "competition_id"),
             inverseJoinColumns = @JoinColumn(name = "question_id")
     )
+    @OrderBy("id ASC")
     private Set<Question> questions = new HashSet<>();
 
     @JsonIgnore

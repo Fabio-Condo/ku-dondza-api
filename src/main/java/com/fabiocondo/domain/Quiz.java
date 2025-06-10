@@ -50,6 +50,7 @@ public class Quiz {
             joinColumns = @JoinColumn(name = "quiz_id"),
             inverseJoinColumns = @JoinColumn(name = "question_id")
     )
+    @OrderBy("id ASC")
     private Set<Question> questions = new HashSet<>();
 
     @JsonIgnore

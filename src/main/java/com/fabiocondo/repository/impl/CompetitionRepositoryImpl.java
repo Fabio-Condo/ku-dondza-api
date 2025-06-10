@@ -81,14 +81,9 @@ public class CompetitionRepositoryImpl implements CompetitionRepositoryQuery {
         if(!ObjectUtils.isEmpty(competitionFilter.getSearchParam())) {
             Predicate subject = builder.like(
                     builder.lower(root.get("subject").get("name")), "%" + competitionFilter.getSearchParam().toLowerCase() + "%");
-            Predicate title = builder.like(
-                    builder.lower(root.get("title")), "%" + competitionFilter.getSearchParam().toLowerCase() + "%");
-            predicates.add(builder.or(subject, title));
-        }
-
-        if(!ObjectUtils.isEmpty(competitionFilter.getTitle())) {
-            predicates.add(builder.like(
-                    builder.lower(root.get("title")), "%" + competitionFilter.getTitle().toLowerCase() + "%"));
+            Predicate competitionType = builder.like(
+                    builder.lower(root.get("competitionType")), "%" + competitionFilter.getSearchParam().toLowerCase() + "%");
+            predicates.add(builder.or(subject, competitionType));
         }
 
         if(!ObjectUtils.isEmpty(competitionFilter.getSubject())) {

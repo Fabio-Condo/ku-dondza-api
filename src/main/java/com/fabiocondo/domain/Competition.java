@@ -3,9 +3,11 @@ package com.fabiocondo.domain;
 import com.fabiocondo.enumeration.CompetitionType;
 import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +42,10 @@ public class Competition {
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
+
+    @JsonIgnoreProperties({"competition"})
+    @OneToMany(mappedBy = "competition", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Prize> prizes; // premios
 
     @JsonIgnore
     @ManyToMany
@@ -161,6 +167,14 @@ public class Competition {
 
     public void setSubject(Subject subject) {
         this.subject = subject;
+    }
+
+    public List<Prize> getPrizes() {
+        return prizes;
+    }
+
+    public void setPrizes(List<Prize> prizes) {
+        this.prizes = prizes;
     }
 
     public Set<Question> getQuestions() {

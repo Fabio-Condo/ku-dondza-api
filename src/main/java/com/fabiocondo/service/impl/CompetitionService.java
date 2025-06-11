@@ -47,14 +47,20 @@ public class CompetitionService {
         Set<Question> questions = questionRepository.findRandomQuestionsByTopicsAndDifficulty(topicIds, competition.getDifficultyLevel(), 2);
         competition.setQuestions(questions);
         competition.setCompetitionId(UUID.randomUUID().toString());
+        competition.getPrizes().forEach(prize -> prize.setCompetition(competition));
 
         return competitionRepository.save(competition);
     }
 
     @Transactional
     public Competition updateCompetition(Long id, Competition competition) throws CompetitionNotFoundException {
-            Competition existingCompetition = getCompetitionById(id);
-        BeanUtils.copyProperties(competition, existingCompetition, "id", "competitionId", "difficultyLevel", "limitPerTopic", "timeLimit", "timeSpent", "subject", "questions", "submissions", "allowedUsers");
+        Competition existingCompetition = getCompetitionById(id);
+
+        existingCompetition.getPrizes().clear();
+        existingCompetition.getPrizes().addAll(competition.getPrizes());
+        existingCompetition.getPrizes().forEach(prize -> prize.setCompetition(existingCompetition));
+
+        BeanUtils.copyProperties(competition, existingCompetition, "id", "competitionId", "difficultyLevel", "limitPerTopic", "timeLimit", "timeSpent", "subject", "questions", "prizes", "submissions", "allowedUsers");
         return competitionRepository.save(existingCompetition);
     }
 

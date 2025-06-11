@@ -99,6 +99,9 @@ public class User implements Serializable {
     )
     private Set<Article> savedArticles = new HashSet<>();
 
+    @OneToMany(mappedBy = "user")
+    private List<PrizeAssignment> prizeAssignments;
+
     public User(){}
 
     public User(Long id, String userId, String fullName, String email, String bio, String password, String profileImageUrl, String fileName, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, boolean isActive, boolean isNotLocked) {
@@ -309,5 +312,13 @@ public class User implements Serializable {
 
     public void setSavedArticles(Set<Article> savedArticles) {
         this.savedArticles = savedArticles;
+    }
+
+    public List<PrizeAssignment> getPrizeAssignments() {
+        return prizeAssignments;
+    }
+
+    public void setPrizeAssignments(List<PrizeAssignment> prizeAssignments) {
+        this.prizeAssignments = prizeAssignments;
     }
 }

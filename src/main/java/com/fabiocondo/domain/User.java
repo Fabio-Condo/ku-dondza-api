@@ -99,6 +99,7 @@ public class User implements Serializable {
     )
     private Set<Article> savedArticles = new HashSet<>();
 
+    @JsonIgnoreProperties({"user"})
     @OneToMany(mappedBy = "user")
     private List<PrizeAssignment> prizeAssignments;
 

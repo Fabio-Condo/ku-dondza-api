@@ -1,5 +1,7 @@
 package com.fabiocondo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 
 @Entity
@@ -13,6 +15,8 @@ public class Prize {
     private int position; // 1 para primeiro lugar, 2 para segundo, etc.
     private String description;
 
+
+    @JsonIgnoreProperties({"prizes"})
     @ManyToOne
     @JoinColumn(name = "competition_id")
     private Competition competition;

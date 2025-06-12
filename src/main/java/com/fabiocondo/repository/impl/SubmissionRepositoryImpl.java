@@ -58,7 +58,6 @@ public class SubmissionRepositoryImpl implements SubmissionRepositoryQuery {
                 "GROUP BY s.user.id, s.user.fullName, s.user.profileImageUrl, s.user.userId " +
                 "ORDER BY SUM(CASE WHEN a.isCorrect = true THEN 1 ELSE 0 END) DESC, MIN(s.submittedAt) ASC";
 
-
         TypedQuery<RankingDTO> query = manager.createQuery(baseQuery, RankingDTO.class);
         query.setParameter("competitionId", competitionId);
         query.setFirstResult((int) pageable.getOffset());

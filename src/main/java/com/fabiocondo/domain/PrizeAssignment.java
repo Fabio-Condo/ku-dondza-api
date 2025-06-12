@@ -1,5 +1,7 @@
 package com.fabiocondo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -11,10 +13,12 @@ public class PrizeAssignment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnoreProperties({"assignment"})
     @OneToOne
     @JoinColumn(name = "prize_id")
     private Prize prize;
 
+    @JsonIgnoreProperties({"prizeAssignments"})
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;

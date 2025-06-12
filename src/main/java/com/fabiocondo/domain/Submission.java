@@ -21,6 +21,9 @@ public class Submission {
     @Temporal(TemporalType.TIMESTAMP)
     private Date submittedAt;
 
+    private Integer timeSpent; // Tempo gasto em segundos
+
+    @JsonIgnoreProperties({"prizes"})
     @ManyToOne
     @JoinColumn(name = "competition_id", nullable = false)
     private Competition competition;
@@ -57,6 +60,14 @@ public class Submission {
 
     public void setSubmittedAt(Date submittedAt) {
         this.submittedAt = submittedAt;
+    }
+
+    public Integer getTimeSpent() {
+        return timeSpent;
+    }
+
+    public void setTimeSpent(Integer timeSpent) {
+        this.timeSpent = timeSpent;
     }
 
     public Competition getCompetition() {

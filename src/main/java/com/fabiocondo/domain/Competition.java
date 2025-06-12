@@ -37,8 +37,6 @@ public class Competition {
 
     private Integer timeLimit; // Tempo atribuído em segundos
 
-    private Integer timeSpent; // Tempo gasto em segundos
-
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
@@ -74,14 +72,13 @@ public class Competition {
     public Competition() {
     }
 
-    public Competition(String competitionId, LocalDateTime expiry, boolean active, DifficultyLevel difficultyLevel, int limitPerTopic, Integer timeLimit, Integer timeSpent, Subject subject) {
+    public Competition(String competitionId, LocalDateTime expiry, boolean active, DifficultyLevel difficultyLevel, int limitPerTopic, Integer timeLimit, Subject subject) {
         this.competitionId = competitionId;
         this.expiry = expiry;
         this.active = active;
         this.difficultyLevel = difficultyLevel;
         this.limitPerTopic = limitPerTopic;
         this.timeLimit = timeLimit;
-        this.timeSpent = timeSpent;
         this.subject = subject;
     }
 
@@ -151,14 +148,6 @@ public class Competition {
 
     public void setTimeLimit(Integer timeLimit) {
         this.timeLimit = timeLimit;
-    }
-
-    public Integer getTimeSpent() {
-        return timeSpent;
-    }
-
-    public void setTimeSpent(Integer timeSpent) {
-        this.timeSpent = timeSpent;
     }
 
     public Subject getSubject() {

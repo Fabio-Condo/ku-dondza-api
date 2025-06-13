@@ -49,6 +49,12 @@ public class CompetitionService {
         competition.setCompetitionId(UUID.randomUUID().toString());
         competition.getPrizes().forEach(prize -> prize.setCompetition(competition));
 
+        // Soma do tempo total das perguntas
+        int totalTimeLimit = questions.stream()
+                .mapToInt(Question::getTimeLimit)
+                .sum();
+        competition.setTimeLimit(totalTimeLimit);
+
         return competitionRepository.save(competition);
     }
 
@@ -60,7 +66,7 @@ public class CompetitionService {
         existingCompetition.getPrizes().addAll(competition.getPrizes());
         existingCompetition.getPrizes().forEach(prize -> prize.setCompetition(existingCompetition));
 
-        BeanUtils.copyProperties(competition, existingCompetition, "id", "competitionId", "difficultyLevel", "limitPerTopic", "timeLimit", "timeSpent", "subject", "questions", "prizes", "submissions", "allowedUsers");
+        BeanUtils.copyProperties(competition, existingCompetition, "id", "competitionId", "difficultyLevel", "limitPerTopic", "timeLimit", "subject", "questions", "prizes", "submissions", "allowedUsers");
         return competitionRepository.save(existingCompetition);
     }
 

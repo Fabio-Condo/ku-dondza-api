@@ -8,8 +8,6 @@ import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.CompetitionRepository;
 import com.fabiocondo.repository.SubmissionRepository;
 import com.fabiocondo.repository.UserRepository;
-import com.fabiocondo.repository.filter.BookFilter;
-import com.fabiocondo.repository.filter.CompetitionFilter;
 import com.fabiocondo.repository.filter.SubmissionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,7 +103,41 @@ public class SubmissionService {
         submission.setUser(user);
         submission.setCompetition(competition);
         submission.setAnswers(answers);
-        submission.setSubmittedAt(new Date());
+        submission.setSubmittedAt(new Date()); // Last update
+
+        return submissionRepository.save(submission);
+    }
+
+    @Transactional
+    public Submission update(Long submissionId, Set<Long> userAnswerIds)
+            throws CompetitionNotFoundException, UserNotFoundException, ClosedSubmissionException, CompetitionUserUnauthorizedExceptionException, SubmissionNotFoundException {
+
+        Submission submission = submissionRepository.findById(submissionId)
+                .orElseThrow(() -> new SubmissionNotFoundException("Submissão não encontrada."));
+
+        Long competitionId = submission.getCompetition().getId();
+        Long userId = submission.getUser().getId();
+
+        Competition competition = competitionRepository.findById(competitionId)
+                .orElseThrow(() -> new CompetitionNotFoundException("Competição não encontrada."));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado."));
+
+        if(!competition.isOpen()){
+            throw new ClosedSubmissionException("Competição encerrada.");
+        }
+
+        if (competition.getCompetitionType().requiresAuthorization()) {
+            if (!competition.getAllowedUsers().contains(user)) {
+                throw new CompetitionUserUnauthorizedExceptionException("Você não está autorizado a participar desta competição.");
+            }
+        }
+
+        Set<Answer> answers = new HashSet<>(answerRepository.findAllById(userAnswerIds));
+        submission.setAnswers(answers);
+
+        submission.setSubmittedAt(new Date()); // Last update
 
         return submissionRepository.save(submission);
     }

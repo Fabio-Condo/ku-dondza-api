@@ -55,6 +55,12 @@ public class SubmissionController {
         return ResponseEntity.status(HttpStatus.OK).body(submissionService.create(submission, userAnswerIds));
     }
 
+    @PutMapping
+    public ResponseEntity<Submission> update(@RequestParam("submissionId") Long submissionId,
+                                             @RequestParam Set<Long> userAnswerIds) throws UserNotFoundException, CompetitionNotFoundException, UserAlreadySubmittedException, ClosedSubmissionException, CompetitionUserUnauthorizedExceptionException, SubmissionNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(submissionService.update(submissionId, userAnswerIds));
+    }
+
     @GetMapping("/user/{userId}/competition/{competitionId}")
     public Optional<Submission> getSubmissionByUserAndCompetition(@PathVariable Long userId, @PathVariable Long competitionId) {
         return submissionService.findSubmissionByUserAndCompetition(userId, competitionId);

@@ -128,7 +128,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         validateNewEmail(EMPTY, email);
 
         logger.info("Uploading file: " + profileImage.getOriginalFilename());
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
+        //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
+
+        String fileKey = UUID.randomUUID() + "-" + profileImage.getOriginalFilename();
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME, fileKey);
 
         // Adicionar funcao que diminue o tamanho da imagem
         User user = new User();
@@ -146,6 +149,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setRole(getRoleEnumName(role).name());
         user.setAuthorities(getRoleEnumName(role).getAuthorities());
         user.setProfileImageUrl(s3UploadResponse.getFileUrl());
+        user.setFileName(fileKey);
         userRepository.save(user);
         emailService.sendOtpCodeEmail(email, password);
         logger.info("New user password: " + password);
@@ -172,9 +176,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 logger.info("Deleting file: " + currentUser.getFileName());
                 amazonS3Service.deleteFile(currentUser.getFileName(), BUCKET_NAME);
             }
-            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
+            //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
+            //currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
+            //currentUser.setFileName(profileImage.getOriginalFilename());
+
+            String newFileKey = UUID.randomUUID() + "-" + profileImage.getOriginalFilename();
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME, newFileKey);
             currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
-            currentUser.setFileName(profileImage.getOriginalFilename());
+            currentUser.setFileName(newFileKey);
         }
 
         userRepository.save(currentUser);
@@ -199,9 +208,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 logger.info("Deleting file: " + currentUser.getFileName());
                 amazonS3Service.deleteFile(currentUser.getFileName(), BUCKET_NAME);
             }
-            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
+            //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
+            //currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
+            //currentUser.setFileName(profileImage.getOriginalFilename());
+
+            String newFileKey = UUID.randomUUID() + "-" + profileImage.getOriginalFilename();
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME, newFileKey);
             currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
-            currentUser.setFileName(profileImage.getOriginalFilename());
+            currentUser.setFileName(newFileKey);
         }
 
         userRepository.save(currentUser);
@@ -236,8 +250,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             amazonS3Service.deleteFile(currentUser.getFileName(), BUCKET_NAME);
         }
 
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
-        currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
+        //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
+        //currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
         currentUser.setFileName(profileImage.getOriginalFilename());
 
         userRepository.save(currentUser);
@@ -263,8 +277,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             amazonS3Service.deleteFile(currentUser.getFileNameCoverImage(), BUCKET_NAME);
         }
 
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(coverImage, BUCKET_NAME);
-        currentUser.setProfileCoverImageUrl(s3UploadResponse.getFileUrl());
+        //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(coverImage, BUCKET_NAME);
+        //currentUser.setProfileCoverImageUrl(s3UploadResponse.getFileUrl());
         currentUser.setFileNameCoverImage(coverImage.getOriginalFilename());
 
         userRepository.save(currentUser);

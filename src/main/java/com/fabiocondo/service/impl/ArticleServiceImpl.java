@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -65,7 +66,9 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public Article save(String title, String content, CategoryType category, int readingTimeMinutes, MultipartFile file) throws SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
-        //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+
+        String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
 
         Article article = new Article();
         article.setArticleId(generateArticleIdId());
@@ -74,8 +77,8 @@ public class ArticleServiceImpl implements ArticleService {
         article.setCategory(category);
         article.setReadingTimeMinutes(readingTimeMinutes);
         article.setDate(new Date());
-        //article.setUrlFile(s3UploadResponse.getFileUrl());
-        article.setFileName(file.getOriginalFilename());
+        article.setUrlFile(s3UploadResponse.getFileUrl());
+        article.setFileName(fileKey);
 
         logger.info("Saving new article: " + article.getTitle());
         return articleRepository.save(article);
@@ -96,9 +99,10 @@ public class ArticleServiceImpl implements ArticleService {
                 logger.info("Deleting file: " + existArticle.getFileName());
                 amazonS3Service.deleteFile(existArticle.getFileName(), BUCKET_NAME);
             }
-            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+            String newFileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, newFileKey);
             existArticle.setUrlFile(s3UploadResponse.getFileUrl());
-            existArticle.setFileName(file.getOriginalFilename());
+            existArticle.setFileName(newFileKey);
         }
 
         logger.info("Saving new article: " + existArticle.getTitle());

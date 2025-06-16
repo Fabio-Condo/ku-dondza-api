@@ -97,7 +97,9 @@ public class CourseService {
 
     public Course save(String name, String description, String lunchDate, Long instrutorId, MultipartFile file) throws UserNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+
+        String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
 
         User instrutor = userService.findById(instrutorId);
 
@@ -108,7 +110,7 @@ public class CourseService {
         course.setLunchDate(lunchDate);
         course.setInstrutor(instrutor);
         course.setCoverImageUrl(s3UploadResponse.getFileUrl());
-        course.setFileName(file.getOriginalFilename());
+        course.setFileName(fileKey);
 
         logger.info("Saving new course: " + course.getDescription());
         return courseRepository.save(course);
@@ -129,9 +131,10 @@ public class CourseService {
                 logger.info("Deleting file: " + existCourse.getFileName());
                 amazonS3Service.deleteFile(existCourse.getFileName(), BUCKET_NAME);
             }
-            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+            String newFileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, newFileKey);
+            existCourse.setFileName(newFileKey);
             existCourse.setCoverImageUrl(s3UploadResponse.getFileUrl());
-            existCourse.setFileName(file.getOriginalFilename());
         }
 
         logger.info("Saving new course: " + existCourse.getDescription());

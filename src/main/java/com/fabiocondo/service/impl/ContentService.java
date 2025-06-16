@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 @Service
 public class ContentService {
 
@@ -47,7 +49,9 @@ public class ContentService {
 
     public Content save(String description, ContentType contentType, String time, Long moduleId, Integer position, MultipartFile file) throws ModuleNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+
+        String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
 
         Module module = moduleService.findById(moduleId); // Nome totalmente qualificado
 
@@ -58,7 +62,7 @@ public class ContentService {
         content.setTime(time);
         content.setPosition(position);
         content.setUrlFile(s3UploadResponse.getFileUrl());
-        content.setFileName(file.getOriginalFilename());
+        content.setFileName(fileKey);
 
         logger.info("Saving new course content: " + content.getDescription());
         return contentRepository.save(content);
@@ -79,9 +83,10 @@ public class ContentService {
                 logger.info("Deleting file: " + existContent.getFileName());
                 amazonS3Service.deleteFile(existContent.getFileName(), BUCKET_NAME);
             }
-            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+            String newFileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, newFileKey);
+            existContent.setFileName(newFileKey);
             existContent.setUrlFile(s3UploadResponse.getFileUrl());
-            existContent.setFileName(file.getOriginalFilename());
         }
 
         logger.info("Updating content: " + existContent.getDescription());

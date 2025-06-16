@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -65,8 +66,12 @@ public class BookServiceImpl implements BookService {
     @Override
     public Book save(String name, String description, String author, Long subjectId, MultipartFile coverImageFile, MultipartFile file) throws SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
-        S3UploadResponse s3UploadResponseCoverImageFile = amazonS3Service.uploadFile(coverImageFile, BUCKET_NAME);
+
+        String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+        String coverKey = UUID.randomUUID() + "-" + coverImageFile.getOriginalFilename();
+
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
+        S3UploadResponse s3UploadResponseCoverImageFile = amazonS3Service.uploadFile(coverImageFile, BUCKET_NAME, coverKey);
 
         Subject subject = subjectServiceImpl.findById(subjectId);
 
@@ -77,9 +82,9 @@ public class BookServiceImpl implements BookService {
         book.setAuthor(author);
         book.setTotalDownloadNumber(0L);
         book.setUrlFile(s3UploadResponse.getFileUrl());
-        book.setFileName(file.getOriginalFilename());
+        book.setFileName(fileKey);
         book.setUrlCoverImage(s3UploadResponseCoverImageFile.getFileUrl());
-        book.setCoverImageFileName(coverImageFile.getOriginalFilename());
+        book.setCoverImageFileName(coverKey);
 
         logger.info("Saving new book: " + book.getDescription());
         return bookRepository.save(book);
@@ -88,38 +93,35 @@ public class BookServiceImpl implements BookService {
     @Override
     public Book update(Long id, String name, String description, String author, Long subjectId, MultipartFile coverImageFile, MultipartFile file) throws BookNotFoundException, SubjectNotFoundException {
         Subject subject = subjectServiceImpl.findById(subjectId);
-        logger.info("Name: " + name);
         Book existBook = findById(id);
         existBook.setSubject(subject);
         existBook.setName(name);
         existBook.setDescription(description);
         existBook.setAuthor(author);
 
-        // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (file != null) {
             if (existBook.getFileName() != null) {
-                logger.info("Deleting file: " + existBook.getFileName());
                 amazonS3Service.deleteFile(existBook.getFileName(), BUCKET_NAME);
             }
-            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+            String newFileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, newFileKey);
+            existBook.setFileName(newFileKey);
             existBook.setUrlFile(s3UploadResponse.getFileUrl());
-            existBook.setFileName(file.getOriginalFilename());
         }
 
-        // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
         if (coverImageFile != null) {
             if (existBook.getCoverImageFileName() != null) {
-                logger.info("Deleting file: " + existBook.getCoverImageFileName());
                 amazonS3Service.deleteFile(existBook.getCoverImageFileName(), BUCKET_NAME);
             }
-            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(coverImageFile, BUCKET_NAME);
+            String newCoverKey = UUID.randomUUID() + "-" + coverImageFile.getOriginalFilename();
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(coverImageFile, BUCKET_NAME, newCoverKey);
+            existBook.setCoverImageFileName(newCoverKey);
             existBook.setUrlCoverImage(s3UploadResponse.getFileUrl());
-            existBook.setCoverImageFileName(coverImageFile.getOriginalFilename());
         }
 
-        logger.info("Saving new book: " + existBook.getDescription());
         return bookRepository.save(existBook);
     }
+
 
     @Override
     public void delete(Long id) throws BookNotFoundException {

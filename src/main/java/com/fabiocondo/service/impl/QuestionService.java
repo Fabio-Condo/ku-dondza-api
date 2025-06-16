@@ -110,9 +110,10 @@ public class QuestionService {
             amazonS3Service.deleteFile(question.getFileName(), BUCKET_NAME);
         }
 
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME);
+        String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
         question.setUrlFile(s3UploadResponse.getFileUrl());
-        question.setFileName(file.getOriginalFilename());
+        question.setFileName(fileKey);
 
         questionRepository.save(question);
         return question;

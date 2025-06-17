@@ -21,8 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -330,6 +328,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public Page<User> findAll(String searchParam, Pageable pageable) throws UserNotFoundException {
         return userRepository.findByAnyProperty(searchParam, pageable);
+    }
+
+    @Override
+    public Page<User> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Override

@@ -26,6 +26,8 @@ public class UserDTO {
 
     private double markedContentRate;
 
+    private boolean isAllowedUser;
+
     public Long getId() {
         return id;
     }
@@ -98,4 +100,11 @@ public class UserDTO {
         this.markedContentRate = markedContentRate;
     }
 
+    public boolean isAllowedUser() {
+        return isAllowedUser;
+    }
+
+    public void setAllowedUser(boolean allowedUser) {
+        isAllowedUser = allowedUser;
+    }
 }

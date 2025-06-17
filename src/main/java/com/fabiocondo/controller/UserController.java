@@ -2,8 +2,11 @@ package com.fabiocondo.controller;
 
 
 import com.fabiocondo.domain.*;
+import com.fabiocondo.dto.UserDTO;
+import com.fabiocondo.dtoMapper.UserMapper;
 import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
+import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.repository.filter.UserFilter;
 import com.fabiocondo.service.impl.AuthServiceImpl;
 import com.fabiocondo.service.UserService;
@@ -13,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,10 +33,12 @@ import static org.springframework.http.HttpStatus.OK;
 public class UserController {
 
     private final UserService userService;
+    private final UserMapper userMapper;
 
     @Autowired
-    public UserController(UserService userService, AuthServiceImpl authServiceImpl) {
+    public UserController(UserService userService, AuthServiceImpl authServiceImpl, UserMapper userMapper) {
         this.userService = userService;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/register")
@@ -183,8 +187,12 @@ public class UserController {
 
     @PutMapping("/{userId}/saved-articles/{articleId}/toggle")
     public ResponseEntity<Article> toggleSaveArticle(@PathVariable Long userId, @PathVariable Long articleId) throws UserNotFoundException, ArticleNotFoundException {
-        System.out.println("AAAAAAAAAAA ++++++++++ " + articleId);
         return ResponseEntity.status(OK).body(userService.toggleSaveArticle(userId, articleId));
+    }
+
+    @GetMapping("/with-permission-check/competitions/{competitionId}") // Para a lisa que eh mostrada ao adicionar os user permitidos nas competicoes
+    public Page<UserDTO> getUsersWithPermissionCheck(@PathVariable Long competitionId, Pageable pageable) {
+        return userMapper.domainPageToDTOPage(userService.findAll(pageable), competitionId, pageable);
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

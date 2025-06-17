@@ -45,7 +45,6 @@ public class CompetitionMapper {
         competitionDto.setCompetitionType(competition.getCompetitionType());
         competitionDto.setDifficultyLevel(competition.getDifficultyLevel());
         competitionDto.setLimitPerTopic(competition.getLimitPerTopic());
-        competitionDto.setTimeLimit(competition.getTimeLimit());
         competitionDto.setSubject(competition.getSubject());
         competitionDto.setPrizes(competition.getPrizes());
         competitionDto.setQuestions(competition.getQuestions());
@@ -66,7 +65,6 @@ public class CompetitionMapper {
         competitionDto.setCompetitionType(competition.getCompetitionType());
         competitionDto.setDifficultyLevel(competition.getDifficultyLevel());
         competitionDto.setLimitPerTopic(competition.getLimitPerTopic());
-        competitionDto.setTimeLimit(competition.getTimeLimit());
         competitionDto.setSubject(competition.getSubject());
         competitionDto.setPrizes(competition.getPrizes());
         competitionDto.setCurrentUserAllowedToSubmit(submissionService.isUserAllowedToParticipate(competition.getId(), currentUserId));

@@ -34,8 +34,6 @@ public class CompetitionDto {
 
     private int limitPerTopic;
 
-    private Integer timeLimit; // Tempo atribuído em segundos
-
     private Subject subject;
 
     private Long totalTopics;
@@ -116,14 +114,6 @@ public class CompetitionDto {
 
     public void setLimitPerTopic(int limitPerTopic) {
         this.limitPerTopic = limitPerTopic;
-    }
-
-    public Integer getTimeLimit() {
-        return timeLimit;
-    }
-
-    public void setTimeLimit(Integer timeLimit) {
-        this.timeLimit = timeLimit;
     }
 
     public Subject getSubject() {

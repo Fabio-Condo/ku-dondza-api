@@ -49,12 +49,6 @@ public class CompetitionService {
         competition.setCompetitionId(UUID.randomUUID().toString());
         competition.getPrizes().forEach(prize -> prize.setCompetition(competition));
 
-        // Soma do tempo total das perguntas
-        int totalTimeLimit = questions.stream()
-                .mapToInt(Question::getTimeLimit)
-                .sum();
-        competition.setTimeLimit(totalTimeLimit);
-
         return competitionRepository.save(competition);
     }
 

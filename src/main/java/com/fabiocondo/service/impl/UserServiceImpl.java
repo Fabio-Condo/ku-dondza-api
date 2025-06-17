@@ -331,11 +331,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public Page<User> findAll(Pageable pageable) {
-        return userRepository.findAll(pageable);
-    }
-
-    @Override
     public Page<User> filter(UserFilter userFilter, Pageable pageable) {
         return userRepository.filter(userFilter, pageable);
     }

@@ -191,9 +191,14 @@ public class UserController {
     }
 
     @GetMapping("/with-permission-check/competitions/{competitionId}") // Para a lisa que eh mostrada ao adicionar os user permitidos nas competicoes
-    public Page<UserDTO> getUsersWithPermissionCheck(@PathVariable Long competitionId, Pageable pageable) {
-        return userMapper.domainPageToDTOPage(userService.findAll(pageable), competitionId, pageable);
+    public Page<UserDTO> getUsersWithPermissionCheck(UserFilter userFilter, @PathVariable Long competitionId, Pageable pageable) {
+        return userMapper.domainPageToDTOPage(userService.filter(userFilter, pageable), competitionId, pageable);
     }
+
+    //@GetMapping("/filter")
+    //public Page<User> filter(UserFilter userFilter, Pageable pageable) {
+    //    return userService.filter(userFilter, pageable);
+    //}
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
         return new ResponseEntity<>(new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(),

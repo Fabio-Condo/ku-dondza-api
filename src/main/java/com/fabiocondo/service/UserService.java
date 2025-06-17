@@ -62,8 +62,6 @@ public interface UserService {
 
     Page<User> findAll(String searchParam, Pageable pageable) throws UserNotFoundException;
 
-    Page<User> findAll(Pageable pageable);
-
     Page<User> filter(UserFilter userFilter, Pageable pageable);
 
     long getTotal();

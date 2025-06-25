@@ -248,9 +248,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             amazonS3Service.deleteFile(currentUser.getFileName(), BUCKET_NAME);
         }
 
-        //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
-        //currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
-        currentUser.setFileName(profileImage.getOriginalFilename());
+        String newFileKey = UUID.randomUUID() + "-" + profileImage.getOriginalFilename();
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME, newFileKey);
+        currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
+        currentUser.setFileName(newFileKey);
 
         userRepository.save(currentUser);
         return currentUser;

@@ -16,8 +16,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositoryQuery {
-    @Query("SELECT q FROM Quiz q WHERE q.title LIKE %:searchParam%")
-    public Page<Quiz> findAll(@Param("searchParam") String searchParam, Pageable pageable);
+    //@Query("SELECT q FROM Quiz q WHERE q.title LIKE %:searchParam%")
+    //public Page<Quiz> findAll(@Param("searchParam") String searchParam, Pageable pageable);
 
     @Query("SELECT usa FROM Quiz qz JOIN qz.answers usa WHERE qz.id = :quizId")
     Set<Answer> findAnswersByQuizId(@Param("quizId") Long quizId);

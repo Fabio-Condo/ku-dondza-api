@@ -13,8 +13,6 @@ public class QuizFilter {
 
     private String sort;
 
-    private String title;
-
     private Subject subject;
 
     private User user;
@@ -33,14 +31,6 @@ public class QuizFilter {
     public String getSort() { return sort; }
 
     public void setSort(String sort) { this.sort = sort; }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 
     public Subject getSubject() { return subject; }
 

@@ -82,7 +82,6 @@ public class QuizService {
 
     public void delete(Long id) throws QuizNotFoundException {
         Quiz existQuiz = findById(id);
-        logger.info("Deleting quiz: " + existQuiz.getTitle());
         quizRepository.deleteById(id);
     }
 

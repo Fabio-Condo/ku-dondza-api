@@ -25,4 +25,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Quest
     //        @Param("difficultyLevel") DifficultyLevel difficultyLevel);
 
     Optional<Question> findQuestionByQuestionId(String questionId);
+
+    Set<Question> findByTopicId(Long topicId);
 }

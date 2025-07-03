@@ -55,6 +55,11 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.getQuestionsByTopics(topicIds, difficultyLevel, limitPerTopic));
     }
 
+    @GetMapping("/topics/{topicId}")
+    public ResponseEntity<Set<Question>> getQuestionsByTopicId(@PathVariable("topicId") Long topicId) {
+        return ResponseEntity.ok(questionService.getQuestionsByTopicId(topicId));
+    }
+
     @PostMapping
     public ResponseEntity<Question> save(@RequestBody Question question) {
         Question createdQuestion = questionService.save(question);

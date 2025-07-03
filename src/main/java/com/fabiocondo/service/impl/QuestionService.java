@@ -60,6 +60,10 @@ public class QuestionService {
         }
     }
 
+    public Set<Question> getQuestionsByTopicId(Long topicId) {
+        return questionRepository.findByTopicId(topicId);
+    }
+
     public Question save(Question question) {
         question.setQuestionId(UUID.randomUUID().toString());
         question.getAnswers().forEach(answer -> answer.setQuestion(question));

@@ -3,6 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.domain.Topic;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.TopicRepository;
+import com.fabiocondo.repository.filter.TopicFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TopicService {
@@ -30,6 +32,7 @@ public class TopicService {
     }
 
     public Topic save(Topic topic) {
+        topic.setTopicId(UUID.randomUUID().toString());
         return topicRepository.save(topic);
     }
 
@@ -38,6 +41,10 @@ public class TopicService {
         BeanUtils.copyProperties(topic, existTopic, "id");
         logger.info("Updating topic: " + topic.getName());
         return topicRepository.save(existTopic);
+    }
+
+    public Page<Topic> filter(TopicFilter topicFilter, Pageable pageable) {
+        return topicRepository.filter(topicFilter, pageable);
     }
 
     public Page<Topic> findAll(Pageable pageable) {

@@ -1,7 +1,9 @@
 package com.fabiocondo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "topic")
@@ -13,7 +15,11 @@ public class Topic {
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
+    private String topicId;
+
     private String name;
+
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
@@ -21,12 +27,17 @@ public class Topic {
 
     private boolean isReadyForQuiz;
 
+    @JsonIgnoreProperties("topic")
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Question> questions;
+
     public Topic() {
     }
 
-    public Topic(Long id, String name, Subject subject) {
-        this.id = id;
+    public Topic(String topicId, String name, String description, Subject subject) {
+        this.topicId = topicId;
         this.name = name;
+        this.description = description;
         this.subject = subject;
     }
 
@@ -39,12 +50,28 @@ public class Topic {
         this.id = id;
     }
 
+    public String getTopicId() {
+        return topicId;
+    }
+
+    public void setTopicId(String topicId) {
+        this.topicId = topicId;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Subject getSubject() {
@@ -61,5 +88,13 @@ public class Topic {
 
     public void setReadyForQuiz(boolean readyForQuiz) {
         isReadyForQuiz = readyForQuiz;
+    }
+
+    public List<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
     }
 }

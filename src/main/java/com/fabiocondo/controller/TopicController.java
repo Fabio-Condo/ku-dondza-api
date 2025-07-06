@@ -3,6 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Topic;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
+import com.fabiocondo.repository.filter.TopicFilter;
 import com.fabiocondo.service.impl.TopicService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,9 +39,14 @@ public class TopicController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<Page<Topic>> findAll(Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(topicService.findAll(pageable));
+    public Page<Topic> filter(TopicFilter topicFilter, Pageable pageable) {
+        return topicService.filter(topicFilter, pageable);
     }
+
+    //@GetMapping("/filter")
+    //public ResponseEntity<Page<Topic>> findAll(Pageable pageable) {
+    //    return ResponseEntity.status(HttpStatus.OK).body(topicService.findAll(pageable));
+    //}
 
     @GetMapping
     public ResponseEntity<List<Topic>> findAll() {

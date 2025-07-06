@@ -96,7 +96,6 @@ public class TopicRepositoryImpl implements TopicRepositoryQuery {
 
         // Adiciona filtro para isReadyForQuiz = true
         predicates.add(builder.isTrue(root.get("isReadyForQuiz")));
-
     }
 
     public void getSortOrder(TopicFilter topicFilter, CriteriaBuilder builder, CriteriaQuery<Topic> criteria, Root<Topic> root){

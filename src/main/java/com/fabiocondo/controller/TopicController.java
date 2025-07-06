@@ -28,6 +28,12 @@ public class TopicController {
         return ResponseEntity.status(HttpStatus.OK).body(topicService.findById(id));
     }
 
+    @GetMapping("/find-by-topicId/{topicId}")
+    public ResponseEntity<Topic> findQuizByQuizId(@PathVariable("topicId") String topicId) throws TopicNotFoundException {
+        Topic topic = topicService.findQuizByQuizId(topicId);
+        return ResponseEntity.status(HttpStatus.OK).body(topic);
+    }
+
     @PostMapping
     public ResponseEntity<Topic> save(@RequestBody Topic Topic) throws TopicNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(topicService.save(Topic));

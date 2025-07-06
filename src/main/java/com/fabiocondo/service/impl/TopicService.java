@@ -31,6 +31,11 @@ public class TopicService {
                 .orElseThrow(() -> new TopicNotFoundException("No topic found by id: " + id));
     }
 
+    public Topic findQuizByQuizId(String quizId) throws TopicNotFoundException {
+        return topicRepository.findTopicByTopicId(quizId)
+                .orElseThrow(() -> new TopicNotFoundException("No topic found by id: " + quizId));
+    }
+
     public Topic save(Topic topic) {
         topic.setTopicId(UUID.randomUUID().toString());
         return topicRepository.save(topic);

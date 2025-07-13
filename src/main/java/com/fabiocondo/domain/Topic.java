@@ -31,6 +31,10 @@ public class Topic {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Question> questions;
 
+    @JsonIgnoreProperties("topic")
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TopicContent> contents;
+
     public Topic() {
     }
 
@@ -96,5 +100,13 @@ public class Topic {
 
     public void setQuestions(List<Question> questions) {
         this.questions = questions;
+    }
+
+    public List<TopicContent> getContents() {
+        return contents;
+    }
+
+    public void setContents(List<TopicContent> contents) {
+        this.contents = contents;
     }
 }

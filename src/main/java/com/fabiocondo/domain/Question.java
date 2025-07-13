@@ -38,6 +38,7 @@ public class Question {
     private String urlFile;
 
     @ManyToOne
+    //@JsonIgnoreProperties("questions")
     @JoinColumn(name = "topic_id")
     private Topic topic;
 

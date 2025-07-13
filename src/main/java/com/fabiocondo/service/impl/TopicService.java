@@ -43,7 +43,7 @@ public class TopicService {
 
     public Topic update(Topic topic, Long id) throws TopicNotFoundException {
         Topic existTopic = findById(id);
-        BeanUtils.copyProperties(topic, existTopic, "id", "topicId", "isReadyForQuiz", "questions");
+        BeanUtils.copyProperties(topic, existTopic, "id", "topicId", "isReadyForQuiz", "questions", "contents");
         logger.info("Updating topic: " + topic.getName());
         return topicRepository.save(existTopic);
     }

@@ -20,11 +20,6 @@ server:
   address: 0.0.0.0
   port: 8080
 
-  tomcat:
-    max-http-form-post-size: -1
-    max-swallow-size: -1
-    max-post-size: -1
-
 spring:
 
   profiles:

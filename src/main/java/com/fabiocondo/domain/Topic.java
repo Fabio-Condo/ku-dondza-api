@@ -33,6 +33,7 @@ public class Topic {
 
     @JsonIgnoreProperties("topic")
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("position ASC") // Ordena os conteúdos ao carregar
     private List<TopicContent> contents;
 
     public Topic() {

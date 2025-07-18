@@ -7,7 +7,9 @@ public class SecurityConstant {
     // 15 * 60 * 1000 // 15 minutes expressed in milliseconds
 
     // 15 * 60 * 1000 // 15 minutes expressed in milliseconds
-    public static final long EXPIRATION_TIME = 432_000_000; // 5 days expressed in milliseconds (5 * 24 * 60 * 60 * 1000 = 432 000 000)
+    // static final long EXPIRATION_TIME = 432_000_000; // 5 days expressed in milliseconds (5 * 24 * 60 * 60 * 1000 = 432 000 000)
+    public static final long EXPIRATION_TIME = 365L * 24 * 60 * 60 * 1000; // 365 dias
+
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String JWT_TOKEN_HEADER = "Jwt-Token";
     public static final String TOKEN_CANNOT_BE_VERIFIED = "Token cannot be verified";

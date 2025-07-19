@@ -37,6 +37,11 @@ public class ExceptionHandling implements ErrorController {
     public static final String ERROR_PATH = "/error";
     private static final String ENTITY_IN_USE = "Entity in use, can't be deleted";
 
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<HttpResponse> commentNotFoundException(CommentNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(ArticleNotFoundException.class)
     public ResponseEntity<HttpResponse> articleNotFoundException(ArticleNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());

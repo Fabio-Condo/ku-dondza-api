@@ -38,8 +38,9 @@ public class QuestionController {
     }
 
     @GetMapping("/find-by-questionId/{questionId}")
-    public ResponseEntity<Question> findQuestionByQuestionId(@PathVariable("questionId") String questionId) throws QuestionNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(questionService.findQuestionByQuestionId(questionId));
+    public ResponseEntity<QuestionDTO> findQuestionByQuestionId(@PathVariable("questionId") String questionId) throws QuestionNotFoundException {
+        Question question = questionService.findQuestionByQuestionId(questionId);
+        return ResponseEntity.status(HttpStatus.OK).body(questionMapper.domainToDTO(question));
     }
 
     @GetMapping("/filter")

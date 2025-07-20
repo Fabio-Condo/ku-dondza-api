@@ -36,7 +36,6 @@ public class CommentController {
 
     @GetMapping("/question/{questionId}")
     public Page<CommentDTO> getComments(@PathVariable Long questionId, @RequestParam("currentUserId") Long currentUserId, Pageable pageable) {
-        //return commentService.getCommentsByQuestion(questionId, pageable);
         return commentMapper.domainPageToDTOPage(commentService.getCommentsByQuestion(questionId, pageable), currentUserId, pageable);
     }
 

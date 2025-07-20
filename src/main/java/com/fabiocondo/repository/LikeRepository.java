@@ -15,7 +15,7 @@ public interface LikeRepository extends JpaRepository<Like, Long> {
     boolean existsByArticleIdAndUserId(Long articleId, Long userId);
 
     @Query("SELECT COUNT(l) FROM Like l WHERE l.article.id = :articleId")
-    Long countLikesByArticleId(@Param("articleId") Long postId);
+    Long countLikesByArticleId(@Param("articleId") Long articleId);
 
     Page<Like> findByArticleId(Long articleId, Pageable pageable);
 }

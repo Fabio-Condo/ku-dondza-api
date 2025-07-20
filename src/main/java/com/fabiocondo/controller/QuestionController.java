@@ -1,6 +1,8 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
+import com.fabiocondo.dto.QuestionDTO;
+import com.fabiocondo.dtoMapper.QuestionMapper;
 import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.exception.domain.InterestNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
@@ -23,9 +25,11 @@ import java.util.Set;
 public class QuestionController {
 
     private final QuestionService questionService;
+    private final QuestionMapper questionMapper;
 
-    public QuestionController(QuestionService questionService) {
+    public QuestionController(QuestionService questionService, QuestionMapper questionMapper) {
         this.questionService = questionService;
+        this.questionMapper = questionMapper;
     }
 
     @GetMapping("/{id}")
@@ -39,8 +43,8 @@ public class QuestionController {
     }
 
     @GetMapping("/filter")
-    public Page<Question> filter(QuestionFilter questionFilter, Pageable pageable) {
-        return questionService.filter(questionFilter, pageable);
+    public Page<QuestionDTO> filter(QuestionFilter questionFilter, Pageable pageable) {
+        return questionMapper.domainPageToDTOPage(questionService.filter(questionFilter, pageable), pageable);
     }
 
     @GetMapping

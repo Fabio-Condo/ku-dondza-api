@@ -8,8 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-
 @Service
 public class CommentService {
 
@@ -41,6 +39,10 @@ public class CommentService {
     public void delete(Long id) throws CommentNotFoundException {
         Comment existComment = findById(id);
         commentRepository.deleteById(id);
+    }
+
+    public Long countCommentsByQuestionId(Long questionId) {
+        return commentRepository.countCommentsByQuestionId(questionId);
     }
 }
 

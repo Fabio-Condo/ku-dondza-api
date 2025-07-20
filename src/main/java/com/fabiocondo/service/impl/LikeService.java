@@ -17,13 +17,11 @@ public class LikeService {
 
     private final ArticleServiceImpl articleService;
 
-    private final UserServiceImpl userService;
     private final UserRepository userRepository;
 
-    public LikeService(LikeRepository likeRepository, ArticleServiceImpl articleService, UserServiceImpl userService, UserRepository userRepository) {
+    public LikeService(LikeRepository likeRepository, ArticleServiceImpl articleService, UserRepository userRepository) {
         this.likeRepository = likeRepository;
         this.articleService = articleService;
-        this.userService = userService;
         this.userRepository = userRepository;
     }
 

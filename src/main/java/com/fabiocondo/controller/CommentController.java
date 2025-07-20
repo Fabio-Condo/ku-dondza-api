@@ -2,6 +2,8 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.Comment;
 import com.fabiocondo.domain.HttpResponse;
+import com.fabiocondo.dto.CommentDTO;
+import com.fabiocondo.dtoMapper.CommentMapper;
 import com.fabiocondo.exception.domain.CommentNotFoundException;
 import com.fabiocondo.service.impl.CommentService;
 import org.springframework.data.domain.Page;
@@ -15,9 +17,11 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
+    private final CommentMapper commentMapper;
 
-    public CommentController(CommentService commentService) {
+    public CommentController(CommentService commentService, CommentMapper commentMapper) {
         this.commentService = commentService;
+        this.commentMapper = commentMapper;
     }
 
     @PostMapping
@@ -31,8 +35,9 @@ public class CommentController {
     }
 
     @GetMapping("/question/{questionId}")
-    public Page<Comment> getComments(@PathVariable Long questionId, Pageable pageable) {
-        return commentService.getCommentsByQuestion(questionId, pageable);
+    public Page<CommentDTO> getComments(@PathVariable Long questionId, @RequestParam("currentUserId") Long currentUserId, Pageable pageable) {
+        //return commentService.getCommentsByQuestion(questionId, pageable);
+        return commentMapper.domainPageToDTOPage(commentService.getCommentsByQuestion(questionId, pageable), currentUserId, pageable);
     }
 
     @DeleteMapping("/{id}")

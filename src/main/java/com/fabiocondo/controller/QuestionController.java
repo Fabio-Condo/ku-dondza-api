@@ -60,9 +60,14 @@ public class QuestionController {
         return ResponseEntity.ok(questionService.getQuestionsByTopics(topicIds, difficultyLevel, limitPerTopic));
     }
 
+    //@GetMapping("/topics/{topicId}")
+    //public ResponseEntity<Set<Question>> getQuestionsByTopicId(@PathVariable("topicId") Long topicId) {
+    //    return ResponseEntity.ok(questionService.getQuestionsByTopicId(topicId));
+    //}
+
     @GetMapping("/topics/{topicId}")
-    public ResponseEntity<Set<Question>> getQuestionsByTopicId(@PathVariable("topicId") Long topicId) {
-        return ResponseEntity.ok(questionService.getQuestionsByTopicId(topicId));
+    public ResponseEntity<Set<QuestionDTO>> getQuestionsByTopicId(@PathVariable("topicId") Long topicId) {
+        return ResponseEntity.ok(questionMapper.domainPageToDTOSet(questionService.getQuestionsByTopicId(topicId)));
     }
 
     @PostMapping

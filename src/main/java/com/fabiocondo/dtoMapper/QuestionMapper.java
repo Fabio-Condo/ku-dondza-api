@@ -8,6 +8,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -59,4 +61,12 @@ public class QuestionMapper {
                 .map(this::domainToDTO)
                 .collect(Collectors.toList()), pageable, questions.getTotalElements());
     }
+
+    public Set<QuestionDTO> domainPageToDTOSet(Set<Question> questions) {
+        return questions.stream()
+                .map(this::domainToDTO)
+                .collect(Collectors.toSet());
+    }
+
+
 }

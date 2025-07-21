@@ -1,6 +1,7 @@
 package com.fabiocondo.dtoMapper;
 
 import com.fabiocondo.domain.Quiz;
+import com.fabiocondo.domain.Topic;
 import com.fabiocondo.dto.QuizDTO;
 import com.fabiocondo.repository.QuizRepository;
 import com.fabiocondo.service.impl.QuizService;
@@ -9,6 +10,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -49,7 +52,7 @@ public class QuizMapper {
         quizDTO.setSubject(quiz.getSubject());
         quizDTO.setUser(quiz.getUser());
         quizDTO.setTotalQuestions(quizRepository.countQuestionsByQuizId(quiz.getId()));
-        quizDTO.setTopics(quizService.getTopics(quiz));
+        quizDTO.setTopics(quizService.getSortedTopics(quiz));
         quizDTO.setAccuracyRate(quizService.calculateAccuracyRate(quiz));
         return quizDTO;
     }
@@ -68,6 +71,13 @@ public class QuizMapper {
         quizDTO.setQuestions(quiz.getQuestions()); //
         quizDTO.setAnswers(quiz.getAnswers());
         return quizDTO;
+    }
+
+    public List<Topic> getTopics(QuizDTO quiz) {
+        return quiz.getTopics()
+                .stream()
+                .sorted(Comparator.comparing(Topic::getName)) // ou getOrder(), getId(), etc.
+                .collect(Collectors.toList());
     }
 
     public Page<QuizDTO> domainPageToDTOPage(Page<Quiz> quizzes, Pageable pageable) {

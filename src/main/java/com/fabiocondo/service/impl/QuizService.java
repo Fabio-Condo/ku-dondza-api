@@ -103,6 +103,20 @@ public class QuizService {
         return topics;
     }
 
+    public Set<Topic> getSortedTopics(Quiz quiz) {
+        Set<Topic> topics = new HashSet<>();
+        for (Question question : quiz.getQuestions()) {
+            if (question.getTopic() != null) {
+                topics.add(question.getTopic());
+            }
+        }
+
+        List<Topic> sortedTopics = new ArrayList<>(topics);
+        Collections.sort(sortedTopics, Comparator.comparing(Topic::getName)); // ou getId, etc.
+
+        return new LinkedHashSet<>(sortedTopics); // mantém a ordem após a ordenação
+    }
+
     public double calculateAccuracyRate(Quiz quiz) {
         Set<Question> questions = quiz.getQuestions();
         Set<Answer> userAnswers = quiz.getAnswers();

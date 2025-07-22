@@ -49,6 +49,15 @@ public class QuizController {
     }
 
     @PostMapping
+    public ResponseEntity<QuizDTO> createQuiz(@RequestBody Quiz quiz,
+                                           @RequestParam Set<Long> questionIds,
+                                           @RequestParam Set<Long> userAnswerIds) {
+
+        Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, questionIds, userAnswerIds);
+        return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(savedQuiz));
+    }
+/*
+    @PostMapping
     public ResponseEntity<Quiz> createQuiz(@RequestBody Quiz quiz,
                                            @RequestParam Set<Long> questionIds,
                                            @RequestParam Set<Long> userAnswerIds) {
@@ -56,6 +65,8 @@ public class QuizController {
         Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, questionIds, userAnswerIds);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedQuiz);
     }
+
+ */
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws QuizNotFoundException {

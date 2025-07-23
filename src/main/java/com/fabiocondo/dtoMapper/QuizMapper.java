@@ -20,9 +20,12 @@ public class QuizMapper {
     private final QuizRepository quizRepository;
     private final QuizService quizService;
 
-    public QuizMapper(QuizRepository quizRepository, QuizService quizService) {
+    private final QuestionMapper questionMapper;
+
+    public QuizMapper(QuizRepository quizRepository, QuizService quizService, QuestionMapper questionMapper) {
         this.quizRepository = quizRepository;
         this.quizService = quizService;
+        this.questionMapper = questionMapper;
     }
 
     public Quiz dtoToDomainObject(QuizDTO quizDTO) {
@@ -35,7 +38,7 @@ public class QuizMapper {
         quiz.setTimeSpent(quizDTO.getTimeSpent());
         quiz.setSubject(quizDTO.getSubject());
         quiz.setUser(quizDTO.getUser());
-        quiz.setQuestions(quizDTO.getQuestions());
+        //quiz.setQuestions(quizDTO.getQuestions());
         quiz.setAnswers(quizDTO.getAnswers());
         return quiz;
     }
@@ -68,7 +71,8 @@ public class QuizMapper {
         quizDTO.setTimeSpent(quiz.getTimeSpent());
         quizDTO.setSubject(quiz.getSubject());
         quizDTO.setUser(quiz.getUser());
-        quizDTO.setQuestions(quiz.getQuestions()); //
+        //quizDTO.setQuestions(quiz.getQuestions()); //
+        quizDTO.setQuestions(questionMapper.domainPageToDTOSet(quiz.getQuestions())); //
         quizDTO.setAnswers(quiz.getAnswers());
         return quizDTO;
     }

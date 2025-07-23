@@ -31,7 +31,8 @@ public class QuizDTO {
 
     private User user;
 
-    private Set<Question> questions = new HashSet<>();
+    //private Set<Question> questions = new HashSet<>();
+    private Set<QuestionDTO> questions = new HashSet<>();
 
     private Set<Answer> answers = new HashSet<>();
 
@@ -107,11 +108,11 @@ public class QuizDTO {
 
     public void setUser(User user) { this.user = user; }
 
-    public Set<Question> getQuestions() {
+    public Set<QuestionDTO> getQuestions() {
         return questions;
     }
 
-    public void setQuestions(Set<Question> questions) {
+    public void setQuestions(Set<QuestionDTO> questions) {
         this.questions = questions;
     }
 

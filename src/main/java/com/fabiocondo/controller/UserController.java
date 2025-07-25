@@ -190,6 +190,11 @@ public class UserController {
         return ResponseEntity.status(OK).body(userService.toggleSaveArticle(userId, articleId));
     }
 
+    @PutMapping("/{userId}/saved-questions/{questionId}/toggle")
+    public ResponseEntity<Question> toggleSaveQuestion(@PathVariable Long userId, @PathVariable Long questionId) throws QuestionNotFoundException {
+        return ResponseEntity.status(OK).body(userService.toggleSaveQuestion(userId, questionId));
+    }
+
     @GetMapping("/with-permission-check/competitions/{competitionId}") // Para a lisa que eh mostrada ao adicionar os user permitidos nas competicoes
     public Page<UserDTO> getUsersWithPermissionCheck(UserFilter userFilter, @PathVariable Long competitionId, Pageable pageable) {
         return userMapper.domainPageToDTOPage(userService.filter(userFilter, pageable), competitionId, pageable);

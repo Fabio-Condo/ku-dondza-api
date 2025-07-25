@@ -54,6 +54,11 @@ public interface UserService {
 
     boolean checkIfSaved(Long articleId, Long currentUserId) throws UserNotFoundException, ArticleNotFoundException;
 
+    @Transactional
+    Question toggleSaveQuestion(Long userId, Long questionId) throws QuestionNotFoundException;
+
+    boolean checkIfSavedQuestion(Long questionId, Long currentUserId);
+
     User findUserByUserId(String userId) throws UserNotFoundException;
 
     User findUserByEmail(String email);

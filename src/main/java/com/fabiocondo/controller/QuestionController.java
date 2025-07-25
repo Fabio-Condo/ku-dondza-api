@@ -38,14 +38,14 @@ public class QuestionController {
     }
 
     @GetMapping("/find-by-questionId/{questionId}")
-    public ResponseEntity<QuestionDTO> findQuestionByQuestionId(@PathVariable("questionId") String questionId) throws QuestionNotFoundException {
+    public ResponseEntity<QuestionDTO> findQuestionByQuestionId(@PathVariable("questionId") String questionId, @RequestParam("currentUserId") Long currentUserId) throws QuestionNotFoundException {
         Question question = questionService.findQuestionByQuestionId(questionId);
-        return ResponseEntity.status(HttpStatus.OK).body(questionMapper.domainToDTO(question));
+        return ResponseEntity.status(HttpStatus.OK).body(questionMapper.domainToDTO(question, currentUserId));
     }
 
     @GetMapping("/filter")
-    public Page<QuestionDTO> filter(QuestionFilter questionFilter, Pageable pageable) {
-        return questionMapper.domainPageToDTOPage(questionService.filter(questionFilter, pageable), pageable);
+    public Page<QuestionDTO> filter(QuestionFilter questionFilter, @RequestParam("currentUserId") Long currentUserId, Pageable pageable) {
+        return questionMapper.domainPageToDTOPage(questionService.filter(questionFilter, pageable), currentUserId, pageable);
     }
 
     @GetMapping

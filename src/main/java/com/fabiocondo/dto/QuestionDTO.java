@@ -36,6 +36,8 @@ public class QuestionDTO {
 
     private List<Answer> answers;
 
+    private boolean savedByUser;
+
     private long numberOfComments;
 
     public Long getId() {
@@ -132,6 +134,14 @@ public class QuestionDTO {
 
     public void setAnswers(List<Answer> answers) {
         this.answers = answers;
+    }
+
+    public boolean isSavedByUser() {
+        return savedByUser;
+    }
+
+    public void setSavedByUser(boolean savedByUser) {
+        this.savedByUser = savedByUser;
     }
 
     public long getNumberOfComments() {

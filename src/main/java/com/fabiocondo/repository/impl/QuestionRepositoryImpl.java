@@ -1,6 +1,7 @@
 package com.fabiocondo.repository.impl;
 
 import com.fabiocondo.domain.Question;
+import com.fabiocondo.domain.User;
 import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.repository.filter.QuestionFilter;
 import com.fabiocondo.repository.query.QuestionRepositoryQuery;
@@ -15,10 +16,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.util.*;
 
 public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
@@ -100,16 +98,6 @@ public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
 
     public void restrictions(QuestionFilter questionFilter, List<Predicate> predicates, CriteriaBuilder builder, Root<Question> root){
 
-        if(!ObjectUtils.isEmpty(questionFilter.getSearchParam())) {
-            Predicate subject = builder.like(
-                    builder.lower(root.get("topic").get("subject").get("name")), "%" + questionFilter.getSearchParam().toLowerCase() + "%");
-            Predicate topic = builder.like(
-                    builder.lower(root.get("topic").get("name")), "%" + questionFilter.getSearchParam().toLowerCase() + "%");
-            Predicate text = builder.like(
-                    builder.lower(root.get("text")), "%" + questionFilter.getSearchParam().toLowerCase() + "%");
-            predicates.add(builder.or(subject, topic, text));
-        }
-
         if(!ObjectUtils.isEmpty(questionFilter.getText())) {
             predicates.add(builder.like(
                     builder.lower(root.get("text")), "%" + questionFilter.getText().toLowerCase() + "%"));
@@ -121,6 +109,23 @@ public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
         if(!ObjectUtils.isEmpty(questionFilter.getTopic())) {
             predicates.add(builder.equal(
                     builder.lower(root.get("topic").get("id")), questionFilter.getTopic().getId()));
+        }
+
+        // Filtro: questions salvos por um usuário específico
+        if (questionFilter.getUserId() != null) {
+            // Criação da subquery
+            Subquery<Long> subquery = builder.createQuery().subquery(Long.class);
+            Root<User> userRoot = subquery.from(User.class);
+
+            // Referência à coleção savedQuestions
+            Join<User, Question> savedQuestionsJoin = userRoot.join("savedQuestions");
+
+            // Subquery retorna os IDs dos questions salvos por esse usuário
+            subquery.select(savedQuestionsJoin.get("id"))
+                    .where(builder.equal(userRoot.get("id"), questionFilter.getUserId()));
+
+            // Restringe o question atual (root) aos IDs retornados na subquery
+            predicates.add(root.get("id").in(subquery));
         }
 
     }

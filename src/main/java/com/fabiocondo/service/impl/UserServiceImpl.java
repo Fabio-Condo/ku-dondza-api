@@ -50,20 +50,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final EmailService emailService;
     private final AmazonS3Service amazonS3Service;
     private final SubjectRepository subjectRepository;
-    private final CourseRepository courseRepository;
     private final ArticleRepository articleRepository;
+    private final QuestionRepository questionRepository;
     private final ContentRepository contentRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, CourseRepository courseRepository, ArticleRepository articleRepository, ContentRepository contentRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, ArticleRepository articleRepository, QuestionRepository questionRepository, ContentRepository contentRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
         this.amazonS3Service = amazonS3Service;
         this.subjectRepository = subjectRepository;
-        this.courseRepository = courseRepository;
         this.articleRepository = articleRepository;
+        this.questionRepository = questionRepository;
         this.contentRepository = contentRepository;
     }
 
@@ -429,6 +429,40 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .orElseThrow(() -> new ArticleNotFoundException("Article not find"));
         return currentUser.getSavedArticles().contains(article);
     }
+
+    @Override
+    @Transactional
+    public Question toggleSaveQuestion(Long userId, Long questionId) throws QuestionNotFoundException {
+        User currentUser = userRepository.findById(userId).orElseThrow(null);
+
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new QuestionNotFoundException("Question not find"));
+
+        Set<Question> savedQuestions = currentUser.getSavedQuestions();
+
+        if (savedQuestions.contains(question)) {
+            savedQuestions.remove(question);
+        } else {
+            savedQuestions.add(question);
+        }
+
+        userRepository.save(currentUser); // atualiza a relação
+
+        return question;
+    }
+
+    @Override
+    public boolean checkIfSavedQuestion(Long questionId, Long currentUserId) {
+        User currentUser = userRepository.findById(currentUserId).orElse(null);
+        Question question = questionRepository.findById(questionId).orElse(null);
+
+        if (currentUser == null || question == null) {
+            return false;
+        }
+
+        return currentUser.getSavedQuestions().contains(question);
+    }
+
 
     private void validateLoginAttempt(User user) {
         if(user.isNotLocked()) {

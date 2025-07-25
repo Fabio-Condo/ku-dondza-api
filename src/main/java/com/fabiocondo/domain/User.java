@@ -99,6 +99,15 @@ public class User implements Serializable {
     )
     private Set<Article> savedArticles = new HashSet<>();
 
+    @JsonIgnore
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(
+            name = "user_saved_question",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "question_id")
+    )
+    private Set<Question> savedQuestions = new HashSet<>();
+
     @JsonIgnoreProperties({"user"})
     @OneToMany(mappedBy = "user")
     private List<PrizeAssignment> prizeAssignments;
@@ -313,6 +322,14 @@ public class User implements Serializable {
 
     public void setSavedArticles(Set<Article> savedArticles) {
         this.savedArticles = savedArticles;
+    }
+
+    public Set<Question> getSavedQuestions() {
+        return savedQuestions;
+    }
+
+    public void setSavedQuestions(Set<Question> savedQuestions) {
+        this.savedQuestions = savedQuestions;
     }
 
     public List<PrizeAssignment> getPrizeAssignments() {

@@ -74,6 +74,11 @@ public class QuizController {
         return response(HttpStatus.OK, "Quiz deleted successfully");
     }
 
+    @PutMapping("/{id}/anonymous")
+    public void toggleAnonymous(@PathVariable("id") Long id, @RequestBody Boolean status) throws QuizNotFoundException {
+        quizService.toggleAnonymous(id, status);
+    }
+
     @GetMapping("/{quizId}/questions/total")
     public ResponseEntity<Long> countQuestionsByQuizId(@PathVariable Long quizId){
         return ResponseEntity.status(HttpStatus.OK).body(quizService.countQuestionsByQuizId(quizId));

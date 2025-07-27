@@ -1,9 +1,6 @@
 package com.fabiocondo.service.impl;
 
-import com.fabiocondo.domain.Answer;
-import com.fabiocondo.domain.Question;
-import com.fabiocondo.domain.Quiz;
-import com.fabiocondo.domain.Topic;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
@@ -136,6 +133,19 @@ public class QuizService {
         }
 
         return (double) correctAnswers / questions.size() * 100;
+    }
+
+    public void toggleAnonymous(Long id, Boolean status) throws QuizNotFoundException {
+        Quiz quiz = findById(id);
+        quiz.setAnonymous(status);
+        quizRepository.save(quiz);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("A operação foi interrompida", e);
+        }
     }
 
 }

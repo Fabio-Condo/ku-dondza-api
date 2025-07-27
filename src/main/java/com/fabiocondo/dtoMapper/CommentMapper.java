@@ -35,6 +35,18 @@ public class CommentMapper {
         return comment;
     }
 
+    public CommentDTO domainToDTO(Comment comment) {
+        CommentDTO commentDTO = new CommentDTO();
+        commentDTO.setId(comment.getId());
+        commentDTO.setContent(comment.getContent());
+        commentDTO.setCreatedAt(comment.getCreatedAt());
+        commentDTO.setUser(comment.getUser());
+        commentDTO.setQuestion(comment.getQuestion());
+
+        commentDTO.setNumberOfLikes(commentLikeService.countLikesByCommentId(comment.getId()));
+        return commentDTO;
+    }
+
     public CommentDTO domainToDTO(Comment comment, Long currentUserId) throws UserNotFoundException {
         CommentDTO commentDTO = new CommentDTO();
         commentDTO.setId(comment.getId());

@@ -25,13 +25,13 @@ public class CommentController {
     }
 
     @PostMapping
-    public Comment addComment(@RequestBody Comment comment) {
-        return commentService.save(comment);
+    public ResponseEntity<CommentDTO> addComment(@RequestBody Comment comment) {
+        return ResponseEntity.status(HttpStatus.OK).body(commentMapper.domainToDTO(commentService.save(comment)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Comment> updateComment(@PathVariable("id") Long id, @RequestBody Comment comment) throws CommentNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.update(comment, id));
+    public ResponseEntity<CommentDTO> updateComment(@PathVariable("id") Long id, @RequestBody Comment comment) throws CommentNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(commentMapper.domainToDTO(commentService.update(comment, id)));
     }
 
     @GetMapping("/question/{questionId}")

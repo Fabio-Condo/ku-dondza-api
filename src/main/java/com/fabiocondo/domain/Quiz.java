@@ -33,6 +33,9 @@ public class Quiz {
 
     private Integer timeSpent; // Tempo gasto em segundos
 
+    @Column(nullable = false)
+    private boolean anonymous = false;
+
     @ManyToOne
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
@@ -114,6 +117,14 @@ public class Quiz {
 
     public void setTimeSpent(Integer timeSpent) {
         this.timeSpent = timeSpent;
+    }
+
+    public boolean isAnonymous() {
+        return anonymous;
+    }
+
+    public void setAnonymous(boolean anonymous) {
+        this.anonymous = anonymous;
     }
 
     public Subject getSubject() { return subject; }

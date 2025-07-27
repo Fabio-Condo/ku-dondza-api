@@ -27,6 +27,9 @@ public class QuizDTO {
 
     private Integer timeSpent; // Tempo gasto em segundos
 
+    @Column(nullable = false)
+    private boolean anonymous = false;
+
     private Subject subject;
 
     private User user;
@@ -98,6 +101,14 @@ public class QuizDTO {
 
     public void setTimeSpent(Integer timeSpent) {
         this.timeSpent = timeSpent;
+    }
+
+    public boolean isAnonymous() {
+        return anonymous;
+    }
+
+    public void setAnonymous(boolean anonymous) {
+        this.anonymous = anonymous;
     }
 
     public Subject getSubject() { return subject; }

@@ -36,6 +36,7 @@ public class QuizMapper {
         quiz.setSubmittedAt(quizDTO.getSubmittedAt());
         quiz.setTimeLimit(quizDTO.getTimeLimit());
         quiz.setTimeSpent(quizDTO.getTimeSpent());
+        quiz.setAnonymous(quizDTO.isAnonymous());
         quiz.setSubject(quizDTO.getSubject());
         quiz.setUser(quizDTO.getUser());
         //quiz.setQuestions(quizDTO.getQuestions());
@@ -52,6 +53,7 @@ public class QuizMapper {
         quizDTO.setSubmittedAt(quiz.getSubmittedAt());
         quizDTO.setTimeLimit(quiz.getTimeLimit());
         quizDTO.setTimeSpent(quiz.getTimeSpent());
+        quizDTO.setAnonymous(quiz.isAnonymous());
         quizDTO.setSubject(quiz.getSubject());
         quizDTO.setUser(quiz.getUser());
         quizDTO.setTotalQuestions(quizRepository.countQuestionsByQuizId(quiz.getId()));
@@ -69,6 +71,7 @@ public class QuizMapper {
         quizDTO.setSubmittedAt(quiz.getSubmittedAt());
         quizDTO.setTimeLimit(quiz.getTimeLimit());
         quizDTO.setTimeSpent(quiz.getTimeSpent());
+        quizDTO.setAnonymous(quiz.isAnonymous());
         quizDTO.setSubject(quiz.getSubject());
         quizDTO.setUser(quiz.getUser());
         //quizDTO.setQuestions(quiz.getQuestions()); //

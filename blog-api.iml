@@ -11,6 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: com.github.vladimir-bukhtoyarov:bucket4j-core:6.2.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.api-client:google-api-client:1.33.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.oauth-client:google-oauth-client:1.32.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.http-client:google-http-client-gson:1.41.0" level="project" />

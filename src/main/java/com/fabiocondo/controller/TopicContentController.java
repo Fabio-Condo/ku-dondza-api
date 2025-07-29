@@ -4,6 +4,7 @@ import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.TopicContent;
 import com.fabiocondo.enumeration.ContentType;
 import com.fabiocondo.exception.domain.ContentNotFoundException;
+import com.fabiocondo.exception.domain.DownloadRateLimitExceededException;
 import com.fabiocondo.exception.domain.ModuleNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.service.impl.TopicContentService;
@@ -63,8 +64,8 @@ public class TopicContentController {
     }
 
     @GetMapping("/download/{id}/{fileName}")
-    public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable Long id, @PathVariable String fileName) throws ContentNotFoundException {
-        byte[] data = topicContentService.downloadFile(id, fileName);
+    public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable Long id, @PathVariable String fileName, @RequestParam("currentUserId") Long currentUserId) throws ContentNotFoundException, DownloadRateLimitExceededException {
+        byte[] data = topicContentService.downloadFile(id, fileName, currentUserId);
         ByteArrayResource resource = new ByteArrayResource(data);
 
         return ResponseEntity

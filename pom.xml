@@ -24,6 +24,13 @@
 
     <dependencies>
 
+        <!--Para implementar o limite rate nos endpoints de download-->
+        <dependency>
+            <groupId>com.github.vladimir-bukhtoyarov</groupId>
+            <artifactId>bucket4j-core</artifactId>
+            <version>6.2.0</version> <!-- Compatível com Java 8 -->
+        </dependency>
+
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>

@@ -4,14 +4,19 @@ import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Topic;
 import com.fabiocondo.domain.TopicContent;
+import com.fabiocondo.domain.User;
 import com.fabiocondo.enumeration.ContentType;
 import com.fabiocondo.exception.domain.ContentNotFoundException;
+import com.fabiocondo.exception.domain.DownloadRateLimitExceededException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.TopicContentRepository;
+import com.fabiocondo.repository.UserRepository;
+import io.github.bucket4j.Bucket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,11 +35,16 @@ public class TopicContentService {
     private final TopicService topicService;
 
     private final AmazonS3Service amazonS3Service;
+    public final RateLimiterService rateLimiterService;
 
-    public TopicContentService(TopicContentRepository contentRepository, TopicService topicService, AmazonS3Service amazonS3Service) {
+    public final UserRepository userRepository;
+
+    public TopicContentService(TopicContentRepository contentRepository, TopicService topicService, AmazonS3Service amazonS3Service, RateLimiterService rateLimiterService, UserRepository userRepository) {
         this.contentRepository = contentRepository;
         this.topicService = topicService;
         this.amazonS3Service = amazonS3Service;
+        this.rateLimiterService = rateLimiterService;
+        this.userRepository = userRepository;
     }
 
     public TopicContent findById(Long id) throws ContentNotFoundException {
@@ -108,7 +118,17 @@ public class TopicContentService {
         }
     }
 
-    public byte[] downloadFile(Long id, @PathVariable String fileName) throws ContentNotFoundException {
+    public byte[] downloadFile(Long id, @PathVariable String fileName, Long currentUserId) throws ContentNotFoundException, DownloadRateLimitExceededException {
+
+        User user = userRepository.findById(1L)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+
+        // Verifica se o usuário excedeu o limite
+        Bucket bucket = rateLimiterService.resolveBucketForUser(user.getId().toString());
+        if (!bucket.tryConsume(1)) {
+            throw new DownloadRateLimitExceededException("Limite de downloads excedido. Tente novamente mais tarde.");
+        }
+
         TopicContent existContent = findById(id);
         logger.info("Downloading file: " + existContent.getFileName());
         byte[] data = amazonS3Service.downloadFile(fileName, BUCKET_NAME);

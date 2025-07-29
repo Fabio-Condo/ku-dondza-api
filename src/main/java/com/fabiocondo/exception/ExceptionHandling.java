@@ -37,8 +37,18 @@ public class ExceptionHandling implements ErrorController {
     public static final String ERROR_PATH = "/error";
     private static final String ENTITY_IN_USE = "Entity in use, can't be deleted";
 
+    @ExceptionHandler(DownloadRateLimitExceededException.class)
+    public ResponseEntity<HttpResponse> downloadRateLimitExceededException(DownloadRateLimitExceededException exception) {
+        return createHttpResponse(HttpStatus.TOO_MANY_REQUESTS, exception.getMessage());
+    }
+
     @ExceptionHandler(CommentNotFoundException.class)
     public ResponseEntity<HttpResponse> commentNotFoundException(CommentNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler(ContentNotFoundException.class)
+    public ResponseEntity<HttpResponse> contentNotFoundException(ContentNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 

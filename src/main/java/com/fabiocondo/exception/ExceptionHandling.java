@@ -107,6 +107,11 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(UserSubjectSubscriptionNotFoundException.class)
+    public ResponseEntity<HttpResponse> userSubjectSubscriptionNotFoundException(UserSubjectSubscriptionNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(CourseNotFoundException.class)
     public ResponseEntity<HttpResponse> onlineCourseNotFoundException(CourseNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
@@ -226,6 +231,7 @@ public class ExceptionHandling implements ErrorController {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<HttpResponse> internalServerErrorException(Exception exception) {
+        System.out.println(exception.getMessage());
         LOGGER.error(exception.getMessage());
         return createHttpResponse(INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MSG.toUpperCase());
     }

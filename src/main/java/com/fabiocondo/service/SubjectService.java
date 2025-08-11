@@ -14,6 +14,8 @@ public interface SubjectService {
 
     Page<Subject> findAll(Pageable pageable);
 
+    Page<Subject> findByName(String name, Pageable pageable);
+
     Subject save(Subject subject);
 
     Subject update(Subject subject, Long id) throws SubjectNotFoundException;

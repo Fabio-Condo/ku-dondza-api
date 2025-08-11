@@ -180,6 +180,11 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.removeInterestFromUserInterests(userId, interestId));
     }
 
+    @PutMapping("/{userId}/marked-topic-contents/{contentId}/toggle")
+    public ResponseEntity<User> toggleTopicContentMarkedStatus(@PathVariable Long userId, @PathVariable Long contentId) throws UserNotFoundException, ContentNotFoundException {
+        return ResponseEntity.status(OK).body(userService.toggleTopicContentMarkedStatus(userId, contentId));
+    }
+
     @PutMapping("/{userId}/marked-contents/{contentId}/toggle")
     public ResponseEntity<User> toggleMarkedContent(@PathVariable Long userId, @PathVariable Long contentId) throws UserNotFoundException, ContentNotFoundException {
         return ResponseEntity.status(OK).body(userService.toggleContentMarkedStatus(userId, contentId));

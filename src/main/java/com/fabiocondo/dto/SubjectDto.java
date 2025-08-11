@@ -1,18 +1,12 @@
-package com.fabiocondo.domain;
+package com.fabiocondo.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import javax.persistence.*;
+import com.fabiocondo.domain.Topic;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.List;
 
-@Entity
-@Table(name = "subject")
-public class Subject {
+public class SubjectDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, updatable = false)
-    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
     private String subjectId;
@@ -21,21 +15,11 @@ public class Subject {
 
     private String description;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
+    private boolean isCurrentUserSubscribed;
+
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<Topic> topics;
 
-    public Subject() {
-    }
-
-    public Subject(Long id, String name, String description, List<Topic> topics) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.topics = topics;
-    }
-
-    // Getters e Setters
     public Long getId() {
         return id;
     }
@@ -66,6 +50,14 @@ public class Subject {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isCurrentUserSubscribed() {
+        return isCurrentUserSubscribed;
+    }
+
+    public void setCurrentUserSubscribed(boolean currentUserSubscribed) {
+        isCurrentUserSubscribed = currentUserSubscribed;
     }
 
     public List<Topic> getTopics() {

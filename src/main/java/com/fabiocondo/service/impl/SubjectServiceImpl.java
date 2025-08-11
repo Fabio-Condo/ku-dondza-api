@@ -1,8 +1,9 @@
 package com.fabiocondo.service.impl;
 
-import com.fabiocondo.domain.Subject;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.repository.SubjectRepository;
+import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.SubjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -21,8 +26,11 @@ public class SubjectServiceImpl implements SubjectService {
 
     SubjectRepository subjectRepository;
 
-    public SubjectServiceImpl(SubjectRepository subjectRepository) {
+    UserRepository userRepository;
+
+    public SubjectServiceImpl(SubjectRepository subjectRepository, UserRepository userRepository) {
         this.subjectRepository = subjectRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -30,6 +38,49 @@ public class SubjectServiceImpl implements SubjectService {
         logger.info("Getting subject by id: " + id);
         return subjectRepository.findById(id)
                 .orElseThrow(() -> new SubjectNotFoundException("No subject found by id: " + id));
+    }
+
+    public Subject findSubjectBySubjectId(String subjectId) throws SubjectNotFoundException {
+        return subjectRepository.findSubjectBySubjectId(subjectId)
+                .orElseThrow(() -> new SubjectNotFoundException("No subject found by id: " + subjectId));
+    }
+
+    public Subject findSubjectBySubjectId(String onlineCourseId, Long currentUserId)
+            throws SubjectNotFoundException {
+
+        Subject subject = subjectRepository.findSubjectBySubjectId(onlineCourseId)
+                .orElseThrow(() -> new SubjectNotFoundException("No subject found by id: " + onlineCourseId));
+
+        // Tenta buscar o usuário, mas continua normalmente se não existir
+        Optional<User> optionalUser = userRepository.findById(currentUserId);
+
+        if (optionalUser.isPresent()) {
+            User currentUser = optionalUser.get();
+
+            Set<Long> markedIds = currentUser.getMarkedTopicContents().stream()
+                    .map(TopicContent::getId)
+                    .collect(Collectors.toSet());
+
+            for (Topic topic : subject.getTopics()) {
+                for (TopicContent content : topic.getContents()) {
+                    content.setMarkedByUser(markedIds.contains(content.getId()));
+                }
+            }
+        }
+
+        return subject;
+    }
+
+    public boolean checkIfCurrentUserSubscribed(Long subjectId, Long currentUserId) {
+        User currentUser = userRepository.findById(currentUserId).orElseThrow(null);
+        if (currentUser == null) {
+            return false;
+        }
+        Optional<Subject> subject = subjectRepository.findById(subjectId);
+        if (!subject.isPresent()) {
+            return false;
+        }
+        return currentUser.getSubscribedSubjects().contains(subject.get());
     }
 
     @Override
@@ -43,14 +94,21 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
+    public Page<Subject> findByName(String name, Pageable pageable) {
+        return subjectRepository.findByName(name, pageable);
+    }
+
+    @Override
     public Subject save(Subject subject) {
+        subject.setSubjectId(UUID.randomUUID().toString());
         return subjectRepository.save(subject);
     }
 
     @Override
     public Subject update(Subject subject, Long id) throws SubjectNotFoundException {
         Subject existSubject = findById(id);
-        BeanUtils.copyProperties(subject, existSubject, "id", "topics");
+        //existSubject.setSubjectId(UUID.randomUUID().toString());
+        BeanUtils.copyProperties(subject, existSubject, "id", "subjectId", "topics");
         logger.info("Updating subject: " + subject.getName());
         return subjectRepository.save(existSubject);
     }

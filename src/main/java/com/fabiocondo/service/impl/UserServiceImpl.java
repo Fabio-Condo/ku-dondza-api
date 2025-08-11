@@ -53,9 +53,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final ArticleRepository articleRepository;
     private final QuestionRepository questionRepository;
     private final ContentRepository contentRepository;
+    private final TopicContentRepository topicContentRepository;
+
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, ArticleRepository articleRepository, QuestionRepository questionRepository, ContentRepository contentRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, ArticleRepository articleRepository, QuestionRepository questionRepository, ContentRepository contentRepository, TopicContentRepository topicContentRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
@@ -65,6 +67,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.articleRepository = articleRepository;
         this.questionRepository = questionRepository;
         this.contentRepository = contentRepository;
+        this.topicContentRepository = topicContentRepository;
     }
 
     public Page<User> searchUsers(String query, Pageable pageable) {
@@ -374,6 +377,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new SubjectNotFoundException("Interest not found by id: " + interestId);
         }
         user.getSubjectsInterests().remove(optionalInterest.get());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User toggleTopicContentMarkedStatus(Long userId, Long topicContentId) throws UserNotFoundException, ContentNotFoundException {
+        User user = findById(userId);
+
+        TopicContent topicContent = topicContentRepository.findById(topicContentId)
+                .orElseThrow(() -> new ContentNotFoundException("No Course Content found by id: " + topicContentId));
+
+        Set<TopicContent> markedContents = user.getMarkedTopicContents();
+
+        if (markedContents.contains(topicContent)) {
+            markedContents.remove(topicContent);
+        } else {
+            markedContents.add(topicContent);
+        }
+
         return userRepository.save(user);
     }
 

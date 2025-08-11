@@ -43,6 +43,8 @@ public interface UserService {
 
     void updatePropertyNotLocked(String email, Boolean notLocked) throws EmailNotFoundException;
 
+    User toggleTopicContentMarkedStatus(Long userId, Long topicContentId) throws UserNotFoundException, ContentNotFoundException;
+
     User toggleContentMarkedStatus(Long userId, Long onlineCourseContentId) throws UserNotFoundException, ContentNotFoundException;
 
     @Transactional

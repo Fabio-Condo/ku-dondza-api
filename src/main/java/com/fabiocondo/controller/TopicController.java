@@ -29,8 +29,8 @@ public class TopicController {
     }
 
     @GetMapping("/find-by-topicId/{topicId}")
-    public ResponseEntity<Topic> findQuizByQuizId(@PathVariable("topicId") String topicId) throws TopicNotFoundException {
-        Topic topic = topicService.findQuizByQuizId(topicId);
+    public ResponseEntity<Topic> findTopicByTopicId(@PathVariable("topicId") String topicId) throws TopicNotFoundException {
+        Topic topic = topicService.findTopicByTopicId(topicId);
         return ResponseEntity.status(HttpStatus.OK).body(topic);
     }
 

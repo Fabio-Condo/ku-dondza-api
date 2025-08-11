@@ -2,6 +2,8 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Subject;
+import com.fabiocondo.dto.SubjectDto;
+import com.fabiocondo.dtoMapper.SubjectMapper;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.service.impl.SubjectServiceImpl;
 import org.springframework.data.domain.Page;
@@ -17,9 +19,11 @@ import java.util.List;
 public class SubjectController {
 
     public SubjectServiceImpl subjectServiceImpl;
+    public SubjectMapper subjectMapper;
 
-    public SubjectController(SubjectServiceImpl subjectServiceImpl) {
+    public SubjectController(SubjectServiceImpl subjectServiceImpl, SubjectMapper subjectMapper) {
         this.subjectServiceImpl = subjectServiceImpl;
+        this.subjectMapper = subjectMapper;
     }
 
     @GetMapping("/{id}")
@@ -27,9 +31,20 @@ public class SubjectController {
         return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.findById(id));
     }
 
+    @GetMapping("/find-by-subjectId/{subjectId}")
+    public ResponseEntity<SubjectDto> findSubjectBySubjectId(@PathVariable("subjectId") String subjectId, @RequestParam("currentUserId") Long currentUserId) throws SubjectNotFoundException {
+        Subject subject = subjectServiceImpl.findSubjectBySubjectId(subjectId, currentUserId);
+        return ResponseEntity.status(HttpStatus.OK).body(subjectMapper.domainToDtoWithTopics(subject, currentUserId));
+    }
+
+    //@GetMapping("/filter")
+    //public ResponseEntity<Page<Subject>> findAll(Pageable pageable) {
+    //    return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.findAll(pageable));
+    //}
+
     @GetMapping("/filter")
-    public ResponseEntity<Page<Subject>> findAll(Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.findAll(pageable));
+    public Page<Subject> findByName(@RequestParam(required = false, defaultValue = "") String name, Pageable pageable){
+        return subjectServiceImpl.findByName(name, pageable);
     }
 
     @GetMapping

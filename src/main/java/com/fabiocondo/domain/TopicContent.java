@@ -29,6 +29,9 @@ public class TopicContent {
     @JoinColumn(name = "topic_id", nullable = false)
     private Topic topic;
 
+    @Transient // Nao salvar na bd
+    private boolean markedByUser;
+
     // Constructors
     public TopicContent() {}
 
@@ -103,6 +106,14 @@ public class TopicContent {
 
     public void setTopic(Topic topic) {
         this.topic = topic;
+    }
+
+    public boolean isMarkedByUser() {
+        return markedByUser;
+    }
+
+    public void setMarkedByUser(boolean markedByUser) {
+        this.markedByUser = markedByUser;
     }
 }
 

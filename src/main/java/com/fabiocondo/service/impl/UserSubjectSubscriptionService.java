@@ -2,6 +2,7 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.UserSubjectSubscription;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
+import com.fabiocondo.exception.domain.SubscriptionExistException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.exception.domain.UserSubjectSubscriptionNotFoundException;
 import com.fabiocondo.repository.SubjectRepository;
@@ -27,7 +28,11 @@ public class UserSubjectSubscriptionService {
         this.userSubjectSubscriptionRepository = userSubjectSubscriptionRepository;
     }
 
-    public UserSubjectSubscription addSubjectToUser(UserSubjectSubscription userSubjectSubscription) {
+    public UserSubjectSubscription addSubjectToUser(UserSubjectSubscription userSubjectSubscription) throws UserNotFoundException, SubjectNotFoundException, SubscriptionExistException {
+        boolean isEnrolled = isUserEnrolledInSubject(userSubjectSubscription.getUser().getId(), userSubjectSubscription.getSubject().getId());
+        if(isEnrolled){
+            throw new SubscriptionExistException("Subscription already exists");
+        }
         userSubjectSubscription.setDate(new Date());
         return userSubjectSubscriptionRepository.save(userSubjectSubscription);
     }

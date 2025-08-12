@@ -5,6 +5,7 @@ import com.fabiocondo.domain.UserSubjectSubscription;
 import com.fabiocondo.dto.UserDTO;
 import com.fabiocondo.dtoMapper.UserMapper;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
+import com.fabiocondo.exception.domain.SubscriptionExistException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.exception.domain.UserSubjectSubscriptionNotFoundException;
 import com.fabiocondo.service.impl.SubjectServiceImpl;
@@ -29,7 +30,7 @@ public class UserSubjectSubscriptionController {
     }
 
     @PostMapping
-    public ResponseEntity<UserSubjectSubscription> addSubjectToUser(@RequestBody UserSubjectSubscription userSubjectSubscription) {
+    public ResponseEntity<UserSubjectSubscription> addSubjectToUser(@RequestBody UserSubjectSubscription userSubjectSubscription) throws UserNotFoundException, SubjectNotFoundException, SubscriptionExistException {
         return ResponseEntity.ok(userSubjectSubscriptionService.addSubjectToUser(userSubjectSubscription));
     }
 

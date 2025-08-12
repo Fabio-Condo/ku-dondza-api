@@ -38,12 +38,12 @@ public class SubjectMapper {
         subjectDto.setName(subject.getName());
         subjectDto.setDescription(subject.getDescription());
         subjectDto.setTopics(subject.getTopics());
-        subjectDto.setCurrentUserMarkedContentRate(subjectService.calculateUserProgressInSubject(currentUserId, subject.getId()));
 
         Optional<User> currentUser = userRepository.findById(currentUserId);
 
         if(currentUser.isPresent()){
             subjectDto.setCurrentUserSubscribed(subjectService.checkIfCurrentUserSubscribed(subject.getId(), currentUserId));
+            subjectDto.setCurrentUserMarkedContentRate(subjectService.calculateUserProgressInSubject(currentUserId, subject.getId()));
         }
         return subjectDto;
     }

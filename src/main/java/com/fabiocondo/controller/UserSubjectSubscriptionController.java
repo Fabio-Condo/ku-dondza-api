@@ -1,6 +1,8 @@
 package com.fabiocondo.controller;
 
+import com.fabiocondo.domain.User;
 import com.fabiocondo.domain.UserSubjectSubscription;
+import com.fabiocondo.dto.UserDTO;
 import com.fabiocondo.dtoMapper.UserMapper;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
@@ -58,15 +60,14 @@ public class UserSubjectSubscriptionController {
         return ResponseEntity.ok(isEnrolled);
     }
 
-    /*
     @GetMapping("/{subjectId}/enrolled-users")
-    public ResponseEntity<Page<UserDTO>> getEnrolledUsersBySubjectId(@PathVariable Long subjectId, Pageable pageable) throws CourseNotFoundException {
+    public ResponseEntity<Page<UserDTO>> getEnrolledUsersBySubjectId(@PathVariable Long subjectId, Pageable pageable) throws SubjectNotFoundException {
         Page<User> students = subjectService.getStudentsByCourseId(subjectId, pageable);
         Page<UserDTO> userDTOs = userMapper.domainPageToDTOPage(students, pageable);
 
         userDTOs.forEach(dto -> {
             try {
-                double progress = subjectService.calculateUserProgressInCourse(dto.getId(), subjectId);
+                double progress = subjectService.calculateUserProgressInSubject(dto.getId(), subjectId);
                 dto.setMarkedContentRate(progress);
             } catch (UserNotFoundException e) {
                 dto.setMarkedContentRate(0);
@@ -75,5 +76,4 @@ public class UserSubjectSubscriptionController {
 
         return ResponseEntity.ok(userDTOs);
     }
-    */
 }

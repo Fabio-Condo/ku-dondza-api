@@ -3,6 +3,7 @@ package com.fabiocondo.dtoMapper;
 import com.fabiocondo.domain.Subject;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.dto.SubjectDto;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.impl.SubjectServiceImpl;
 import org.springframework.stereotype.Component;
@@ -30,13 +31,14 @@ public class SubjectMapper {
         return subjectDto;
     }
 
-    public SubjectDto domainToDtoWithTopics(Subject subject, Long currentUserId) {
+    public SubjectDto domainToDtoWithTopics(Subject subject, Long currentUserId) throws UserNotFoundException {
         SubjectDto subjectDto = new SubjectDto();
         subjectDto.setId(subject.getId());
         subjectDto.setSubjectId(subject.getSubjectId());
         subjectDto.setName(subject.getName());
         subjectDto.setDescription(subject.getDescription());
         subjectDto.setTopics(subject.getTopics());
+        subjectDto.setCurrentUserMarkedContentRate(subjectService.calculateUserProgressInSubject(currentUserId, subject.getId()));
 
         Optional<User> currentUser = userRepository.findById(currentUserId);
 

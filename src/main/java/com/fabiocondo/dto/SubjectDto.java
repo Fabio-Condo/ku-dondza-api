@@ -17,6 +17,8 @@ public class SubjectDto {
 
     private boolean isCurrentUserSubscribed;
 
+    private double currentUserMarkedContentRate;
+
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<Topic> topics;
 
@@ -58,6 +60,14 @@ public class SubjectDto {
 
     public void setCurrentUserSubscribed(boolean currentUserSubscribed) {
         isCurrentUserSubscribed = currentUserSubscribed;
+    }
+
+    public double getCurrentUserMarkedContentRate() {
+        return currentUserMarkedContentRate;
+    }
+
+    public void setCurrentUserMarkedContentRate(double currentUserMarkedContentRate) {
+        this.currentUserMarkedContentRate = currentUserMarkedContentRate;
     }
 
     public List<Topic> getTopics() {

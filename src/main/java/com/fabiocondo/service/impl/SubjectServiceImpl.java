@@ -2,7 +2,9 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.SubjectRepository;
+import com.fabiocondo.repository.TopicContentRepository;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.SubjectService;
 import org.slf4j.Logger;
@@ -28,9 +30,12 @@ public class SubjectServiceImpl implements SubjectService {
 
     UserRepository userRepository;
 
-    public SubjectServiceImpl(SubjectRepository subjectRepository, UserRepository userRepository) {
+    private final TopicContentRepository contentRepository;
+
+    public SubjectServiceImpl(SubjectRepository subjectRepository, UserRepository userRepository, TopicContentRepository contentRepository) {
         this.subjectRepository = subjectRepository;
         this.userRepository = userRepository;
+        this.contentRepository = contentRepository;
     }
 
     @Override
@@ -81,6 +86,25 @@ public class SubjectServiceImpl implements SubjectService {
             return false;
         }
         return currentUser.getSubscribedSubjects().contains(subject.get());
+    }
+
+    public Page<User> getStudentsByCourseId(Long courseId, Pageable pageable) throws SubjectNotFoundException {
+        Subject subject = findById(courseId);
+        return subjectRepository.findStudentsBySubjectId(subject.getId(), pageable);
+    }
+
+    public double calculateUserProgressInSubject(Long userId, Long subjectId) throws UserNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));
+
+        List<TopicContent> contents = contentRepository.findByTopic_Subject_Id(subjectId);
+
+        long totalMarked = user.getMarkedTopicContents().stream()
+                .filter(contents::contains)
+                .count();
+
+        if (contents.isEmpty()) return 0;
+        return (double) totalMarked / contents.size() * 100;
     }
 
     @Override

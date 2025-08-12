@@ -5,6 +5,7 @@ import com.fabiocondo.domain.Subject;
 import com.fabiocondo.dto.SubjectDto;
 import com.fabiocondo.dtoMapper.SubjectMapper;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.SubjectServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +33,7 @@ public class SubjectController {
     }
 
     @GetMapping("/find-by-subjectId/{subjectId}")
-    public ResponseEntity<SubjectDto> findSubjectBySubjectId(@PathVariable("subjectId") String subjectId, @RequestParam("currentUserId") Long currentUserId) throws SubjectNotFoundException {
+    public ResponseEntity<SubjectDto> findSubjectBySubjectId(@PathVariable("subjectId") String subjectId, @RequestParam("currentUserId") Long currentUserId) throws SubjectNotFoundException, UserNotFoundException {
         Subject subject = subjectServiceImpl.findSubjectBySubjectId(subjectId, currentUserId);
         return ResponseEntity.status(HttpStatus.OK).body(subjectMapper.domainToDtoWithTopics(subject, currentUserId));
     }

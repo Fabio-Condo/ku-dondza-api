@@ -22,6 +22,8 @@ public class SubjectDto {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<Topic> topics;
 
+    private Long totalTopics;
+
     public Long getId() {
         return id;
     }
@@ -76,5 +78,13 @@ public class SubjectDto {
 
     public void setTopics(List<Topic> topics) {
         this.topics = topics;
+    }
+
+    public Long getTotalTopics() {
+        return totalTopics;
+    }
+
+    public void setTotalTopics(Long totalTopics) {
+        this.totalTopics = totalTopics;
     }
 }

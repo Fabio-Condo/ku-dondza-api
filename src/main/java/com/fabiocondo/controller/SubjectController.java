@@ -2,10 +2,12 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Subject;
+import com.fabiocondo.dto.QuestionDTO;
 import com.fabiocondo.dto.SubjectDto;
 import com.fabiocondo.dtoMapper.SubjectMapper;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.repository.filter.QuestionFilter;
 import com.fabiocondo.service.impl.SubjectServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,9 +45,14 @@ public class SubjectController {
     //    return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.findAll(pageable));
     //}
 
+    //@GetMapping("/filter")
+    //public Page<Subject> findByName(@RequestParam(required = false, defaultValue = "") String name, Pageable pageable){
+    //    return subjectServiceImpl.findByName(name, pageable);
+    //}
+
     @GetMapping("/filter")
-    public Page<Subject> findByName(@RequestParam(required = false, defaultValue = "") String name, Pageable pageable){
-        return subjectServiceImpl.findByName(name, pageable);
+    public Page<SubjectDto> filter(@RequestParam(required = false, defaultValue = "") String name, @RequestParam("currentUserId") Long currentUserId, Pageable pageable) {
+        return subjectMapper.domainPageToDTOPage(subjectServiceImpl.findByName(name, pageable), currentUserId, pageable);
     }
 
     @GetMapping

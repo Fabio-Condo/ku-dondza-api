@@ -15,4 +15,6 @@ public interface TopicRepository extends JpaRepository<Topic, Long>, TopicReposi
     Optional<Topic> findTopicByTopicId(String topicId);
 
     long countBySubjectId(Long subjectId);
+
+    long countBySubjectIdAndIsReadyForQuizTrue(Long subjectId);
 }

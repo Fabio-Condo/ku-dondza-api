@@ -6,6 +6,7 @@ import com.fabiocondo.dto.SubjectDto;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.impl.SubjectServiceImpl;
+import com.fabiocondo.service.impl.TopicService;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -16,10 +17,12 @@ public class SubjectMapper {
     private final UserRepository userRepository;
 
     private final SubjectServiceImpl subjectService;
+    private final TopicService topicService;
 
-    public SubjectMapper(UserRepository userRepository, SubjectServiceImpl subjectService) {
+    public SubjectMapper(UserRepository userRepository, SubjectServiceImpl subjectService, TopicService topicService) {
         this.userRepository = userRepository;
         this.subjectService = subjectService;
+        this.topicService = topicService;
     }
 
     public SubjectDto domainToDto(Subject subject) {
@@ -37,7 +40,9 @@ public class SubjectMapper {
         subjectDto.setSubjectId(subject.getSubjectId());
         subjectDto.setName(subject.getName());
         subjectDto.setDescription(subject.getDescription());
-        subjectDto.setTopics(subject.getTopics());
+
+        //subjectDto.setTopics(subject.getTopics());
+        subjectDto.setTopics(topicService.getBySubjectId(subject.getId()));
 
         Optional<User> currentUser = userRepository.findById(currentUserId);
 

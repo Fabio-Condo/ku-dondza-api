@@ -61,12 +61,6 @@ public class TopicService {
     }
 
     public List<Topic> getBySubjectId(Long subjectId) {
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//            throw new RuntimeException("A operação foi interrompida", e);
-//        }
 
         return topicRepository.findBySubjectIdAndIsReadyForQuizTrueOrderByNameAsc(subjectId);
         //return topicRepository.findBySubjectIdOrderByNameAsc(subjectId);

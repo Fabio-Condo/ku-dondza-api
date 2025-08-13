@@ -131,7 +131,7 @@ public class SubjectServiceImpl implements SubjectService {
     @Override
     public Subject update(Subject subject, Long id) throws SubjectNotFoundException {
         Subject existSubject = findById(id);
-        //existSubject.setSubjectId(UUID.randomUUID().toString());
+        existSubject.setSubjectId(UUID.randomUUID().toString());
         BeanUtils.copyProperties(subject, existSubject, "id", "subjectId", "topics");
         logger.info("Updating subject: " + subject.getName());
         return subjectRepository.save(existSubject);

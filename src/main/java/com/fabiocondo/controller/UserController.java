@@ -6,7 +6,7 @@ import com.fabiocondo.dto.UserDTO;
 import com.fabiocondo.dtoMapper.UserMapper;
 import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
-import com.fabiocondo.repository.filter.QuizFilter;
+import com.fabiocondo.repository.TopicContentRepository;
 import com.fabiocondo.repository.filter.UserFilter;
 import com.fabiocondo.service.impl.AuthServiceImpl;
 import com.fabiocondo.service.UserService;
@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.fabiocondo.constant.UserImplConstant.EMAIL_SENT;
@@ -34,11 +35,13 @@ public class UserController {
 
     private final UserService userService;
     private final UserMapper userMapper;
+    private final TopicContentRepository topicContentRepository;
 
     @Autowired
-    public UserController(UserService userService, AuthServiceImpl authServiceImpl, UserMapper userMapper) {
+    public UserController(UserService userService, AuthServiceImpl authServiceImpl, UserMapper userMapper, TopicContentRepository topicContentRepository) {
         this.userService = userService;
         this.userMapper = userMapper;
+        this.topicContentRepository = topicContentRepository;
     }
 
     @PostMapping("/register")
@@ -180,13 +183,36 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.removeInterestFromUserInterests(userId, interestId));
     }
 
-    @PutMapping("/{userId}/marked-topic-contents/{contentId}/toggle")
+    //@PutMapping("/{userId}/marked-topic-contents/{contentId}/toggle")
     public ResponseEntity<User> toggleTopicContentMarkedStatus(@PathVariable Long userId, @PathVariable Long contentId) throws UserNotFoundException, ContentNotFoundException {
         return ResponseEntity.status(OK).body(userService.toggleTopicContentMarkedStatus(userId, contentId));
     }
 
-    @PutMapping("/{userId}/marked-contents/{contentId}/toggle")
-    public ResponseEntity<User> toggleMarkedContent(@PathVariable Long userId, @PathVariable Long contentId) throws UserNotFoundException, ContentNotFoundException {
+    @PutMapping("/{userId}/marked-topic-contents/{contentId}/toggle")
+    public ResponseEntity<UserDTO> toggleMarkedContent(
+            @PathVariable Long userId,
+            @PathVariable Long contentId
+    ) throws UserNotFoundException, ContentNotFoundException {
+
+        // Busca o conteúdo
+        TopicContent content = topicContentRepository.findById(contentId)
+                .orElseThrow(() -> new ContentNotFoundException("Content not found with id: " + contentId));
+
+        // Alterna o status de marcado/desmarcado
+        User user = userService.toggleTopicContentMarkedStatus(userId, contentId);
+
+        // Mapeia o usuário com a taxa de progresso atualizada
+        Long subjectId = content.getTopic().getSubject().getId();
+        UserDTO userDTO = userMapper.domainToDtoWithMarkedContentRate(subjectId, user);
+
+        System.out.println("Rate: " + userDTO.getMarkedContentRate());
+
+        // Retorna a resposta
+        return ResponseEntity.ok(userDTO);
+    }
+
+    //@PutMapping("/{userId}/marked-contents/{contentId}/toggle")
+    public ResponseEntity<User> toggleMarkedContentOld(@PathVariable Long userId, @PathVariable Long contentId) throws UserNotFoundException, ContentNotFoundException {
         return ResponseEntity.status(OK).body(userService.toggleContentMarkedStatus(userId, contentId));
     }
 

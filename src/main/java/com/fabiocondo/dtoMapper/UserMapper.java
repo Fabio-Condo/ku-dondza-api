@@ -2,7 +2,9 @@ package com.fabiocondo.dtoMapper;
 
 import com.fabiocondo.domain.User;
 import com.fabiocondo.dto.UserDTO;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.CompetitionService;
+import com.fabiocondo.service.impl.SubjectServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -15,8 +17,11 @@ public class UserMapper {
 
     private final CompetitionService competitionService;
 
-    public UserMapper(CompetitionService competitionService) {
+    private final SubjectServiceImpl subjectService;
+
+    public UserMapper(CompetitionService competitionService, SubjectServiceImpl subjectService) {
         this.competitionService = competitionService;
+        this.subjectService = subjectService;
     }
 
     public User dtoToDomainObject(UserDTO userDTO) {
@@ -43,6 +48,20 @@ public class UserMapper {
         userDTO.setUserType(user.getUserType());
         userDTO.setPlan(user.getPlan());
         userDTO.setAllowedUser(competitionService.checkIfIsAllowed(competitionId, user.getId()));
+        return userDTO;
+    }
+
+    public UserDTO domainToDtoWithMarkedContentRate(Long subjectId, User user) throws UserNotFoundException {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
+        userDTO.setUserId(user.getUserId());
+        userDTO.setFullName(user.getFullName());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setBio(user.getBio());
+        userDTO.setProfileImageUrl(user.getProfileImageUrl());
+        userDTO.setUserType(user.getUserType());
+        userDTO.setPlan(user.getPlan());
+        userDTO.setMarkedContentRate(subjectService.calculateUserProgressInSubject(user.getId(), subjectId));
         return userDTO;
     }
 

@@ -6,6 +6,7 @@ import com.fabiocondo.dtoMapper.QuestionMapper;
 import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.exception.domain.InterestNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
+import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.filter.QuestionFilter;
 import com.fabiocondo.service.impl.QuestionService;
 import org.springframework.data.domain.Page;
@@ -91,6 +92,11 @@ public class QuestionController {
     @PostMapping("/{questionId}/question-image") // remover
     public ResponseEntity<Question> updateQuestionImage(@PathVariable Long questionId, @RequestParam("file") MultipartFile file) throws IOException, QuestionNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.updateQuestionImage(questionId, file));
+    }
+
+    @PostMapping("/generate-from-ai")
+    public Question generateQuestionFromAI(@RequestParam Long topicId, @RequestParam DifficultyLevel difficultyLevel) throws TopicNotFoundException {
+        return questionService.generateAdvancedQuestionFromAI(topicId, difficultyLevel);
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

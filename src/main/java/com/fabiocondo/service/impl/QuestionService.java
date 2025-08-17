@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.plaf.synth.SynthEditorPaneUI;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,7 +135,7 @@ public class QuestionService {
         return question;
     }
 
-    public Question generateAdvancedQuestionFromAI(Long topicId, DifficultyLevel difficulty) throws TopicNotFoundException {
+    public Question generateAdvancedQuestionFromAI(Long topicId, DifficultyLevel difficulty) throws TopicNotFoundException, QuestionNotFoundException {
 
         Topic topic = topicService.findById(topicId);
         String subject = topic.getSubject().getName();
@@ -143,6 +144,7 @@ public class QuestionService {
         Question question = new Question();
         question.setTopic(topic);
         question.setDifficultyLevel(difficulty);
+        question.setTimeLimit(60);
 
         String prompt = String.format(
                 "Gere uma questão no seguinte formato JSON:\n" +
@@ -167,7 +169,7 @@ public class QuestionService {
                         "- mathExpressions é opcional, mas inclua se houver expressões relevantes.\n" +
                         "- Tema: %s — %s\n" +
                         "- Dificuldade: %s\n",
-                subject, topicName, difficulty.name()
+                subject, topicName, difficulty
         );
 
         try {
@@ -208,7 +210,10 @@ public class QuestionService {
             e.printStackTrace();
             throw new RuntimeException("Erro ao gerar questão pela IA: " + e.getMessage());
         }
+        System.out.println("Top id: " + topicId);
+        System.out.println("Difficulty: " + difficulty);
 
+        //return findById(1L);
         return question;
     }
 

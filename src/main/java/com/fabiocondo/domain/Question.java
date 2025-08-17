@@ -28,6 +28,7 @@ public class Question {
 
     @Lob // Large Object
     private String tip;
+
     @Lob // Large Object
     private String solution;
 

@@ -94,8 +94,8 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.updateQuestionImage(questionId, file));
     }
 
-    @PostMapping("/generate-from-ai")
-    public Question generateQuestionFromAI(@RequestParam Long topicId, @RequestParam DifficultyLevel difficultyLevel) throws TopicNotFoundException {
+    @GetMapping("/generate-from-ai")
+    public Question generateQuestionFromAI(@RequestParam Long topicId, @RequestParam DifficultyLevel difficultyLevel) throws TopicNotFoundException, QuestionNotFoundException {
         return questionService.generateAdvancedQuestionFromAI(topicId, difficultyLevel);
     }
 

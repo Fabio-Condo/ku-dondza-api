@@ -149,24 +149,28 @@ public class QuestionService {
         String prompt = String.format(
                 "Gere uma questão no seguinte formato JSON:\n" +
                         "{\n" +
-                        "    \"text\": \"enunciado em LaTeX\",\n" +
-                        "    \"tip\": \"dica em LaTeX\",\n" +
-                        "    \"solution\": \"solução em LaTeX\",\n" +
-                        "    \"answers\": [\n" +
-                        "        {\"text\": \"resposta 1\", \"correct\": false},\n" +
-                        "        {\"text\": \"resposta 2\", \"correct\": true},\n" +
-                        "        {\"text\": \"resposta 3\", \"correct\": false},\n" +
-                        "        {\"text\": \"resposta 4\", \"correct\": false}\n" +
-                        "    ],\n" +
-                        "    \"mathExpressions\": [\n" +
-                        "        {\"expression\": \"x^2 + 3x + 2\"},\n" +
-                        "        {\"expression\": \"\\\\frac{1}{x}\"}\n" +
-                        "    ]\n" +
+                        "  \"text\": \"enunciado em LaTeX\",\n" +
+                        "  \"tip\": \"dica em LaTeX\",\n" +
+                        "  \"solution\": \"solução em LaTeX\",\n" +
+                        "  \"answers\": [\n" +
+                        "    {\"text\": \"resposta 1\", \"correct\": false},\n" +
+                        "    {\"text\": \"resposta 2\", \"correct\": true},\n" +
+                        "    {\"text\": \"resposta 3\", \"correct\": false},\n" +
+                        "    {\"text\": \"resposta 4\", \"correct\": false}\n" +
+                        "  ],\n" +
+                        "  \"mathExpressions\": [\n" +
+                        "    {\"expression\": \"x^2 + 3x + 2\"},\n" +
+                        "    {\"expression\": \"\\\\frac{1}{x}\"}\n" +
+                        "  ]\n" +
                         "}\n\n" +
-                        "Regras:\n" +
-                        "- Enunciado, dica e solução devem conter LaTeX válido para ser renderizado.\n" +
-                        "- Máximo de 4 alternativas.\n" +
-                        "- mathExpressions é opcional, mas inclua se houver expressões relevantes.\n" +
+                        "Regras obrigatórias:\n" +
+                        "- Responda **somente** com o JSON válido, nada antes ou depois.\n" +
+                        "- Não inclua explicações, comentários ou texto fora do JSON.\n" +
+                        "- O JSON deve ser sintaticamente válido (parseável em Java).\n" +
+                        "- Todos os campos são obrigatórios.\n" +
+                        "- O enunciado, a dica e a solução devem conter apenas LaTeX válido.\n" +
+                        "- Máximo de 4 alternativas em \"answers\" (uma correta, as demais incorretas).\n" +
+                        "- \"mathExpressions\" é opcional, mas inclua se houver expressões relevantes.\n" +
                         "- Tema: %s — %s\n" +
                         "- Dificuldade: %s\n",
                 subject, topicName, difficulty
@@ -174,12 +178,20 @@ public class QuestionService {
 
         try {
             String aiResponse = gptService.askAssistant(prompt);
+            aiResponse = extractJson(aiResponse);
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(aiResponse);
 
             question.setText(root.get("text").asText());
             question.setTip(root.get("tip").asText());
             question.setSolution(root.get("solution").asText());
+
+            // Falta de fallback se o JSON não tiver todos os campos
+            // Se a IA não gerar "tip" ou "mathExpressions", root.get("tip").asText() pode dar NPE.
+            // Melhor usar path() em vez de get():
+            //question.setText(root.path("text").asText(null));
+            //question.setTip(root.path("tip").asText(null));
+            //question.setSolution(root.path("solution").asText(null));
 
             List<Answer> answers = new ArrayList<>();
             for (JsonNode ansNode : root.withArray("answers")) {
@@ -215,6 +227,15 @@ public class QuestionService {
 
         //return findById(1L);
         return question;
+    }
+
+    private String extractJson(String response) {
+        int start = response.indexOf("{");
+        int end = response.lastIndexOf("}");
+        if (start >= 0 && end >= 0 && end > start) {
+            return response.substring(start, end + 1);
+        }
+        throw new RuntimeException("Resposta da IA não contém JSON válido");
     }
 
     private boolean validateLatex(String latex) {

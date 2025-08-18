@@ -62,8 +62,8 @@ public class TopicService {
 
     public List<Topic> getBySubjectId(Long subjectId) {
 
-        return topicRepository.findBySubjectIdAndIsReadyForQuizTrueOrderByNameAsc(subjectId);
-        //return topicRepository.findBySubjectIdOrderByNameAsc(subjectId);
+        return topicRepository.findBySubjectIdAndIsReadyForQuizTrueOrderByPositionAsc(subjectId);
+        //return topicRepository.findBySubjectIdOrderByPositionAsc(subjectId);
     }
 
     public void delete(Long id) throws TopicNotFoundException {

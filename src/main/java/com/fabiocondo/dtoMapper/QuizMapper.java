@@ -1,7 +1,9 @@
 package com.fabiocondo.dtoMapper;
 
+import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.domain.Topic;
+import com.fabiocondo.dto.QuestionDTO;
 import com.fabiocondo.dto.QuizDTO;
 import com.fabiocondo.repository.QuizRepository;
 import com.fabiocondo.service.impl.QuizService;
@@ -11,7 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -74,8 +78,7 @@ public class QuizMapper {
         quizDTO.setAnonymous(quiz.isAnonymous());
         quizDTO.setSubject(quiz.getSubject());
         quizDTO.setUser(quiz.getUser());
-        //quizDTO.setQuestions(quiz.getQuestions()); //
-        quizDTO.setQuestions(questionMapper.domainPageToDTOSet(quiz.getQuestions())); //
+        quizDTO.setQuestions(sortQuestionsByTopicPositionAndId(quiz.getQuestions()));
         quizDTO.setAnswers(quiz.getAnswers());
         return quizDTO;
     }
@@ -85,6 +88,17 @@ public class QuizMapper {
                 .stream()
                 .sorted(Comparator.comparing(Topic::getName)) // ou getOrder(), getId(), etc.
                 .collect(Collectors.toList());
+    }
+
+    public Set<QuestionDTO> sortQuestionsByTopicPositionAndId(Set<Question> questions) {
+        return questions.stream()
+                .sorted(
+                        Comparator
+                                .comparing((Question q) -> q.getTopic().getPosition())
+                                .thenComparing(Question::getId)
+                )
+                .map(questionMapper::domainToDTO)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public Page<QuizDTO> domainPageToDTOPage(Page<Quiz> quizzes, Pageable pageable) {

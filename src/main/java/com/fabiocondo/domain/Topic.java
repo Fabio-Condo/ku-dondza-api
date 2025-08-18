@@ -27,6 +27,8 @@ public class Topic {
 
     private boolean isReadyForQuiz;
 
+    private Integer position; // Novo campo para controlar a posição do conteúdo
+
     @JsonIgnoreProperties("topic")
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Question> questions;
@@ -93,6 +95,14 @@ public class Topic {
 
     public void setReadyForQuiz(boolean readyForQuiz) {
         isReadyForQuiz = readyForQuiz;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
     }
 
     public List<Question> getQuestions() {

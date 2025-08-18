@@ -23,6 +23,7 @@ public class Subject {
 
     @JsonIgnore
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("position ASC") // Ordena os conteúdos ao carregar
     private List<Topic> topics;
 
     @JsonIgnore

@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TopicRepository extends JpaRepository<Topic, Long>, TopicRepositoryQuery {
-    List<Topic> findBySubjectIdOrderByNameAsc(Long subjectId);
+    List<Topic> findBySubjectIdOrderByPositionAsc(Long subjectId);
 
-    List<Topic> findBySubjectIdAndIsReadyForQuizTrueOrderByNameAsc(Long subjectId);
+    List<Topic> findBySubjectIdAndIsReadyForQuizTrueOrderByPositionAsc(Long subjectId);
 
     Optional<Topic> findTopicByTopicId(String topicId);
 

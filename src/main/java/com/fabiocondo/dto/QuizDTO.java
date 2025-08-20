@@ -2,6 +2,7 @@ package com.fabiocondo.dto;
 
 import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.DifficultyLevel;
+import com.fabiocondo.enumeration.QuizType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -17,6 +18,9 @@ public class QuizDTO {
 
     @Enumerated(EnumType.STRING)
     private DifficultyLevel difficultyLevel;
+
+    @Enumerated(EnumType.STRING)
+    private QuizType type;
 
     private int limitPerTopic;
 
@@ -69,6 +73,14 @@ public class QuizDTO {
 
     public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
         this.difficultyLevel = difficultyLevel;
+    }
+
+    public QuizType getType() {
+        return type;
+    }
+
+    public void setType(QuizType type) {
+        this.type = type;
     }
 
     public int getLimitPerTopic() {

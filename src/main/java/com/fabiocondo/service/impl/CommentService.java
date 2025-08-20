@@ -28,7 +28,7 @@ public class CommentService {
 
     public Comment update(Comment comment, Long id) throws CommentNotFoundException {
         Comment existComment = findById(id);
-        BeanUtils.copyProperties(comment, existComment, "id", "question", "user", "createdAt");
+        BeanUtils.copyProperties(comment, existComment, "id", "question", "user", "createdAt", "likes");
         return commentRepository.save(existComment);
     }
 

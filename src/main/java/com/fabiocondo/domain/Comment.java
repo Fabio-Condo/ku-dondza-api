@@ -1,7 +1,11 @@
 package com.fabiocondo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -26,6 +30,11 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentLike> likes = new ArrayList<>();
+
 
     //@ManyToOne(fetch = FetchType.LAZY)
     //@JoinColumn(name = "parent_id")
@@ -90,5 +99,13 @@ public class Comment {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<CommentLike> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(List<CommentLike> likes) {
+        this.likes = likes;
     }
 }

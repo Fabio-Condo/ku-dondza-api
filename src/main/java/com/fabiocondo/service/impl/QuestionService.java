@@ -137,13 +137,6 @@ public class QuestionService {
         Question question = findById(id);
         question.setValidated(status);
         questionRepository.save(question);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
     }
 
     public Question generateAdvancedQuestionFromAI(Long topicId, DifficultyLevel difficulty) throws TopicNotFoundException, QuestionNotFoundException {

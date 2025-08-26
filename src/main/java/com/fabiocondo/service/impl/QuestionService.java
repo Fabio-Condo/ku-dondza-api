@@ -5,7 +5,6 @@ import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
-import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.filter.QuestionFilter;
@@ -19,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.plaf.synth.SynthEditorPaneUI;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;

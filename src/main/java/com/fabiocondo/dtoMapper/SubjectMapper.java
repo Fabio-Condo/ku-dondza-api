@@ -37,7 +37,7 @@ public class SubjectMapper {
         subjectDto.setSubjectId(subject.getSubjectId());
         subjectDto.setName(subject.getName());
         subjectDto.setDescription(subject.getDescription());
-        subjectDto.setTotalTopics(topicRepository.countBySubjectIdAndIsReadyForQuizTrue(subject.getId()));
+        subjectDto.setTotalTopics(topicRepository.countBySubjectIdAndEnabledTrue(subject.getId()));
         return subjectDto;
     }
 
@@ -50,7 +50,7 @@ public class SubjectMapper {
 
         //subjectDto.setTopics(subject.getTopics());
         subjectDto.setTopics(topicService.getBySubjectId(subject.getId()));
-        subjectDto.setTotalTopics(topicRepository.countBySubjectIdAndIsReadyForQuizTrue(subject.getId()));
+        subjectDto.setTotalTopics(topicRepository.countBySubjectIdAndEnabledTrue(subject.getId()));
 
         Optional<User> currentUser = userRepository.findById(currentUserId);
 

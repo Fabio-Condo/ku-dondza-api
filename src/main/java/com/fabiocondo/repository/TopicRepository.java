@@ -10,11 +10,11 @@ import java.util.Optional;
 public interface TopicRepository extends JpaRepository<Topic, Long>, TopicRepositoryQuery {
     List<Topic> findBySubjectIdOrderByPositionAsc(Long subjectId);
 
-    List<Topic> findBySubjectIdAndIsReadyForQuizTrueOrderByPositionAsc(Long subjectId);
+    List<Topic> findBySubjectIdAndEnabledTrueOrderByPositionAsc(Long subjectId);
 
     Optional<Topic> findTopicByTopicId(String topicId);
 
     long countBySubjectId(Long subjectId);
 
-    long countBySubjectIdAndIsReadyForQuizTrue(Long subjectId);
+    long countBySubjectIdAndEnabledTrue(Long subjectId);
 }

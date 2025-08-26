@@ -25,7 +25,7 @@ public class Topic {
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
-    private boolean isReadyForQuiz;
+    private boolean enabled; // Para quizzes, etc
 
     private Integer position; // Novo campo para controlar a posição do conteúdo
 
@@ -89,12 +89,12 @@ public class Topic {
         this.subject = subject;
     }
 
-    public boolean isReadyForQuiz() {
-        return isReadyForQuiz;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setReadyForQuiz(boolean readyForQuiz) {
-        isReadyForQuiz = readyForQuiz;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public Integer getPosition() {

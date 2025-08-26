@@ -62,7 +62,7 @@ public class TopicService {
 
     public List<Topic> getBySubjectId(Long subjectId) {
 
-        return topicRepository.findBySubjectIdAndIsReadyForQuizTrueOrderByPositionAsc(subjectId);
+        return topicRepository.findBySubjectIdAndEnabledTrueOrderByPositionAsc(subjectId);
         //return topicRepository.findBySubjectIdOrderByPositionAsc(subjectId);
     }
 

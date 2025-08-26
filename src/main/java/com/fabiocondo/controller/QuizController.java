@@ -33,9 +33,9 @@ public class QuizController {
     }
 
     @GetMapping("/find-by-quizId/{quizId}")
-    public ResponseEntity<QuizDTO> findQuizByQuizId(@PathVariable("quizId") String quizId) throws QuizNotFoundException {
+    public ResponseEntity<QuizDTO> findQuizByQuizId(@PathVariable("quizId") String quizId, @RequestParam("currentUserId") Long currentUserId) throws QuizNotFoundException {
         Quiz quiz = quizService.findQuizByQuizId(quizId);
-        return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(quiz));
+        return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(quiz, currentUserId));
     }
 
     @GetMapping("/filter")
@@ -50,11 +50,12 @@ public class QuizController {
 
     @PostMapping
     public ResponseEntity<QuizDTO> createQuiz(@RequestBody Quiz quiz,
-                                           @RequestParam Set<Long> questionIds,
-                                           @RequestParam Set<Long> userAnswerIds) {
+                                               @RequestParam Set<Long> questionIds,
+                                               @RequestParam Set<Long> userAnswerIds,
+                                               @RequestParam("currentUserId") Long currentUserId) {
 
         Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, questionIds, userAnswerIds);
-        return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(savedQuiz));
+        return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(savedQuiz, currentUserId));
     }
 
     @DeleteMapping("/{id}")

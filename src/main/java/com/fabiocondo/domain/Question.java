@@ -34,6 +34,8 @@ public class Question {
 
     private Integer timeLimit; // Tempo em segundos
 
+    private boolean validated;
+
     private String fileName;
 
     private String urlFile;
@@ -110,6 +112,14 @@ public class Question {
 
     public void setSolution(String solution) {
         this.solution = solution;
+    }
+
+    public boolean isValidated() {
+        return validated;
+    }
+
+    public void setValidated(boolean validated) {
+        this.validated = validated;
     }
 
     public String getFileName() {

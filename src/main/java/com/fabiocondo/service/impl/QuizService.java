@@ -139,13 +139,6 @@ public class QuizService {
         Quiz quiz = findById(id);
         quiz.setAnonymous(status);
         quizRepository.save(quiz);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("A operação foi interrompida", e);
-        }
     }
 
 }

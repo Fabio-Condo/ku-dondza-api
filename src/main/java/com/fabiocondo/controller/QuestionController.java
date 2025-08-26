@@ -94,6 +94,11 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.updateQuestionImage(questionId, file));
     }
 
+    @PutMapping("/{id}/validated")
+    public void toggleValidated(@PathVariable("id") Long id, @RequestBody Boolean status) throws QuestionNotFoundException {
+        questionService.toggleValidated(id, status);
+    }
+
     @GetMapping("/generate-from-ai")
     public Question generateQuestionFromAI(@RequestParam Long topicId, @RequestParam DifficultyLevel difficultyLevel) throws TopicNotFoundException, QuestionNotFoundException {
         return questionService.generateAdvancedQuestionFromAI(topicId, difficultyLevel);

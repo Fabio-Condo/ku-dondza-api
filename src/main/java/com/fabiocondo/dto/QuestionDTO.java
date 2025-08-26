@@ -26,6 +26,8 @@ public class QuestionDTO {
 
     private Integer timeLimit; // Tempo em segundos
 
+    private boolean validated;
+
     private String fileName;
 
     private String urlFile;
@@ -94,6 +96,14 @@ public class QuestionDTO {
 
     public void setTimeLimit(Integer timeLimit) {
         this.timeLimit = timeLimit;
+    }
+
+    public boolean isValidated() {
+        return validated;
+    }
+
+    public void setValidated(boolean validated) {
+        this.validated = validated;
     }
 
     public String getFileName() {

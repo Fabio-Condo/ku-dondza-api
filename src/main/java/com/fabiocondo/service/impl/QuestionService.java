@@ -2,12 +2,10 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
-import com.fabiocondo.domain.Answer;
-import com.fabiocondo.domain.MathExpression;
-import com.fabiocondo.domain.Question;
-import com.fabiocondo.domain.Topic;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
+import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.filter.QuestionFilter;
@@ -133,6 +131,19 @@ public class QuestionService {
 
         questionRepository.save(question);
         return question;
+    }
+
+    public void toggleValidated(Long id, Boolean status) throws QuestionNotFoundException {
+        Question question = findById(id);
+        question.setValidated(status);
+        questionRepository.save(question);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("A operação foi interrompida", e);
+        }
     }
 
     public Question generateAdvancedQuestionFromAI(Long topicId, DifficultyLevel difficulty) throws TopicNotFoundException, QuestionNotFoundException {

@@ -30,20 +30,21 @@ public class QuestionMapper {
     }
 
     public Question dtoToDomainObject(QuestionDTO questionDTO) {
-        Question course = new Question();
-        course.setId(questionDTO.getId());
-        course.setQuestionId(questionDTO.getQuestionId());
-        course.setDifficultyLevel(questionDTO.getDifficultyLevel());
-        course.setText(questionDTO.getText());
-        course.setTip(questionDTO.getTip());
-        course.setSolution(questionDTO.getSolution());
-        course.setTimeLimit(questionDTO.getTimeLimit());
-        course.setFileName(questionDTO.getFileName());
-        course.setUrlFile(questionDTO.getUrlFile());
-        course.setTopic(questionDTO.getTopic());
-        course.setMathExpressions(questionDTO.getMathExpressions());
-        course.setAnswers(questionDTO.getAnswers());
-        return course;
+        Question question = new Question();
+        question.setId(questionDTO.getId());
+        question.setQuestionId(questionDTO.getQuestionId());
+        question.setDifficultyLevel(questionDTO.getDifficultyLevel());
+        question.setText(questionDTO.getText());
+        question.setTip(questionDTO.getTip());
+        question.setSolution(questionDTO.getSolution());
+        question.setTimeLimit(questionDTO.getTimeLimit());
+        question.setValidated(questionDTO.isValidated());
+        question.setFileName(questionDTO.getFileName());
+        question.setUrlFile(questionDTO.getUrlFile());
+        question.setTopic(questionDTO.getTopic());
+        question.setMathExpressions(questionDTO.getMathExpressions());
+        question.setAnswers(questionDTO.getAnswers());
+        return question;
     }
 
     public QuestionDTO domainToDTO(Question question, Long currentUserId) {
@@ -55,6 +56,7 @@ public class QuestionMapper {
         questionDTO.setTip(question.getTip());
         questionDTO.setSolution(question.getSolution());
         questionDTO.setTimeLimit(question.getTimeLimit());
+        questionDTO.setValidated(question.isValidated());
         questionDTO.setFileName(question.getFileName());
         questionDTO.setUrlFile(question.getUrlFile());
         questionDTO.setTopic(question.getTopic());
@@ -80,6 +82,7 @@ public class QuestionMapper {
         questionDTO.setTip(question.getTip());
         questionDTO.setSolution(question.getSolution());
         questionDTO.setTimeLimit(question.getTimeLimit());
+        questionDTO.setValidated(question.isValidated());
         questionDTO.setFileName(question.getFileName());
         questionDTO.setUrlFile(question.getUrlFile());
         questionDTO.setTopic(question.getTopic());

@@ -83,7 +83,7 @@ public class QuestionController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('user:delete')")
+    //@PreAuthorize("hasAnyAuthority('user:delete')")
     public ResponseEntity<?> delete(@PathVariable("id") Long id) throws QuestionNotFoundException {
         questionService.delete(id);
         return response(HttpStatus.OK, "Question deleted successfully");
@@ -100,7 +100,7 @@ public class QuestionController {
     }
 
     @GetMapping("/generate-from-ai")
-    public Question generateQuestionFromAI(@RequestParam Long topicId, @RequestParam DifficultyLevel difficultyLevel) throws TopicNotFoundException, QuestionNotFoundException {
+    public Question generateQuestionFromAI(@RequestParam Long topicId, @RequestParam DifficultyLevel difficultyLevel) {
         return questionService.generateAdvancedQuestionFromAI(topicId, difficultyLevel);
     }
 

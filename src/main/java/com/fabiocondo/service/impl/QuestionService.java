@@ -181,20 +181,20 @@ public class QuestionService {
                             "- Responda **somente** com JSON válido, nada antes ou depois.\n" +
                             "- O JSON deve ser sintaticamente válido (parseável em Java).\n" +
                             "- Todos os campos são obrigatórios.\n" +
-                            "- Exatamente 4 alternativas em \"answers\" (uma correta, três incorretas).\n" +
+                            "- Exactamente 4 alternativas em \"answers\" (uma correta, três incorrectas).\n" +
                             "- \"mathExpressions\" é opcional.\n" +
                             "- Para LaTeX, **não use o símbolo $**. Para conteúdo inline use **\\\\( ... \\\\)** e para bloco use **\\\\[ ... \\\\]**.\n" +
                             "- Tema: %s — %s\n" +
                             "- Dificuldade: %s\n" +
                             "- Para todo LaTeX (enunciado, dica, solução, respostas e expressões), **não use o símbolo $**.\n" +
-                            "  - Para conteúdo inline, use exatamente \\\\(...\\\\).\n" +
-                            "  - Para conteúdo em bloco, use exatamente \\\\[...\\\\].\n" +
+                            "  - Para conteúdo inline, use exactamente \\\\(...\\\\).\n" +
+                            "  - Para conteúdo em bloco, use exactamente \\\\[...\\\\].\n" +
                             "- A questão deve ser **inteligente e não trivial**:\n" +
                             "  - Exija raciocínio do aluno, não mera memorização.\n" +
-                            "  - Garanta que as alternativas incorretas sejam **plausíveis** (não óbvias).\n" +
+                            "  - Garanta que as alternativas incorrectas sejam **plausíveis** (não óbvias).\n" +
                             "  - O enunciado deve contextualizar bem o problema.\n" +
                             "  - A solução deve explicar o raciocínio passo a passo.\n" +
-                            "  - O nível de dificuldade deve refletir a escolha (%s).\n",
+                            "  - O nível de dificuldade deve reflectir a escolha (%s).\n",
                     subject, topicName, difficulty, difficulty
             );
 

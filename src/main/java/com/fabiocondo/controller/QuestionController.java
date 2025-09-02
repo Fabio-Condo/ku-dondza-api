@@ -100,8 +100,8 @@ public class QuestionController {
     }
 
     @GetMapping("/generate-from-ai")
-    public Question generateQuestionFromAI(@RequestParam Long topicId, @RequestParam DifficultyLevel difficultyLevel) {
-        return questionService.generateAdvancedQuestionFromAI(topicId, difficultyLevel);
+    public Question generateQuestionFromAI(@RequestParam Long topicId, @RequestParam DifficultyLevel difficultyLevel, @RequestParam String extraRule) {
+        return questionService.generateAdvancedQuestionFromAI(topicId, difficultyLevel, extraRule);
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

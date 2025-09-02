@@ -139,7 +139,7 @@ public class QuestionService {
         questionRepository.save(question);
     }
 
-    public Question generateAdvancedQuestionFromAI(Long topicId, DifficultyLevel difficulty) {
+    public Question generateAdvancedQuestionFromAI(Long topicId, DifficultyLevel difficulty, String extraRule) {
 
         logger.info("Gerando questão para Tópico ID: {}, Dificuldade: {}", topicId, difficulty);
 
@@ -194,8 +194,10 @@ public class QuestionService {
                             "  - Garanta que as alternativas incorrectas sejam **plausíveis** (não óbvias).\n" +
                             "  - O enunciado deve contextualizar bem o problema.\n" +
                             "  - A solução deve explicar o raciocínio passo a passo.\n" +
-                            "  - O nível de dificuldade deve reflectir a escolha (%s).\n",
-                    subject, topicName, difficulty, difficulty
+                            "  - O nível de dificuldade deve reflectir a escolha (%s).\n" +
+                            "%s", // <-- extra rule aqui
+                    subject, topicName, difficulty, difficulty,
+                    (extraRule != null && !extraRule.isEmpty()) ? "- Regra adicional: " + extraRule : ""
             );
 
             System.out.println("Prompt: " + prompt);

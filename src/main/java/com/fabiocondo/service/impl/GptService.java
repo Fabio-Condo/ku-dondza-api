@@ -27,7 +27,9 @@ public class GptService {
         try {
             // Monta o corpo da requisição
             Map<String, Object> requestBodyMap = new HashMap<>();
-            requestBodyMap.put("model", "gpt-3.5-turbo");
+            //requestBodyMap.put("model", "gpt-3.5-turbo");
+            //requestBodyMap.put("model", "gpt-4.1"); // Boa alternativa se não tiver GPT-5
+            requestBodyMap.put("model", "gpt-5"); // Melhor versão para geração de questões inteligentes
             requestBodyMap.put("messages", new Object[]{
                     new HashMap<String, String>() {{
                         put("role", "user");

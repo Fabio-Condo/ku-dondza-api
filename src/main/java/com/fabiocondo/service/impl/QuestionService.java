@@ -189,7 +189,6 @@ public class QuestionService {
                             "- Para todo LaTeX (enunciado, dica, solução, respostas e expressões), **não use o símbolo $**.\n" +
                             "  - Para conteúdo inline, use exatamente \\\\(...\\\\).\n" +
                             "  - Para conteúdo em bloco, use exatamente \\\\[...\\\\].\n" +
-                            "- Para **negrito (bold)**, use exatamente **...** (duas vezes o asterisco ao redor do texto); não use <b>...</b> nem __...__.\n" +
                             "- A questão deve ser **inteligente e não trivial**:\n" +
                             "  - Exija raciocínio do aluno, não mera memorização.\n" +
                             "  - Garanta que as alternativas incorretas sejam **plausíveis** (não óbvias).\n" +
@@ -223,9 +222,9 @@ public class QuestionService {
             // Lê como JsonNode normalmente
             JsonNode root = mapper.readTree(aiResponse);
 
-            question.setText(root.has("text") ? root.get("text").toString() : "Enunciado não fornecido");
-            question.setTip(root.has("tip") ? root.get("tip").toString() : "Sem dica disponível");
-            question.setSolution(root.has("solution") ? root.get("solution").toString() : "Sem solução disponível");
+            question.setText(root.has("text") ? root.get("text").asText() : "Enunciado não fornecido");
+            question.setTip(root.has("tip") ? root.get("tip").asText() : "Sem dica disponível");
+            question.setSolution(root.has("solution") ? root.get("solution").asText() : "Sem solução disponível");
 
             // --- Processar respostas ---
             List<Answer> answers = new ArrayList<>();

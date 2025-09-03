@@ -182,7 +182,7 @@ public class QuestionService {
                             "- O JSON deve ser sintaticamente válido (parseável em Java).\n" +
                             "- Todos os campos são obrigatórios.\n" +
                             "- Exactamente %d alternativas em \"answers\" (uma correta, as restantes incorrectas).\n" +
-                            "- \"mathExpressions\" é opcional.\n" +
+                            "- \"mathExpressions\" é **opcional** e só deve ser incluído quando o enunciado exigir interpretação gráfica ou análise visual de uma função/equação.\n" +
                             "- Para LaTeX, **não use o símbolo $**. Para conteúdo inline use **\\\\( ... \\\\)** e para bloco use **\\\\[ ... \\\\]**.\n" +
                             "- Tema: %s — %s\n" +
                             "- Dificuldade: %s\n" +
@@ -191,7 +191,13 @@ public class QuestionService {
                             "  - Para conteúdo em bloco, use exactamente \\\\[...\\\\].\n" +
                             "- Para colocar em **negrito**, coloque o texto entre dois asteriscos. Exemplo: **Texto em negrito**.\n" +
                             "- Para colocar em *itálico*, coloque o texto entre um asterisco. Exemplo: *texto em italico*.\n" +
-                            "- Valores monetários: se mencionar dinheiro, represente-o **apenas em dólares (USD)**.\n" +
+                            "- Para saltar linha/começar um novo parágrafo, utilize **Enter** (linha em branco). Não use \"\\n\".\n" +
+                            "- Valores monetários: se mencionar dinheiro, represente-o **apenas em metical (MT)**.\n" +
+                            "- Se adicionar expressões matemáticas em \"mathExpressions\":\n" +
+                            "  - As variáveis devem ser **apenas em função de x**.\n" +
+                            "  - Não utilize notação de função como f(x)=2x+5, escreva apenas **2x+5**.\n" +
+                            "  - As expressões devem ser **não redundantes**: evite formas diferentes da mesma função. \n" +
+                            "    Exemplo inválido: -2x^2+12x-10 e -2(x-3)^2+8 (são a mesma função em formas diferentes).\n" +
                             "- A questão deve ser **inteligente e não trivial**:\n" +
                             "  - Exija raciocínio do aluno, não mera memorização.\n" +
                             "  - Garanta que as alternativas incorrectas sejam **plausíveis** (não óbvias).\n" +
@@ -203,7 +209,6 @@ public class QuestionService {
                     subject, topicName, difficulty.getDescription(), difficulty.getDescription(),
                     (extraRule != null && !extraRule.isEmpty()) ? "- Regra adicional: " + extraRule : ""
             );
-
 
             System.out.println("Prompt: " + prompt);
 

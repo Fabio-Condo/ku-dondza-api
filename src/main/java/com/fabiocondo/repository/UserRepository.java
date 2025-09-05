@@ -27,12 +27,6 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
     @Query("SELECT u FROM User u WHERE u.fullName LIKE %:query%")
     Page<User> searchByQuery(@Param("query") String query, Pageable pageable);
 
-    @Query("SELECT oc FROM User u JOIN u.subscribedCourses oc WHERE u.id = :userId")
-    Page<Course> findSubscribedCoursesByUserId(@Param("userId") Long userId, Pageable pageable);
-
-    @Query("SELECT COUNT(oc) FROM User u JOIN u.subscribedCourses oc WHERE u.id = :userId")
-    Long countSubscribedCoursesByUserId(@Param("userId") Long userId);
-
     public long countByIsActiveTrue();
 
 }

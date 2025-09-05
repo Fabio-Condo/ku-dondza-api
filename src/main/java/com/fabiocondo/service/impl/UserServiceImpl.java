@@ -51,12 +51,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final AmazonS3Service amazonS3Service;
     private final SubjectRepository subjectRepository;
     private final QuestionRepository questionRepository;
-    private final ContentRepository contentRepository;
     private final TopicContentRepository topicContentRepository;
 
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, ContentRepository contentRepository, TopicContentRepository topicContentRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
@@ -64,7 +63,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.amazonS3Service = amazonS3Service;
         this.subjectRepository = subjectRepository;
         this.questionRepository = questionRepository;
-        this.contentRepository = contentRepository;
         this.topicContentRepository = topicContentRepository;
     }
 
@@ -394,30 +392,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         return userRepository.save(user);
-    }
-
-    @Override
-    public User toggleContentMarkedStatus(Long userId, Long onlineCourseContentId) throws UserNotFoundException, ContentNotFoundException {
-        User user = findById(userId);
-
-        Content content = contentRepository.findById(onlineCourseContentId)
-                .orElseThrow(() -> new ContentNotFoundException("No Course Content found by id: " + onlineCourseContentId));
-
-        Set<Content> markedContents = user.getMarkedContents();
-
-        if (markedContents.contains(content)) {
-            markedContents.remove(content);
-        } else {
-            markedContents.add(content);
-        }
-
-        return userRepository.save(user);
-    }
-
-    @Override
-    public Page<Course> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException {
-        User user = findById(userId);
-        return userRepository.findSubscribedCoursesByUserId(user.getId(), pageable);
     }
 
     @Override

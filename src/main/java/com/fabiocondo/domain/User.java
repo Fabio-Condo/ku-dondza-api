@@ -93,24 +93,6 @@ public class User implements Serializable {
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
-            name = "user_course",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "course_id")
-    )
-    private Set<Course> subscribedCourses = new HashSet<>();
-
-    @JsonIgnore
-    @ManyToMany(cascade = CascadeType.DETACH)
-    @JoinTable(
-            name = "user_marked_content",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "content_id")
-    )
-    private Set<Content> markedContents = new HashSet<>(); // marcado como assistidos
-
-    @JsonIgnore
-    @ManyToMany(cascade = CascadeType.DETACH)
-    @JoinTable(
             name = "user_saved_question",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "question_id")
@@ -323,22 +305,6 @@ public class User implements Serializable {
 
     public void setMarkedTopicContents(Set<TopicContent> markedTopicContents) {
         this.markedTopicContents = markedTopicContents;
-    }
-
-    public Set<Course> getSubscribedCourses() {
-        return subscribedCourses;
-    }
-
-    public void setSubscribedCourses(Set<Course> subscribedCourses) {
-        this.subscribedCourses = subscribedCourses;
-    }
-
-    public Set<Content> getMarkedContents() {
-        return markedContents;
-    }
-
-    public void setMarkedContents(Set<Content> markedContents) {
-        this.markedContents = markedContents;
     }
 
     public Set<Question> getSavedQuestions() {

@@ -1,6 +1,5 @@
 package com.fabiocondo.repository;
 
-import com.fabiocondo.domain.Content;
 import com.fabiocondo.domain.TopicContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

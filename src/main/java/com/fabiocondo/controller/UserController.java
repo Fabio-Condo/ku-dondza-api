@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static com.fabiocondo.constant.UserImplConstant.EMAIL_SENT;
@@ -214,11 +213,6 @@ public class UserController {
     @PutMapping("/{userId}/saved-questions/{questionId}/toggle")
     public ResponseEntity<Question> toggleSaveQuestion(@PathVariable Long userId, @PathVariable Long questionId) throws QuestionNotFoundException {
         return ResponseEntity.status(OK).body(userService.toggleSaveQuestion(userId, questionId));
-    }
-
-    @GetMapping("/with-permission-check/competitions/{competitionId}") // Para a lisa que eh mostrada ao adicionar os user permitidos nas competicoes
-    public Page<UserDTO> getUsersWithPermissionCheck(UserFilter userFilter, @PathVariable Long competitionId, Pageable pageable) {
-        return userMapper.domainPageToDTOPage(userService.filter(userFilter, pageable), competitionId, pageable);
     }
 
     //@GetMapping("/filter")

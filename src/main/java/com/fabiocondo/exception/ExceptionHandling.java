@@ -52,11 +52,6 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
-    @ExceptionHandler(ArticleNotFoundException.class)
-    public ResponseEntity<HttpResponse> articleNotFoundException(ArticleNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
     @ExceptionHandler(OtpNotFoundException.class)
     public ResponseEntity<HttpResponse> otpNotFoundException(OtpNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
@@ -174,11 +169,6 @@ public class ExceptionHandling implements ErrorController {
 
     @ExceptionHandler(UserCourseNotFoundException.class)
     public ResponseEntity<HttpResponse> userCourseNotFoundException(UserCourseNotFoundException exception) {
-        return createHttpResponse(BAD_REQUEST, exception.getMessage());
-    }
-
-    @ExceptionHandler(BookNotFoundException.class)
-    public ResponseEntity<HttpResponse> bookNotFoundException(BookNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 

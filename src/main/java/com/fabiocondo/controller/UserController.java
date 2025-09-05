@@ -216,11 +216,6 @@ public class UserController {
         return ResponseEntity.status(OK).body(userService.toggleContentMarkedStatus(userId, contentId));
     }
 
-    @PutMapping("/{userId}/saved-articles/{articleId}/toggle")
-    public ResponseEntity<Article> toggleSaveArticle(@PathVariable Long userId, @PathVariable Long articleId) throws UserNotFoundException, ArticleNotFoundException {
-        return ResponseEntity.status(OK).body(userService.toggleSaveArticle(userId, articleId));
-    }
-
     @PutMapping("/{userId}/saved-questions/{questionId}/toggle")
     public ResponseEntity<Question> toggleSaveQuestion(@PathVariable Long userId, @PathVariable Long questionId) throws QuestionNotFoundException {
         return ResponseEntity.status(OK).body(userService.toggleSaveQuestion(userId, questionId));

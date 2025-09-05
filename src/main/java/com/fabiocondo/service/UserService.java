@@ -47,14 +47,9 @@ public interface UserService {
 
     User toggleContentMarkedStatus(Long userId, Long onlineCourseContentId) throws UserNotFoundException, ContentNotFoundException;
 
-    @Transactional
-    Article toggleSaveArticle(Long userId, Long articleId) throws UserNotFoundException, ArticleNotFoundException;
-
     Page<Course> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException;
 
     //boolean checkIfSaved(Long articleId) throws UserNotFoundException, ArticleNotFoundException;
-
-    boolean checkIfSaved(Long articleId, Long currentUserId) throws UserNotFoundException, ArticleNotFoundException;
 
     @Transactional
     Question toggleSaveQuestion(Long userId, Long questionId) throws QuestionNotFoundException;

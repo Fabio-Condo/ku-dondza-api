@@ -50,21 +50,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final EmailService emailService;
     private final AmazonS3Service amazonS3Service;
     private final SubjectRepository subjectRepository;
-    private final ArticleRepository articleRepository;
     private final QuestionRepository questionRepository;
     private final ContentRepository contentRepository;
     private final TopicContentRepository topicContentRepository;
 
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, ArticleRepository articleRepository, QuestionRepository questionRepository, ContentRepository contentRepository, TopicContentRepository topicContentRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, ContentRepository contentRepository, TopicContentRepository topicContentRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
         this.emailService = emailService;
         this.amazonS3Service = amazonS3Service;
         this.subjectRepository = subjectRepository;
-        this.articleRepository = articleRepository;
         this.questionRepository = questionRepository;
         this.contentRepository = contentRepository;
         this.topicContentRepository = topicContentRepository;
@@ -420,35 +418,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public Page<Course> getSubscribedOnlineCoursesByUserId(Long userId, Pageable pageable) throws UserNotFoundException {
         User user = findById(userId);
         return userRepository.findSubscribedCoursesByUserId(user.getId(), pageable);
-    }
-
-    @Override
-    @Transactional
-    public Article toggleSaveArticle(Long userId, Long articleId) throws UserNotFoundException, ArticleNotFoundException {
-        User currentUser = userRepository.findById(userId).orElseThrow(null);
-
-        Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new ArticleNotFoundException("Article not find"));
-
-        Set<Article> savedArticles = currentUser.getSavedArticles();
-
-        if (savedArticles.contains(article)) {
-            savedArticles.remove(article);
-        } else {
-            savedArticles.add(article);
-        }
-
-        userRepository.save(currentUser); // atualiza a relação
-
-        return article;
-    }
-
-    @Override
-    public boolean checkIfSaved(Long articleId, Long currentUserId) throws ArticleNotFoundException {
-        User currentUser = userRepository.findById(currentUserId).orElseThrow(null);
-        Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new ArticleNotFoundException("Article not find"));
-        return currentUser.getSavedArticles().contains(article);
     }
 
     @Override

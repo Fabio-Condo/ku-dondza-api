@@ -62,11 +62,11 @@ public class QuestionService {
         return questionRepository.findAll();
     }
 
-    public Set<Question> getQuestionsByTopics(Set<Long> topicIds, DifficultyLevel difficultyLevel, int limitPerTopic) {
+    public Set<Question> getQuestionsByTopics(Set<Long> topicIds, int limitPerTopic) {
         if (topicIds == null || topicIds.isEmpty()) {
             throw new IllegalArgumentException("O Quiz deve ter pelo menos um tópico associado.");
         } else {
-            return questionRepository.findRandomQuestionsByTopicsAndDifficulty(topicIds, difficultyLevel, limitPerTopic);
+            return questionRepository.findRandomQuestionsByTopics(topicIds, limitPerTopic);
         }
     }
 

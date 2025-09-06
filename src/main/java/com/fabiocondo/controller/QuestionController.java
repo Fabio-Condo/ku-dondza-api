@@ -55,10 +55,8 @@ public class QuestionController {
     }
 
     @GetMapping("/by-topics")
-    public ResponseEntity<Set<Question>> getQuestionsByTopics(@RequestParam Set<Long> topicIds,
-                                                              @RequestParam DifficultyLevel difficultyLevel,
-                                                              @RequestParam int limitPerTopic) {
-        return ResponseEntity.ok(questionService.getQuestionsByTopics(topicIds, difficultyLevel, limitPerTopic));
+    public ResponseEntity<Set<Question>> getQuestionsByTopics(@RequestParam Set<Long> topicIds, @RequestParam int limitPerTopic) {
+        return ResponseEntity.ok(questionService.getQuestionsByTopics(topicIds, limitPerTopic));
     }
 
     //@GetMapping("/topics/{topicId}")

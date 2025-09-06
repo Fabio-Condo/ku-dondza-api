@@ -12,5 +12,5 @@ import java.util.Set;
 public interface QuestionRepositoryQuery {
     public Page<Question> filter(QuestionFilter questionFilter, Pageable pageable);
 
-    Set<Question> findRandomQuestionsByTopicsAndDifficulty(Set<Long> topicIds, DifficultyLevel difficultyLevel, int limitPerTopic);
+    Set<Question> findRandomQuestionsByTopics(Set<Long> topicIds, int limitPerTopic);
 }

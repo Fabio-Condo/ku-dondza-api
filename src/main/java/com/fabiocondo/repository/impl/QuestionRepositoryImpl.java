@@ -44,21 +44,20 @@ public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
     }
 
     @Override
-    public Set<Question> findRandomQuestionsByTopicsAndDifficulty(Set<Long> topicIds, DifficultyLevel difficultyLevel, int limitPerTopic) {
+    public Set<Question> findRandomQuestionsByTopics(Set<Long> topicIds, int limitPerTopic) {
 
         // Essa query utiliza CTE e ROW_NUMBER para particionar as questões por tópico,
         // ordenando aleatoriamente (usando RAND() para MySQL; se for PostgreSQL, substitua por RANDOM())
         String sql = "WITH ranked_questions AS ( " +
                 "    SELECT q.*, ROW_NUMBER() OVER (PARTITION BY q.topic_id ORDER BY RAND()) as rn " +
                 "    FROM question q " +
-                "    WHERE q.topic_id IN (:topicIds) AND q.difficulty_level = :difficultyLevel " +
+                "    WHERE q.topic_id IN (:topicIds) " +
                 ") " +
                 "SELECT * FROM ranked_questions WHERE rn <= :limitPerTopic " +
                 "ORDER BY id ASC";
 
         Query query = manager.createNativeQuery(sql, Question.class);
         query.setParameter("topicIds", topicIds);
-        query.setParameter("difficultyLevel", difficultyLevel.name()); // ajuste conforme o mapeamento do enum
         query.setParameter("limitPerTopic", limitPerTopic);
 
         List<Question> questions = query.getResultList();

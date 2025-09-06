@@ -3,9 +3,6 @@ package com.fabiocondo.dto;
 import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.MathExpression;
 import com.fabiocondo.domain.Topic;
-import com.fabiocondo.enumeration.DifficultyLevel;
-
-import javax.persistence.*;
 
 import java.util.List;
 
@@ -14,9 +11,6 @@ public class QuestionDTO {
     private Long id;
 
     private String questionId;
-
-    @Enumerated(EnumType.STRING)
-    private DifficultyLevel difficultyLevel;
 
     private String text;
 
@@ -56,14 +50,6 @@ public class QuestionDTO {
 
     public void setQuestionId(String questionId) {
         this.questionId = questionId;
-    }
-
-    public DifficultyLevel getDifficultyLevel() {
-        return difficultyLevel;
-    }
-
-    public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
-        this.difficultyLevel = difficultyLevel;
     }
 
     public String getText() {

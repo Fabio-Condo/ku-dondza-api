@@ -32,7 +32,6 @@ public class QuestionMapper {
         Question question = new Question();
         question.setId(questionDTO.getId());
         question.setQuestionId(questionDTO.getQuestionId());
-        question.setDifficultyLevel(questionDTO.getDifficultyLevel());
         question.setText(questionDTO.getText());
         question.setTip(questionDTO.getTip());
         question.setSolution(questionDTO.getSolution());
@@ -50,7 +49,6 @@ public class QuestionMapper {
         QuestionDTO questionDTO = new QuestionDTO();
         questionDTO.setId(question.getId());
         questionDTO.setQuestionId(question.getQuestionId());
-        questionDTO.setDifficultyLevel(question.getDifficultyLevel());
         questionDTO.setText(question.getText());
         questionDTO.setTip(question.getTip());
         questionDTO.setSolution(question.getSolution());
@@ -76,7 +74,6 @@ public class QuestionMapper {
         QuestionDTO questionDTO = new QuestionDTO();
         questionDTO.setId(question.getId());
         questionDTO.setQuestionId(question.getQuestionId());
-        questionDTO.setDifficultyLevel(question.getDifficultyLevel());
         questionDTO.setText(question.getText());
         questionDTO.setTip(question.getTip());
         questionDTO.setSolution(question.getSolution());

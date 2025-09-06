@@ -1,6 +1,5 @@
 package com.fabiocondo.domain;
 
-import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -19,9 +18,6 @@ public class Question {
     private Long id;
 
     private String questionId;
-
-    @Enumerated(EnumType.STRING)
-    private DifficultyLevel difficultyLevel;
 
     @Lob // Large Object
     private String text;
@@ -72,14 +68,6 @@ public class Question {
 
     public void setQuestionId(String questionId) {
         this.questionId = questionId;
-    }
-
-    public DifficultyLevel getDifficultyLevel() {
-        return difficultyLevel;
-    }
-
-    public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
-        this.difficultyLevel = difficultyLevel;
     }
 
     public String getText() {

@@ -39,7 +39,6 @@ public class QuizMapper {
     public Quiz dtoToDomainObject(QuizDTO quizDTO) {
         Quiz quiz = new Quiz();
         quiz.setQuizId(quizDTO.getQuizId());
-        quiz.setDifficultyLevel(quizDTO.getDifficultyLevel());
         quiz.setType(quizDTO.getType());
         quiz.setLimitPerTopic(quizDTO.getLimitPerTopic());
         quiz.setSubmittedAt(quizDTO.getSubmittedAt());
@@ -57,7 +56,6 @@ public class QuizMapper {
         QuizDTO quizDTO = new QuizDTO();
         quizDTO.setId(quiz.getId());
         quizDTO.setQuizId(quiz.getQuizId());
-        quizDTO.setDifficultyLevel(quiz.getDifficultyLevel());
         quizDTO.setType(quiz.getType());
         quizDTO.setLimitPerTopic(quiz.getLimitPerTopic());
         quizDTO.setSubmittedAt(quiz.getSubmittedAt());
@@ -76,7 +74,6 @@ public class QuizMapper {
         QuizDTO quizDTO = new QuizDTO();
         quizDTO.setId(quiz.getId());
         quizDTO.setQuizId(quiz.getQuizId());
-        quizDTO.setDifficultyLevel(quiz.getDifficultyLevel());
         quizDTO.setType(quiz.getType());
         quizDTO.setLimitPerTopic(quiz.getLimitPerTopic());
         quizDTO.setSubmittedAt(quiz.getSubmittedAt());

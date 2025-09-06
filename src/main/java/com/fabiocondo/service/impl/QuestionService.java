@@ -3,7 +3,6 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
-import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
@@ -139,9 +138,9 @@ public class QuestionService {
         questionRepository.save(question);
     }
 
-    public Question generateAdvancedQuestionFromAI(Long topicId, DifficultyLevel difficulty, String extraRule, int numberOfOptions) {
+    public Question generateAdvancedQuestionFromAI(Long topicId, String extraRule, int numberOfOptions) {
 
-        logger.info("Gerando questão para Tópico ID: {}, Dificuldade: {}, Opções: {}", topicId, difficulty, numberOfOptions);
+        logger.info("Gerando questão para Tópico ID: {}, Opções: {}", topicId, numberOfOptions);
 
         try {
             // --- Buscar tópico ---
@@ -155,7 +154,6 @@ public class QuestionService {
             // --- Criar objeto Question ---
             Question question = new Question();
             question.setTopic(topic);
-            question.setDifficultyLevel(difficulty);
             question.setTimeLimit(60);
             question.setValidated(false);
 
@@ -185,7 +183,6 @@ public class QuestionService {
                             "- \"mathExpressions\" é **opcional** e só deve ser incluído quando o enunciado exigir interpretação gráfica ou análise visual de uma função/equação.\n" +
                             "- Para LaTeX, **não use o símbolo $**. Para conteúdo inline use **\\\\( ... \\\\)** e para bloco use **\\\\[ ... \\\\]**.\n" +
                             "- Tema: %s — %s\n" +
-                            "- Dificuldade: %s\n" +
                             "- Para todo LaTeX (enunciado, dica, solução, respostas e expressões), **não use o símbolo $**.\n" +
                             "  - Para conteúdo inline, use exactamente \\\\(...\\\\).\n" +
                             "  - Para conteúdo em bloco, use exactamente \\\\[...\\\\].\n" +
@@ -203,10 +200,9 @@ public class QuestionService {
                             "  - Garanta que as alternativas incorrectas sejam **plausíveis** (não óbvias).\n" +
                             "  - O enunciado deve contextualizar bem o problema.\n" +
                             "  - A solução deve explicar o raciocínio passo a passo.\n" +
-                            "  - O nível de dificuldade deve reflectir a escolha (%s).\n" +
                             "%s", // <-- extra rule
                     numberOfOptions,
-                    subject, topicName, difficulty.getDescription(), difficulty.getDescription(),
+                    subject, topicName,
                     (extraRule != null && !extraRule.isEmpty()) ? "- Regra adicional: " + extraRule : ""
             );
 
@@ -231,7 +227,6 @@ public class QuestionService {
                     .enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS)
                     .build();
 
-            // Lê como JsonNode normalmente
             JsonNode root = mapper.readTree(aiResponse);
 
             question.setText(root.has("text") ? root.get("text").asText() : "Enunciado não fornecido");
@@ -252,7 +247,6 @@ public class QuestionService {
                 }
             }
 
-            // fallback se não vier nenhuma resposta
             if (answers.isEmpty()) {
                 Answer defaultAns = new Answer();
                 defaultAns.setText("Resposta padrão");
@@ -261,7 +255,6 @@ public class QuestionService {
                 answers.add(defaultAns);
             }
 
-            // garantir exatamente 1 correta
             long correctCount = answers.stream().filter(Answer::isCorrect).count();
             if (correctCount != 1) {
                 answers.get(0).setCorrect(true);

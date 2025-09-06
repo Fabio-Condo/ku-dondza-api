@@ -1,6 +1,5 @@
 package com.fabiocondo.domain;
 
-import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.enumeration.QuizType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,9 +20,6 @@ public class Quiz {
     private Long id;
 
     private String quizId;
-
-    @Enumerated(EnumType.STRING)
-    private DifficultyLevel difficultyLevel;
 
     @Enumerated(EnumType.STRING)
     private QuizType type;
@@ -81,14 +77,6 @@ public class Quiz {
 
     public void setQuizId(String quizId) {
         this.quizId = quizId;
-    }
-
-    public DifficultyLevel getDifficultyLevel() {
-        return difficultyLevel;
-    }
-
-    public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
-        this.difficultyLevel = difficultyLevel;
     }
 
     public QuizType getType() {

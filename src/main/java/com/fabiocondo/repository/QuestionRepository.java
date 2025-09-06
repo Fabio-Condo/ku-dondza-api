@@ -1,7 +1,6 @@
 package com.fabiocondo.repository;
 
 import com.fabiocondo.domain.Question;
-import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.repository.query.QuestionRepositoryQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

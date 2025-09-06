@@ -3,17 +3,14 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.QuestionDTO;
 import com.fabiocondo.dtoMapper.QuestionMapper;
-import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.exception.domain.InterestNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
-import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.filter.QuestionFilter;
 import com.fabiocondo.service.impl.QuestionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -98,8 +95,8 @@ public class QuestionController {
     }
 
     @GetMapping("/generate-from-ai")
-    public Question generateQuestionFromAI(@RequestParam Long topicId, @RequestParam DifficultyLevel difficultyLevel, @RequestParam String extraRule, int numberOfOptions) {
-        return questionService.generateAdvancedQuestionFromAI(topicId, difficultyLevel, extraRule, numberOfOptions);
+    public Question generateQuestionFromAI(@RequestParam Long topicId, @RequestParam String extraRule, int numberOfOptions) {
+        return questionService.generateAdvancedQuestionFromAI(topicId, extraRule, numberOfOptions);
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

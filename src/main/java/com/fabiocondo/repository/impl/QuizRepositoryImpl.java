@@ -95,11 +95,6 @@ public class QuizRepositoryImpl implements QuizRepositoryQuery {
             predicates.add(builder.equal(
                     builder.lower(root.get("user").get("id")), quizFilter.getUser().getId()));
         }
-
-        if(!ObjectUtils.isEmpty(quizFilter.getDifficultyLevel())) {
-            predicates.add(builder.equal(
-                    builder.lower(root.get("difficultyLevel")), quizFilter.getDifficultyLevel()));
-        }
     }
 
     public void getSortOrder(QuizFilter quizFilter, CriteriaBuilder builder, CriteriaQuery<Quiz> criteria, Root<Quiz> root){

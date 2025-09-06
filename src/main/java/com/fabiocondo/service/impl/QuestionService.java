@@ -200,6 +200,7 @@ public class QuestionService {
                             "  - Garanta que as alternativas incorrectas sejam **plausíveis** (não óbvias).\n" +
                             "  - O enunciado deve contextualizar bem o problema.\n" +
                             "  - A solução deve explicar o raciocínio passo a passo.\n" +
+                            "- Para intervalos (ex: [0,1], ]0,1[, ]0,1], [0,1[), utilize **apenas colchetes [ ]**, inclusive para intervalos abertos. Nunca use parênteses ().\n" +
                             "%s", // <-- extra rule
                     numberOfOptions,
                     subject, topicName,

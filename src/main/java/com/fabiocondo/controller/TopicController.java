@@ -2,6 +2,8 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Topic;
+import com.fabiocondo.dto.TopicDTO;
+import com.fabiocondo.dtoMapper.TopicMapper;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.filter.TopicFilter;
 import com.fabiocondo.service.impl.TopicService;
@@ -17,10 +19,13 @@ import java.util.List;
 @RequestMapping("/topics")
 public class TopicController {
 
-    public TopicService topicService;
+    public final TopicService topicService;
+    private final TopicMapper topicMapper;
 
-    public TopicController(TopicService topicService) {
+
+    public TopicController(TopicService topicService, TopicMapper topicMapper) {
         this.topicService = topicService;
+        this.topicMapper = topicMapper;
     }
 
     @GetMapping("/{id}")
@@ -28,10 +33,16 @@ public class TopicController {
         return ResponseEntity.status(HttpStatus.OK).body(topicService.findById(id));
     }
 
+    //@GetMapping("/find-by-topicId/{topicId}")
+    //public ResponseEntity<Topic> findTopicByTopicId(@PathVariable("topicId") String topicId) throws TopicNotFoundException {
+    //    Topic topic = topicService.findTopicByTopicId(topicId);
+    //    return ResponseEntity.status(HttpStatus.OK).body(topic);
+    //}
+
     @GetMapping("/find-by-topicId/{topicId}")
-    public ResponseEntity<Topic> findTopicByTopicId(@PathVariable("topicId") String topicId) throws TopicNotFoundException {
+    public ResponseEntity<TopicDTO> findTopicByTopicId(@PathVariable("topicId") String topicId, @RequestParam("currentUserId") Long currentUserId) throws TopicNotFoundException {
         Topic topic = topicService.findTopicByTopicId(topicId);
-        return ResponseEntity.status(HttpStatus.OK).body(topic);
+        return ResponseEntity.status(HttpStatus.OK).body(topicMapper.domainToDTO(topic, currentUserId));
     }
 
     @PostMapping

@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = new User();
         user.setPlan(Plan.PREMIUM);
         user.setUserType(UserType.STUDENT);
-        user.setUserId(generateUserId());
+        user.setUserId(UUID.randomUUID().toString());
         String password = generatePassword();
         user.setFullName(fullName);
         user.setEmail(email);
@@ -133,7 +133,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         // Adicionar funcao que diminue o tamanho da imagem
         User user = new User();
         String password = generatePassword();
-        user.setUserId(generateUserId());
+        user.setUserId(UUID.randomUUID().toString());
         user.setFullName(firstName);
         user.setJoinDate(new Date());
         user.setEmail(email);
@@ -161,6 +161,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         currentUser.setEmail(newEmail);
         //currentUser.setActive(isActive);
         //currentUser.setNotLocked(isNonLocked);
+        currentUser.setUserId(UUID.randomUUID().toString());
         currentUser.setUserType(userType);
         currentUser.setActive(true);
         currentUser.setNotLocked(true);
@@ -479,10 +480,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     private String generatePassword() {
-        return RandomStringUtils.randomAlphanumeric(10);
-    }
-
-    private String generateUserId() {
         return RandomStringUtils.randomAlphanumeric(10);
     }
 

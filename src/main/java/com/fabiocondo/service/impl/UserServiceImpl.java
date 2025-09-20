@@ -161,7 +161,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         currentUser.setEmail(newEmail);
         //currentUser.setActive(isActive);
         //currentUser.setNotLocked(isNonLocked);
-        currentUser.setUserId(UUID.randomUUID().toString());
         currentUser.setUserType(userType);
         currentUser.setActive(true);
         currentUser.setNotLocked(true);

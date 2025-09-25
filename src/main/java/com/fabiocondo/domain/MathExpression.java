@@ -11,6 +11,8 @@ public class MathExpression {
     @Column(nullable = false, updatable = false)
     private Long id;
 
+    private String name; // Exemplo: "f(x)"
+
     @Lob
     private String expression; // Exemplo: "x^2 + 2x - 3"
 
@@ -27,6 +29,14 @@ public class MathExpression {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getExpression() {

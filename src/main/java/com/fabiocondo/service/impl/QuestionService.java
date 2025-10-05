@@ -171,8 +171,8 @@ public class QuestionService {
                             "    {\"text\": \"resposta 4\", \"correct\": false}\n" +
                             "  ],\n" +
                             "  \"mathExpressions\": [\n" +
-                            "    {\"expression\": \"x^2 + 3x + 2\"},\n" +
-                            "    {\"expression\": \"\\\\frac{1}{x}\"}\n" +
+                            "    {\"expression\": \"x^2 + 3x + 2\", \"name\": \"f(x)\"},\n" +
+                            "    {\"expression\": \"\\\\frac{1}{x}\", \"name\": \"g(x)\"}\n" +
                             "  ]\n" +
                             "}\n\n" +
                             "Regras obrigatórias:\n" +
@@ -272,6 +272,14 @@ public class QuestionService {
                     if (expNode.has("expression")) {
                         MathExpression expr = new MathExpression();
                         expr.setExpression(expNode.get("expression").asText());
+
+                        // --- Nova linha: define name ---
+                        if (expNode.has("name")) {
+                            expr.setName(expNode.get("name").asText());
+                        } else {
+                            expr.setName("f(x)"); // valor padrão caso não venha da IA
+                        }
+
                         expr.setQuestion(question);
                         expressions.add(expr);
                     }
@@ -305,7 +313,6 @@ public class QuestionService {
         logger.info("Generating question: {}", question.getText());
         return question;
     }
-
 
     private String extractJson(String response) {
         try {

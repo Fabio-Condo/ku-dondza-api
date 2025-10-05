@@ -95,8 +95,8 @@ public class QuestionController {
     }
 
     @GetMapping("/generate-from-ai")
-    public Question generateQuestionFromAI(@RequestParam Long topicId, @RequestParam String extraRule, int numberOfOptions) {
-        return questionService.generateAdvancedQuestionFromAI(topicId, extraRule, numberOfOptions);
+    public Question generateQuestionFromAI(@RequestParam Long topicId, @RequestParam String extraRule, int numberOfOptions, @RequestParam String exerciseFormat) {
+        return questionService.generateAdvancedQuestionFromAI(topicId, extraRule, numberOfOptions, exerciseFormat);
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

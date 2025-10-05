@@ -138,7 +138,7 @@ public class QuestionService {
         questionRepository.save(question);
     }
 
-    public Question generateAdvancedQuestionFromAI(Long topicId, String extraRule, int numberOfOptions) {
+    public Question generateAdvancedQuestionFromAI(Long topicId, String extraRule, int numberOfOptions, String exerciseFormat) {
 
         logger.info("Gerando questão para Tópico ID: {}, Opções: {}", topicId, numberOfOptions);
 
@@ -156,6 +156,11 @@ public class QuestionService {
             question.setTopic(topic);
             question.setTimeLimit(60);
             question.setValidated(false);
+
+            String exerciseInstruction = "";
+            if ("Matemática".equalsIgnoreCase(subject) && exerciseFormat != null && !exerciseFormat.isEmpty()) {
+                exerciseInstruction = "- Formato do exercício: " + exerciseFormat + ".\n";
+            }
 
             // --- Construir prompt ---
             String prompt = String.format(
@@ -201,9 +206,10 @@ public class QuestionService {
                             "  - O enunciado deve contextualizar bem o problema.\n" +
                             "  - A solução deve explicar o raciocínio passo a passo.\n" +
                             "- Para intervalos (ex: [0,1], ]0,1[, ]0,1], [0,1[), utilize **apenas colchetes [ ]**, inclusive para intervalos abertos. Nunca use parênteses ().\n" +
+                            "%s" + // <-- instrução do formato do exercício
                             "%s", // <-- extra rule
                     numberOfOptions,
-                    subject, topicName,
+                    subject, topicName, exerciseInstruction,
                     (extraRule != null && !extraRule.isEmpty()) ? "- Regra adicional: " + extraRule : ""
             );
 

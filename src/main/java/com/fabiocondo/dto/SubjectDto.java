@@ -1,8 +1,11 @@
 package com.fabiocondo.dto;
 
 import com.fabiocondo.domain.Topic;
+import com.fabiocondo.enumeration.Category;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.util.List;
 
 public class SubjectDto {
@@ -14,6 +17,9 @@ public class SubjectDto {
     private String name;
 
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     private boolean isCurrentUserSubscribed;
 
@@ -54,6 +60,14 @@ public class SubjectDto {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public boolean isCurrentUserSubscribed() {

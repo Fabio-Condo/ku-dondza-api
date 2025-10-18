@@ -37,6 +37,7 @@ public class SubjectMapper {
         subjectDto.setSubjectId(subject.getSubjectId());
         subjectDto.setName(subject.getName());
         subjectDto.setDescription(subject.getDescription());
+        subjectDto.setCategory(subject.getCategory());
         subjectDto.setTotalTopics(topicRepository.countBySubjectIdAndEnabledTrue(subject.getId()));
         return subjectDto;
     }
@@ -47,6 +48,7 @@ public class SubjectMapper {
         subjectDto.setSubjectId(subject.getSubjectId());
         subjectDto.setName(subject.getName());
         subjectDto.setDescription(subject.getDescription());
+        subjectDto.setCategory(subject.getCategory());
 
         //subjectDto.setTopics(subject.getTopics());
         subjectDto.setTopics(topicService.getBySubjectId(subject.getId()));

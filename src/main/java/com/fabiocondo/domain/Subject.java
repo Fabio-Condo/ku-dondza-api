@@ -1,5 +1,6 @@
 package com.fabiocondo.domain;
 
+import com.fabiocondo.enumeration.Category;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.*;
@@ -20,6 +21,9 @@ public class Subject {
     private String name;
 
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     @JsonIgnore
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -63,6 +67,14 @@ public class Subject {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public String getDescription() {

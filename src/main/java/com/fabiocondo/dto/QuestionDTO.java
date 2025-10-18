@@ -3,7 +3,10 @@ package com.fabiocondo.dto;
 import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.MathExpression;
 import com.fabiocondo.domain.Topic;
+import com.fabiocondo.enumeration.DifficultyLevel;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.util.List;
 
 public class QuestionDTO {
@@ -17,6 +20,9 @@ public class QuestionDTO {
     private String tip;
 
     private String solution;
+
+    @Enumerated(EnumType.STRING)
+    private DifficultyLevel difficultyLevel;
 
     private Integer timeLimit; // Tempo em segundos
 
@@ -74,6 +80,14 @@ public class QuestionDTO {
 
     public void setSolution(String solution) {
         this.solution = solution;
+    }
+
+    public DifficultyLevel getDifficultyLevel() {
+        return difficultyLevel;
+    }
+
+    public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
+        this.difficultyLevel = difficultyLevel;
     }
 
     public Integer getTimeLimit() {

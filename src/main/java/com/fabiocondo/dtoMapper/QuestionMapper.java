@@ -35,6 +35,7 @@ public class QuestionMapper {
         question.setText(questionDTO.getText());
         question.setTip(questionDTO.getTip());
         question.setSolution(questionDTO.getSolution());
+        question.setDifficultyLevel(questionDTO.getDifficultyLevel());
         question.setTimeLimit(questionDTO.getTimeLimit());
         question.setValidated(questionDTO.isValidated());
         question.setFileName(questionDTO.getFileName());
@@ -52,6 +53,7 @@ public class QuestionMapper {
         questionDTO.setText(question.getText());
         questionDTO.setTip(question.getTip());
         questionDTO.setSolution(question.getSolution());
+        questionDTO.setDifficultyLevel(question.getDifficultyLevel());
         questionDTO.setTimeLimit(question.getTimeLimit());
         questionDTO.setValidated(question.isValidated());
         questionDTO.setFileName(question.getFileName());
@@ -77,6 +79,7 @@ public class QuestionMapper {
         questionDTO.setText(question.getText());
         questionDTO.setTip(question.getTip());
         questionDTO.setSolution(question.getSolution());
+        questionDTO.setDifficultyLevel(question.getDifficultyLevel());
         questionDTO.setTimeLimit(question.getTimeLimit());
         questionDTO.setValidated(question.isValidated());
         questionDTO.setFileName(question.getFileName());

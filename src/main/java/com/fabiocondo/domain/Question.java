@@ -1,5 +1,6 @@
 package com.fabiocondo.domain;
 
+import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -27,6 +28,9 @@ public class Question {
 
     @Lob // Large Object
     private String solution;
+
+    @Enumerated(EnumType.STRING)
+    private DifficultyLevel difficultyLevel;
 
     private Integer timeLimit; // Tempo em segundos
 
@@ -100,6 +104,14 @@ public class Question {
 
     public void setSolution(String solution) {
         this.solution = solution;
+    }
+
+    public DifficultyLevel getDifficultyLevel() {
+        return difficultyLevel;
+    }
+
+    public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
+        this.difficultyLevel = difficultyLevel;
     }
 
     public boolean isValidated() {

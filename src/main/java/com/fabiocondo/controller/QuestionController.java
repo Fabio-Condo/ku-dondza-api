@@ -3,6 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.QuestionDTO;
 import com.fabiocondo.dtoMapper.QuestionMapper;
+import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.exception.domain.InterestNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.repository.filter.QuestionFilter;
@@ -52,8 +53,10 @@ public class QuestionController {
     }
 
     @GetMapping("/by-topics")
-    public ResponseEntity<Set<Question>> getQuestionsByTopics(@RequestParam Set<Long> topicIds, @RequestParam int limitPerTopic) {
-        return ResponseEntity.ok(questionService.getQuestionsByTopics(topicIds, limitPerTopic));
+    public ResponseEntity<Set<Question>> getQuestionsByTopics(@RequestParam Set<Long> topicIds,
+                                                              @RequestParam DifficultyLevel difficultyLevel,
+                                                              @RequestParam int limitPerTopic) {
+        return ResponseEntity.ok(questionService.getQuestionsByTopics(topicIds, difficultyLevel, limitPerTopic));
     }
 
     //@GetMapping("/topics/{topicId}")

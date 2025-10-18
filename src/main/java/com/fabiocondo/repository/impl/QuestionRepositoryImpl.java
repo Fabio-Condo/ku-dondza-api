@@ -2,6 +2,7 @@ package com.fabiocondo.repository.impl;
 
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.User;
+import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.repository.filter.QuestionFilter;
 import com.fabiocondo.repository.query.QuestionRepositoryQuery;
 import org.slf4j.Logger;
@@ -43,24 +44,24 @@ public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
     }
 
     @Override
-    public Set<Question> findRandomQuestionsByTopics(Set<Long> topicIds, int limitPerTopic) {
+    public Set<Question> findRandomQuestionsByTopicsAndDifficulty(Set<Long> topicIds, DifficultyLevel difficultyLevel, int limitPerTopic) {
 
         // Essa query utiliza CTE e ROW_NUMBER para particionar as questões por tópico,
         // ordenando aleatoriamente (usando RAND() para MySQL; se for PostgreSQL, substitua por RANDOM())
         String sql = "WITH ranked_questions AS ( " +
                 "    SELECT q.*, ROW_NUMBER() OVER (PARTITION BY q.topic_id ORDER BY RAND()) as rn " +
                 "    FROM question q " +
-                "    WHERE q.topic_id IN (:topicIds) " +
+                "    WHERE q.topic_id IN (:topicIds) AND q.difficulty_level = :difficultyLevel " +
                 ") " +
-                "SELECT * FROM ranked_questions WHERE rn <= :limitPerTopic " +
-                "ORDER BY id ASC";
+                "SELECT * FROM ranked_questions WHERE rn <= :limitPerTopic";
 
         Query query = manager.createNativeQuery(sql, Question.class);
         query.setParameter("topicIds", topicIds);
+        query.setParameter("difficultyLevel", difficultyLevel.name()); // ajuste conforme o mapeamento do enum
         query.setParameter("limitPerTopic", limitPerTopic);
 
         List<Question> questions = query.getResultList();
-        return new LinkedHashSet<>(questions); // Preserva a ordem
+        return new HashSet<>(questions);
     }
 
     private void addRestrictionsPagination(TypedQuery<?> query, Pageable pageable) {

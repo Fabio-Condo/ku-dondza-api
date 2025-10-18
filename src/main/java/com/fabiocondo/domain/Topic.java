@@ -25,7 +25,9 @@ public class Topic {
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
-    private boolean enabled; // Para quizzes, etc
+    private boolean enabled; // Para quizzes, etc verifica se o topico esta pronto para ser selecionado nos quizzes
+
+    private boolean unlocked = false; // Controle dos topicos para users pagos e nao pagos
 
     private Integer position; // Novo campo para controlar a posição do conteúdo
 
@@ -95,6 +97,14 @@ public class Topic {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isUnlocked() {
+        return unlocked;
+    }
+
+    public void setUnlocked(boolean unlocked) {
+        this.unlocked = unlocked;
     }
 
     public Integer getPosition() {

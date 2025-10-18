@@ -20,6 +20,8 @@ public class TopicDTO {
 
     private boolean enabled;
 
+    private boolean unlocked = false;
+
     private Integer position;
 
     private List<Question> questions;
@@ -72,6 +74,14 @@ public class TopicDTO {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isUnlocked() {
+        return unlocked;
+    }
+
+    public void setUnlocked(boolean unlocked) {
+        this.unlocked = unlocked;
     }
 
     public Integer getPosition() {

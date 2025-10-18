@@ -20,7 +20,7 @@ public class TopicDTO {
 
     private boolean enabled;
 
-    private boolean unlocked = false;
+    private boolean premium = false;
 
     private Integer position;
 
@@ -77,11 +77,11 @@ public class TopicDTO {
     }
 
     public boolean isUnlocked() {
-        return unlocked;
+        return premium;
     }
 
     public void setUnlocked(boolean unlocked) {
-        this.unlocked = unlocked;
+        this.premium = unlocked;
     }
 
     public Integer getPosition() {

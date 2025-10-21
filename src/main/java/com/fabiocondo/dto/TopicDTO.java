@@ -76,12 +76,12 @@ public class TopicDTO {
         this.enabled = enabled;
     }
 
-    public boolean isUnlocked() {
+    public boolean isPremium() {
         return premium;
     }
 
-    public void setUnlocked(boolean unlocked) {
-        this.premium = unlocked;
+    public void setPremium(boolean premium) {
+        this.premium = premium;
     }
 
     public Integer getPosition() {

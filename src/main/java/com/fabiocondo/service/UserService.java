@@ -1,6 +1,7 @@
 package com.fabiocondo.service;
 
 import com.fabiocondo.domain.*;
+import com.fabiocondo.enumeration.Plan;
 import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.filter.UserFilter;
@@ -38,6 +39,12 @@ public interface UserService {
     void deleteUser(String email) throws IOException;
 
     User updateProfileImage(String email, MultipartFile profileImage) throws EmailExistException, IOException, UserNotFoundException;
+
+    User activatePlan(Long userId, Plan plan, int days) throws UserNotFoundException;
+
+    boolean isPlanActive(User user, Plan plan);
+
+    void cancelSubscription(Long userId);
 
     void updatePropertyActive(String email, Boolean active) throws EmailNotFoundException;
 

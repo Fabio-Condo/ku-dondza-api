@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -58,7 +59,9 @@ public class User implements Serializable {
     private boolean isNotLocked;
 
     @Enumerated(EnumType.STRING)
-    private Plan plan; //FREE or PREMIUM
+    private Plan plan = Plan.FREE; //FREE or PREMIUM
+
+    private LocalDateTime expiresAt;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -269,6 +272,14 @@ public class User implements Serializable {
 
     public void setPlan(Plan plan) {
         this.plan = plan;
+    }
+
+    public LocalDateTime getExpiresAt() {
+        return expiresAt;
+    }
+
+    public void setExpiresAt(LocalDateTime expiresAt) {
+        this.expiresAt = expiresAt;
     }
 
     public Set<ExternalAuthMethod> getExternalAuthMethods() {

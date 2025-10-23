@@ -4,15 +4,18 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.UserDTO;
 import com.fabiocondo.dtoMapper.UserMapper;
+import com.fabiocondo.enumeration.Plan;
 import com.fabiocondo.enumeration.UserType;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.TopicContentRepository;
 import com.fabiocondo.repository.filter.UserFilter;
+import com.fabiocondo.security.utility.JWTTokenProvider;
 import com.fabiocondo.service.impl.AuthServiceImpl;
 import com.fabiocondo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +27,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import static com.fabiocondo.constant.SecurityConstant.JWT_TOKEN_HEADER;
 import static com.fabiocondo.constant.UserImplConstant.EMAIL_SENT;
 import static com.fabiocondo.constant.UserImplConstant.USER_DELETED_SUCCESSFULLY;
 import static org.springframework.http.HttpStatus.OK;
@@ -35,12 +39,14 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
     private final TopicContentRepository topicContentRepository;
+    private final JWTTokenProvider jwtTokenProvider;
 
     @Autowired
-    public UserController(UserService userService, AuthServiceImpl authServiceImpl, UserMapper userMapper, TopicContentRepository topicContentRepository) {
+    public UserController(UserService userService, AuthServiceImpl authServiceImpl, UserMapper userMapper, TopicContentRepository topicContentRepository, JWTTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.userMapper = userMapper;
         this.topicContentRepository = topicContentRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @PostMapping("/register")
@@ -158,6 +164,27 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('user:update')")
     public void updatePropertyActive(@PathVariable("newEmail") String newEmail, @RequestBody Boolean active) throws EmailNotFoundException {
         userService.updatePropertyActive(newEmail, active);
+    }
+
+    @PutMapping("/activate-plan/{userId}")
+    public ResponseEntity<User> activatePlan(
+            @PathVariable Long userId,
+            @RequestParam Plan plan,
+            @RequestParam(defaultValue = "30") int days) throws UserNotFoundException {
+
+        User user = userService.activatePlan(userId, plan, days);
+
+        // 🔹 Gerar JWT e cabeçalhos
+        UserPrincipal userPrincipal = new UserPrincipal(user);
+        HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
+
+        return new ResponseEntity<>(user, jwtHeader, HttpStatus.OK);
+    }
+
+    private HttpHeaders getJwtHeader(UserPrincipal user) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(JWT_TOKEN_HEADER, jwtTokenProvider.generateJwtToken(user));
+        return headers;
     }
 
     @PutMapping("/{newEmail}/notLocked-user")

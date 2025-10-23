@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.fabiocondo.constant.UserImplConstant.*;
@@ -307,6 +308,36 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = validateNewEmail(email, null);
         //saveProfileImage(user, profileImage);
         return user;
+    }
+
+    @Override
+    public User activatePlan(Long userId, Plan plan, int days) throws UserNotFoundException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expiresAt = now.plusDays(days);
+
+        user.setPlan(plan);
+        user.setExpiresAt(expiresAt);
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    public boolean isPlanActive(User user, Plan plan) {
+        return user.getPlan() == plan &&
+                user.getExpiresAt() != null &&
+                LocalDateTime.now().isBefore(user.getExpiresAt());
+    }
+
+    @Override
+    public void cancelSubscription(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setPlan(Plan.FREE);
+        user.setExpiresAt(null);
+        userRepository.save(user);
     }
 
     @Override

@@ -170,9 +170,10 @@ public class UserController {
     public ResponseEntity<User> activatePlan(
             @PathVariable Long userId,
             @RequestParam Plan plan,
-            @RequestParam(defaultValue = "30") int days) throws UserNotFoundException {
+            @RequestParam Long walletId) throws UserNotFoundException, WalletNotFoundException {
 
-        User user = userService.activatePlan(userId, plan, days);
+        // Ativar plano com a carteira selecionada
+        User user = userService.activatePlan(userId, plan, walletId);
 
         // 🔹 Gerar JWT e cabeçalhos
         UserPrincipal userPrincipal = new UserPrincipal(user);

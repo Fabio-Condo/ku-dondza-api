@@ -1,8 +1,11 @@
 package com.fabiocondo.service.impl;
 
+import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.domain.Wallet;
+import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.exception.domain.WalletNotFoundException;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.repository.WalletRepository;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,11 @@ public class WalletService {
     public WalletService(WalletRepository walletRepository, UserRepository userRepository) {
         this.walletRepository = walletRepository;
         this.userRepository = userRepository;
+    }
+
+    public Wallet findById(Long id) throws WalletNotFoundException {
+        return walletRepository.findById(id)
+                .orElseThrow(() -> new WalletNotFoundException("No wallet found by id: " + id));
     }
 
     public List<Wallet> getWallets(Long userId) {

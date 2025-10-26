@@ -6,6 +6,7 @@ import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.Plan;
 import com.fabiocondo.enumeration.Role;
 import com.fabiocondo.enumeration.UserType;
+import com.fabiocondo.enumeration.WalletType;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.*;
 import com.fabiocondo.repository.filter.UserFilter;
@@ -53,10 +54,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final SubjectRepository subjectRepository;
     private final QuestionRepository questionRepository;
     private final TopicContentRepository topicContentRepository;
+    private final WalletService walletService;
+
 
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository, WalletService walletService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
@@ -65,6 +68,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.subjectRepository = subjectRepository;
         this.questionRepository = questionRepository;
         this.topicContentRepository = topicContentRepository;
+        this.walletService = walletService;
     }
 
     public Page<User> searchUsers(String query, Pageable pageable) {
@@ -311,9 +315,33 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User activatePlan(Long userId, Plan plan, int days) throws UserNotFoundException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    public User activatePlan(Long userId, Plan plan, Long walletId) throws UserNotFoundException, WalletNotFoundException {
+        int days = 30;
+
+        User user = findById(userId);
+
+        // Buscar carteira pelo ID
+        Wallet wallet = walletService.findById(walletId);
+
+        // Usa enum para determinar o tipo de carteira
+        boolean paymentSuccess = false;
+
+        WalletType walletType = wallet.getType(); // supondo que Wallet tem método getTypeEnum()
+
+        switch (walletType) {
+            case MPESA:
+                paymentSuccess = simulateMpesaPayment(wallet.getPhoneNumber(), plan);
+                break;
+            case EMOLA:
+                paymentSuccess = simulateEmolaPayment(wallet.getPhoneNumber(), plan);
+                break;
+            default:
+                throw new IllegalArgumentException("Tipo de carteira inválido.");
+        }
+
+        if (!paymentSuccess) {
+            throw new RuntimeException("Falha ao processar o pagamento. Tente novamente.");
+        }
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiresAt = now.plusDays(days);
@@ -330,6 +358,31 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 user.getExpiresAt() != null &&
                 LocalDateTime.now().isBefore(user.getExpiresAt());
     }
+
+    private boolean simulateMpesaPayment(String phoneNumber, Plan plan) {
+        System.out.println("Simulando pagamento MPESA para " + phoneNumber +
+                " no plano " + plan + "...");
+        simulateNetworkDelay();
+        // Lógica fictícia de sucesso (exemplo: sempre dá certo se começa com 84 ou 85)
+        return phoneNumber.startsWith("84") || phoneNumber.startsWith("85");
+    }
+
+    private boolean simulateEmolaPayment(String phoneNumber, Plan plan) {
+        System.out.println("Simulando pagamento EMOLA para " + phoneNumber +
+                " no plano " + plan + "...");
+        simulateNetworkDelay();
+        // Lógica fictícia de sucesso (exemplo: sempre dá certo se começa com 86 ou 87)
+        return phoneNumber.startsWith("86") || phoneNumber.startsWith("87");
+    }
+
+    private void simulateNetworkDelay() {
+        try {
+            Thread.sleep(1500); // simula um pequeno atraso da transação
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
 
     @Override
     public void cancelSubscription(Long userId) {

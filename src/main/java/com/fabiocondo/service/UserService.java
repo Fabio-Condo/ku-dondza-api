@@ -40,7 +40,7 @@ public interface UserService {
 
     User updateProfileImage(String email, MultipartFile profileImage) throws EmailExistException, IOException, UserNotFoundException;
 
-    User activatePlan(Long userId, Plan plan, int days) throws UserNotFoundException;
+    User activatePlan(Long userId, Plan plan, Long walletId) throws UserNotFoundException, WalletNotFoundException;
 
     boolean isPlanActive(User user, Plan plan);
 

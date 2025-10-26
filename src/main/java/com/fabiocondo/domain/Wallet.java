@@ -22,6 +22,8 @@ public class Wallet {
 
     private Boolean isDefault = false;
 
+    private Boolean isActive = true;
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -67,6 +69,14 @@ public class Wallet {
 
     public void setDefault(Boolean aDefault) {
         isDefault = aDefault;
+    }
+
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
     }
 
     public User getUser() {

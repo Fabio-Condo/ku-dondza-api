@@ -3,10 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
-import com.fabiocondo.enumeration.Plan;
-import com.fabiocondo.enumeration.Role;
-import com.fabiocondo.enumeration.UserType;
-import com.fabiocondo.enumeration.WalletType;
+import com.fabiocondo.enumeration.*;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.*;
 import com.fabiocondo.repository.filter.UserFilter;
@@ -55,11 +52,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final QuestionRepository questionRepository;
     private final TopicContentRepository topicContentRepository;
     private final WalletService walletService;
-
-
+    private final PaymentService paymentService;
+    private final MPesaPaymentService mPesaPaymentService;
+    private final EmolaPaymentService emolaPaymentService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository, WalletService walletService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository, WalletService walletService, PaymentService paymentService, MPesaPaymentService mPesaPaymentService, EmolaPaymentService emolaPaymentService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
@@ -69,6 +67,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.questionRepository = questionRepository;
         this.topicContentRepository = topicContentRepository;
         this.walletService = walletService;
+        this.paymentService = paymentService;
+        this.mPesaPaymentService = mPesaPaymentService;
+        this.emolaPaymentService = emolaPaymentService;
     }
 
     public Page<User> searchUsers(String query, Pageable pageable) {
@@ -315,40 +316,57 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User activatePlan(Long userId, Plan plan, Long walletId) throws UserNotFoundException, WalletNotFoundException {
-        int days = 30;
+    public User activatePlan(Long userId, Plan plan, Long walletId)
+            throws UserNotFoundException, WalletNotFoundException {
 
+        final int DAYS_VALID = 30;
+        final double PLAN_PRICE = 299.0;
+
+        // Buscar utilizador e carteira
         User user = findById(userId);
-
-        // Buscar carteira pelo ID
         Wallet wallet = walletService.findById(walletId);
 
-        // Usa enum para determinar o tipo de carteira
-        boolean paymentSuccess = false;
+        if (wallet == null) {
+            throw new WalletNotFoundException("Carteira não encontrada.");
+        }
 
-        WalletType walletType = wallet.getType(); // supondo que Wallet tem método getTypeEnum()
-
-        switch (walletType) {
+        // Determinar tipo de carteira e simular pagamento
+        boolean paymentSuccess;
+        switch (wallet.getType()) {
             case MPESA:
-                paymentSuccess = simulateMpesaPayment(wallet.getPhoneNumber(), plan);
+                paymentSuccess = mPesaPaymentService.simulateMpesaPayment(wallet.getPhoneNumber(), plan);
                 break;
             case EMOLA:
-                paymentSuccess = simulateEmolaPayment(wallet.getPhoneNumber(), plan);
+                paymentSuccess = emolaPaymentService.simulateEmolaPayment(wallet.getPhoneNumber(), plan);
                 break;
             default:
-                throw new IllegalArgumentException("Tipo de carteira inválido.");
+                throw new IllegalArgumentException("Tipo de carteira inválido: " + wallet.getType());
         }
 
         if (!paymentSuccess) {
             throw new RuntimeException("Falha ao processar o pagamento. Tente novamente.");
         }
 
+        // Atualizar plano e validade
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expiresAt = now.plusDays(days);
-
+        LocalDateTime expiresAt = now.plusDays(DAYS_VALID);
         user.setPlan(plan);
         user.setExpiresAt(expiresAt);
 
+        // Registrar pagamento
+        Payment payment = new Payment();
+        payment.setUser(user);
+        payment.setWallet(wallet);
+        payment.setPlan(plan);
+        payment.setAmount(PLAN_PRICE);
+        payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setCreatedAt(now);
+        payment.setExpiresAt(expiresAt);
+        payment.setTransactionReference(UUID.randomUUID().toString()); // id de simulação
+
+        paymentService.save(payment);
+
+        // Salvar usuário com novo plano
         return userRepository.save(user);
     }
 
@@ -358,31 +376,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 user.getExpiresAt() != null &&
                 LocalDateTime.now().isBefore(user.getExpiresAt());
     }
-
-    private boolean simulateMpesaPayment(String phoneNumber, Plan plan) {
-        System.out.println("Simulando pagamento MPESA para " + phoneNumber +
-                " no plano " + plan + "...");
-        simulateNetworkDelay();
-        // Lógica fictícia de sucesso (exemplo: sempre dá certo se começa com 84 ou 85)
-        return phoneNumber.startsWith("84") || phoneNumber.startsWith("85");
-    }
-
-    private boolean simulateEmolaPayment(String phoneNumber, Plan plan) {
-        System.out.println("Simulando pagamento EMOLA para " + phoneNumber +
-                " no plano " + plan + "...");
-        simulateNetworkDelay();
-        // Lógica fictícia de sucesso (exemplo: sempre dá certo se começa com 86 ou 87)
-        return phoneNumber.startsWith("86") || phoneNumber.startsWith("87");
-    }
-
-    private void simulateNetworkDelay() {
-        try {
-            Thread.sleep(1500); // simula um pequeno atraso da transação
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
 
     @Override
     public void cancelSubscription(Long userId) {

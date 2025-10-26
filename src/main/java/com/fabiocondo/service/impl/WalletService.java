@@ -59,4 +59,10 @@ public class WalletService {
         walletRepository.saveAll(user.getWallets()); // atualiza as outras
         return walletRepository.save(wallet); // atualiza a selecionada
     }
+
+    public void deactivateWallet(Long walletId) throws WalletNotFoundException {
+        Wallet wallet = findById(walletId);
+        wallet.setActive(false);
+        walletRepository.save(wallet);
+    }
 }

@@ -39,4 +39,24 @@ public class WalletService {
         wallet.setUser(user);
         return walletRepository.save(wallet);
     }
+
+    public Wallet setDefault(Long walletId) throws WalletNotFoundException {
+        Wallet wallet = findById(walletId);
+
+        User user = wallet.getUser();
+
+        // Desmarca todas as outras carteiras do usuário
+        user.getWallets().forEach(w -> {
+            if (!w.getId().equals(walletId)) {
+                w.setDefault(false);
+            }
+        });
+
+        // Marca a carteira selecionada como default
+        wallet.setDefault(true);
+
+        // Salva alterações
+        walletRepository.saveAll(user.getWallets()); // atualiza as outras
+        return walletRepository.save(wallet); // atualiza a selecionada
+    }
 }

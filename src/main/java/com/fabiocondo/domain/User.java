@@ -102,6 +102,10 @@ public class User implements Serializable {
     )
     private Set<Question> savedQuestions = new HashSet<>();
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Wallet> wallets = new ArrayList<>();
+
     public User(){}
 
     public User(Long id, String userId, String fullName, String email, String bio, String password, String profileImageUrl, String fileName, Date lastLoginDate, Date lastLoginDateDisplay, Date joinDate, String role, String[] authorities, boolean isActive, boolean isNotLocked) {
@@ -320,5 +324,13 @@ public class User implements Serializable {
 
     public void setSavedQuestions(Set<Question> savedQuestions) {
         this.savedQuestions = savedQuestions;
+    }
+
+    public List<Wallet> getWallets() {
+        return wallets;
+    }
+
+    public void setWallets(List<Wallet> wallets) {
+        this.wallets = wallets;
     }
 }

@@ -2,6 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.Wallet;
 import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.exception.domain.WalletNotFoundException;
 import com.fabiocondo.service.impl.WalletService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,12 @@ public class WalletController {
     public ResponseEntity<Wallet> addWallet(@PathVariable Long userId, @RequestBody Wallet wallet) throws UserNotFoundException {
         Wallet savedWallet = walletService.addWallet(userId, wallet);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedWallet);
+    }
+
+    @PutMapping("/{walletId}/set-default")
+    public ResponseEntity<Wallet> setDefaultWallet(@PathVariable Long walletId) throws WalletNotFoundException {
+        Wallet wallet = walletService.setDefault(walletId);
+        return ResponseEntity.ok(wallet);
     }
 }
 

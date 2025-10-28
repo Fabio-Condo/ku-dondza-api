@@ -64,8 +64,8 @@ public class TopicContentController {
     }
 
     @GetMapping("/download/{id}/{fileName}")
-    public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable Long id, @PathVariable String fileName, @RequestParam("currentUserId") Long currentUserId) throws ContentNotFoundException, DownloadRateLimitExceededException {
-        byte[] data = topicContentService.downloadFile(id, fileName, currentUserId);
+    public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable Long id, @PathVariable String fileName) throws ContentNotFoundException {
+        byte[] data = topicContentService.downloadFile(id, fileName);
         ByteArrayResource resource = new ByteArrayResource(data);
 
         return ResponseEntity

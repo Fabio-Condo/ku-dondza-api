@@ -118,17 +118,7 @@ public class TopicContentService {
         }
     }
 
-    public byte[] downloadFile(Long id, @PathVariable String fileName, Long currentUserId) throws ContentNotFoundException, DownloadRateLimitExceededException {
-
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
-
-        // Verifica se o usuário excedeu o limite
-        Bucket bucket = rateLimiterService.resolveBucketForUser(user.getId().toString());
-        if (!bucket.tryConsume(1)) {
-            throw new DownloadRateLimitExceededException("Limite de downloads excedido. Tente novamente mais tarde.");
-        }
-
+    public byte[] downloadFile(Long id, @PathVariable String fileName) throws ContentNotFoundException {
         TopicContent existContent = findById(id);
         logger.info("Downloading file: " + existContent.getFileName());
         byte[] data = amazonS3Service.downloadFile(fileName, BUCKET_NAME);

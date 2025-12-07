@@ -1,13 +1,13 @@
 package com.fabiocondo.enumeration;
 
-public enum DifficultyLevel {
-    BEGINNER("Beginner"),
-    INTERMEDIATE("Intermediate"),
-    ADVANCED("Advanced");
+public enum TopicTestStatus {
+    LOCKED("LOCKED"),
+    ACTIVE("ACTIVE"),
+    COMPLETE("COMPLETE");
 
     private final String label;
 
-    DifficultyLevel(String label) {
+    TopicTestStatus(String label) {
         this.label = label;
     }
 

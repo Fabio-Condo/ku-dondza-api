@@ -109,6 +109,10 @@ public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
             predicates.add(builder.equal(
                     builder.lower(root.get("topic").get("id")), questionFilter.getTopic().getId()));
         }
+        if(!ObjectUtils.isEmpty(questionFilter.getDifficultyLevel())) {
+            predicates.add(builder.equal(
+                    builder.lower(root.get("difficultyLevel")), questionFilter.getDifficultyLevel()));
+        }
 
         // Filtro: questions salvos por um usuário específico
         if (questionFilter.getUserId() != null) {

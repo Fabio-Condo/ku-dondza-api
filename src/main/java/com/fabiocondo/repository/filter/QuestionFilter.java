@@ -2,6 +2,10 @@ package com.fabiocondo.repository.filter;
 
 import com.fabiocondo.domain.Subject;
 import com.fabiocondo.domain.Topic;
+import com.fabiocondo.enumeration.DifficultyLevel;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 public class QuestionFilter {
 
@@ -14,6 +18,9 @@ public class QuestionFilter {
     private Topic topic;
 
     private String text;
+
+    @Enumerated(EnumType.STRING)
+    private DifficultyLevel difficultyLevel;
 
     private Long userId;
 
@@ -55,6 +62,14 @@ public class QuestionFilter {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public DifficultyLevel getDifficultyLevel() {
+        return difficultyLevel;
+    }
+
+    public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
+        this.difficultyLevel = difficultyLevel;
     }
 
     public Long getUserId() {

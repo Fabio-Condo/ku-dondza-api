@@ -1,5 +1,6 @@
 package com.fabiocondo.repository;
 
+import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.domain.TopicTest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,6 +13,9 @@ public interface TopicTestRepository extends JpaRepository<TopicTest, Long> {
     @Query("SELECT t FROM TopicTest t WHERE t.topic.subject.id = :subjectId ORDER BY t.orderIndex ASC")
     List<TopicTest> findBySubjectId(@Param("subjectId") Long subjectId);
 
-    //List<TopicTest> findByTopic_Subject_Id(Long subjectId);
+    @Query("SELECT q FROM TopicTest tt " + "JOIN tt.submittedQuizzes q " + "WHERE tt.id = :topicTestId " + "AND q.user.id = :userId")
+    Optional<Quiz> findUserQuizByTopicTest(@Param("topicTestId") Long topicTestId, @Param("userId") Long userId);
 
+    //@Query("SELECT q FROM TopicTest tt JOIN tt.submittedQuizzes q " + "WHERE tt.id IN :topicTestIds AND q.user.id = :userId")
+    //List<Quiz> findUserQuizzesByTopicTests(@Param("topicTestIds") List<Long> topicTestIds, @Param("userId") Long userId);
 }

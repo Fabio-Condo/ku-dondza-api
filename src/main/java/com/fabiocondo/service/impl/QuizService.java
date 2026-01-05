@@ -2,6 +2,7 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
+import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
@@ -22,7 +23,6 @@ public class QuizService {
     private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
-
 
     public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, AnswerRepository answerRepository) {
         this.quizRepository = quizRepository;
@@ -53,6 +53,32 @@ public class QuizService {
 
     @Transactional
     public Quiz saveQuizWithQuestions(Quiz quiz, Set<Long> questionIds, Set<Long> userAnswerIds) {
+
+        if (quiz == null) {
+            throw new IllegalArgumentException("O objeto Quiz não pode ser nulo.");
+        }
+
+        if (questionIds == null || questionIds.isEmpty()) {
+            throw new IllegalArgumentException("O Quiz deve ter pelo menos uma questão associada.");
+        }
+
+        Set<Question> questions = new HashSet<>(questionRepository.findAllById(questionIds));
+        Set<Answer> answers = new HashSet<>(answerRepository.findAllById(userAnswerIds));
+
+        if (questions.size() != questionIds.size()) {
+            throw new IllegalArgumentException("Uma ou mais questões não foram encontradas no banco de dados.");
+        }
+
+        quiz.setQuizId(UUID.randomUUID().toString());
+        quiz.setSubmittedAt(new Date());
+        quiz.setQuestions(questions);
+        quiz.setAnswers(answers);
+
+        return quizRepository.save(quiz);
+    }
+
+    @Transactional
+    public Quiz saveQuizTopicTestWithQuestions(Quiz quiz, Set<Long> questionIds, Set<Long> userAnswerIds, Long topicTestId) throws TopicNotFoundException {
 
         if (quiz == null) {
             throw new IllegalArgumentException("O objeto Quiz não pode ser nulo.");

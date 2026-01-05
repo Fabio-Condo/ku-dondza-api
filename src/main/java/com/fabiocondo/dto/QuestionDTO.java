@@ -4,6 +4,7 @@ import com.fabiocondo.domain.Answer;
 import com.fabiocondo.domain.MathExpression;
 import com.fabiocondo.domain.Topic;
 import com.fabiocondo.enumeration.DifficultyLevel;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -32,6 +33,9 @@ public class QuestionDTO {
 
     private String urlFile;
 
+    @JsonIgnoreProperties(
+            value = { "questions", "hibernateLazyInitializer", "handler" }
+    ) // ADICIONANDO PORCAUSA DE TOPIC_TEST (MODULO DE PROGRESSAO) - MELHORAR DEPOIS COM DTO
     private Topic topic;
 
     private List<MathExpression> mathExpressions; // Se for math

@@ -4,6 +4,8 @@ import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.QuizDTO;
 import com.fabiocondo.dtoMapper.QuizMapper;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
+import com.fabiocondo.exception.domain.TopicNotFoundException;
+import com.fabiocondo.repository.TopicTestRepository;
 import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.QuizService;
 import org.springframework.data.domain.Page;
@@ -22,9 +24,12 @@ public class QuizController {
 
     private final QuizMapper quizMapper;
 
-    public QuizController(QuizService quizService, QuizMapper quizMapper) {
+    private final TopicTestRepository topicTestRepository;
+
+    public QuizController(QuizService quizService, QuizMapper quizMapper, TopicTestRepository topicTestRepository) {
         this.quizService = quizService;
         this.quizMapper = quizMapper;
+        this.topicTestRepository = topicTestRepository;
     }
 
     @GetMapping("/{id}")
@@ -55,6 +60,28 @@ public class QuizController {
                                                @RequestParam("currentUserId") Long currentUserId) {
 
         Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, questionIds, userAnswerIds);
+        return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(savedQuiz, currentUserId));
+    }
+
+    @PostMapping("/topic-test")
+    public ResponseEntity<QuizDTO> createQuizTopicTest(@RequestBody Quiz quiz,
+                                              @RequestParam Set<Long> questionIds,
+                                              @RequestParam Set<Long> userAnswerIds,
+                                              @RequestParam("topicTestId") Long topicTestId,
+                                              @RequestParam("currentUserId") Long currentUserId) throws TopicNotFoundException {
+
+        Quiz savedQuiz = quizService.saveQuizTopicTestWithQuestions(quiz, questionIds, userAnswerIds, topicTestId);
+
+        QuizDTO quizDTO = quizMapper.domainToDTO(savedQuiz);
+
+        // O quiz so eh adicionado se a taxa de acerto for de 85% para cima
+        if (quizDTO.getAccuracyRate() >= 85.0){
+            TopicTest topicTest = topicTestRepository.findById(topicTestId)
+                    .orElseThrow(() -> new TopicNotFoundException("No topic test found by id: " + topicTestId));
+            topicTest.getSubmittedQuizzes().add(savedQuiz);
+            topicTestRepository.save(topicTest);
+        }
+
         return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(savedQuiz, currentUserId));
     }
 

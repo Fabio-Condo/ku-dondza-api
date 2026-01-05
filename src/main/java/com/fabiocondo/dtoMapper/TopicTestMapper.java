@@ -1,18 +1,26 @@
 package com.fabiocondo.dtoMapper;
 
+import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.domain.TopicTest;
 import com.fabiocondo.dto.TopicTestDTO;
 import com.fabiocondo.dto.TopicWithTestsDTO;
+import com.fabiocondo.repository.TopicTestRepository;
+import com.fabiocondo.repository.UserRepository;
 import org.springframework.stereotype.Component;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
 @Component
 public class TopicTestMapper {
+
+    TopicTestRepository topicTestRepository;
+    UserRepository userRepository;
+
+    public TopicTestMapper(TopicTestRepository topicTestRepository) {
+        this.topicTestRepository = topicTestRepository;
+    }
 
     public TopicTest dtoToDomainObject(TopicTestDTO topicTestDTO) {
         TopicTest topicTest = new TopicTest();
@@ -30,7 +38,6 @@ public class TopicTestMapper {
         topicTestDTO.setId(topicTest.getId());
         topicTestDTO.setDifficultyLevel(topicTest.getDifficultyLevel());
         topicTestDTO.setTopic(topicTest.getTopic());
-        //topicTestDTO.setQuestions(topicTest.getQuestions());
         //topicTestDTO.setSubmittedQuizzes(topicTest.getSubmittedQuizzes());
         topicTestDTO.setOrderIndex(topicTest.getOrderIndex());
         topicTestDTO.setTopicTestStatus(topicTest.getTopicTestStatus());
@@ -40,33 +47,58 @@ public class TopicTestMapper {
         return topicTestDTO;
     }
 
-    public List<TopicTestDTO> toDTOListOrdered(List<TopicTest> tests) {
+    public TopicTestDTO domainToDTO(TopicTest topicTest, Long userId) {
+        TopicTestDTO dto = new TopicTestDTO();
+
+        dto.setId(topicTest.getId());
+        dto.setDifficultyLevel(topicTest.getDifficultyLevel());
+        dto.setTopic(topicTest.getTopic());
+        dto.setOrderIndex(topicTest.getOrderIndex());
+        dto.setTopicTestStatus(topicTest.getTopicTestStatus());
+        dto.setAccuracyRate(100.0);
+        dto.setTotalQuestions((long) topicTest.getQuestions().size());
+
+        // buscar APENAS o quiz do user atual
+        Optional<Quiz> userQuiz =
+                topicTestRepository.findUserQuizByTopicTest(topicTest.getId(), userId);
+
+        userQuiz.ifPresent(quiz -> {
+            Set<Quiz> quizzes = new HashSet<>();
+            quizzes.add(quiz);
+            dto.setSubmittedQuizzes(quizzes);
+        });
+
+        return dto;
+    }
+
+    public List<TopicTestDTO> toDTOListOrdered(List<TopicTest> tests, Long user) {
         return tests.stream()
-                // primeiro converte para DTO
-                .map(this::domainToDTO)
-                // ordena por: nome do tópico e depois pelo orderIndex
-                .sorted(Comparator.comparing((TopicTestDTO dto) -> dto.getTopic().getName())
-                        .thenComparing(TopicTestDTO::getOrderIndex))
+                .map(test -> domainToDTO(test, user))
+                .sorted(
+                        Comparator
+                                .comparing((TopicTestDTO dto) -> dto.getTopic().getName())
+                                .thenComparing(TopicTestDTO::getOrderIndex)
+                )
                 .collect(Collectors.toList());
     }
 
-    public List<TopicWithTestsDTO> groupByTopic(List<TopicTest> tests) {
-        // converte para DTO
-        List<TopicTestDTO> dtos = toDTOListOrdered(tests);
+    public List<TopicWithTestsDTO> groupByTopic(List<TopicTest> tests, Long userId) {
 
-        // agrupa por nome do tópico
-        Map<String, List<TopicTestDTO>> grouped = dtos.stream()
-                .collect(Collectors.groupingBy(dto -> dto.getTopic().getName()));
+        List<TopicTestDTO> dtos = toDTOListOrdered(tests, userId);
 
-        // transforma em lista de TopicWithTestsDTO
+        Map<String, List<TopicTestDTO>> grouped =
+                dtos.stream()
+                        .collect(Collectors.groupingBy(dto -> dto.getTopic().getName()));
+
         return grouped.entrySet().stream()
                 .map(entry -> new TopicWithTestsDTO(
-                        entry.getValue().get(0).getTopic().getId(), // id do tópico
-                        entry.getKey(),                              // nome do tópico
-                        entry.getValue()                             // lista de testes do tópico
+                        entry.getValue().get(0).getTopic().getId(),
+                        entry.getKey(),
+                        entry.getValue()
                 ))
                 .sorted(Comparator.comparing(TopicWithTestsDTO::getTopicName))
                 .collect(Collectors.toList());
     }
+
 
 }

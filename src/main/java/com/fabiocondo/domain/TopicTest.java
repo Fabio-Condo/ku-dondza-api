@@ -32,7 +32,7 @@ public class TopicTest {
     @JoinColumn(name = "topic_id", nullable = false)
     @JsonIgnoreProperties(
             value = { "questions", "contents", "hibernateLazyInitializer", "handler" }
-    )
+    )// ADICIONANDO PORCAUSA DE TOPIC_TEST (MODULO DE PROGRESSAO) - MELHORAR DEPOIS COM DTO
     private Topic topic;
 
     @JsonIgnore

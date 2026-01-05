@@ -20,7 +20,7 @@ public class TopicTestDTO {
 
     @JsonIgnoreProperties(
             value = { "questions", "contents", "hibernateLazyInitializer", "handler" }
-    )
+    )// ADICIONANDO PORCAUSA DE TOPIC_TEST (MODULO DE PROGRESSAO) - MELHORAR DEPOIS COM DTO
     private Topic topic;
 
     @OrderBy("id ASC")

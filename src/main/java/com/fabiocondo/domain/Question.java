@@ -41,7 +41,10 @@ public class Question {
     private String urlFile;
 
     @ManyToOne
-    @JsonIgnoreProperties("questions")
+    //@JsonIgnoreProperties("questions")
+    @JsonIgnoreProperties(
+            value = { "questions", "hibernateLazyInitializer", "handler" }
+    ) // ADICIONANDO PORCAUSA DE TOPIC_TEST (MODULO DE PROGRESSAO) - MELHORAR DEPOIS COM DTO
     @JoinColumn(name = "topic_id")
     private Topic topic;
 

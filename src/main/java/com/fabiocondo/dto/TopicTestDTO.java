@@ -4,7 +4,6 @@ import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.domain.Topic;
 import com.fabiocondo.enumeration.DifficultyLevel;
-import com.fabiocondo.enumeration.TopicTestStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -30,9 +29,6 @@ public class TopicTestDTO {
 
     private int orderIndex; // 1, 2, 3
 
-    @Enumerated(EnumType.STRING)
-    private TopicTestStatus topicTestStatus;
-
     private double accuracyRate;
 
     private Long totalQuestions;
@@ -40,14 +36,13 @@ public class TopicTestDTO {
     public TopicTestDTO() {
     }
 
-    public TopicTestDTO(Long id, DifficultyLevel difficultyLevel, Topic topic, Set<Question> questions, Set<Quiz> submittedQuizzes, int orderIndex, TopicTestStatus topicTestStatus) {
+    public TopicTestDTO(Long id, DifficultyLevel difficultyLevel, Topic topic, Set<Question> questions, Set<Quiz> submittedQuizzes, int orderIndex) {
         this.id = id;
         this.difficultyLevel = difficultyLevel;
         this.topic = topic;
         this.questions = questions;
         this.submittedQuizzes = submittedQuizzes;
         this.orderIndex = orderIndex;
-        this.topicTestStatus = topicTestStatus;
     }
 
     public Long getId() {
@@ -96,14 +91,6 @@ public class TopicTestDTO {
 
     public void setOrderIndex(int orderIndex) {
         this.orderIndex = orderIndex;
-    }
-
-    public TopicTestStatus getTopicTestStatus() {
-        return topicTestStatus;
-    }
-
-    public void setTopicTestStatus(TopicTestStatus topicTestStatus) {
-        this.topicTestStatus = topicTestStatus;
     }
 
     public double getAccuracyRate() {

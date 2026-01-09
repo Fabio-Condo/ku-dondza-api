@@ -1,7 +1,6 @@
 package com.fabiocondo.domain;
 
 import com.fabiocondo.enumeration.DifficultyLevel;
-import com.fabiocondo.enumeration.TopicTestStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,9 +21,6 @@ public class TopicTest {
 
     @Enumerated(EnumType.STRING)
     private DifficultyLevel difficultyLevel;
-
-    @Enumerated(EnumType.STRING)
-    private TopicTestStatus topicTestStatus;
 
     //@JsonIgnoreProperties("questions")
     //@JsonIgnore
@@ -80,14 +76,6 @@ public class TopicTest {
 
     public void setDifficultyLevel(DifficultyLevel difficultyLevel) {
         this.difficultyLevel = difficultyLevel;
-    }
-
-    public TopicTestStatus getTopicTestStatus() {
-        return topicTestStatus;
-    }
-
-    public void setTopicTestStatus(TopicTestStatus topicTestStatus) {
-        this.topicTestStatus = topicTestStatus;
     }
 
     public Topic getTopic() {

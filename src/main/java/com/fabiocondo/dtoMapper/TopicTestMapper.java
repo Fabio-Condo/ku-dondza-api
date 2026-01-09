@@ -40,7 +40,6 @@ public class TopicTestMapper {
         topicTestDTO.setTopic(topicTest.getTopic());
         //topicTestDTO.setSubmittedQuizzes(topicTest.getSubmittedQuizzes());
         topicTestDTO.setOrderIndex(topicTest.getOrderIndex());
-        topicTestDTO.setTopicTestStatus(topicTest.getTopicTestStatus());
         topicTestDTO.setAccuracyRate(100.0);
         topicTestDTO.setTotalQuestions((long) topicTestDTO.getQuestions().size());
 
@@ -54,7 +53,6 @@ public class TopicTestMapper {
         dto.setDifficultyLevel(topicTest.getDifficultyLevel());
         dto.setTopic(topicTest.getTopic());
         dto.setOrderIndex(topicTest.getOrderIndex());
-        dto.setTopicTestStatus(topicTest.getTopicTestStatus());
         dto.setAccuracyRate(100.0);
         dto.setTotalQuestions((long) topicTest.getQuestions().size());
 

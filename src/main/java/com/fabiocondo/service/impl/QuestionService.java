@@ -3,10 +3,13 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
+import com.fabiocondo.dto.QuestionDTO;
+import com.fabiocondo.dtoMapper.QuestionMapper;
 import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
+import com.fabiocondo.repository.TopicTestRepository;
 import com.fabiocondo.repository.filter.QuestionFilter;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionService {
@@ -34,12 +38,18 @@ public class QuestionService {
     private final AmazonS3Service amazonS3Service;
     private final QuestionRepository questionRepository;
     private final TopicService topicService;
+
+    private final TopicTestRepository topicTestRepository;
+
+    private final QuestionMapper questionMapper; // ou onde está o domainToDTO
     private final GptService gptService;
 
-    public QuestionService(AmazonS3Service amazonS3Service, QuestionRepository questionRepository, TopicService topicService, GptService gptService) {
+    public QuestionService(AmazonS3Service amazonS3Service, QuestionRepository questionRepository, TopicService topicService, TopicTestRepository topicTestRepository, QuestionMapper questionMapper, GptService gptService) {
         this.amazonS3Service = amazonS3Service;
         this.questionRepository = questionRepository;
         this.topicService = topicService;
+        this.topicTestRepository = topicTestRepository;
+        this.questionMapper = questionMapper;
         this.gptService = gptService;
     }
 
@@ -60,6 +70,39 @@ public class QuestionService {
 
     public List<Question> findAll() {
         return questionRepository.findAll();
+    }
+
+    // USADO PARA ADD QUESTIONS NOS TESTES DE PROGRESSO
+    public List<QuestionDTO> findAllByTopicAndMarkSelected(Long topicTestId) throws TopicNotFoundException {
+
+        // 1. Buscar TopicTest
+        TopicTest topicTest = topicTestRepository.findById(topicTestId)
+                .orElseThrow(() -> new TopicNotFoundException("No topic test found by id: " + topicTestId));
+
+        // 2. Extrair IDs das questions já associadas ao TopicTest
+        Set<Long> questionIdsInTopicTest = topicTest.getQuestions()
+                .stream()
+                .map(Question::getId)
+                .collect(Collectors.toSet());
+
+        // 3. Buscar todas as questions do topic
+        Set<Question> questionsByTopic =
+                questionRepository.findByTopicId(topicTest.getTopic().getId());
+
+        // 4. Converter para DTO e marcar selected
+        return questionsByTopic.stream().map(question -> {
+
+            QuestionDTO dto = questionMapper
+                    .domainToDTO(question, topicTestId);
+
+            if (questionIdsInTopicTest.contains(question.getId())) {
+                dto.setSelected(true);
+            } else {
+                dto.setSelected(false);
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     public Set<Question> getQuestionsByTopics(Set<Long> topicIds, DifficultyLevel difficultyLevel, int limitPerTopic) {

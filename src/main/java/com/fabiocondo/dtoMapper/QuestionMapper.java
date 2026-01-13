@@ -1,8 +1,11 @@
 package com.fabiocondo.dtoMapper;
 
 import com.fabiocondo.domain.Question;
+import com.fabiocondo.domain.TopicTest;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.dto.QuestionDTO;
+import com.fabiocondo.exception.domain.TopicNotFoundException;
+import com.fabiocondo.repository.TopicTestRepository;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.UserService;
 import com.fabiocondo.service.impl.CommentService;
@@ -21,11 +24,14 @@ public class QuestionMapper {
     private final CommentService commentService;
     private final UserService userService;
     private final UserRepository userRepository;
+    private final TopicTestRepository topicTestRepository;
 
-    public QuestionMapper(CommentService commentService, UserService userService, UserRepository userRepository) {
+
+    public QuestionMapper(CommentService commentService, UserService userService, UserRepository userRepository, TopicTestRepository topicTestRepository) {
         this.commentService = commentService;
         this.userService = userService;
         this.userRepository = userRepository;
+        this.topicTestRepository = topicTestRepository;
     }
 
     public Question dtoToDomainObject(QuestionDTO questionDTO) {

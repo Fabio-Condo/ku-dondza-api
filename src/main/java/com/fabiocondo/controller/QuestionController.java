@@ -6,6 +6,7 @@ import com.fabiocondo.dtoMapper.QuestionMapper;
 import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.exception.domain.InterestNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
+import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.filter.QuestionFilter;
 import com.fabiocondo.service.impl.QuestionService;
 import org.springframework.data.domain.Page;
@@ -50,6 +51,12 @@ public class QuestionController {
     @GetMapping
     public ResponseEntity<List<Question>> findAll() throws InterestNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(questionService.findAll());
+    }
+
+    // USADO PARA ADD QUESTIONS NOS TESTES DE PROGRESSO
+    @GetMapping("/topic-tests/{topicTestId}")
+    public ResponseEntity<List<QuestionDTO>> findAllByTopicAndMarkSelected(@PathVariable("topicTestId") Long topicTestId) throws TopicNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(questionService.findAllByTopicAndMarkSelected(topicTestId));
     }
 
     @GetMapping("/by-topics")

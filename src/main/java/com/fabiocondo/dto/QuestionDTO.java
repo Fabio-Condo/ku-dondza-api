@@ -46,6 +46,8 @@ public class QuestionDTO {
 
     private long numberOfComments;
 
+    private boolean selected;
+
     public Long getId() {
         return id;
     }
@@ -164,5 +166,13 @@ public class QuestionDTO {
 
     public void setNumberOfComments(long numberOfComments) {
         this.numberOfComments = numberOfComments;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

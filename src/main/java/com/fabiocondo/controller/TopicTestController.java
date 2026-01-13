@@ -3,9 +3,13 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.TopicTest;
+import com.fabiocondo.domain.User;
 import com.fabiocondo.dto.TopicWithTestsDTO;
 import com.fabiocondo.dtoMapper.TopicTestMapper;
+import com.fabiocondo.exception.domain.QuestionNotFoundException;
+import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.TopicTestRepository;
 import com.fabiocondo.service.impl.TopicTestService;
 import org.springframework.http.HttpStatus;
@@ -101,6 +105,16 @@ public class TopicTestController {
     public ResponseEntity<Set<Question>> getQuestionsByTopicTestId(@PathVariable("id") Long topicTestId) throws TopicNotFoundException {
         Set<Question> questions = topicTestService.getQuestionsByTopicTestId(topicTestId);
         return ResponseEntity.ok(questions);
+    }
+
+    @PostMapping("/{topicTestId}/questions/{questionId}")
+    public ResponseEntity<TopicTest> addQuestionToTopicTestQuestions(@PathVariable Long topicTestId, @PathVariable Long questionId) throws TopicNotFoundException, QuestionNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(topicTestService.addQuestionToTopicTestQuestions(topicTestId, questionId));
+    }
+
+    @DeleteMapping("/{topicTestId}/questions/{questionId}")
+    public ResponseEntity<TopicTest> c(@PathVariable Long topicTestId, @PathVariable Long questionId) throws TopicNotFoundException, QuestionNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(topicTestService.removeQuestionFromTopicTestQuestions(topicTestId, questionId));
     }
 
     //@GetMapping("/{topicTestId}/users/{userId}")

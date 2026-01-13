@@ -1,10 +1,12 @@
 package com.fabiocondo.service.impl;
 
-import com.fabiocondo.domain.Question;
-import com.fabiocondo.domain.Quiz;
-import com.fabiocondo.domain.TopicTest;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.QuestionDTO;
+import com.fabiocondo.exception.domain.QuestionNotFoundException;
+import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.TopicTestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +27,11 @@ public class TopicTestService {
 
     TopicTestRepository topicTestRepository;
 
-    public TopicTestService(TopicTestRepository topicTestRepository) {
+    QuestionRepository questionRepository;
+
+    public TopicTestService(TopicTestRepository topicTestRepository, QuestionRepository questionRepository) {
         this.topicTestRepository = topicTestRepository;
+        this.questionRepository = questionRepository;
     }
 
     public TopicTest findById(Long id) throws TopicNotFoundException {
@@ -72,6 +77,26 @@ public class TopicTestService {
                 .orElseThrow(() -> new TopicNotFoundException("No topic test found by id: " + topicTestId));
 
         return topicTest.getQuestions();
+    }
+
+    public TopicTest addQuestionToTopicTestQuestions(Long topicTestId, Long questionId) throws TopicNotFoundException, QuestionNotFoundException {
+        TopicTest topicTest = findById(topicTestId);
+        Optional<Question> question = questionRepository.findById(questionId);
+        if (!question.isPresent()){
+            throw new QuestionNotFoundException("Question not found by id: " + questionId);
+        }
+        topicTest.getQuestions().add(question.get());
+        return topicTestRepository.save(topicTest);
+    }
+
+    public TopicTest removeQuestionFromTopicTestQuestions(Long topicTestId, Long questionId) throws TopicNotFoundException, QuestionNotFoundException {
+        TopicTest topicTest = findById(topicTestId);
+        Optional<Question> question = questionRepository.findById(questionId);
+        if (!question.isPresent()) {
+            throw new QuestionNotFoundException("Question not found by id: " + questionId);
+        }
+        topicTest.getQuestions().remove(question.get());
+        return topicTestRepository.save(topicTest);
     }
 
     //public Optional<Quiz> getQuizByUserAndTopicTest(Long topicTestId, Long userId) {

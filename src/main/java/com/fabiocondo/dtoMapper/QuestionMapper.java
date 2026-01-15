@@ -1,10 +1,8 @@
 package com.fabiocondo.dtoMapper;
 
 import com.fabiocondo.domain.Question;
-import com.fabiocondo.domain.TopicTest;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.dto.QuestionDTO;
-import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.TopicTestRepository;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.UserService;

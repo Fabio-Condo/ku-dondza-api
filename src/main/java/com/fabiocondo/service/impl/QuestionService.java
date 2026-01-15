@@ -75,19 +75,19 @@ public class QuestionService {
     // USADO PARA ADD QUESTIONS NOS TESTES DE PROGRESSO
     public List<QuestionDTO> findAllByTopicAndMarkSelected(Long topicTestId) throws TopicNotFoundException {
 
-        // 1. Buscar TopicTest
-        TopicTest topicTest = topicTestRepository.findById(topicTestId)
-                .orElseThrow(() -> new TopicNotFoundException("No topic test found by id: " + topicTestId));
+        // 1. Buscar Test
+        Test test = topicTestRepository.findById(topicTestId)
+                .orElseThrow(() -> new TopicNotFoundException("No test found by id: " + topicTestId));
 
-        // 2. Extrair IDs das questions já associadas ao TopicTest
-        Set<Long> questionIdsInTopicTest = topicTest.getQuestions()
+        // 2. Extrair IDs das questions já associadas ao Test
+        Set<Long> questionIdsInTopicTest = test.getQuestions()
                 .stream()
                 .map(Question::getId)
                 .collect(Collectors.toSet());
 
         // 3. Buscar todas as questions do topic
         Set<Question> questionsByTopic =
-                questionRepository.findByTopicId(topicTest.getTopic().getId());
+                questionRepository.findByTopicId(test.getTopic().getId());
 
         // 4. Converter para DTO e marcar selected
         return questionsByTopic.stream().map(question -> {

@@ -10,8 +10,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "topic_test")
-public class TopicTest {
+@Table(name = "test")
+public class Test {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,8 +34,8 @@ public class TopicTest {
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
-            name = "topic_test_questions",
-            joinColumns = @JoinColumn(name = "topic_test_id"),
+            name = "test_questions",
+            joinColumns = @JoinColumn(name = "test_id"),
             inverseJoinColumns = @JoinColumn(name = "question_id")
     )
     @OrderBy("id ASC")
@@ -45,17 +45,17 @@ public class TopicTest {
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
             name = "submitted_quizzes",
-            joinColumns = @JoinColumn(name = "topic_test_id"),
+            joinColumns = @JoinColumn(name = "test_id"),
             inverseJoinColumns = @JoinColumn(name = "quiz_id")
     )
     private Set<Quiz> submittedQuizzes = new HashSet<>();
 
     private int orderIndex; // 1, 2, 3
 
-    public TopicTest() {
+    public Test() {
     }
 
-    public TopicTest(Long id, DifficultyLevel difficultyLevel, Topic topic, int orderIndex) {
+    public Test(Long id, DifficultyLevel difficultyLevel, Topic topic, int orderIndex) {
         this.id = id;
         this.difficultyLevel = difficultyLevel;
         this.topic = topic;

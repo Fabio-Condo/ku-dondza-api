@@ -76,10 +76,10 @@ public class QuizController {
 
         // O quiz so eh adicionado se a taxa de acerto for de 85% para cima
         if (quizDTO.getAccuracyRate() >= 85.0){
-            TopicTest topicTest = topicTestRepository.findById(topicTestId)
+            Test test = topicTestRepository.findById(topicTestId)
                     .orElseThrow(() -> new TopicNotFoundException("No topic test found by id: " + topicTestId));
-            topicTest.getSubmittedQuizzes().add(savedQuiz);
-            topicTestRepository.save(topicTest);
+            test.getSubmittedQuizzes().add(savedQuiz);
+            topicTestRepository.save(test);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(savedQuiz, currentUserId));

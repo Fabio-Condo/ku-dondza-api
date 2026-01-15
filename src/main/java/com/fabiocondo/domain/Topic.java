@@ -1,5 +1,6 @@
 package com.fabiocondo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.*;
@@ -39,6 +40,10 @@ public class Topic {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("position ASC") // Ordena os conteúdos ao carregar
     private List<TopicContent> contents;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Test> tests;
 
     public Topic() {
     }
@@ -129,5 +134,13 @@ public class Topic {
 
     public void setContents(List<TopicContent> contents) {
         this.contents = contents;
+    }
+
+    public List<Test> getTests() {
+        return tests;
+    }
+
+    public void setTests(List<Test> tests) {
+        this.tests = tests;
     }
 }

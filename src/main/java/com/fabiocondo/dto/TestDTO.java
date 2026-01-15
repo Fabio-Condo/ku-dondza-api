@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-public class TopicTestDTO {
+public class TestDTO {
 
     private Long id;
 
@@ -33,10 +33,10 @@ public class TopicTestDTO {
 
     private Long totalQuestions;
 
-    public TopicTestDTO() {
+    public TestDTO() {
     }
 
-    public TopicTestDTO(Long id, DifficultyLevel difficultyLevel, Topic topic, Set<Question> questions, Set<Quiz> submittedQuizzes, int orderIndex) {
+    public TestDTO(Long id, DifficultyLevel difficultyLevel, Topic topic, Set<Question> questions, Set<Quiz> submittedQuizzes, int orderIndex) {
         this.id = id;
         this.difficultyLevel = difficultyLevel;
         this.topic = topic;

@@ -3,7 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Test;
-import com.fabiocondo.dto.TopicWithTestsDTO;
+import com.fabiocondo.dto.TopicTestsDTO;
 import com.fabiocondo.dtoMapper.TestMapper;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
@@ -58,10 +58,8 @@ public class TestController {
     //    return testService.getBySubjectId(id);
     //}
 
-    // ORGANIZAR BEM O LINK
-    // @GetMapping("/subjects/{subjectId}/users/{userId}")
-    @GetMapping("/{subjectId}/subjects/users/{userId}")
-    public List<TopicWithTestsDTO> getTopicsWithTestsBySubject(@PathVariable("subjectId") Long subjectId, @PathVariable("userId") Long userId) {
+    @GetMapping("/subjects/{subjectId}/users/{userId}")
+    public List<TopicTestsDTO> getTopicsWithTestsBySubject(@PathVariable("subjectId") Long subjectId, @PathVariable("userId") Long userId) {
 
         // Busca todos os Test da disciplina
         List<Test> tests = topicTestRepository.findBySubjectId(subjectId);
@@ -71,7 +69,7 @@ public class TestController {
     }
 
     //@GetMapping("/{subjectId}/subjects/users/{userId}")
-    //public List<TopicWithTestsDTO> getTopicsWithTests22(
+    //public List<TopicTestsDTO> getTopicsWithTests22(
     //        @PathVariable Long subjectId,
     //        @PathVariable Long userId) {
     //    List<Test> tests = testService.getTopicTestsWithUserQuizzes(subjectId, userId);

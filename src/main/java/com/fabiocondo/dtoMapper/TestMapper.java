@@ -3,7 +3,7 @@ package com.fabiocondo.dtoMapper;
 import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.domain.Test;
 import com.fabiocondo.dto.TestDTO;
-import com.fabiocondo.dto.TopicWithTestsDTO;
+import com.fabiocondo.dto.TopicTestsDTO;
 import com.fabiocondo.repository.TopicTestRepository;
 import com.fabiocondo.repository.UserRepository;
 import org.springframework.stereotype.Component;
@@ -80,7 +80,7 @@ public class TestMapper {
                 .collect(Collectors.toList());
     }
 
-    public List<TopicWithTestsDTO> groupByTopic(List<Test> tests, Long userId) {
+    public List<TopicTestsDTO> groupByTopic(List<Test> tests, Long userId) {
 
         List<TestDTO> dtos = toDTOListOrdered(tests, userId);
 
@@ -89,14 +89,13 @@ public class TestMapper {
                         .collect(Collectors.groupingBy(dto -> dto.getTopic().getName()));
 
         return grouped.entrySet().stream()
-                .map(entry -> new TopicWithTestsDTO(
+                .map(entry -> new TopicTestsDTO(
                         entry.getValue().get(0).getTopic().getId(),
                         entry.getKey(),
                         entry.getValue()
                 ))
-                .sorted(Comparator.comparing(TopicWithTestsDTO::getTopicName))
+                .sorted(Comparator.comparing(TopicTestsDTO::getTopicName))
                 .collect(Collectors.toList());
     }
-
 
 }

@@ -16,8 +16,6 @@ public class ExamFilter {
 
     private Subject subject;
 
-    private String description;
-
     @Enumerated(EnumType.STRING)
     private ExamType examType;
 
@@ -52,14 +50,6 @@ public class ExamFilter {
 
     public void setSubject(Subject subject) {
         this.subject = subject;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public ExamType getExamType() {

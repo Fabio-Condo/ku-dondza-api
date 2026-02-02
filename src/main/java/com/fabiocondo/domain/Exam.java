@@ -17,8 +17,6 @@ public class Exam implements Serializable {
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
-    private String description;
-
     @Enumerated(EnumType.STRING)
     private ExamType examType;
 
@@ -37,10 +35,9 @@ public class Exam implements Serializable {
     public Exam() {
     }
 
-    public Exam(Long id, Subject subject, String description, ExamType examType, String fileName, String urlFile, Date date, Long totalDownloadNumber) {
+    public Exam(Long id, Subject subject, ExamType examType, String fileName, String urlFile, Date date, Long totalDownloadNumber) {
         this.id = id;
         this.subject = subject;
-        this.description = description;
         this.examType = examType;
         this.fileName = fileName;
         this.urlFile = urlFile;
@@ -62,14 +59,6 @@ public class Exam implements Serializable {
 
     public void setSubject(Subject subject) {
         this.subject = subject;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public ExamType getExamType() {

@@ -54,24 +54,22 @@ public class ExamController {
     }
 
     @PostMapping
-    public ResponseEntity<Exam> save(@RequestParam("description") String description,
-                                     @RequestParam("examType") ExamType examType,
+    public ResponseEntity<Exam> save(@RequestParam("examType") ExamType examType,
                                      @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
                                      @RequestParam("subjectId") Long subjectId,
                                      @RequestParam("file") MultipartFile file) throws SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.save(description, examType, date, subjectId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.save(examType, date, subjectId, file));
     }
 
     @PutMapping
     public ResponseEntity<Exam> update(@RequestParam("id") Long id,
-                                       @RequestParam("description") String description,
                                        @RequestParam("examType") ExamType examType,
                                        @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
                                        @RequestParam("subjectId") Long subjectId,
                                        @RequestParam(value = "file", required = false) MultipartFile file) throws ExamNotFoundException, SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.update(id, description, examType, date, subjectId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.update(id, examType, date, subjectId, file));
     }
 
     @DeleteMapping("/{id}")

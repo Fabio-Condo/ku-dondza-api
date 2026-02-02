@@ -22,9 +22,9 @@ public interface ExamService {
 
     List<Exam> findAll();
 
-    Exam save(String description, ExamType status, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException;
+    Exam save(ExamType status, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException;
 
-    Exam update(Long id, String description, ExamType status, Date date, Long subjectId, MultipartFile file) throws ExamNotFoundException, SubjectNotFoundException;
+    Exam update(Long id, ExamType status, Date date, Long subjectId, MultipartFile file) throws ExamNotFoundException, SubjectNotFoundException;
 
     void delete(Long id) throws ExamNotFoundException;
 

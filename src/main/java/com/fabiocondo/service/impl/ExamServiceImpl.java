@@ -75,7 +75,7 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public Exam save(String description, ExamType examType, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException {
+    public Exam save(ExamType examType, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
@@ -84,24 +84,22 @@ public class ExamServiceImpl implements ExamService {
 
         Exam exam = new Exam();
         exam.setSubject(subject);
-        exam.setDescription(description);
         exam.setExamType(examType);
         exam.setDate(date);
         exam.setTotalDownloadNumber(0L);
         exam.setUrlFile(s3UploadResponse.getFileUrl());
         exam.setFileName(fileKey);
 
-        logger.info("Saving new exam: " + exam.getDescription());
+        logger.info("Saving new exam: " + exam.getExamType());
         return examRepository.save(exam);
     }
 
     @Override
-    public Exam update(Long id, String description, ExamType examType, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException, ExamNotFoundException {
+    public Exam update(Long id, ExamType examType, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException, ExamNotFoundException {
         Subject subject = subjectServiceImpl.findById(subjectId);
 
         Exam existExam = findById(id);
         existExam.setSubject(subject);
-        existExam.setDescription(description);
         existExam.setExamType(examType);
         existExam.setDate(date);
 
@@ -117,14 +115,14 @@ public class ExamServiceImpl implements ExamService {
             existExam.setFileName(fileKey);
         }
 
-        logger.info("Saving new exame: " + existExam.getDescription());
+        logger.info("Saving new exame: " + existExam.getExamType());
         return examRepository.save(existExam);
     }
 
     @Override
     public void delete(Long id) throws ExamNotFoundException {
         Exam existExam = findById(id);
-        logger.info("Deleting exame: " + existExam.getDescription());
+        logger.info("Deleting exame: " + existExam.getExamType());
         examRepository.deleteById(id);
         if (existExam.getFileName() != null) {
             logger.info("Deleting file: " + existExam.getFileName());

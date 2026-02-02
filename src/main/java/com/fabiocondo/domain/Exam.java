@@ -1,6 +1,7 @@
 package com.fabiocondo.domain;
 
 import com.fabiocondo.enumeration.ExamType;
+import com.fabiocondo.enumeration.Institution;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
@@ -19,6 +20,9 @@ public class Exam implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private ExamType examType;
+
+    @Enumerated(EnumType.STRING)
+    private Institution institution;
 
     private String fileName;
 
@@ -75,6 +79,14 @@ public class Exam implements Serializable {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public Institution getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(Institution institution) {
+        this.institution = institution;
     }
 
     public String getUrlFile() {

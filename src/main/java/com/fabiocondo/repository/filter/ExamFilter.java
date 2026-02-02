@@ -2,6 +2,7 @@ package com.fabiocondo.repository.filter;
 
 import com.fabiocondo.domain.Subject;
 import com.fabiocondo.enumeration.ExamType;
+import com.fabiocondo.enumeration.Institution;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.EnumType;
@@ -18,6 +19,9 @@ public class ExamFilter {
 
     @Enumerated(EnumType.STRING)
     private ExamType examType;
+
+    @Enumerated(EnumType.STRING)
+    private Institution institution;
 
     private String level;
 
@@ -58,6 +62,14 @@ public class ExamFilter {
 
     public void setExamType(ExamType examType) {
         this.examType = examType;
+    }
+
+    public Institution getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(Institution institution) {
+        this.institution = institution;
     }
 
     public String getLevel() {

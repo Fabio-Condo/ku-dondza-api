@@ -47,6 +47,11 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(ExamNotFoundException.class)
+    public ResponseEntity<HttpResponse> exameNotFoundException(ExamNotFoundException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(CommentNotFoundException.class)
     public ResponseEntity<HttpResponse> commentNotFoundException(CommentNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());

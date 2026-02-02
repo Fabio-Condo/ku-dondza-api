@@ -122,7 +122,7 @@ public class TopicContentService {
         TopicContent existContent = findById(id);
         logger.info("Downloading file: " + existContent.getFileName());
         byte[] data = amazonS3Service.downloadFile(fileName, BUCKET_NAME);
-        contentRepository.save(existContent);
+        //contentRepository.save(existContent);
         return data;
     }
 

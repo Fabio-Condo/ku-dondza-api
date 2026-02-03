@@ -56,7 +56,7 @@ public class ExamController {
 
     @PostMapping
     public ResponseEntity<Exam> save(@RequestParam("examType") ExamType examType,
-                                     @RequestParam("examType") Institution institution,
+                                     @RequestParam("institution") Institution institution,
                                      @RequestParam("premium") boolean premium,
                                      @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
                                      @RequestParam("subjectId") Long subjectId,
@@ -68,7 +68,7 @@ public class ExamController {
     @PutMapping
     public ResponseEntity<Exam> update(@RequestParam("id") Long id,
                                        @RequestParam("examType") ExamType examType,
-                                       @RequestParam("examType") Institution institution,
+                                       @RequestParam("institution") Institution institution,
                                        @RequestParam("premium") boolean premium,
                                        @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
                                        @RequestParam("subjectId") Long subjectId,

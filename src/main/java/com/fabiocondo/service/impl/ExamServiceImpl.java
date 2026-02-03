@@ -75,7 +75,7 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public Exam save(ExamType examType, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException {
+    public Exam save(ExamType examType, boolean premium, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
@@ -85,6 +85,7 @@ public class ExamServiceImpl implements ExamService {
         Exam exam = new Exam();
         exam.setSubject(subject);
         exam.setExamType(examType);
+        exam.setPremium(premium);
         exam.setDate(date);
         exam.setTotalDownloadNumber(0L);
         exam.setUrlFile(s3UploadResponse.getFileUrl());
@@ -95,12 +96,13 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public Exam update(Long id, ExamType examType, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException, ExamNotFoundException {
+    public Exam update(Long id, ExamType examType, boolean premium, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException, ExamNotFoundException {
         Subject subject = subjectServiceImpl.findById(subjectId);
 
         Exam existExam = findById(id);
         existExam.setSubject(subject);
         existExam.setExamType(examType);
+        existExam.setPremium(premium);
         existExam.setDate(date);
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo

@@ -24,6 +24,8 @@ public class Exam implements Serializable {
     @Enumerated(EnumType.STRING)
     private Institution institution;
 
+    private boolean premium = false; // Controle dos exames para users pagos e nao pagos
+
     private String fileName;
 
     private String urlFile;
@@ -39,10 +41,11 @@ public class Exam implements Serializable {
     public Exam() {
     }
 
-    public Exam(Long id, Subject subject, ExamType examType, String fileName, String urlFile, Date date, Long totalDownloadNumber) {
+    public Exam(Long id, Subject subject, ExamType examType, boolean premium, String fileName, String urlFile, Date date, Long totalDownloadNumber) {
         this.id = id;
         this.subject = subject;
         this.examType = examType;
+        this.premium = premium;
         this.fileName = fileName;
         this.urlFile = urlFile;
         this.date = date;
@@ -87,6 +90,14 @@ public class Exam implements Serializable {
 
     public void setInstitution(Institution institution) {
         this.institution = institution;
+    }
+
+    public boolean isPremium() {
+        return premium;
+    }
+
+    public void setPremium(boolean premium) {
+        this.premium = premium;
     }
 
     public String getUrlFile() {

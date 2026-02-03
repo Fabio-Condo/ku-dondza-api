@@ -3,6 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.Exam;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.enumeration.ExamType;
+import com.fabiocondo.enumeration.Institution;
 import com.fabiocondo.exception.domain.ExamNotFoundException;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.repository.filter.ExamFilter;
@@ -55,23 +56,25 @@ public class ExamController {
 
     @PostMapping
     public ResponseEntity<Exam> save(@RequestParam("examType") ExamType examType,
+                                     @RequestParam("examType") Institution institution,
                                      @RequestParam("premium") boolean premium,
                                      @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
                                      @RequestParam("subjectId") Long subjectId,
                                      @RequestParam("file") MultipartFile file) throws SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.save(examType, premium, date, subjectId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.save(examType, institution, premium, date, subjectId, file));
     }
 
     @PutMapping
     public ResponseEntity<Exam> update(@RequestParam("id") Long id,
                                        @RequestParam("examType") ExamType examType,
+                                       @RequestParam("examType") Institution institution,
                                        @RequestParam("premium") boolean premium,
                                        @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
                                        @RequestParam("subjectId") Long subjectId,
                                        @RequestParam(value = "file", required = false) MultipartFile file) throws ExamNotFoundException, SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.update(id, examType, premium, date, subjectId, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.update(id, examType, institution, premium, date, subjectId, file));
     }
 
     @DeleteMapping("/{id}")

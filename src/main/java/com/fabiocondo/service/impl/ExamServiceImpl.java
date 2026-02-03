@@ -5,6 +5,7 @@ import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.ContentType;
 import com.fabiocondo.enumeration.ExamType;
+import com.fabiocondo.enumeration.Institution;
 import com.fabiocondo.exception.domain.ExamNotFoundException;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
@@ -75,7 +76,7 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public Exam save(ExamType examType, boolean premium, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException {
+    public Exam save(ExamType examType, Institution institution, boolean premium, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
@@ -85,6 +86,7 @@ public class ExamServiceImpl implements ExamService {
         Exam exam = new Exam();
         exam.setSubject(subject);
         exam.setExamType(examType);
+        exam.setInstitution(institution);
         exam.setPremium(premium);
         exam.setDate(date);
         exam.setTotalDownloadNumber(0L);
@@ -96,12 +98,13 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public Exam update(Long id, ExamType examType, boolean premium, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException, ExamNotFoundException {
+    public Exam update(Long id, ExamType examType, Institution institution, boolean premium, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException, ExamNotFoundException {
         Subject subject = subjectServiceImpl.findById(subjectId);
 
         Exam existExam = findById(id);
         existExam.setSubject(subject);
         existExam.setExamType(examType);
+        existExam.setInstitution(institution);
         existExam.setPremium(premium);
         existExam.setDate(date);
 

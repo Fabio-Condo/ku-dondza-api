@@ -76,7 +76,7 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public Exam save(ExamType examType, Institution institution, boolean premium, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException {
+    public Exam save(ExamType examType, Institution institution, boolean premium, Date date, Long subjectId, String number, MultipartFile file) throws SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
@@ -88,6 +88,7 @@ public class ExamServiceImpl implements ExamService {
         exam.setExamType(examType);
         exam.setInstitution(institution);
         exam.setPremium(premium);
+        exam.setNumber(number);
         exam.setDate(date);
         exam.setTotalDownloadNumber(0L);
         exam.setUrlFile(s3UploadResponse.getFileUrl());
@@ -98,7 +99,7 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public Exam update(Long id, ExamType examType, Institution institution, boolean premium, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException, ExamNotFoundException {
+    public Exam update(Long id, ExamType examType, Institution institution, boolean premium, Date date, Long subjectId, String number, MultipartFile file) throws SubjectNotFoundException, ExamNotFoundException {
         Subject subject = subjectServiceImpl.findById(subjectId);
 
         Exam existExam = findById(id);
@@ -106,6 +107,7 @@ public class ExamServiceImpl implements ExamService {
         existExam.setExamType(examType);
         existExam.setInstitution(institution);
         existExam.setPremium(premium);
+        existExam.setNumber(number);
         existExam.setDate(date);
 
         // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo

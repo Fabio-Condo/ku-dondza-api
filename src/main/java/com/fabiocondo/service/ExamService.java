@@ -23,9 +23,9 @@ public interface ExamService {
 
     List<Exam> findAll();
 
-    Exam save(ExamType status, Institution institution, boolean premium, Date date, Long subjectId, MultipartFile file) throws SubjectNotFoundException;
+    Exam save(ExamType status, Institution institution, boolean premium, Date date, Long subjectId, String number, MultipartFile file) throws SubjectNotFoundException;
 
-    Exam update(Long id, ExamType status, Institution institution, boolean premium, Date date, Long subjectId, MultipartFile file) throws ExamNotFoundException, SubjectNotFoundException;
+    Exam update(Long id, ExamType status, Institution institution, boolean premium, Date date, Long subjectId, String number, MultipartFile file) throws ExamNotFoundException, SubjectNotFoundException;
 
     void delete(Long id) throws ExamNotFoundException;
 

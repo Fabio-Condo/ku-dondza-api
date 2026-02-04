@@ -34,6 +34,8 @@ public class Exam implements Serializable {
 
     private Long totalDownloadNumber;
 
+    private String number; // Se for UEM
+
     @ManyToOne
     @JoinColumn(name = "subject_id")
     private Subject subject;
@@ -124,4 +126,11 @@ public class Exam implements Serializable {
         this.totalDownloadNumber = totalDownloadNumber;
     }
 
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
+    }
 }

@@ -12,6 +12,13 @@ aws:
 
   region.static: us-east-2
 
+emola:
+  url: https://XXX.XXX.XXX.XXX:YYYY/BCCSGateway/BCCSGateway
+  username: SEU_USERNAME
+  password: SEU_PASSWORD
+  partnerCode: SEU_PARTNER_CODE
+  key: SUA_PRIVATE_KEY
+
 openai:
   api-key: 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
   url: https://api.openai.com/v1/completions

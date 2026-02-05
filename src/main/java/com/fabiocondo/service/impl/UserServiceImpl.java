@@ -5,7 +5,6 @@ import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.*;
 import com.fabiocondo.exception.domain.*;
-import com.fabiocondo.payments.emola.EMolaPaymentService;
 import com.fabiocondo.payments.mpesa.MpesaPaymentService;
 import com.fabiocondo.repository.*;
 import com.fabiocondo.repository.filter.UserFilter;
@@ -56,10 +55,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final WalletService walletService;
     private final PaymentService paymentService;
     private final MpesaPaymentService mPesaPaymentService;
-    private final EMolaPaymentService eMolaPaymentService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository, WalletService walletService, PaymentService paymentService, MpesaPaymentService mPesaPaymentService, EMolaPaymentService eMolaPaymentService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository, WalletService walletService, PaymentService paymentService, MpesaPaymentService mPesaPaymentService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
@@ -71,7 +69,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.walletService = walletService;
         this.paymentService = paymentService;
         this.mPesaPaymentService = mPesaPaymentService;
-        this.eMolaPaymentService = eMolaPaymentService;
     }
 
     public Page<User> searchUsers(String query, Pageable pageable) {
@@ -339,15 +336,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 paymentSuccess = mPesaPaymentService.simulateMpesaPayment(wallet.getPhoneNumber(), plan);
                 break;
             case EMOLA:
-                paymentSuccess = eMolaPaymentService.simulateEmolaPayment(wallet.getPhoneNumber(), plan);
+                //paymentSuccess = eMolaPaymentService.simulateEmolaPayment(wallet.getPhoneNumber(), plan);
                 break;
             default:
                 throw new IllegalArgumentException("Tipo de carteira inválido: " + wallet.getType());
         }
 
-        if (!paymentSuccess) {
-            throw new RuntimeException("Falha ao processar o pagamento. Tente novamente.");
-        }
+        //if (!paymentSuccess) {
+        //    throw new RuntimeException("Falha ao processar o pagamento. Tente novamente.");
+        //}
 
         // Atualizar plano e validade
         LocalDateTime now = LocalDateTime.now();

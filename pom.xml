@@ -140,6 +140,12 @@
             <version>1.2.2</version> <!-- Use a versão mais recente, se disponível -->
         </dependency>
 
+        <!-- WebClient -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
         <!-- SOAP -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -154,6 +160,15 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+
+        <!-- MPESA API-->
+        <dependency>
+            <groupId>com.fc.sdk</groupId>
+            <artifactId>portal-sdk</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/portal-sdk.jar</systemPath>
         </dependency>
 
     </dependencies>

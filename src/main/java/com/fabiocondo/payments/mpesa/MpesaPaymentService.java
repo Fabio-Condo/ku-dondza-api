@@ -1,64 +1,118 @@
 package com.fabiocondo.payments.mpesa;
 
-import com.fabiocondo.enumeration.Plan;
-import org.springframework.http.*;
+import com.fc.sdk.APIContext;
+import com.fc.sdk.APIRequest;
+import com.fc.sdk.APIResponse;
+import com.fc.sdk.APIMethodType;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+
+import javax.crypto.Cipher;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
+@Slf4j
 public class MpesaPaymentService {
 
-    private static final String SERVICE_PROVIDER_CODE = "171717";
-    private static final String PAYMENT_URL = "https://api.vm.co.mz:18352/ipg/v1x/c2bPayment/singleStage/";
+    @Value("${mpesa.api.api-key}")
+    private String apiKey;
 
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final MpesaAuthService authService = new MpesaAuthService();
+    @Value("${mpesa.api.public-key}")
+    private String publicKey;
 
-    public void sendC2BPayment(String msisdn, String amount, String reference) {
-        String token = authService.getAccessToken();
+    @Value("${mpesa.api.base-url}")
+    private String baseUrl;
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(token);
+    @Value("${mpesa.api.port}")
+    private int port;
 
-        String body = String.format(
-                "{\"input_TransactionReference\":\"%s\"," +
-                        "\"input_CustomerMSISDN\":\"%s\"," +
-                        "\"input_Amount\":\"%s\"," +
-                        "\"input_ThirdPartyReference\":\"%s\"," +
-                        "\"input_ServiceProviderCode\":\"%s\"}",
-                reference, msisdn, amount, reference, SERVICE_PROVIDER_CODE
-        );
+    @Value("${mpesa.api.c2b-path}")
+    private String c2bPath;
 
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+    @Value("${mpesa.api.initiator}")
+    private String initiator;
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                PAYMENT_URL,
-                HttpMethod.POST,
-                entity,
-                String.class
-        );
-
-        System.out.println("Status: " + response.getStatusCode());
-        System.out.println("Resposta: " + response.getBody());
-    }
-
-    // DEPOIS REMOVER
-    public boolean simulateMpesaPayment(String phoneNumber, Plan plan) {
-        System.out.println("Simulando pagamento MPESA para " + phoneNumber +
-                " no plano " + plan + "...");
-        simulateNetworkDelay();
-        // Lógica fictícia de sucesso (exemplo: sempre dá certo se começa com 84 ou 85)
-        return phoneNumber.startsWith("84") || phoneNumber.startsWith("85");
-    }
-
-    // DEPOIS REMOVER
-    private void simulateNetworkDelay() {
+    public String processPayment(String phoneNumber, String amount) {
         try {
-            Thread.sleep(1500); // simula um pequeno atraso da transação
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+
+            log.info("Iniciando pagamento M-Pesa...");
+            log.info("Base URL: {}", baseUrl);
+            log.info("Port: {}", port);
+            log.info("Path: {}", c2bPath);
+            log.info("Phone Number: {}", phoneNumber);
+            log.info("Amount: {}", amount);
+
+            // Gerar Bearer Token manualmente
+            String bearerToken = generateBearerToken(apiKey, publicKey);
+
+            APIContext context = new APIContext();
+            context.setApiKey(apiKey);
+            context.setPublicKey(publicKey);
+
+            // Sandbox usa false
+            context.setSsl(false);
+            context.setMethodType(APIMethodType.POST);
+            context.setAddress(baseUrl);
+            context.setPort(port);
+            context.setPath(c2bPath);
+
+            // Adicionar parâmetros da transação
+            context.addParameter("input_TransactionReference", UUID.randomUUID().toString());
+            context.addParameter("input_CustomerMSISDN", phoneNumber);
+            context.addParameter("input_Amount", amount);
+            context.addParameter("input_ThirdPartyReference", UUID.randomUUID().toString());
+            context.addParameter("input_ServiceProviderCode", initiator);
+
+            // Adicionar Bearer Token manualmente
+            context.addHeader("Authorization", "Bearer " + bearerToken);
+            context.addHeader("Origin", "developer.mpesa.vm.co.mz");
+
+            APIRequest request = new APIRequest(context);
+            APIResponse response = request.execute();
+
+            if (response != null) {
+                log.info("==================================");
+                log.info("Status: {} - {}", response.getStatusCode(), response.getReason());
+                log.info("==================================");
+
+                for (Map.Entry<String, String> entry : response.getParameters().entrySet()) {
+                    log.info("{} : {}", entry.getKey(), response.getParameter(entry.getKey()));
+                }
+
+                return response.getResult();
+            }
+
+        } catch (Exception e) {
+            log.error("Erro ao processar pagamento M-Pesa", e);
+        }
+
+        return null;
+    }
+
+    // Geração do Bearer Token conforme doc oficial
+    private String generateBearerToken(String apiKey, String publicKey) {
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            Cipher cipher = Cipher.getInstance("RSA");
+
+            byte[] encodedPublicKey = Base64.decodeBase64(publicKey);
+            X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(encodedPublicKey);
+            PublicKey pk = keyFactory.generatePublic(publicKeySpec);
+
+            cipher.init(Cipher.ENCRYPT_MODE, pk);
+            byte[] encryptedApiKey = Base64.encodeBase64(cipher.doFinal(apiKey.getBytes("UTF-8")));
+
+            return new String(encryptedApiKey, "UTF-8");
+
+        } catch (Exception e) {
+            log.error("Erro ao gerar Bearer Token", e);
+            return null;
         }
     }
 }
-

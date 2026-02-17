@@ -54,10 +54,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final TopicContentRepository topicContentRepository;
     private final WalletService walletService;
     private final PaymentService paymentService;
-    private final MpesaPaymentService mPesaPaymentService;
+    private final MpesaPaymentService mpesaPaymentService;
+
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository, WalletService walletService, PaymentService paymentService, MpesaPaymentService mPesaPaymentService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository, WalletService walletService, PaymentService paymentService, MpesaPaymentService mpesaPaymentService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
@@ -68,7 +69,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.topicContentRepository = topicContentRepository;
         this.walletService = walletService;
         this.paymentService = paymentService;
-        this.mPesaPaymentService = mPesaPaymentService;
+        this.mpesaPaymentService = mpesaPaymentService;
     }
 
     public Page<User> searchUsers(String query, Pageable pageable) {
@@ -330,10 +331,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         // Determinar tipo de carteira e simular pagamento
-        boolean paymentSuccess;
+        //boolean paymentSuccess;
+        String paymentSuccess;
         switch (wallet.getType()) {
             case MPESA:
-                paymentSuccess = mPesaPaymentService.simulateMpesaPayment(wallet.getPhoneNumber(), plan);
+
+                //paymentSuccess = mpesaPaymentService.processPayment(wallet.getPhoneNumber(), plan);
+                paymentSuccess = mpesaPaymentService.processPayment("258844505579", "10");
+                System.out.println("Resposta: " + paymentSuccess);
                 break;
             case EMOLA:
                 //paymentSuccess = eMolaPaymentService.simulateEmolaPayment(wallet.getPhoneNumber(), plan);

@@ -1,5 +1,6 @@
 package com.fabiocondo.payments.mpesa;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fc.sdk.APIContext;
 import com.fc.sdk.APIRequest;
 import com.fc.sdk.APIResponse;
@@ -15,7 +16,6 @@ import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -39,7 +39,7 @@ public class MpesaPaymentService {
     @Value("${mpesa.api.initiator}")
     private String initiator;
 
-    public String processPayment(String phoneNumber, String amount) {
+    public MpesaPaymentResponse processPayment(String phoneNumber, String amount) {
         try {
 
             log.info("Iniciando pagamento M-Pesa...");
@@ -49,10 +49,8 @@ public class MpesaPaymentService {
             log.info("Phone Number: {}", phoneNumber);
             log.info("Amount: {}", amount);
 
-            // Gerar Bearer Token manualmente
             String bearerToken = getBearerToken(apiKey, publicKey);
 
-            // Create API Context
             APIContext context = new APIContext();
             context.setApiKey(apiKey);
             context.setPublicKey(publicKey);
@@ -62,40 +60,46 @@ public class MpesaPaymentService {
             context.setPort(port);
             context.setPath(c2bPath);
 
-            // Adicionar parâmetros da transação
             context.addParameter("input_TransactionReference", generateReference());
             context.addParameter("input_CustomerMSISDN", phoneNumber);
             context.addParameter("input_Amount", amount);
             context.addParameter("input_ThirdPartyReference", generateReference());
             context.addParameter("input_ServiceProviderCode", initiator);
 
-            // Adicionar Bearer Token manualmente
             context.addHeader("Authorization", "Bearer " + bearerToken);
-            //context.addHeader("Origin", "developer.mpesa.vm.co.mz");
             context.addHeader("Origin", "*");
 
             APIRequest request = new APIRequest(context);
             APIResponse response = request.execute();
 
-            if (response != null) {
-                log.info("==================================");
-                log.info("Status: {} - {}", response.getStatusCode(), response.getReason());
-                log.info("==================================");
-
-                for (Map.Entry<String, String> entry : response.getParameters().entrySet()) {
-                    log.info("{} : {}", entry.getKey(), response.getParameter(entry.getKey()));
-                }
-
-                return response.getResult();
-
-            } else {
+            if (response == null || response.getResult() == null) {
                 log.warn("API M-Pesa retornou resposta nula.");
-                return "Erro: resposta nula da API M-Pesa.";
+                throw new RuntimeException("Resposta nula da API M-Pesa");
             }
+
+            log.info("==================================");
+            log.info("Status: {} - {}", response.getStatusCode(), response.getReason());
+            log.info("==================================");
+
+            for (Map.Entry<String, String> entry : response.getParameters().entrySet()) {
+                log.info("{} : {}", entry.getKey(), response.getParameter(entry.getKey()));
+            }
+
+            // Converter JSON para entidade
+            ObjectMapper mapper = new ObjectMapper();
+            MpesaPaymentResponse mpesaResponse =
+                    mapper.readValue(response.getResult(), MpesaPaymentResponse.class);
+
+            return mpesaResponse;
 
         } catch (Exception e) {
             log.error("Erro ao processar pagamento M-Pesa", e);
-            return "Erro ao processar pagamento M-Pesa: " + e.getMessage();
+
+            MpesaPaymentResponse errorResponse = new MpesaPaymentResponse();
+            errorResponse.setOutput_ResponseCode("ERROR");
+            errorResponse.setOutput_ResponseDesc(e.getMessage());
+
+            return errorResponse;
         }
     }
 

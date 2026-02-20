@@ -5,6 +5,7 @@ import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.*;
 import com.fabiocondo.exception.domain.*;
+import com.fabiocondo.payments.mpesa.MpesaPaymentResponse;
 import com.fabiocondo.payments.mpesa.MpesaPaymentService;
 import com.fabiocondo.repository.*;
 import com.fabiocondo.repository.filter.UserFilter;
@@ -331,17 +332,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         // Determinar tipo de carteira e simular pagamento
-        //boolean paymentSuccess;
-        String paymentSuccess;
         switch (wallet.getType()) {
             case MPESA:
-
-                //paymentSuccess = mpesaPaymentService.processPayment(wallet.getPhoneNumber(), plan);
-                paymentSuccess = mpesaPaymentService.processPayment("258844505579", "10");
-                System.out.println("Resposta: " + paymentSuccess);
+                MpesaPaymentResponse response = mpesaPaymentService.processPayment("258844505579", "10");
+                if (response.isSuccess()) {
+                    logger.info("Pagamento iniciado com sucesso. TransactionID: {}",
+                            response.getOutput_TransactionID());
+                } else {
+                    logger.error("Falha no pagamento: {}",
+                            response.getOutput_ResponseDesc());
+                }
                 break;
             case EMOLA:
-                //paymentSuccess = eMolaPaymentService.simulateEmolaPayment(wallet.getPhoneNumber(), plan);
+                //MpesaPaymentResponse response = eMolaPaymentService.processPayment(wallet.getPhoneNumber(), plan);
                 break;
             default:
                 throw new IllegalArgumentException("Tipo de carteira inválido: " + wallet.getType());

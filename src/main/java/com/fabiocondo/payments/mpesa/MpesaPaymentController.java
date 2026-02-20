@@ -18,12 +18,12 @@ public class MpesaPaymentController {
     }
 
     @PostMapping("/pay")
-    public ResponseEntity<String> pay(
+    public ResponseEntity<MpesaPaymentResponse> pay(
             @RequestParam String phone,
             @RequestParam String amount
     ) {
 
-        String response = mpesaPaymentService.processPayment(phone, amount);
+        MpesaPaymentResponse response = mpesaPaymentService.processPayment(phone, amount);
 
         return ResponseEntity.ok(response);
     }

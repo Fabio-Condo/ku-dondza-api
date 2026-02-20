@@ -6,6 +6,7 @@ import com.fc.sdk.APIResponse;
 import com.fc.sdk.APIMethodType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -51,28 +52,27 @@ public class MpesaPaymentService {
             // Gerar Bearer Token manualmente
             String bearerToken = getBearerToken(apiKey, publicKey);
 
+            // Create API Context
             APIContext context = new APIContext();
             context.setApiKey(apiKey);
             context.setPublicKey(publicKey);
-
-            // Sandbox usa false
-            context.setSsl(false);
+            context.setSsl(true);
             context.setMethodType(APIMethodType.POST);
             context.setAddress(baseUrl);
             context.setPort(port);
             context.setPath(c2bPath);
 
             // Adicionar parâmetros da transação
-            context.addParameter("input_TransactionReference", UUID.randomUUID().toString());
+            context.addParameter("input_TransactionReference", generateReference());
             context.addParameter("input_CustomerMSISDN", phoneNumber);
             context.addParameter("input_Amount", amount);
-            context.addParameter("input_ThirdPartyReference", UUID.randomUUID().toString());
+            context.addParameter("input_ThirdPartyReference", generateReference());
             context.addParameter("input_ServiceProviderCode", initiator);
 
             // Adicionar Bearer Token manualmente
             context.addHeader("Authorization", "Bearer " + bearerToken);
-            context.addHeader("Origin", "developer.mpesa.vm.co.mz");
-            //context.addHeader("Origin", "*");
+            //context.addHeader("Origin", "developer.mpesa.vm.co.mz");
+            context.addHeader("Origin", "*");
 
             APIRequest request = new APIRequest(context);
             APIResponse response = request.execute();
@@ -119,5 +119,9 @@ public class MpesaPaymentService {
         }
 
         return null;
+    }
+
+    private String generateReference() {
+        return RandomStringUtils.randomAlphanumeric(10);
     }
 }

@@ -321,7 +321,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throws UserNotFoundException, WalletNotFoundException, PaymentException {
 
         final int DAYS_VALID = 30;
-        final double PLAN_PRICE = 299.0;
+        final double PLAN_PRICE = 299;
 
         // Buscar utilizador e carteira
         User user = findById(userId);
@@ -334,14 +334,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         // Determinar tipo de carteira e simular pagamento
         switch (wallet.getType()) {
             case MPESA:
-                MpesaPaymentResponse response = mpesaPaymentService.processPayment("258" + wallet.getPhoneNumber(), "10");
+                MpesaPaymentResponse response = mpesaPaymentService.processPayment("258" + wallet.getPhoneNumber(), String.valueOf(PLAN_PRICE));
                 if (!response.isSuccess()) {
                     logger.error("Falha no pagamento: {}", response.getOutput_ResponseDesc());
                     throw new PaymentException("Falha ao processar o pagamento. Tente novamente.");
                 }
                 break;
             case EMOLA:
-                //EmolaPaymentResponse response = eMolaPaymentService.processPayment("258" + wallet.getPhoneNumber(), plan);
+                //EmolaPaymentResponse response = eMolaPaymentService.processPayment("258" + wallet.getPhoneNumber(), "299");
                 //if (!response.isSuccess()) {
                 //    logger.error("Falha no pagamento: {}", response.getOutput_ResponseDesc());
                 //    throw new PaymentException("Falha ao processar o pagamento. Tente novamente.");

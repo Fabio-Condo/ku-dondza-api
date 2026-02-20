@@ -318,7 +318,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User activatePlan(Long userId, Plan plan, Long walletId)
-            throws UserNotFoundException, WalletNotFoundException {
+            throws UserNotFoundException, WalletNotFoundException, PaymentException {
 
         final int DAYS_VALID = 30;
         final double PLAN_PRICE = 299.0;
@@ -334,25 +334,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         // Determinar tipo de carteira e simular pagamento
         switch (wallet.getType()) {
             case MPESA:
-                MpesaPaymentResponse response = mpesaPaymentService.processPayment("258844505579", "10");
-                if (response.isSuccess()) {
-                    logger.info("Pagamento iniciado com sucesso. TransactionID: {}",
-                            response.getOutput_TransactionID());
-                } else {
-                    logger.error("Falha no pagamento: {}",
-                            response.getOutput_ResponseDesc());
+                MpesaPaymentResponse response = mpesaPaymentService.processPayment("258" + wallet.getPhoneNumber(), "10");
+                if (!response.isSuccess()) {
+                    logger.error("Falha no pagamento: {}", response.getOutput_ResponseDesc());
+                    throw new PaymentException("Falha ao processar o pagamento. Tente novamente.");
                 }
                 break;
             case EMOLA:
-                //MpesaPaymentResponse response = eMolaPaymentService.processPayment(wallet.getPhoneNumber(), plan);
+                //EmolaPaymentResponse response = eMolaPaymentService.processPayment("258" + wallet.getPhoneNumber(), plan);
+                //if (!response.isSuccess()) {
+                //    logger.error("Falha no pagamento: {}", response.getOutput_ResponseDesc());
+                //    throw new PaymentException("Falha ao processar o pagamento. Tente novamente.");
+                //}
                 break;
             default:
-                throw new IllegalArgumentException("Tipo de carteira inválido: " + wallet.getType());
+                throw new PaymentException("Tipo de carteira inválido: " + wallet.getType());
         }
-
-        //if (!paymentSuccess) {
-        //    throw new RuntimeException("Falha ao processar o pagamento. Tente novamente.");
-        //}
 
         // Atualizar plano e validade
         LocalDateTime now = LocalDateTime.now();

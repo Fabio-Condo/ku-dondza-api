@@ -42,6 +42,11 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(HttpStatus.TOO_MANY_REQUESTS, exception.getMessage());
     }
 
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<HttpResponse> paymentException(PaymentException exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(WalletNotFoundException.class)
     public ResponseEntity<HttpResponse> walletNotFoundException(WalletNotFoundException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());

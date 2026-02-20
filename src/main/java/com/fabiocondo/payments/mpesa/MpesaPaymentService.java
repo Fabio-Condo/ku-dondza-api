@@ -1,5 +1,6 @@
 package com.fabiocondo.payments.mpesa;
 
+import com.fabiocondo.exception.domain.PaymentException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fc.sdk.APIContext;
 import com.fc.sdk.APIRequest;
@@ -74,7 +75,7 @@ public class MpesaPaymentService {
 
             if (response == null || response.getResult() == null) {
                 log.warn("API M-Pesa retornou resposta nula.");
-                throw new RuntimeException("Resposta nula da API M-Pesa");
+                throw new PaymentException("Resposta nula da API M-Pesa");
             }
 
             log.info("==================================");

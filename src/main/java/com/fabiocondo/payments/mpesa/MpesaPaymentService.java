@@ -49,7 +49,7 @@ public class MpesaPaymentService {
             log.info("Amount: {}", amount);
 
             // Gerar Bearer Token manualmente
-            String bearerToken = generateBearerToken(apiKey, publicKey);
+            String bearerToken = getBearerToken(apiKey, publicKey);
 
             APIContext context = new APIContext();
             context.setApiKey(apiKey);
@@ -72,6 +72,7 @@ public class MpesaPaymentService {
             // Adicionar Bearer Token manualmente
             context.addHeader("Authorization", "Bearer " + bearerToken);
             context.addHeader("Origin", "developer.mpesa.vm.co.mz");
+            //context.addHeader("Origin", "*");
 
             APIRequest request = new APIRequest(context);
             APIResponse response = request.execute();
@@ -86,17 +87,20 @@ public class MpesaPaymentService {
                 }
 
                 return response.getResult();
+
+            } else {
+                log.warn("API M-Pesa retornou resposta nula.");
+                return "Erro: resposta nula da API M-Pesa.";
             }
 
         } catch (Exception e) {
             log.error("Erro ao processar pagamento M-Pesa", e);
+            return "Erro ao processar pagamento M-Pesa: " + e.getMessage();
         }
-
-        return null;
     }
 
     // Geração do Bearer Token conforme doc oficial
-    private String generateBearerToken(String apiKey, String publicKey) {
+    private String getBearerToken(String apiKey, String publicKey) {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             Cipher cipher = Cipher.getInstance("RSA");
@@ -112,7 +116,8 @@ public class MpesaPaymentService {
 
         } catch (Exception e) {
             log.error("Erro ao gerar Bearer Token", e);
-            return null;
         }
+
+        return null;
     }
 }

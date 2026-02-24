@@ -40,29 +40,71 @@ public class EmailService {
     }
 
     private String buildOtpHtmlContent(String otpCode) {
+
         return String.format(
                 "<!DOCTYPE html>" +
                         "<html lang='pt'>" +
                         "<head>" +
                         "<meta charset='UTF-8'>" +
+                        "<meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
                         "<style>" +
-                        "body { font-family: Arial; background-color: #f4f4f4; padding: 0; margin: 0; }" +
-                        ".container { max-width: 600px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }" +
-                        "h2 { color: #2f80ed; text-align: center; }" +
-                        ".otp { margin-top: 20px; font-size: 28px; font-weight: bold; text-align: center; background: #eef3ff; padding: 15px; border-radius: 6px; color: #2f80ed; }" +
-                        ".footer { margin-top: 30px; font-size: 13px; text-align: center; color: #888; }" +
+
+                        "body { margin:0; padding:0; background-color:#f4f6fb; font-family: Arial, Helvetica, sans-serif; }" +
+                        ".wrapper { width:100%%; padding:40px 15px; }" +
+                        ".container { max-width:600px; margin:0 auto; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.08); }" +
+
+                        ".header { background:#4361ee; padding:25px; text-align:center; }" +
+                        ".header h1 { color:#ffffff; margin:0; font-size:22px; letter-spacing:0.5px; }" +
+
+                        ".content { padding:30px; text-align:center; }" +
+                        ".badge { display:inline-block; padding:6px 14px; background:#e6ecff; color:#4361ee; font-weight:bold; border-radius:20px; font-size:13px; margin-bottom:20px; }" +
+                        ".title { font-size:20px; color:#2b2d42; margin-bottom:10px; }" +
+                        ".text { font-size:15px; color:#555; line-height:1.6; }" +
+
+                        ".otp-box { margin:25px 0; background:#f1f4ff; border:2px dashed #4361ee; padding:18px; border-radius:10px; font-size:32px; font-weight:bold; letter-spacing:4px; color:#4361ee; }" +
+
+                        ".warning { font-size:13px; color:#888; margin-top:15px; }" +
+
+                        ".footer { text-align:center; padding:20px; font-size:12px; color:#999; background:#fafbff; }" +
+
+                        "@media (max-width:600px) { .content { padding:20px; } .otp-box { font-size:26px; } }" +
+
                         "</style>" +
                         "</head>" +
+
                         "<body>" +
+                        "<div class='wrapper'>" +
                         "<div class='container'>" +
-                        "<h2>Verificação de Segurança</h2>" +
-                        "<p>Utilize o código abaixo para concluir o processo:</p>" +
-                        "<div class='otp'>%s</div>" +
-                        "<p>Este código expira em 10 minutos.</p>" +
-                        "<div class='footer'>DikaHub • Educação Digital<br>Não responda este e-mail.</div>" +
+
+                        "<div class='header'>" +
+                        "<h1>DikaHub</h1>" +
+                        "</div>" +
+
+                        "<div class='content'>" +
+
+                        "<span class='badge'>VERIFICAÇÃO DE SEGURANÇA</span>" +
+
+                        "<div class='title'>Confirme sua identidade</div>" +
+
+                        "<p class='text'>Utilize o código abaixo para concluir o processo de verificação.</p>" +
+
+                        "<div class='otp-box'>%s</div>" +
+
+                        "<p class='warning'>Este código expira em 10 minutos.<br>Se você não solicitou este código, ignore este e-mail.</p>" +
+
+                        "</div>" +
+
+                        "<div class='footer'>" +
+                        "© 2026 DikaHub • Educação Digital<br>" +
+                        "www.dikahub.com<br>" +
+                        "Este é um e-mail automático. Não responda." +
+                        "</div>" +
+
+                        "</div>" +
                         "</div>" +
                         "</body>" +
                         "</html>",
+
                 otpCode
         );
     }

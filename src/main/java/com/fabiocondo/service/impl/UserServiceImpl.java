@@ -32,6 +32,7 @@ import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.fabiocondo.constant.UserImplConstant.*;
@@ -318,7 +319,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public User activatePlan(Long userId, Plan plan, Long walletId)
-            throws UserNotFoundException, WalletNotFoundException, PaymentException {
+            throws UserNotFoundException, WalletNotFoundException, PaymentException, MessagingException {
 
         final int DAYS_VALID = 30;
         final double PLAN_PRICE = 299;
@@ -369,9 +370,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         payment.setTransactionReference(UUID.randomUUID().toString()); // id de simulação
 
         paymentService.save(payment);
+        User userResponse = userRepository.save(user);
 
-        // Salvar usuário com novo plano
-        return userRepository.save(user);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String formattedDate = LocalDateTime.now().format(formatter);
+
+        emailService.sendPaymentConfirmationEmail(user.getEmail(), user.getFullName(), String.valueOf(PLAN_PRICE), "M-Pesa", "TXN98374623", wallet.getPhoneNumber(), formattedDate);
+        return userResponse;
     }
 
     @Override

@@ -170,7 +170,7 @@ public class UserController {
     public ResponseEntity<User> activatePlan(
             @PathVariable Long userId,
             @RequestParam Plan plan,
-            @RequestParam Long walletId) throws UserNotFoundException, WalletNotFoundException, PaymentException {
+            @RequestParam Long walletId) throws UserNotFoundException, WalletNotFoundException, PaymentException, MessagingException {
 
         // Ativar plano com a carteira selecionada
         User user = userService.activatePlan(userId, plan, walletId);

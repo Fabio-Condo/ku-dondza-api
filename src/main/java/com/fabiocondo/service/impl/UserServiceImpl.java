@@ -332,51 +332,88 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new WalletNotFoundException("Carteira não encontrada.");
         }
 
-        // Determinar tipo de carteira e simular pagamento
-        switch (wallet.getType()) {
-            case MPESA:
-                MpesaPaymentResponse response = mpesaPaymentService.processPayment("258" + wallet.getPhoneNumber(), String.valueOf(PLAN_PRICE));
-                if (!response.isSuccess()) {
-                    logger.error("Falha no pagamento: {}", response.getOutput_ResponseDesc());
-                    throw new PaymentException("Falha ao processar o pagamento. Tente novamente.");
-                }
-                break;
-            case EMOLA:
-                //EmolaPaymentResponse response = eMolaPaymentService.processPayment("258" + wallet.getPhoneNumber(), "299");
-                //if (!response.isSuccess()) {
-                //    logger.error("Falha no pagamento: {}", response.getOutput_ResponseDesc());
-                //    throw new PaymentException("Falha ao processar o pagamento. Tente novamente.");
-                //}
-                break;
-            default:
-                throw new PaymentException("Tipo de carteira inválido: " + wallet.getType());
-        }
-
-        // Atualizar plano e validade
+        // Data atual
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiresAt = now.plusDays(DAYS_VALID);
+
+        // Determinar tipo de carteira e processar pagamento
+        processPayment(wallet, PLAN_PRICE);
+
+        // Atualizar plano e validade do usuário
         user.setPlan(plan);
         user.setExpiresAt(expiresAt);
 
         // Registrar pagamento
+        Payment payment = buildPaymentRecord(user, wallet, plan, PLAN_PRICE, now, expiresAt);
+        paymentService.save(payment);
+
+        User userResponse = userRepository.save(user);
+
+        // Formatar data para email
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        String formattedDate = now.format(formatter);
+
+        // Enviar email de confirmação
+        emailService.sendPaymentConfirmationEmail(
+                user.getEmail(),
+                user.getFullName(),
+                String.valueOf(PLAN_PRICE),
+                wallet.getType().name(),
+                payment.getTransactionReference(),
+                wallet.getPhoneNumber(),
+                formattedDate
+        );
+
+        return userResponse;
+    }
+
+    private void processPayment(Wallet wallet, double amount) throws PaymentException {
+        if (wallet == null || wallet.getType() == null) {
+            throw new PaymentException("Carteira inválida.");
+        }
+
+        switch (wallet.getType()) {
+            case MPESA:
+                MpesaPaymentResponse mpesaResponse = mpesaPaymentService.processPayment(
+                        "258" + wallet.getPhoneNumber(), String.valueOf(amount)
+                );
+                if (!mpesaResponse.isSuccess()) {
+                    logger.error("Falha no pagamento M-Pesa: {}", mpesaResponse.getOutput_ResponseDesc());
+                    throw new PaymentException("Falha ao processar pagamento M-Pesa. Tente novamente.");
+                }
+                break;
+
+            case EMOLA:
+                // Descomente quando implementar o e-Mola
+            /*
+            EmolaPaymentResponse emolaResponse = eMolaPaymentService.processPayment(
+                    "258" + wallet.getPhoneNumber(), String.valueOf(amount)
+            );
+            if (!emolaResponse.isSuccess()) {
+                logger.error("Falha no pagamento e-Mola: {}", emolaResponse.getOutput_ResponseDesc());
+                throw new PaymentException("Falha ao processar pagamento e-Mola. Tente novamente.");
+            }
+            */
+                break;
+
+            default:
+                throw new PaymentException("Tipo de carteira inválido: " + wallet.getType());
+        }
+    }
+
+    private Payment buildPaymentRecord(User user, Wallet wallet, Plan plan, double amount,
+                                       LocalDateTime createdAt, LocalDateTime expiresAt) {
+
         Payment payment = new Payment();
         payment.setUser(user);
         payment.setWallet(wallet);
         payment.setPlan(plan);
-        payment.setAmount(PLAN_PRICE);
+        payment.setAmount(amount);
         payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setCreatedAt(now);
+        payment.setCreatedAt(createdAt);
         payment.setExpiresAt(expiresAt);
-        payment.setTransactionReference(UUID.randomUUID().toString()); // id de simulação
-
-        paymentService.save(payment);
-        User userResponse = userRepository.save(user);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        String formattedDate = LocalDateTime.now().format(formatter);
-
-        emailService.sendPaymentConfirmationEmail(user.getEmail(), user.getFullName(), String.valueOf(PLAN_PRICE), "M-Pesa", "TXN98374623", wallet.getPhoneNumber(), formattedDate);
-        return userResponse;
+        payment.setTransactionReference(UUID.randomUUID().toString());
+        return payment;
     }
 
     @Override

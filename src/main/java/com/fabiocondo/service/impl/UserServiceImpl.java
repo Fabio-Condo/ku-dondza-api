@@ -334,12 +334,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiresAt = now.plusDays(DAYS_VALID);
 
-        String transactionReference = processPayment(wallet, PLAN_PRICE);
+        String transactionId = processPayment(wallet, PLAN_PRICE);
 
         user.setPlan(plan);
         user.setExpiresAt(expiresAt);
 
-        Payment payment = buildPaymentRecord(user, wallet, plan, PLAN_PRICE, now, expiresAt, transactionReference);
+        Payment payment = buildPaymentRecord(user, wallet, plan, PLAN_PRICE, now, expiresAt, transactionId);
 
         paymentService.save(payment);
         User userResponse = userRepository.save(user);
@@ -347,7 +347,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         String formattedDate = now.format(formatter);
 
-        emailService.sendPaymentConfirmationEmail(user.getEmail(), user.getFullName(), String.valueOf(PLAN_PRICE), wallet.getType().name(), transactionReference, wallet.getPhoneNumber(), formattedDate);
+        emailService.sendPaymentConfirmationEmail(user.getEmail(), user.getFullName(), String.valueOf(PLAN_PRICE), wallet.getType().name(), transactionId, wallet.getPhoneNumber(), formattedDate);
 
         return userResponse;
     }
@@ -384,7 +384,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                                        double amount,
                                        LocalDateTime createdAt,
                                        LocalDateTime expiresAt,
-                                       String transactionReference) {
+                                       String transactionId) {
 
         Payment payment = new Payment();
         payment.setUser(user);
@@ -396,7 +396,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         payment.setExpiresAt(expiresAt);
 
         // ✅ AGORA VEM DO MPESA
-        payment.setTransactionReference(transactionReference);
+        payment.setTransactionId(transactionId);
 
         return payment;
     }

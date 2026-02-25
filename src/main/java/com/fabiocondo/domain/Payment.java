@@ -34,7 +34,7 @@ public class Payment {
 
     private LocalDateTime expiresAt;
 
-    private String transactionReference; // ex: ID de transação M-Pesa
+    private String transactionId;
 
     public Long getId() {
         return id;
@@ -100,12 +100,12 @@ public class Payment {
         this.expiresAt = expiresAt;
     }
 
-    public String getTransactionReference() {
-        return transactionReference;
+    public String getTransactionId() {
+        return transactionId;
     }
 
-    public void setTransactionReference(String transactionReference) {
-        this.transactionReference = transactionReference;
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 }
 

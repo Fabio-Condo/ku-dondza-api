@@ -318,11 +318,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    @Transactional
     public User activatePlan(Long userId, Plan plan, Long walletId)
-            throws UserNotFoundException, WalletNotFoundException, PaymentException, MessagingException {
+            throws UserNotFoundException, WalletNotFoundException, PaymentException {
 
         final int DAYS_VALID = 30;
-        final double PLAN_PRICE = 299;
+        final Double PLAN_PRICE = new Double("299.00");
 
         User user = findById(userId);
         Wallet wallet = walletService.findById(walletId);
@@ -331,77 +332,122 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new WalletNotFoundException("Carteira não encontrada.");
         }
 
+        if (wallet.getType() == null) {
+            throw new PaymentException("Tipo de carteira inválido.");
+        }
+
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expiresAt = now.plusDays(DAYS_VALID);
 
-        String transactionId = processPayment(wallet, PLAN_PRICE);
-
-        user.setPlan(plan);
-        user.setExpiresAt(expiresAt);
-
-        Payment payment = buildPaymentRecord(user, wallet, plan, PLAN_PRICE, now, expiresAt, transactionId);
-
-        paymentService.save(payment);
-        User userResponse = userRepository.save(user);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        String formattedDate = now.format(formatter);
-
-        emailService.sendPaymentConfirmationEmail(user.getEmail(), user.getFullName(), String.valueOf(PLAN_PRICE), wallet.getType().name(), transactionId, wallet.getPhoneNumber(), formattedDate);
-
-        return userResponse;
-    }
-
-    private String processPayment(Wallet wallet, double amount) throws PaymentException {
-
-        if (wallet == null || wallet.getType() == null) {
-            throw new PaymentException("Carteira inválida.");
-        }
-
-        switch (wallet.getType()) {
-
-            case MPESA:
-                MpesaPaymentResponse mpesaResponse = mpesaPaymentService.processPayment("258" + wallet.getPhoneNumber(), String.valueOf(amount));
-
-                if (!mpesaResponse.isSuccess()) {
-                    logger.error("Falha no pagamento M-Pesa: {}", mpesaResponse.getOutput_ResponseDesc());
-                    throw new PaymentException("Falha ao processar pagamento M-Pesa.");
-                }
-
-                return mpesaResponse.getOutput_TransactionID();
-
-            case EMOLA:
-                throw new PaymentException("E-Mola ainda não implementado. Use M-Pesa.");
-
-            case MKESH:
-                throw new PaymentException("M-Kesh ainda não implementado. Use M-Pesa.");
-
-            default:
-                throw new PaymentException("Tipo de carteira inválido: " + wallet.getType());
-        }
-    }
-
-    private Payment buildPaymentRecord(User user,
-                                       Wallet wallet,
-                                       Plan plan,
-                                       double amount,
-                                       LocalDateTime createdAt,
-                                       LocalDateTime expiresAt,
-                                       String transactionId) {
-
+        // 1. Criar pagamento como PENDING antes de processar
         Payment payment = new Payment();
         payment.setUser(user);
         payment.setWallet(wallet);
         payment.setPlan(plan);
-        payment.setAmount(amount);
-        payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setCreatedAt(createdAt);
-        payment.setExpiresAt(expiresAt);
+        payment.setAmount(PLAN_PRICE);
+        payment.setStatus(PaymentStatus.PENDING);
+        payment.setCreatedAt(now);
 
-        // ✅ AGORA VEM DO MPESA
-        payment.setTransactionId(transactionId);
+        payment = paymentService.save(payment);
 
-        return payment;
+        try {
+
+            // 2. Processar pagamento
+            String transactionId = processPayment(wallet, PLAN_PRICE);
+
+            // 3. Atualizar pagamento para SUCCESS
+            payment.setStatus(PaymentStatus.SUCCESS);
+            payment.setTransactionId(transactionId);
+            payment.setUpdatedAt(LocalDateTime.now());
+            paymentService.save(payment);
+
+            // 4. Calcular nova data de expiração (não perder dias restantes)
+            LocalDateTime baseDate = user.getExpiresAt() != null &&
+                    user.getExpiresAt().isAfter(now)
+                    ? user.getExpiresAt()
+                    : now;
+
+            LocalDateTime newExpiration = baseDate.plusDays(DAYS_VALID);
+
+            user.setPlan(plan);
+            user.setExpiresAt(newExpiration);
+
+            User savedUser = userRepository.save(user);
+
+            // 5. Enviar email (não pode quebrar pagamento)
+            sendConfirmationEmailSafely(user, PLAN_PRICE, wallet, transactionId, now);
+
+            return savedUser;
+
+        } catch (Exception e) {
+
+            // 6. Atualizar pagamento para FAILED
+            payment.setStatus(PaymentStatus.FAILED);
+            payment.setFailureReason(e.getMessage());
+            payment.setUpdatedAt(LocalDateTime.now());
+            paymentService.save(payment);
+
+            logger.error("Falha ao ativar plano para user {}: {}", userId, e.getMessage());
+
+            throw new PaymentException("Falha ao processar pagamento." + e);
+        }
+    }
+
+    private String processPayment(Wallet wallet, Double amount) throws PaymentException {
+
+        switch (wallet.getType()) {
+
+            case MPESA:
+
+                MpesaPaymentResponse response =
+                        mpesaPaymentService.processPayment(
+                                "258" + wallet.getPhoneNumber(),
+                                amount.toString()
+                        );
+
+                if (response == null) {
+                    throw new PaymentException("Resposta nula do gateway M-Pesa.");
+                }
+
+                if (!response.isSuccess()) {
+                    logger.error("Falha M-Pesa: {}", response.getOutput_ResponseDesc());
+                    throw new PaymentException(response.getOutput_ResponseDesc());
+                }
+
+                return response.getOutput_TransactionID();
+
+            case EMOLA:
+                throw new PaymentException("E-Mola ainda não implementado.");
+
+            case MKESH:
+                throw new PaymentException("M-Kesh ainda não implementado.");
+
+            default:
+                throw new PaymentException("Tipo de carteira inválido.");
+        }
+    }
+
+    private void sendConfirmationEmailSafely(User user, Double amount, Wallet wallet, String transactionId, LocalDateTime paymentDate) {
+
+        try {
+
+            DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+            String formattedDate = paymentDate.format(formatter);
+
+            emailService.sendPaymentConfirmationEmail(
+                    user.getEmail(),
+                    user.getFullName(),
+                    amount.toString(),
+                    wallet.getType().name(),
+                    transactionId,
+                    wallet.getPhoneNumber(),
+                    formattedDate
+            );
+
+        } catch (Exception e) {
+            logger.warn("Pagamento concluído, mas falha ao enviar email: {}", e.getMessage());
+        }
     }
 
     @Override

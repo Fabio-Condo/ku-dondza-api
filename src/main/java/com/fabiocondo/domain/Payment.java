@@ -32,9 +32,13 @@ public class Payment {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    private LocalDateTime updatedAt;
+
     private LocalDateTime expiresAt;
 
     private String transactionId;
+
+    private String failureReason;
 
     public Long getId() {
         return id;
@@ -92,6 +96,14 @@ public class Payment {
         this.createdAt = createdAt;
     }
 
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public LocalDateTime getExpiresAt() {
         return expiresAt;
     }
@@ -106,6 +118,14 @@ public class Payment {
 
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
+    }
+
+    public String getFailureReason() {
+        return failureReason;
+    }
+
+    public void setFailureReason(String failureReason) {
+        this.failureReason = failureReason;
     }
 }
 

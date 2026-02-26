@@ -371,7 +371,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 return mpesaResponse.getOutput_TransactionID();
 
             case EMOLA:
-                throw new PaymentException("e-Mola ainda não implementado.");
+                throw new PaymentException("E-Mola ainda não implementado. Use M-Pesa.");
+
+            case MKESH:
+                throw new PaymentException("M-Kesh ainda não implementado. Use M-Pesa.");
 
             default:
                 throw new PaymentException("Tipo de carteira inválido: " + wallet.getType());

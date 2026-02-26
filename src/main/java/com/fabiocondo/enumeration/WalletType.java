@@ -2,5 +2,6 @@ package com.fabiocondo.enumeration;
 
 public enum WalletType {
     MPESA,
-    EMOLA
+    EMOLA,
+    MKESH
 }

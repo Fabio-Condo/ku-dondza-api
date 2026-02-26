@@ -136,7 +136,7 @@ public class EmailService {
         Message message = new MimeMessage(getEmailSession());
         message.setFrom(new InternetAddress(FROM_EMAIL));
         message.setRecipients(TO, InternetAddress.parse(email, false));
-        message.setSubject("Confirmação de Pagamento – DikaHub");
+        message.setSubject("Confirmação de Pagamento – Dikahub");
         message.setContent(buildPaymentHtmlContent(fullName, amount, method, transactionId, phoneNumber, paymentDate),
                 "text/html; charset=utf-8");
         message.setSentDate(new Date());
@@ -194,7 +194,7 @@ public class EmailService {
                         "<div class='container'>" +
 
                         "<div class='header'>" +
-                        "<h1>DikaHub</h1>" +
+                        "<h1>Dikahub</h1>" +
                         "</div>" +
 
                         "<div class='content'>" +

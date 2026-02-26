@@ -4,6 +4,7 @@ import com.fabiocondo.enumeration.PaymentStatus;
 import com.fabiocondo.enumeration.Plan;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,7 +26,7 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private Plan plan; // FREE, PREMIUM, PRO
 
-    private Double amount; // 299 MT, por exemplo
+    private BigDecimal amount; // 299 MT, por exemplo
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus status; // SUCCESS, FAILED, PENDING
@@ -34,7 +35,7 @@ public class Payment {
 
     private LocalDateTime updatedAt;
 
-    private LocalDateTime expiresAt;
+    private LocalDateTime planExpiresAt;
 
     private String transactionId;
 
@@ -72,11 +73,11 @@ public class Payment {
         this.plan = plan;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -104,12 +105,12 @@ public class Payment {
         this.updatedAt = updatedAt;
     }
 
-    public LocalDateTime getExpiresAt() {
-        return expiresAt;
+    public LocalDateTime getPlanExpiresAt() {
+        return planExpiresAt;
     }
 
-    public void setExpiresAt(LocalDateTime expiresAt) {
-        this.expiresAt = expiresAt;
+    public void setPlanExpiresAt(LocalDateTime planExpiresAt) {
+        this.planExpiresAt = planExpiresAt;
     }
 
     public String getTransactionId() {

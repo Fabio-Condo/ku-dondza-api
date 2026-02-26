@@ -61,7 +61,7 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private Plan plan = Plan.FREE; //FREE or PREMIUM
 
-    private LocalDateTime expiresAt;
+    private LocalDateTime planExpiresAt;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -278,12 +278,12 @@ public class User implements Serializable {
         this.plan = plan;
     }
 
-    public LocalDateTime getExpiresAt() {
-        return expiresAt;
+    public LocalDateTime getPlanExpiresAt() {
+        return planExpiresAt;
     }
 
-    public void setExpiresAt(LocalDateTime expiresAt) {
-        this.expiresAt = expiresAt;
+    public void setPlanExpiresAt(LocalDateTime planExpiresAt) {
+        this.planExpiresAt = planExpiresAt;
     }
 
     public Set<ExternalAuthMethod> getExternalAuthMethods() {

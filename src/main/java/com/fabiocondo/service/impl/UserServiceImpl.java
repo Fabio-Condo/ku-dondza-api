@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -323,7 +324,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throws UserNotFoundException, WalletNotFoundException, PaymentException {
 
         final int DAYS_VALID = 30;
-        final Double PLAN_PRICE = new Double("299.00");
+        final BigDecimal PLAN_PRICE = new BigDecimal("299.00");
 
         User user = findById(userId);
         Wallet wallet = walletService.findById(walletId);
@@ -361,15 +362,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             paymentService.save(payment);
 
             // 4. Calcular nova data de expiração (não perder dias restantes)
-            LocalDateTime baseDate = user.getExpiresAt() != null &&
-                    user.getExpiresAt().isAfter(now)
-                    ? user.getExpiresAt()
+            LocalDateTime baseDate = user.getPlanExpiresAt() != null &&
+                    user.getPlanExpiresAt().isAfter(now)
+                    ? user.getPlanExpiresAt()
                     : now;
 
             LocalDateTime newExpiration = baseDate.plusDays(DAYS_VALID);
 
             user.setPlan(plan);
-            user.setExpiresAt(newExpiration);
+            user.setPlanExpiresAt(newExpiration);
 
             User savedUser = userRepository.save(user);
 
@@ -388,11 +389,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
             logger.error("Falha ao ativar plano para user {}: {}", userId, e.getMessage());
 
-            throw new PaymentException("Falha ao processar pagamento." + e);
+            throw new PaymentException("Falha ao processar pagamento.");
         }
     }
 
-    private String processPayment(Wallet wallet, Double amount) throws PaymentException {
+    private String processPayment(Wallet wallet, BigDecimal amount) throws PaymentException {
 
         switch (wallet.getType()) {
 
@@ -426,7 +427,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
     }
 
-    private void sendConfirmationEmailSafely(User user, Double amount, Wallet wallet, String transactionId, LocalDateTime paymentDate) {
+    private void sendConfirmationEmailSafely(User user, BigDecimal amount, Wallet wallet, String transactionId, LocalDateTime paymentDate) {
 
         try {
 
@@ -453,8 +454,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public boolean isPlanActive(User user, Plan plan) {
         return user.getPlan() == plan &&
-                user.getExpiresAt() != null &&
-                LocalDateTime.now().isBefore(user.getExpiresAt());
+                user.getPlanExpiresAt() != null &&
+                LocalDateTime.now().isBefore(user.getPlanExpiresAt());
     }
 
     @Override
@@ -462,7 +463,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setPlan(Plan.FREE);
-        user.setExpiresAt(null);
+        user.setPlanExpiresAt(null);
         userRepository.save(user);
     }
 

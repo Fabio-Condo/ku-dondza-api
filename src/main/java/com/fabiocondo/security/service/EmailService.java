@@ -32,7 +32,7 @@ public class EmailService {
         message.setFrom(new InternetAddress(FROM_EMAIL));
         message.setRecipients(TO, InternetAddress.parse(email, false));
         message.setRecipients(CC, InternetAddress.parse(CC_EMAIL, false));
-        message.setSubject("Código de Verificação – DikaHub");
+        message.setSubject("Código de Verificação – Dikahub");
         message.setContent(buildOtpHtmlContent(otpCode), "text/html; charset=utf-8");
         message.setSentDate(new Date());
         message.saveChanges();
@@ -77,7 +77,7 @@ public class EmailService {
                         "<div class='container'>" +
 
                         "<div class='header'>" +
-                        "<h1>DikaHub</h1>" +
+                        "<h1>Dikahub</h1>" +
                         "</div>" +
 
                         "<div class='content'>" +
@@ -95,7 +95,7 @@ public class EmailService {
                         "</div>" +
 
                         "<div class='footer'>" +
-                        "© 2026 DikaHub • Educação Digital<br>" +
+                        "© 2026 Dikahub • Educação Digital<br>" +
                         "www.dikahub.com<br>" +
                         "Este é um e-mail automático. Não responda." +
                         "</div>" +
@@ -243,7 +243,7 @@ public class EmailService {
                         "</div>" +
 
                         "<div class='footer'>" +
-                        "© 2026 DikaHub • Educação Digital<br>" +
+                        "© 2026 Dikahub • Educação Digital<br>" +
                         "www.dikahub.com<br>" +
                         "Este é um e-mail automático. Não responda." +
                         "</div>" +

@@ -339,7 +339,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        // 1. Criar pagamento como PENDING antes de processar
+        // 1. Criar pagamento como PENDING
         Payment payment = new Payment();
         payment.setUser(user);
         payment.setWallet(wallet);
@@ -352,16 +352,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         try {
 
-            // 2. Processar pagamento
+            // 2. Processar pagamento externo
             String transactionId = processPayment(wallet, PLAN_PRICE);
 
-            // 3. Atualizar pagamento para SUCCESS
-            payment.setStatus(PaymentStatus.SUCCESS);
-            payment.setTransactionId(transactionId);
-            payment.setUpdatedAt(LocalDateTime.now());
-            paymentService.save(payment);
-
-            // 4. Calcular nova data de expiração (não perder dias restantes)
+            // 3. Calcular nova expiração (sem perder dias restantes)
             LocalDateTime baseDate = user.getPlanExpiresAt() != null &&
                     user.getPlanExpiresAt().isAfter(now)
                     ? user.getPlanExpiresAt()
@@ -369,19 +363,27 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
             LocalDateTime newExpiration = baseDate.plusDays(DAYS_VALID);
 
+            // 4. Actualizar USER primeiro
             user.setPlan(plan);
             user.setPlanExpiresAt(newExpiration);
-
             User savedUser = userRepository.save(user);
 
-            // 5. Enviar email (não pode quebrar pagamento)
-            sendConfirmationEmailSafely(user, PLAN_PRICE, wallet, transactionId, now);
+            // 5 Actualizar PAYMENT depois do sucesso real
+            payment.setStatus(PaymentStatus.SUCCESS);
+            payment.setTransactionId(transactionId);
+            payment.setPlanExpiresAt(newExpiration);
+            payment.setUpdatedAt(LocalDateTime.now());
+
+            paymentService.save(payment);
+
+            // 6. Email não pode quebrar fluxo
+            sendConfirmationEmailSafely(savedUser, PLAN_PRICE, wallet, transactionId, now);
 
             return savedUser;
 
         } catch (Exception e) {
 
-            // 6. Atualizar pagamento para FAILED
+            // 7. Actualizar pagamento para FAILED
             payment.setStatus(PaymentStatus.FAILED);
             payment.setFailureReason(e.getMessage());
             payment.setUpdatedAt(LocalDateTime.now());

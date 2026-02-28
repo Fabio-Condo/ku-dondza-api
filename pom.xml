@@ -183,6 +183,13 @@
 
 </dependencies>
 
+<repositories>
+    <repository>
+        <id>local-libs</id>
+        <url>file://${project.basedir}/libs</url>
+    </repository>
+</repositories>
+
 <!-- Important for run mvn clean package and get the jar.original for reports -->
     <build>
         <plugins>

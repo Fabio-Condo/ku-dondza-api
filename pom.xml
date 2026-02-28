@@ -163,6 +163,8 @@
         </dependency>
 
         <!-- MPESA API-->
+        <!-- TESTES LOCAIS-->
+        <!--
         <dependency>
             <groupId>com.fc.sdk</groupId>
             <artifactId>portal-sdk</artifactId>
@@ -170,10 +172,18 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/libs/portal-sdk.jar</systemPath>
         </dependency>
+        -->
 
-    </dependencies>
+        <!-- PARA PROD COM DOCKER E CICD-->
+        <dependency>
+            <groupId>com.fc.sdk</groupId>
+            <artifactId>portal-sdk</artifactId>
+            <version>1.0</version>
+        </dependency>
 
-    <!-- Important for run mvn clean package and get the jar.original for reports -->
+</dependencies>
+
+<!-- Important for run mvn clean package and get the jar.original for reports -->
     <build>
         <plugins>
             <plugin>

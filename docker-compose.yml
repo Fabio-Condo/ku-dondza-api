@@ -51,6 +51,8 @@ services:
   # docker pull fabiocondo/kudondza-api
   # docker-compose up --scale kudondza-api=3
 
+  # docker compose up -d --scale kudondza-api=3
+
   # Passo 1: Build da aplicacao  (3 comando que contem -Pdocker)
   # ./mvnw clean package
   # ./mvnw clean package -DskipTests

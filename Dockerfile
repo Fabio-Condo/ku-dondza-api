@@ -8,7 +8,6 @@
 
 # Stage 1 - Build
 FROM maven:3.9.6-eclipse-temurin-11 AS build
-
 WORKDIR /app
 
 COPY pom.xml .
@@ -22,19 +21,13 @@ RUN mvn install:install-file \
     -Dpackaging=jar
 
 COPY src ./src
-
 RUN mvn clean package -DskipTests
-
 
 # Stage 2 - Runtime
 FROM eclipse-temurin:11-jre
-
 WORKDIR /app
-
 COPY --from=build /app/target/*.jar kudondza.jar
-
 EXPOSE 8080
-
 CMD ["java", "-jar", "kudondza.jar"]
 
 

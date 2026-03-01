@@ -175,11 +175,13 @@
         -->
 
         <!-- PARA PROD COM DOCKER E CICD-->
+        <!--
         <dependency>
             <groupId>com.fc.sdk</groupId>
             <artifactId>portal-sdk</artifactId>
             <version>1.0</version>
         </dependency>
+        -->
 
 </dependencies>
 

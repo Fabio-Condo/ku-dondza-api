@@ -1,4 +1,4 @@
-package com.fabiocondo.payments.mpesa;
+package com.fabiocondo.payments.mpesa.sdk;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

@@ -1,4 +1,4 @@
-package com.fabiocondo.payments.mpesa;
+package com.fabiocondo.payments.mpesa.sdk;
 
 //import com.fc.sdk.APIMethodType;
 

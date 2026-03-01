@@ -1,10 +1,10 @@
 package com.fabiocondo.payments.mpesa;
 
 import com.fabiocondo.exception.domain.PaymentException;
-import com.fabiocondo.payments.mpesa.sdk.APIContext;
-import com.fabiocondo.payments.mpesa.sdk.APIMethodType;
-import com.fabiocondo.payments.mpesa.sdk.APIRequest;
-import com.fabiocondo.payments.mpesa.sdk.APIResponse;
+import com.fabiocondo.payments.mpesa.util.APIContext;
+import com.fabiocondo.payments.mpesa.util.APIMethodType;
+import com.fabiocondo.payments.mpesa.util.APIRequest;
+import com.fabiocondo.payments.mpesa.util.APIResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 //import com.fc.sdk.APIContext;
 //import com.fc.sdk.APIRequest;

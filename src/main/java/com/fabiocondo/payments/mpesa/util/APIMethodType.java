@@ -1,4 +1,4 @@
-package com.fabiocondo.payments.mpesa.sdk;
+package com.fabiocondo.payments.mpesa.util;
 
 public enum APIMethodType {
     GET,

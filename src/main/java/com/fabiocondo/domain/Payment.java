@@ -2,6 +2,7 @@ package com.fabiocondo.domain;
 
 import com.fabiocondo.enumeration.PaymentStatus;
 import com.fabiocondo.enumeration.Plan;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -15,10 +16,16 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnoreProperties(
+            value = { "hibernateLazyInitializer" }
+    )
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @JsonIgnoreProperties(
+            value = { "hibernateLazyInitializer", "user" }
+    )
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;

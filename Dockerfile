@@ -7,34 +7,10 @@
 # OU
 
 #FROM openjdk:11-jre
-# Stage 1 - Build
-FROM maven:3.9.6-eclipse-temurin-11 AS build
-
-WORKDIR /app
-
-COPY pom.xml .
-COPY libs/portal-sdk.jar /tmp/portal-sdk.jar
-
-RUN mvn install:install-file \
-    -Dfile=/tmp/portal-sdk.jar \
-    -DgroupId=com.fc.sdk \
-    -DartifactId=portal-sdk \
-    -Dversion=1.0 \
-    -Dpackaging=jar
-
-COPY src ./src
-
-RUN mvn clean package -DskipTests
-
-# Stage 2 - Runtime
 FROM eclipse-temurin:11-jre
-
 WORKDIR /app
-
-COPY --from=build /app/target/*.jar kudondza.jar
-
+COPY target/*.jar /app/kudondza.jar
 EXPOSE 8080
-
 CMD ["java", "-jar", "kudondza.jar"]
 
 

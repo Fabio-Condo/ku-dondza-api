@@ -2,10 +2,10 @@ package com.fabiocondo.payments.mpesa;
 
 import com.fabiocondo.exception.domain.PaymentException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fc.sdk.APIContext;
-import com.fc.sdk.APIRequest;
-import com.fc.sdk.APIResponse;
-import com.fc.sdk.APIMethodType;
+//import com.fc.sdk.APIContext;
+//import com.fc.sdk.APIRequest;
+//import com.fc.sdk.APIResponse;
+//import com.fc.sdk.APIMethodType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.RandomStringUtils;

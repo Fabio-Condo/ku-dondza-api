@@ -6,7 +6,6 @@ spring:
 
   servlet:
     multipart:
-      enabled: true
       max-file-size: 50MB        # Tamanho máximo por ficheiro
       max-request-size: 50MB      # Tamanho máximo total da requisição
 

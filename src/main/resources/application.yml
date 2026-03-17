@@ -1,5 +1,6 @@
+# 1. Escolha uma secret DEFINITIVA e SEGURA
 jwt:
-  secret: '[a-zA-Z0-9._]^+$Guidelines89797987forAlphabeticalArraNumeralsandOtherSymbo$'
+  secret: "daf66e01593f61a15b857cf433849ae3a8b7d7b8ab3b7d7b8ab3b7d7b8ab3b7d7"
 
 aws:
   # user: root

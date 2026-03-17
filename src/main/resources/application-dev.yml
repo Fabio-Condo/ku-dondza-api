@@ -3,3 +3,13 @@ spring:
     url: jdbc:mysql://localhost:3306/e-learning?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Africa/Harare
     username: root
     password: root
+
+  servlet:
+    multipart:
+      max-file-size: 1MB        # Tamanho máximo por ficheiro
+      max-request-size: 1MB      # Tamanho máximo total da requisição
+
+server:
+  tomcat:
+    max-swallow-size: 50MB        # Tomcat: tamanho máximo para upload
+    max-http-form-post-size: 50MB # Tomcat: tamanho máximo POST

@@ -3,3 +3,8 @@ spring:
     url: jdbc:mysql://${DB_HOST}/e-learning?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Africa/Harare # Docker compose
     username: root
     password: root
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB

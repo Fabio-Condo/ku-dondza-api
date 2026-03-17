@@ -3,3 +3,8 @@ spring:
     url: jdbc:mysql://ku-dondza-db.c9syoygge7jk.us-east-1.rds.amazonaws.com:3306/blog
     username: admin
     password: fabiocondo123
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB

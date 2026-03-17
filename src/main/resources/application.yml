@@ -36,11 +36,15 @@ server:
   address: 0.0.0.0
   port: 8080
 
+  tomcat:
+    max-swallow-size: 50MB        # Tomcat: tamanho máximo para upload
+    max-http-form-post-size: 50MB # Tomcat: tamanho máximo POST
+
 spring:
 
   profiles:
-    active: stage
-    #active: dev
+    #active: stage
+    active: dev
 
   jpa:
     properties:

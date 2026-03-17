@@ -3,16 +3,3 @@ spring:
     url: jdbc:mysql://ku-dondza-db.c9syoygge7jk.us-east-1.rds.amazonaws.com:3306/blog
     username: admin
     password: fabiocondo123
-
-  servlet:
-    multipart:
-      enabled: true
-      max-file-size: 50MB        # Tamanho máximo por ficheiro
-      max-request-size: 50MB      # Tamanho máximo total da requisição
-      file-size-threshold: 2KB    # Threshold para escrever em disco
-      location: /tmp              # Diretório temporário
-
-server:
-  tomcat:
-    max-swallow-size: 50MB        # Tomcat: tamanho máximo para upload
-    max-http-form-post-size: 50MB # Tomcat: tamanho máximo POST

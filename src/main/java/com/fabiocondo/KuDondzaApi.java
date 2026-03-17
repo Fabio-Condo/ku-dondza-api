@@ -23,39 +23,33 @@ public class KuDondzaApi {
 
     @Bean
     public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
+        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:4200",
+                "https://d2cwnz78eo1z5g.cloudfront.net",  // URL do CloudFront
+                "http://frontend-deploy-bucket-test.s3-website-us-east-1.amazonaws.com",
+                "http://100.29.33.126:4200",
+                "http://192.168.11.45:4200",
+                "http://192.168.11.45",
+                "http://192.168.43.2",
 
-        config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList(
-                "https://dikahub.com",
+                "http://168.231.87.25",
+                "http://147.93.86.82",
+                "http://www.dikahub.com",
+                "http://dikahub.com",
                 "https://www.dikahub.com",
-                "http://localhost:4200"
+                "https://dikahub.com"
         ));
-
-        // CRÍTICO: Headers necessários para multipart
-        config.setAllowedHeaders(Arrays.asList(
-                "Origin",
-                "Content-Type",  // Para multipart, este header tem o boundary
-                "Accept",
-                "Authorization",
-                "X-Requested-With",
-                "Access-Control-Request-Method",
-                "Access-Control-Request-Headers",
-                "Content-Disposition"  // Importante para ficheiros
-        ));
-
-        config.setExposedHeaders(Arrays.asList(
-                "Access-Control-Allow-Origin",
-                "Access-Control-Allow-Credentials",
-                "Content-Disposition"  // Se precisar retornar info do ficheiro
-        ));
-
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setMaxAge(3600L);
-
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
+        corsConfiguration.setAllowedHeaders(Arrays.asList("Origin", "Access-Control-Allow-Origin", "Content-Type",
+                "Accept", "Jwt-Token", "Authorization", "Origin, Accept", "X-Requested-With",
+                "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+        corsConfiguration.setExposedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "Jwt-Token", "Authorization",
+                "Access-Control-Allow-Origin", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+        return new CorsFilter(urlBasedCorsConfigurationSource);
     }
 
     @Bean
@@ -63,5 +57,5 @@ public class KuDondzaApi {
         return new BCryptPasswordEncoder();
     }
 
-    // Test de deploy 10
+    // Test de deploy 9
 }

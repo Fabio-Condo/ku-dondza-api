@@ -4,19 +4,16 @@ import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.Topic;
 import com.fabiocondo.domain.TopicContent;
-import com.fabiocondo.domain.User;
 import com.fabiocondo.enumeration.ContentType;
 import com.fabiocondo.exception.domain.ContentNotFoundException;
-import com.fabiocondo.exception.domain.DownloadRateLimitExceededException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.TopicContentRepository;
 import com.fabiocondo.repository.UserRepository;
-import io.github.bucket4j.Bucket;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +25,7 @@ public class TopicContentService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static final String BUCKET_NAME = "cursos-bucket";
+    private static final String BUCKET_NAME = "dikahub-cursos-bucket";
 
     private final TopicContentRepository contentRepository;
 
@@ -59,8 +56,8 @@ public class TopicContentService {
 
     public TopicContent save(String description, ContentType contentType, String time, Long topicId, Integer position, MultipartFile file) throws TopicNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
-
-        String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+        //String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+        String fileKey = "material_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
 
         Topic topic = topicService.findById(topicId);
@@ -94,7 +91,8 @@ public class TopicContentService {
                 logger.info("Deleting file: " + existContent.getFileName());
                 amazonS3Service.deleteFile(existContent.getFileName(), BUCKET_NAME);
             }
-            String newFileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            //String newFileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            String newFileKey = "material_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
             S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, newFileKey);
             existContent.setFileName(newFileKey);
             existContent.setUrlFile(s3UploadResponse.getFileUrl());

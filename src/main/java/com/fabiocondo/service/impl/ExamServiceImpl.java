@@ -33,7 +33,7 @@ public class ExamServiceImpl implements ExamService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static final String BUCKET_NAME = "exames-bucket";
+    private static final String BUCKET_NAME = "dikahub-exames-bucket";
 
     public ExamRepository examRepository;
 
@@ -79,6 +79,7 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public Exam save(ExamType examType, Institution institution, boolean premium, Long year, Long subjectId, String number, MultipartFile file) throws SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
+        //String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
         String fileKey = "exame_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
 
@@ -117,10 +118,11 @@ public class ExamServiceImpl implements ExamService {
                 logger.info("Deleting file: " + existExam.getFileName());
                 amazonS3Service.deleteFile(existExam.getFileName(), BUCKET_NAME);
             }
-            String fileKey = "exame_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
-            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
+            //String newFileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            String newFileKey = "exame_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, newFileKey);
             existExam.setUrlFile(s3UploadResponse.getFileUrl());
-            existExam.setFileName(fileKey);
+            existExam.setFileName(newFileKey);
         }
 
         logger.info("Saving new exame: " + existExam.getExamType());

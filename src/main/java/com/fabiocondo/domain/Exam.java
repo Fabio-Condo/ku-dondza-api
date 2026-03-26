@@ -30,7 +30,7 @@ public class Exam implements Serializable {
 
     private String urlFile;
 
-    private Date date;
+    private Long year;
 
     private Long totalDownloadNumber;
 
@@ -43,14 +43,14 @@ public class Exam implements Serializable {
     public Exam() {
     }
 
-    public Exam(Long id, Subject subject, ExamType examType, boolean premium, String fileName, String urlFile, Date date, Long totalDownloadNumber) {
+    public Exam(Long id, Subject subject, ExamType examType, boolean premium, String fileName, String urlFile, Long year, Long totalDownloadNumber) {
         this.id = id;
         this.subject = subject;
         this.examType = examType;
         this.premium = premium;
         this.fileName = fileName;
         this.urlFile = urlFile;
-        this.date = date;
+        this.year = year;
         this.totalDownloadNumber = totalDownloadNumber;
     }
 
@@ -110,12 +110,12 @@ public class Exam implements Serializable {
         this.urlFile = urlFile;
     }
 
-    public Date getDate() {
-        return date;
+    public Long getYear() {
+        return year;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setYear(Long year) {
+        this.year = year;
     }
 
     public Long getTotalDownloadNumber() {

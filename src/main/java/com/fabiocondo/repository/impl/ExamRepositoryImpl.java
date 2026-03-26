@@ -95,13 +95,13 @@ public class ExamRepositoryImpl implements ExamRepositoryQuery {
             predicates.add(builder.equal(
                     builder.lower(root.get("institution")), examFilter.getInstitution()));
         }
-        if (examFilter.getBeginDate() != null) {
+        if (examFilter.getBeginYear() != null) {
             predicates.add(
-                    builder.greaterThanOrEqualTo(root.get("date"), examFilter.getBeginDate()));
+                    builder.greaterThanOrEqualTo(root.get("year"), examFilter.getBeginYear()));
         }
-        if (examFilter.getEndDate() != null) {
+        if (examFilter.getEndYear() != null) {
             predicates.add(
-                    builder.lessThanOrEqualTo(root.get("date"), examFilter.getEndDate()));
+                    builder.lessThanOrEqualTo(root.get("year"), examFilter.getEndYear()));
         }
     }
 

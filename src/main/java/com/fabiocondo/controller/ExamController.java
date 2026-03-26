@@ -59,11 +59,11 @@ public class ExamController {
                                      @RequestParam("institution") Institution institution,
                                      @RequestParam("premium") boolean premium,
                                      @RequestParam("number") String number,
-                                     @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
+                                     @RequestParam("year") Long year,
                                      @RequestParam("subjectId") Long subjectId,
                                      @RequestParam("file") MultipartFile file) throws SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.save(examType, institution, premium, date, subjectId, number, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.save(examType, institution, premium, year, subjectId, number, file));
     }
 
     @PutMapping
@@ -72,11 +72,11 @@ public class ExamController {
                                        @RequestParam("institution") Institution institution,
                                        @RequestParam("premium") boolean premium,
                                        @RequestParam("number") String number,
-                                       @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date date,
+                                       @RequestParam("year") Long year,
                                        @RequestParam("subjectId") Long subjectId,
                                        @RequestParam(value = "file", required = false) MultipartFile file) throws ExamNotFoundException, SubjectNotFoundException {
 
-        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.update(id, examType, institution, premium, date, subjectId, number, file));
+        return ResponseEntity.status(HttpStatus.OK).body(exameServiceImpl.update(id, examType, institution, premium, year, subjectId, number, file));
     }
 
     @DeleteMapping("/{id}")

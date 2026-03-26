@@ -2,6 +2,9 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.Payment;
 import com.fabiocondo.repository.PaymentRepository;
+import com.fabiocondo.repository.filter.PaymentFilter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +22,8 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
-    public List<Payment> findAll() {
-        return paymentRepository.findAll();
+    public Page<Payment> filter(PaymentFilter paymentFilter, Pageable pageable) {
+        return paymentRepository.filter(paymentFilter, pageable);
     }
 }
 

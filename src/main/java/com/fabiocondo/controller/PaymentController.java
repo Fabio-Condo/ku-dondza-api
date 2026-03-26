@@ -1,7 +1,10 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.Payment;
+import com.fabiocondo.repository.filter.PaymentFilter;
 import com.fabiocondo.service.impl.PaymentService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +22,9 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<Payment>> getAllPayments() {
-        List<Payment> payments = paymentService.findAll();
-        return ResponseEntity.ok(payments);
+    @GetMapping("/filter")
+    public Page<Payment> filter(PaymentFilter paymentFilter, Pageable pageable) {
+        return paymentService.filter(paymentFilter, pageable);
     }
+
 }

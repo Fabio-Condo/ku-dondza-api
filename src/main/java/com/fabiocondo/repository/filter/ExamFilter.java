@@ -25,12 +25,9 @@ public class ExamFilter {
 
     private String level;
 
+    private Long beginYear;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date beginDate;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date endDate;
+    private Long endYear;
 
     public String getSearchParam() {
         return searchParam;
@@ -80,20 +77,19 @@ public class ExamFilter {
         this.level = level;
     }
 
-    public Date getBeginDate() {
-        return beginDate;
+    public Long getBeginYear() {
+        return beginYear;
     }
 
-    public void setBeginDate(Date beginDate) {
-        this.beginDate = beginDate;
+    public void setBeginYear(Long beginYear) {
+        this.beginYear = beginYear;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public Long getEndYear() {
+        return endYear;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setEndYear(Long endYear) {
+        this.endYear = endYear;
     }
-
 }

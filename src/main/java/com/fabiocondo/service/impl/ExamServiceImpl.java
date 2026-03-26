@@ -13,6 +13,7 @@ import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.ExamRepository;
 import com.fabiocondo.repository.filter.ExamFilter;
 import com.fabiocondo.service.ExamService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +79,7 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public Exam save(ExamType examType, Institution institution, boolean premium, Long year, Long subjectId, String number, MultipartFile file) throws SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
-        String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+        String fileKey = "exame_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
         S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
 
         Subject subject = subjectServiceImpl.findById(subjectId);
@@ -116,7 +117,7 @@ public class ExamServiceImpl implements ExamService {
                 logger.info("Deleting file: " + existExam.getFileName());
                 amazonS3Service.deleteFile(existExam.getFileName(), BUCKET_NAME);
             }
-            String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            String fileKey = "exame_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
             S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
             existExam.setUrlFile(s3UploadResponse.getFileUrl());
             existExam.setFileName(fileKey);

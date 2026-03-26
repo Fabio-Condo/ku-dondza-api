@@ -7,10 +7,10 @@ aws:
   #secretKey: 1i/ZOIphuipqSmauMsB0HOJ/gAOniTqtKTS40GJu
 
   # user: kudondza-user-production
-  accessKeyId: AKIAW3MECWUYOLFKX2OE
-  secretKey: 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
+  accessKeyId: AKIAU6GDVYYOJOHKDO7G
+  secretKey: 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
 
-  region.static: us-east-2
+  region.static: us-east-1
 
 mpesa:
   api:

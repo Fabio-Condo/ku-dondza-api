@@ -46,7 +46,7 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private static final String BUCKET_NAME = "b-tests-bucket";
+    private static final String BUCKET_NAME = "perfis-bucket";
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final LoginAttemptService loginAttemptService;

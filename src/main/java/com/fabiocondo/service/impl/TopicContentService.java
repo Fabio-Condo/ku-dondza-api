@@ -28,7 +28,7 @@ public class TopicContentService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static final String BUCKET_NAME = "b-tests-bucket";
+    private static final String BUCKET_NAME = "cursos-bucket";
 
     private final TopicContentRepository contentRepository;
 

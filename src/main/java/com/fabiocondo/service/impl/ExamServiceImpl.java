@@ -32,7 +32,7 @@ public class ExamServiceImpl implements ExamService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static final String BUCKET_NAME = "b-tests-bucket";
+    private static final String BUCKET_NAME = "exames-bucket";
 
     public ExamRepository examRepository;
 

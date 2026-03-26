@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Service
 public class QuestionService {
 
-    private static final String BUCKET_NAME = "b-tests-bucket";
+    private static final String BUCKET_NAME = "exercicios-bucket";
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final AmazonS3Service amazonS3Service;
     private final QuestionRepository questionRepository;

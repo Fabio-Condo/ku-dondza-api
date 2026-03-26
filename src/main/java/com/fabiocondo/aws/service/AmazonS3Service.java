@@ -116,7 +116,7 @@ public class AmazonS3Service {
                 "Effect": "Allow",
                 "Principal": "*",
                 "Action": "s3:GetObject",
-                "Resource": "arn:aws:s3:::nome-do-seu-bucket/*"
+                "Resource": "arn:aws:s3:::exames-bucket/*"
         }
     ]
     }

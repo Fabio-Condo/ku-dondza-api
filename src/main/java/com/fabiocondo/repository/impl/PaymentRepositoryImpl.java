@@ -78,11 +78,16 @@ public class PaymentRepositoryImpl implements PaymentRepositoryQuery {
 
     public void restrictions(PaymentFilter paymentFilter, List<Predicate> predicates, CriteriaBuilder builder, Root<Payment> root){
 
-        //if(!ObjectUtils.isEmpty(paymentFilter.getSearchParam())) {
-        //    Predicate subject = builder.like(
-        //            builder.lower(root.get("user").get("name")), "%" + paymentFilter.getSearchParam().toLowerCase() + "%");
-        //    predicates.add(builder.or(subject));
-        //}
+        if(!ObjectUtils.isEmpty(paymentFilter.getSearchParam())) {
+            Predicate subject = builder.like(
+                    builder.lower(root.get("user").get("fullName")), "%" + paymentFilter.getSearchParam().toLowerCase() + "%");
+            predicates.add(builder.or(subject));
+        }
+
+        if (paymentFilter.getStatus() != null) {
+            predicates.add(builder.equal(
+                    builder.lower(root.get("status")), paymentFilter.getStatus()));
+        }
     }
 
     public void getSortOrder(PaymentFilter paymentFilter, CriteriaBuilder builder, CriteriaQuery<Payment> criteria, Root<Payment> root){

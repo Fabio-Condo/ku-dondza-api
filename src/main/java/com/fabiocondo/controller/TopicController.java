@@ -40,9 +40,9 @@ public class TopicController {
     //}
 
     @GetMapping("/find-by-topicId/{topicId}")
-    public ResponseEntity<TopicDTO> findTopicByTopicId(@PathVariable("topicId") String topicId, @RequestParam("currentUserId") Long currentUserId) throws TopicNotFoundException {
+    public ResponseEntity<TopicDTO> findTopicByTopicId(@PathVariable("topicId") String topicId) throws TopicNotFoundException {
         Topic topic = topicService.findTopicByTopicId(topicId);
-        return ResponseEntity.status(HttpStatus.OK).body(topicMapper.domainToDTO(topic, currentUserId));
+        return ResponseEntity.status(HttpStatus.OK).body(topicMapper.domainToDTO(topic));
     }
 
     @PostMapping

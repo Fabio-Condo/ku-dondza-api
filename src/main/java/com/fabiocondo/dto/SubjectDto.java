@@ -21,8 +21,6 @@ public class SubjectDto {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    private boolean isCurrentUserSubscribed;
-
     private double currentUserMarkedContentRate;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -68,14 +66,6 @@ public class SubjectDto {
 
     public void setCategory(Category category) {
         this.category = category;
-    }
-
-    public boolean isCurrentUserSubscribed() {
-        return isCurrentUserSubscribed;
-    }
-
-    public void setCurrentUserSubscribed(boolean currentUserSubscribed) {
-        isCurrentUserSubscribed = currentUserSubscribed;
     }
 
     public double getCurrentUserMarkedContentRate() {

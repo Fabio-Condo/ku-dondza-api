@@ -30,10 +30,6 @@ public class Subject {
     @OrderBy("position ASC") // Ordena os conteúdos ao carregar
     private List<Topic> topics;
 
-    @JsonIgnore
-    @ManyToMany(mappedBy = "subscribedSubjects")
-    private List<User> students;
-
     public Subject() {
     }
 
@@ -91,13 +87,5 @@ public class Subject {
 
     public void setTopics(List<Topic> topics) {
         this.topics = topics;
-    }
-
-    public List<User> getStudents() {
-        return students;
-    }
-
-    public void setStudents(List<User> students) {
-        this.students = students;
     }
 }

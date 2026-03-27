@@ -1,8 +1,16 @@
 package com.fabiocondo.repository.filter;
 
+import com.fabiocondo.enumeration.PaymentStatus;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
 public class PaymentFilter {
 
     private String searchParam;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status; // SUCCESS, FAILED, PENDING
 
     private String paymentOrderBy;
 
@@ -20,5 +28,13 @@ public class PaymentFilter {
 
     public void setPaymentOrderBy(String paymentOrderBy) {
         this.paymentOrderBy = paymentOrderBy;
+    }
+
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PaymentStatus status) {
+        this.status = status;
     }
 }

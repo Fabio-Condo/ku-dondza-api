@@ -76,23 +76,6 @@ public class SubjectServiceImpl implements SubjectService {
         return subject;
     }
 
-    public boolean checkIfCurrentUserSubscribed(Long subjectId, Long currentUserId) {
-        User currentUser = userRepository.findById(currentUserId).orElseThrow(null);
-        if (currentUser == null) {
-            return false;
-        }
-        Optional<Subject> subject = subjectRepository.findById(subjectId);
-        if (!subject.isPresent()) {
-            return false;
-        }
-        return currentUser.getSubscribedSubjects().contains(subject.get());
-    }
-
-    public Page<User> getStudentsByCourseId(Long courseId, Pageable pageable) throws SubjectNotFoundException {
-        Subject subject = findById(courseId);
-        return subjectRepository.findStudentsBySubjectId(subject.getId(), pageable);
-    }
-
     public double calculateUserProgressInSubject(Long userId, Long subjectId) throws UserNotFoundException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("No user found by id: " + userId));

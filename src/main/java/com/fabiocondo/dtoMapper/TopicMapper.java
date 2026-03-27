@@ -37,7 +37,7 @@ public class TopicMapper {
         return topic;
     }
 
-    public TopicDTO domainToDTO(Topic topic, Long currentUserId) {
+    public TopicDTO domainToDTO(Topic topic) {
         TopicDTO topicDTO = new TopicDTO();
         topicDTO.setId(topic.getId());
         topicDTO.setTopicId(topic.getTopicId());
@@ -54,12 +54,6 @@ public class TopicMapper {
         subjectDto.setSubjectId(topic.getSubject().getSubjectId());
         subjectDto.setName(topic.getSubject().getName());
         subjectDto.setDescription(topic.getSubject().getDescription());
-
-        Optional<User> currentUser = userRepository.findById(currentUserId);
-
-        if(currentUser.isPresent()){
-            subjectDto.setCurrentUserSubscribed(subjectService.checkIfCurrentUserSubscribed(subjectDto.getId(), currentUserId));
-        }
 
         topicDTO.setSubject(subjectDto);
         return topicDTO;

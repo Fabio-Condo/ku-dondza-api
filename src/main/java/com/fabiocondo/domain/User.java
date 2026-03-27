@@ -78,15 +78,6 @@ public class User implements Serializable {
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.DETACH)
     @JoinTable(
-            name = "user_subject_subscription",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "subject_id")
-    )
-    private Set<Subject> subscribedSubjects = new HashSet<>();
-
-    @JsonIgnore
-    @ManyToMany(cascade = CascadeType.DETACH)
-    @JoinTable(
             name = "user_marked_topic_content",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "topic_content_id")
@@ -300,14 +291,6 @@ public class User implements Serializable {
 
     public void setSubjectsInterests(Set<Subject> subjectsInterests) {
         this.subjectsInterests = subjectsInterests;
-    }
-
-    public Set<Subject> getSubscribedSubjects() {
-        return subscribedSubjects;
-    }
-
-    public void setSubscribedSubjects(Set<Subject> subscribedSubjects) {
-        this.subscribedSubjects = subscribedSubjects;
     }
 
     public Set<TopicContent> getMarkedTopicContents() {

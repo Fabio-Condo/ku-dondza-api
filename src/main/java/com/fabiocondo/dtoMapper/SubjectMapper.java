@@ -31,7 +31,7 @@ public class SubjectMapper {
         this.topicService = topicService;
     }
 
-    public SubjectDto domainToDto(Subject subject, Long currentUserId) {
+    public SubjectDto domainToDto(Subject subject, Long currentUserId) throws UserNotFoundException {
         SubjectDto subjectDto = new SubjectDto();
         subjectDto.setId(subject.getId());
         subjectDto.setSubjectId(subject.getSubjectId());
@@ -39,6 +39,12 @@ public class SubjectMapper {
         subjectDto.setDescription(subject.getDescription());
         subjectDto.setCategory(subject.getCategory());
         subjectDto.setTotalTopics(topicRepository.countBySubjectIdAndEnabledTrue(subject.getId()));
+
+        Optional<User> currentUser = userRepository.findById(currentUserId);
+
+        if(currentUser.isPresent()){
+            subjectDto.setCurrentUserMarkedContentRate(subjectService.calculateUserProgressInSubject(currentUserId, subject.getId()));
+        }
         return subjectDto;
     }
 
@@ -65,7 +71,13 @@ public class SubjectMapper {
     public Page<SubjectDto> domainPageToDTOPage(Page<Subject> subjects, Long currentUserId, Pageable pageable) {
         return new PageImpl<>(
                 subjects.stream()
-                        .map(subject -> domainToDto(subject, currentUserId))
+                        .map(subject -> {
+                            try {
+                                return domainToDto(subject, currentUserId);
+                            } catch (UserNotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
                         .collect(Collectors.toList()),
                 pageable,
                 subjects.getTotalElements()

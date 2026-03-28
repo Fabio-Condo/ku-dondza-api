@@ -10,7 +10,7 @@ aws:
   accessKeyId: AKIAU6GDVYYOJOHKDO7G
   secretKey: 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
 
-  region.static: us-east-1
+  region.static: eu-north-1
 
 mpesa:
   api:

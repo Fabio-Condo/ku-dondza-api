@@ -1,7 +1,10 @@
 package com.fabiocondo.dtoMapper;
 
 import com.fabiocondo.domain.Quiz;
+import com.fabiocondo.domain.Subject;
 import com.fabiocondo.domain.Test;
+import com.fabiocondo.domain.Topic;
+import com.fabiocondo.dto.SubjectProgressDTO;
 import com.fabiocondo.dto.TestDTO;
 import com.fabiocondo.dto.TopicTestsDTO;
 import com.fabiocondo.repository.TopicTestRepository;
@@ -44,6 +47,36 @@ public class TestMapper {
         testDTO.setTotalQuestions((long) testDTO.getQuestions().size());
 
         return testDTO;
+    }
+
+    TopicTestsDTO mapToTopicTestsDTO(Topic topic, List<Test> allTests, Long userId) {
+
+        TopicTestsDTO dto = new TopicTestsDTO();
+
+        dto.setTopicId(topic.getId());
+        dto.setTopicName(topic.getName());
+
+        // 👇 filtrar testes do tópico
+        List<Test> topicTests = allTests.stream()
+                .filter(test -> test.getTopic().getId().equals(topic.getId()))
+                .sorted(Comparator.comparingInt(Test::getOrderIndex)).collect(Collectors.toList());
+
+        // 👇 calcular progresso
+        long submittedCount = topicTests.stream()
+                .filter(test -> test.getSubmittedQuizzes()
+                        .stream()
+                        .anyMatch(q -> q.getUser().getId().equals(userId)))
+                .count();
+
+        double progressRate = topicTests.isEmpty()
+                ? 0
+                : (submittedCount * 100.0) / topicTests.size();
+
+        dto.setProgressRate(progressRate);
+
+        dto.setCompleted(submittedCount == topicTests.size());
+
+        return dto;
     }
 
     public TestDTO domainToDTO(Test test, Long userId) {

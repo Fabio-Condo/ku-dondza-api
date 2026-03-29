@@ -6,6 +6,8 @@ public class TopicTestsDTO {
     private Long topicId;
     private String topicName;
     private List<TestDTO> tests;
+    private double progressRate;
+    private boolean completed;
 
     public TopicTestsDTO() {}
 
@@ -23,5 +25,21 @@ public class TopicTestsDTO {
 
     public List<TestDTO> getTests() { return tests; }
     public void setTests(List<TestDTO> tests) { this.tests = tests; }
+
+    public double getProgressRate() {
+        return progressRate;
+    }
+
+    public void setProgressRate(double progressRate) {
+        this.progressRate = progressRate;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
 }
 

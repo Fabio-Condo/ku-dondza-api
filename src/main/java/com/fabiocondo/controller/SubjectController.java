@@ -45,8 +45,8 @@ public class SubjectController {
     }
 
     @GetMapping("/progress/users")
-    public List<SubjectProgressDTO> findAllAAA(@RequestParam("currentUserId") Long currentUserId) {
-        return subjectMapper.toDTOListOrdered(subjectServiceImpl.findAll(), currentUserId);
+    public List<SubjectProgressDTO> getUserProgress(@RequestParam("currentUserId") Long currentUserId) {
+        return subjectMapper.mapSubjectsToProgressDTOs(subjectServiceImpl.findAll(), currentUserId);
     }
 
     @GetMapping

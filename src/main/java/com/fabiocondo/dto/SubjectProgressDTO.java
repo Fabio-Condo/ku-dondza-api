@@ -4,19 +4,21 @@ import com.fabiocondo.enumeration.Category;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import java.util.List;
 
 public class SubjectProgressDTO {
 
     private Long id;
-
     private String subjectId;
 
-    private String name;
+    private String subjectName;
 
-    private String description;
+    private String subjectDescription;
 
     @Enumerated(EnumType.STRING)
-    private Category category;
+    private Category subjectCategory;
+
+    private List<TopicTestsDTO> topicTests;
 
     private double currentUserProgressRate;
 
@@ -38,28 +40,36 @@ public class SubjectProgressDTO {
         this.subjectId = subjectId;
     }
 
-    public String getName() {
-        return name;
+    public String getSubjectName() {
+        return subjectName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
     }
 
-    public String getDescription() {
-        return description;
+    public String getSubjectDescription() {
+        return subjectDescription;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setSubjectDescription(String subjectDescription) {
+        this.subjectDescription = subjectDescription;
     }
 
-    public Category getCategory() {
-        return category;
+    public Category getSubjectCategory() {
+        return subjectCategory;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setSubjectCategory(Category subjectCategory) {
+        this.subjectCategory = subjectCategory;
+    }
+
+    public List<TopicTestsDTO> getTopicTests() {
+        return topicTests;
+    }
+
+    public void setTopicTests(List<TopicTestsDTO> topicTests) {
+        this.topicTests = topicTests;
     }
 
     public double getCurrentUserProgressRate() {

@@ -3,6 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Subject;
 import com.fabiocondo.dto.SubjectDto;
+import com.fabiocondo.dto.SubjectProgressDTO;
 import com.fabiocondo.dtoMapper.SubjectMapper;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
@@ -41,6 +42,11 @@ public class SubjectController {
     @GetMapping("/filter")
     public Page<SubjectDto> filter(@RequestParam(required = false, defaultValue = "") String name, @RequestParam("currentUserId") Long currentUserId, Pageable pageable) {
         return subjectMapper.domainPageToDTOPage(subjectServiceImpl.findByName(name, pageable), currentUserId, pageable);
+    }
+
+    @GetMapping("/progress/users")
+    public List<SubjectProgressDTO> findAllAAA(@RequestParam("currentUserId") Long currentUserId) {
+        return subjectMapper.toDTOListOrdered(subjectServiceImpl.findAll(), currentUserId);
     }
 
     @GetMapping

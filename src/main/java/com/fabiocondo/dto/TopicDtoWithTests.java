@@ -2,16 +2,16 @@ package com.fabiocondo.dto;
 
 import java.util.List;
 
-public class TopicTestsDTO {
+public class TopicDtoWithTests {
     private Long topicId;
     private String topicName;
-    private List<TestDTO> tests;
     private double progressRate;
     private boolean completed;
+    private List<TestDTO> tests;
 
-    public TopicTestsDTO() {}
+    public TopicDtoWithTests() {}
 
-    public TopicTestsDTO(Long topicId, String topicName, List<TestDTO> tests) {
+    public TopicDtoWithTests(Long topicId, String topicName, List<TestDTO> tests) {
         this.topicId = topicId;
         this.topicName = topicName;
         this.tests = tests;

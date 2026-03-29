@@ -18,7 +18,7 @@ public class SubjectProgressDTO {
     @Enumerated(EnumType.STRING)
     private Category subjectCategory;
 
-    private List<TopicTestsDTO> topicTests;
+    private List<TopicDtoWithTests> topicDtoWithTests;
 
     private double currentUserProgressRate;
 
@@ -64,12 +64,12 @@ public class SubjectProgressDTO {
         this.subjectCategory = subjectCategory;
     }
 
-    public List<TopicTestsDTO> getTopicTests() {
-        return topicTests;
+    public List<TopicDtoWithTests> getTopicDtoWithTests() {
+        return topicDtoWithTests;
     }
 
-    public void setTopicTests(List<TopicTestsDTO> topicTests) {
-        this.topicTests = topicTests;
+    public void setTopicDtoWithTests(List<TopicDtoWithTests> topicDtoWithTests) {
+        this.topicDtoWithTests = topicDtoWithTests;
     }
 
     public double getCurrentUserProgressRate() {

@@ -45,8 +45,13 @@ public class SubjectController {
     }
 
     @GetMapping("/progress/users")
-    public List<SubjectProgressDTO> getUserProgress(@RequestParam("currentUserId") Long currentUserId) {
+    public List<SubjectProgressDTO> getUserProgressSubjects(@RequestParam("currentUserId") Long currentUserId) {
         return subjectMapper.mapSubjectsToProgressDTOs(subjectServiceImpl.findAll(), currentUserId);
+    }
+
+    @GetMapping("/progress/users/view")
+    public SubjectProgressDTO getUserProgressSubject(@RequestParam("currentUserId") Long currentUserId, @RequestParam("subjectId") String subjectId) throws SubjectNotFoundException {
+        return subjectMapper.mapSubjectToProgressDTO(subjectServiceImpl.findSubjectBySubjectId(subjectId), currentUserId);
     }
 
     @GetMapping

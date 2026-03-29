@@ -6,7 +6,7 @@ import com.fabiocondo.domain.Topic;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.dto.SubjectDto;
 import com.fabiocondo.dto.SubjectProgressDTO;
-import com.fabiocondo.dto.TopicTestsDTO;
+import com.fabiocondo.dto.TopicDtoWithTests;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.TopicRepository;
 import com.fabiocondo.repository.TopicTestRepository;
@@ -18,8 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -78,25 +77,51 @@ public class SubjectMapper {
         return subjectDto;
     }
 
-    public Page<SubjectDto> domainPageToDTOPage(Page<Subject> subjects, Long currentUserId, Pageable pageable) {
-        return new PageImpl<>(
-                subjects.stream()
-                        .map(subject -> {
-                            try {
-                                return domainToDto(subject, currentUserId);
-                            } catch (UserNotFoundException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .collect(Collectors.toList()),
-                pageable,
-                subjects.getTotalElements()
-        );
+    public SubjectProgressDTO mapSubjectToProgressDTO(Subject subject, Long userId) {
+
+        List<Test> allTests = topicTestRepository.findAll();
+
+        SubjectProgressDTO dto = new SubjectProgressDTO();
+        dto.setId(subject.getId());
+        dto.setSubjectId(subject.getSubjectId());
+        dto.setSubjectName(subject.getName());
+        dto.setSubjectDescription(subject.getDescription());
+        dto.setSubjectCategory(subject.getCategory());
+
+        List<Topic> topics = topicRepository
+                .findBySubjectIdAndEnabledTrueOrderByPositionAsc(subject.getId());
+
+        List<TopicDtoWithTests> topicDTOs = topics.stream()
+                .map(topic -> testMapper.mapToTopicTestsDTOWithTests(topic, allTests, userId))
+                .collect(Collectors.toList());
+
+        dto.setTopicDtoWithTests(topicDTOs);
+
+        dto.setTotalTopics((long) topics.size());
+
+        // 👇 agora consistente com allTests
+        List<Test> subjectTests = allTests.stream()
+                .filter(test -> test.getTopic().getSubject().getId().equals(subject.getId()))
+                .collect(Collectors.toList());
+
+        long submittedCount = subjectTests.stream()
+                .filter(test -> test.getSubmittedQuizzes()
+                        .stream()
+                        .anyMatch(q -> q.getUser().getId().equals(userId)))
+                .count();
+
+        double progressRate = subjectTests.isEmpty()
+                ? 0
+                : (submittedCount * 100.0) / subjectTests.size();
+
+        dto.setCurrentUserProgressRate(progressRate);
+
+        return dto;
     }
 
     public List<SubjectProgressDTO> mapSubjectsToProgressDTOs(List<Subject> subjects, Long userId) {
 
-        // 👇 buscar TODOS os testes uma vez (evita N+1)
+        // buscar TODOS os testes uma vez (evita N+1)
         List<Test> allTests = topicTestRepository.findAll();
 
         return subjects.stream()
@@ -109,20 +134,20 @@ public class SubjectMapper {
                     dto.setSubjectDescription(subject.getDescription());
                     dto.setSubjectCategory(subject.getCategory());
 
-                    // 👇 buscar tópicos da disciplina
+                    // buscar tópicos da disciplina
                     List<Topic> topics = topicRepository
                             .findBySubjectIdAndEnabledTrueOrderByPositionAsc(subject.getId());
 
-                    // 👇 limitar a 3 tópicos + reutilizar teu método
-                    List<TopicTestsDTO> topicDTOs = topics.stream()
+                    // limitar a 3 tópicos + reutilizar teu método
+                    List<TopicDtoWithTests> topicDTOs = topics.stream()
                             .limit(3)
                             .map(topic -> testMapper.mapToTopicTestsDTO(topic, allTests, userId)).collect(Collectors.toList());
 
-                    dto.setTopicTests(topicDTOs);
+                    dto.setTopicDtoWithTests(topicDTOs);
 
                     dto.setTotalTopics((long) topics.size());
 
-                    // 👇 calcular progresso TOTAL da disciplina (reutilizando lógica)
+                    // calcular progresso TOTAL da disciplina (reutilizando lógica)
                     List<Test> subjectTests = allTests.stream()
                             .filter(test -> test.getTopic().getSubject().getId().equals(subject.getId()))
                             .collect(Collectors.toList());
@@ -143,5 +168,21 @@ public class SubjectMapper {
 
                 })
                 .collect(Collectors.toList());
+    }
+
+    public Page<SubjectDto> domainPageToDTOPage(Page<Subject> subjects, Long currentUserId, Pageable pageable) {
+        return new PageImpl<>(
+                subjects.stream()
+                        .map(subject -> {
+                            try {
+                                return domainToDto(subject, currentUserId);
+                            } catch (UserNotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .collect(Collectors.toList()),
+                pageable,
+                subjects.getTotalElements()
+        );
     }
 }

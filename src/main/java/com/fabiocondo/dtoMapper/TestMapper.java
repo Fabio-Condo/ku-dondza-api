@@ -83,6 +83,7 @@ public class TestMapper {
 
         dto.setTopicId(topic.getId());
         dto.setTopicName(topic.getName());
+        dto.setPremium(topic.isPremium());
 
         // filtrar testes do tópico
         List<Test> topicTests = allTests.stream()

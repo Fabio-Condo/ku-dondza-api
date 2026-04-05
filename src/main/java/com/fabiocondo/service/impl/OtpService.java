@@ -67,7 +67,8 @@ public class OtpService {
         otpRepository.save(entry);
 
         // Envia email
-        emailService.sendOtpCodeEmail(user.getEmail(), otp);
+        //emailService.sendOtpCodeEmail(user.getEmail(), otp);
+        System.out.println("OTP: " + otp);
 
         return otp;
     }

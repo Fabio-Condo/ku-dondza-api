@@ -79,7 +79,8 @@ public class SubjectMapper {
 
     public SubjectProgressDTO mapSubjectToProgressDTO(Subject subject, Long userId) {
 
-        List<Test> allTests = topicTestRepository.findAll();
+        //List<Test> allTests = topicTestRepository.findAll();
+        List<Test> allTests = topicTestRepository.findBySubjectId(subject.getId());
 
         SubjectProgressDTO dto = new SubjectProgressDTO();
         dto.setId(subject.getId());

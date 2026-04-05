@@ -5,6 +5,7 @@ import java.util.List;
 public class TopicDtoWithTests {
     private Long topicId;
     private String topicName;
+    private boolean premium = false; // Controle dos topicos para users pagos e nao pagos
     private double progressRate;
     private boolean completed;
     private List<TestDTO> tests;
@@ -22,6 +23,14 @@ public class TopicDtoWithTests {
 
     public String getTopicName() { return topicName; }
     public void setTopicName(String topicName) { this.topicName = topicName; }
+
+    public boolean isPremium() {
+        return premium;
+    }
+
+    public void setPremium(boolean premium) {
+        this.premium = premium;
+    }
 
     public List<TestDTO> getTests() { return tests; }
     public void setTests(List<TestDTO> tests) { this.tests = tests; }

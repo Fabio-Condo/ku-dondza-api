@@ -66,6 +66,8 @@ public class QuizMapper {
         quizDTO.setUser(quiz.getUser());
         quizDTO.setTotalQuestions(quizRepository.countQuestionsByQuizId(quiz.getId()));
         quizDTO.setTopics(quizService.getSortedTopics(quiz));
+
+
         quizDTO.setAccuracyRate(quizService.calculateAccuracyRate(quiz));
         return quizDTO;
     }
@@ -92,12 +94,12 @@ public class QuizMapper {
         return quizDTO;
     }
 
-    public List<Topic> getTopics(QuizDTO quiz) {
-        return quiz.getTopics()
-                .stream()
-                .sorted(Comparator.comparing(Topic::getName)) // ou getOrder(), getId(), etc.
-                .collect(Collectors.toList());
-    }
+    //public List<Topic> getTopics(QuizDTO quiz) {
+    //    return quiz.getTopics()
+    //            .stream()
+    //            .sorted(Comparator.comparing(Topic::getName)) // ou getOrder(), getId(), etc.
+    //            .collect(Collectors.toList());
+    //}
 
     public Set<QuestionDTO> sortQuestionsByTopicPositionAndId(Set<Question> questions, Optional<User> optionalUser) {
 

@@ -1,6 +1,7 @@
 package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.*;
+import com.fabiocondo.dto.TopicDTO;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.AnswerRepository;

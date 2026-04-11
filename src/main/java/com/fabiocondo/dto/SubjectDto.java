@@ -21,6 +21,12 @@ public class SubjectDto {
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    // CONTROLO DE MÓDULOS
+    private boolean quizEnabled;
+    private boolean courseEnabled;
+    private boolean progressEnabled;
+    private boolean examEnabled;
+
     private double currentUserMarkedContentRate;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -90,5 +96,38 @@ public class SubjectDto {
 
     public void setTotalTopics(Long totalTopics) {
         this.totalTopics = totalTopics;
+    }
+
+
+    public boolean isQuizEnabled() {
+        return quizEnabled;
+    }
+
+    public void setQuizEnabled(boolean quizEnabled) {
+        this.quizEnabled = quizEnabled;
+    }
+
+    public boolean isCourseEnabled() {
+        return courseEnabled;
+    }
+
+    public void setCourseEnabled(boolean courseEnabled) {
+        this.courseEnabled = courseEnabled;
+    }
+
+    public boolean isProgressEnabled() {
+        return progressEnabled;
+    }
+
+    public void setProgressEnabled(boolean progressEnabled) {
+        this.progressEnabled = progressEnabled;
+    }
+
+    public boolean isExamEnabled() {
+        return examEnabled;
+    }
+
+    public void setExamEnabled(boolean examEnabled) {
+        this.examEnabled = examEnabled;
     }
 }

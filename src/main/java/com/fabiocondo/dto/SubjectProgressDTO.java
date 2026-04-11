@@ -18,6 +18,9 @@ public class SubjectProgressDTO {
     @Enumerated(EnumType.STRING)
     private Category subjectCategory;
 
+    // CONTROLO DE MÓDULOS
+    private boolean progressEnabled;
+
     private List<TopicDtoWithTests> topicDtoWithTests;
 
     private double currentUserProgressRate;
@@ -86,5 +89,13 @@ public class SubjectProgressDTO {
 
     public void setTotalTopics(Long totalTopics) {
         this.totalTopics = totalTopics;
+    }
+
+    public boolean isProgressEnabled() {
+        return progressEnabled;
+    }
+
+    public void setProgressEnabled(boolean progressEnabled) {
+        this.progressEnabled = progressEnabled;
     }
 }

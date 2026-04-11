@@ -49,6 +49,11 @@ public class SubjectMapper {
         subjectDto.setCategory(subject.getCategory());
         subjectDto.setTotalTopics(topicRepository.countBySubjectIdAndEnabledTrue(subject.getId()));
 
+        subjectDto.setExamEnabled(subject.isExamEnabled());
+        subjectDto.setCourseEnabled(subject.isCourseEnabled());
+        subjectDto.setProgressEnabled(subject.isProgressEnabled());
+        subjectDto.setQuizEnabled(subject.isQuizEnabled());
+
         Optional<User> currentUser = userRepository.findById(currentUserId);
 
         if(currentUser.isPresent()){
@@ -64,6 +69,11 @@ public class SubjectMapper {
         subjectDto.setName(subject.getName());
         subjectDto.setDescription(subject.getDescription());
         subjectDto.setCategory(subject.getCategory());
+
+        subjectDto.setExamEnabled(subject.isExamEnabled());
+        subjectDto.setCourseEnabled(subject.isCourseEnabled());
+        subjectDto.setProgressEnabled(subject.isProgressEnabled());
+        subjectDto.setQuizEnabled(subject.isQuizEnabled());
 
         //subjectDto.setTopics(subject.getTopics());
         subjectDto.setTopics(topicService.getBySubjectId(subject.getId()));
@@ -88,6 +98,7 @@ public class SubjectMapper {
         dto.setSubjectName(subject.getName());
         dto.setSubjectDescription(subject.getDescription());
         dto.setSubjectCategory(subject.getCategory());
+        dto.setProgressEnabled(subject.isProgressEnabled());
 
         List<Topic> topics = topicRepository
                 .findBySubjectIdAndEnabledTrueOrderByPositionAsc(subject.getId());
@@ -134,6 +145,8 @@ public class SubjectMapper {
                     dto.setSubjectName(subject.getName());
                     dto.setSubjectDescription(subject.getDescription());
                     dto.setSubjectCategory(subject.getCategory());
+
+                    dto.setProgressEnabled(subject.isProgressEnabled());
 
                     // buscar tópicos da disciplina
                     List<Topic> topics = topicRepository

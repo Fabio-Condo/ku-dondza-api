@@ -3,6 +3,7 @@ package com.fabiocondo.domain;
 import com.fabiocondo.enumeration.Category;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -25,9 +26,15 @@ public class Subject {
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    // CONTROLO DE MÓDULOS
+    private boolean quizEnabled;
+    private boolean courseEnabled;
+    private boolean progressEnabled;
+    private boolean examEnabled;
+
     @JsonIgnore
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("position ASC") // Ordena os conteúdos ao carregar
+    @OrderBy("position ASC")
     private List<Topic> topics;
 
     public Subject() {
@@ -40,7 +47,8 @@ public class Subject {
         this.topics = topics;
     }
 
-    // Getters e Setters
+    // GETTERS & SETTERS
+
     public Long getId() {
         return id;
     }
@@ -65,14 +73,6 @@ public class Subject {
         this.name = name;
     }
 
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
     public String getDescription() {
         return description;
     }
@@ -81,11 +81,51 @@ public class Subject {
         this.description = description;
     }
 
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     public List<Topic> getTopics() {
         return topics;
     }
 
     public void setTopics(List<Topic> topics) {
         this.topics = topics;
+    }
+
+    public boolean isQuizEnabled() {
+        return quizEnabled;
+    }
+
+    public void setQuizEnabled(boolean quizEnabled) {
+        this.quizEnabled = quizEnabled;
+    }
+
+    public boolean isCourseEnabled() {
+        return courseEnabled;
+    }
+
+    public void setCourseEnabled(boolean courseEnabled) {
+        this.courseEnabled = courseEnabled;
+    }
+
+    public boolean isProgressEnabled() {
+        return progressEnabled;
+    }
+
+    public void setProgressEnabled(boolean progressEnabled) {
+        this.progressEnabled = progressEnabled;
+    }
+
+    public boolean isExamEnabled() {
+        return examEnabled;
+    }
+
+    public void setExamEnabled(boolean examEnabled) {
+        this.examEnabled = examEnabled;
     }
 }

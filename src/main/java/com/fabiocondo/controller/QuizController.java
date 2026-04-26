@@ -5,10 +5,9 @@ import com.fabiocondo.dto.QuizDTO;
 import com.fabiocondo.dtoMapper.QuizMapper;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
-import com.fabiocondo.repository.TopicTestRepository;
-import com.fabiocondo.repository.UserSubjectScoreRepository;
 import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.QuizService;
+import com.fabiocondo.service.impl.TestService;
 import com.fabiocondo.service.impl.UserSubjectScoreService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,14 +25,14 @@ public class QuizController {
 
     private final QuizMapper quizMapper;
 
-    private final TopicTestRepository topicTestRepository;
+    private final TestService testService;
 
     private final UserSubjectScoreService userSubjectScoreService;
 
-    public QuizController(QuizService quizService, QuizMapper quizMapper, TopicTestRepository topicTestRepository, UserSubjectScoreService userSubjectScoreService) {
+    public QuizController(QuizService quizService, QuizMapper quizMapper, TestService testService, UserSubjectScoreService userSubjectScoreService) {
         this.quizService = quizService;
         this.quizMapper = quizMapper;
-        this.topicTestRepository = topicTestRepository;
+        this.testService = testService;
         this.userSubjectScoreService = userSubjectScoreService;
     }
 
@@ -80,17 +79,19 @@ public class QuizController {
         QuizDTO quizDTO = quizMapper.domainToDTO(savedQuiz);
 
         // O quiz so eh adicionado se a taxa de acerto for de 85% para cima
-        if (quizDTO.getAccuracyRate() >= 85.0){
-            Test test = topicTestRepository.findById(topicTestId)
-                    .orElseThrow(() -> new TopicNotFoundException("No topic test found by id: " + topicTestId));
-            test.getSubmittedQuizzes().add(savedQuiz);
-            topicTestRepository.save(test);
+        if (quizDTO.getAccuracyRate() >= 85.0) {
 
-            // AQUI adicionar score
+            Test test = testService.findById(topicTestId);
+
+            test.getSubmittedQuizzes().add(savedQuiz);
+            testService.save(test);
+
             User user = savedQuiz.getUser();
             Subject subject = savedQuiz.getSubject();
 
-            userSubjectScoreService.addScore(user, subject, 100L);
+            long points = userSubjectScoreService.calculate(quizDTO.getAccuracyRate());
+
+            userSubjectScoreService.addScore(user, subject, points);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(savedQuiz, currentUserId));

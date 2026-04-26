@@ -33,4 +33,21 @@ public class UserSubjectScoreService {
 
         userSubjectScoreRepository.save(score);
     }
+
+    public long calculate(double accuracyRate) {
+
+        if (accuracyRate >= 100.0) {
+            return 40L;
+        }
+
+        if (accuracyRate >= 90.0) {
+            return 30L;
+        }
+
+        if (accuracyRate >= 85.0) {
+            return 20L;
+        }
+
+        return 0L;
+    }
 }

@@ -1,6 +1,8 @@
 package com.fabiocondo.repository;
 
 import com.fabiocondo.domain.UserSubjectScore;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.domain.Subject;
@@ -16,16 +18,16 @@ public interface UserSubjectScoreRepository extends JpaRepository<UserSubjectSco
     Optional<UserSubjectScore> findByUserAndSubject(User user, Subject subject);
 
     // Ranking completo da disciplina
-    List<UserSubjectScore> findBySubjectOrderByScoreDesc(Subject subject);
+    //List<UserSubjectScore> findBySubjectOrderByScoreDesc(Subject subject);
 
     // Top 10 da disciplina
-    List<UserSubjectScore> findTop10BySubjectOrderByScoreDesc(Subject subject);
+    //List<UserSubjectScore> findTop10BySubjectOrderByScoreDesc(Subject subject);
 
     // Ranking por subjectId (JPQL compatível Java 8)
-    @Query("SELECT u FROM UserSubjectScore u " +
-            "WHERE u.subject.id = :subjectId " +
-            "ORDER BY u.score DESC")
-    List<UserSubjectScore> getRankingBySubjectId(@Param("subjectId") Long subjectId);
+    //@Query("SELECT u FROM UserSubjectScore u " +
+    //        "WHERE u.subject.id = :subjectId " +
+    //        "ORDER BY u.score DESC")
+    //List<UserSubjectScore> getRankingBySubjectId(@Param("subjectId") Long subjectId);
 
     // Posição do user no ranking
     @Query("SELECT COUNT(u) + 1 FROM UserSubjectScore u " +
@@ -33,4 +35,11 @@ public interface UserSubjectScoreRepository extends JpaRepository<UserSubjectSco
             "AND u.score > :score")
     Long getUserRank(@Param("subjectId") Long subjectId,
                      @Param("score") Long score);
+
+    @Query("SELECT u FROM UserSubjectScore u " +
+            "WHERE u.subject.id = :subjectId " +
+            "ORDER BY u.score DESC")
+    Page<UserSubjectScore> findRankingBySubjectId(
+            @Param("subjectId") Long subjectId,
+            Pageable pageable);
 }

@@ -6,8 +6,10 @@ import com.fabiocondo.dtoMapper.QuizMapper;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.TopicTestRepository;
+import com.fabiocondo.repository.UserSubjectScoreRepository;
 import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.QuizService;
+import com.fabiocondo.service.impl.UserSubjectScoreService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -26,10 +28,13 @@ public class QuizController {
 
     private final TopicTestRepository topicTestRepository;
 
-    public QuizController(QuizService quizService, QuizMapper quizMapper, TopicTestRepository topicTestRepository) {
+    private final UserSubjectScoreService userSubjectScoreService;
+
+    public QuizController(QuizService quizService, QuizMapper quizMapper, TopicTestRepository topicTestRepository, UserSubjectScoreService userSubjectScoreService) {
         this.quizService = quizService;
         this.quizMapper = quizMapper;
         this.topicTestRepository = topicTestRepository;
+        this.userSubjectScoreService = userSubjectScoreService;
     }
 
     @GetMapping("/{id}")
@@ -80,6 +85,12 @@ public class QuizController {
                     .orElseThrow(() -> new TopicNotFoundException("No topic test found by id: " + topicTestId));
             test.getSubmittedQuizzes().add(savedQuiz);
             topicTestRepository.save(test);
+
+            // AQUI adicionar score
+            User user = savedQuiz.getUser();
+            Subject subject = savedQuiz.getSubject();
+
+            userSubjectScoreService.addScore(user, subject, 100L);
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(savedQuiz, currentUserId));

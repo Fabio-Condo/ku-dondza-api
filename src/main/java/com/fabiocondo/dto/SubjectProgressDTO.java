@@ -25,6 +25,10 @@ public class SubjectProgressDTO {
 
     private double currentUserProgressRate;
 
+    private Long currentUserScore = 0L;
+
+    private Long currentUserRank = 0L;
+
     private Long totalTopics;
 
     public Long getId() {
@@ -81,6 +85,22 @@ public class SubjectProgressDTO {
 
     public void setCurrentUserProgressRate(double currentUserProgressRate) {
         this.currentUserProgressRate = currentUserProgressRate;
+    }
+
+    public Long getCurrentUserScore() {
+        return currentUserScore;
+    }
+
+    public void setCurrentUserScore(Long currentUserScore) {
+        this.currentUserScore = currentUserScore;
+    }
+
+    public Long getCurrentUserRank() {
+        return currentUserRank;
+    }
+
+    public void setCurrentUserRank(Long currentUserRank) {
+        this.currentUserRank = currentUserRank;
     }
 
     public Long getTotalTopics() {

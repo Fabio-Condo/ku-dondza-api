@@ -13,6 +13,7 @@ import com.fabiocondo.repository.TopicTestRepository;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.impl.SubjectServiceImpl;
 import com.fabiocondo.service.impl.TopicService;
+import com.fabiocondo.service.impl.UserSubjectScoreService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -29,14 +30,18 @@ public class SubjectMapper {
     private final TopicRepository topicRepository;
     private final TopicService topicService;
     public final TopicTestRepository topicTestRepository;
+
+    private final UserSubjectScoreService userSubjectScoreService;
+
     private final TestMapper testMapper;
 
-    public SubjectMapper(UserRepository userRepository, SubjectServiceImpl subjectService, TopicRepository topicRepository, TopicService topicService, TopicTestRepository topicTestRepository, TestMapper testMapper) {
+    public SubjectMapper(UserRepository userRepository, SubjectServiceImpl subjectService, TopicRepository topicRepository, TopicService topicService, TopicTestRepository topicTestRepository, UserSubjectScoreService userSubjectScoreService, TestMapper testMapper) {
         this.userRepository = userRepository;
         this.subjectService = subjectService;
         this.topicRepository = topicRepository;
         this.topicService = topicService;
         this.topicTestRepository = topicTestRepository;
+        this.userSubjectScoreService = userSubjectScoreService;
         this.testMapper = testMapper;
     }
 
@@ -100,6 +105,11 @@ public class SubjectMapper {
         dto.setSubjectCategory(subject.getCategory());
         dto.setProgressEnabled(subject.isProgressEnabled());
 
+        User user = new User();
+        user.setId(userId);
+        dto.setCurrentUserScore(userSubjectScoreService.getScore(user, subject));
+        dto.setCurrentUserRank(userSubjectScoreService.getUserRank(user, subject));
+
         List<Topic> topics = topicRepository
                 .findBySubjectIdAndEnabledTrueOrderByPositionAsc(subject.getId());
 
@@ -145,6 +155,11 @@ public class SubjectMapper {
                     dto.setSubjectName(subject.getName());
                     dto.setSubjectDescription(subject.getDescription());
                     dto.setSubjectCategory(subject.getCategory());
+
+                    User user = new User();
+                    user.setId(userId);
+                    dto.setCurrentUserScore(userSubjectScoreService.getScore(user, subject));
+                    dto.setCurrentUserRank(userSubjectScoreService.getUserRank(user, subject));
 
                     dto.setProgressEnabled(subject.isProgressEnabled());
 

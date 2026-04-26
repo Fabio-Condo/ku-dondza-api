@@ -34,6 +34,31 @@ public class UserSubjectScoreService {
         userSubjectScoreRepository.save(score);
     }
 
+    public Long getUserRank(User user, Subject subject) {
+
+        UserSubjectScore score = userSubjectScoreRepository
+                .findByUserAndSubject(user, subject)
+                .orElse(null);
+
+        if (score == null) {
+            return null;
+        }
+
+        return userSubjectScoreRepository.getUserRank(
+                subject.getId(),
+                score.getScore()
+        );
+    }
+
+    public Long getScore(User user, Subject subject) {
+
+        UserSubjectScore score = userSubjectScoreRepository
+                .findByUserAndSubject(user, subject)
+                .orElse(null);
+
+        return (score != null) ? score.getScore() : 0L;
+    }
+
     public long calculate(double accuracyRate) {
 
         if (accuracyRate >= 100.0) {

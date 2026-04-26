@@ -1,6 +1,8 @@
 package com.fabiocondo.repository.impl;
 
 import com.fabiocondo.domain.Exam;
+import com.fabiocondo.enumeration.ExamType;
+import com.fabiocondo.enumeration.Institution;
 import com.fabiocondo.repository.filter.ExamFilter;
 import com.fabiocondo.repository.query.ExamRepositoryQuery;
 import org.slf4j.Logger;
@@ -105,12 +107,51 @@ public class ExamRepositoryImpl implements ExamRepositoryQuery {
         }
     }
 
-    public void getSortOrder(ExamFilter examFilter, CriteriaBuilder builder, CriteriaQuery<Exam> criteria, Root<Exam> root){
+    public void getSortOrderOLD(ExamFilter examFilter, CriteriaBuilder builder, CriteriaQuery<Exam> criteria, Root<Exam> root){
         if(Objects.equals(examFilter.getExameOrderBy(), "subject,asc")){
             criteria.orderBy(builder.asc(root.get("subject")));
         }
         if(Objects.equals(examFilter.getExameOrderBy(), "subject,desc")){
             criteria.orderBy(builder.desc(root.get("subject")));
         }
+    }
+
+    public void getSortOrder(ExamFilter examFilter,
+                             CriteriaBuilder builder,
+                             CriteriaQuery<Exam> criteria,
+                             Root<Exam> root) {
+
+        criteria.orderBy(
+
+                // 1º: RESOLUCAO sempre no topo do seu grupo
+                builder.asc(
+                        builder.selectCase()
+                                .when(builder.equal(root.get("examType"), ExamType.RESOLUCAO), 1)
+                                .when(builder.equal(root.get("examType"), ExamType.ENUNCIADO), 2)
+                                .otherwise(3)
+                ),
+
+                // 2º: Disciplina (agrupa por matéria)
+                builder.asc(root.get("subject").get("name")),
+
+                // 3º: Número do exame (agrupa enunciado + resolução)
+                builder.asc(root.get("number")),
+
+                // 4º: Ano (agrupa por ano)
+                builder.desc(root.get("year")),
+
+                // 5º: Instituição
+                builder.asc(
+                        builder.selectCase()
+                                .when(builder.equal(root.get("institution"), Institution.UEM), 1)
+                                .when(builder.equal(root.get("institution"), Institution.UP), 2)
+                                .when(builder.equal(root.get("institution"), Institution.ACIPOL), 3)
+                                .when(builder.equal(root.get("institution"), Institution.AM), 4)
+                                .when(builder.equal(root.get("institution"), Institution.ISCAM), 5)
+                                .when(builder.equal(root.get("institution"), Institution.ISCISA), 6)
+                                .when(builder.equal(root.get("institution"), Institution.UJC), 7)
+                                .otherwise(99)
+                )
+        );
     }
 }

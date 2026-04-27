@@ -17,17 +17,11 @@ public interface UserSubjectScoreRepository extends JpaRepository<UserSubjectSco
     // Buscar score por user + disciplina
     Optional<UserSubjectScore> findByUserAndSubject(User user, Subject subject);
 
-    // Ranking completo da disciplina
-    //List<UserSubjectScore> findBySubjectOrderByScoreDesc(Subject subject);
+    @Query("SELECT COALESCE(SUM(u.score), 0) FROM UserSubjectScore u")
+    Long getTotalScore();
 
-    // Top 10 da disciplina
-    //List<UserSubjectScore> findTop10BySubjectOrderByScoreDesc(Subject subject);
-
-    // Ranking por subjectId (JPQL compatível Java 8)
-    //@Query("SELECT u FROM UserSubjectScore u " +
-    //        "WHERE u.subject.id = :subjectId " +
-    //        "ORDER BY u.score DESC")
-    //List<UserSubjectScore> getRankingBySubjectId(@Param("subjectId") Long subjectId);
+    @Query("SELECT COALESCE(AVG(u.score), 0) FROM UserSubjectScore u")
+    Double getAverageScore();
 
     // Posição do user no ranking
     @Query("SELECT COUNT(u) + 1 FROM UserSubjectScore u " +
@@ -42,4 +36,16 @@ public interface UserSubjectScoreRepository extends JpaRepository<UserSubjectSco
     Page<UserSubjectScore> findRankingBySubjectId(
             @Param("subjectId") Long subjectId,
             Pageable pageable);
+
+    // Ranking completo da disciplina
+    //List<UserSubjectScore> findBySubjectOrderByScoreDesc(Subject subject);
+
+    // Top 10 da disciplina
+    //List<UserSubjectScore> findTop10BySubjectOrderByScoreDesc(Subject subject);
+
+    // Ranking por subjectId (JPQL compatível Java 8)
+    //@Query("SELECT u FROM UserSubjectScore u " +
+    //        "WHERE u.subject.id = :subjectId " +
+    //        "ORDER BY u.score DESC")
+    //List<UserSubjectScore> getRankingBySubjectId(@Param("subjectId") Long subjectId);
 }

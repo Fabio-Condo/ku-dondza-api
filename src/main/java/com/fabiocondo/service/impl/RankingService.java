@@ -5,6 +5,7 @@ import com.fabiocondo.domain.User;
 import com.fabiocondo.domain.UserSubjectScore;
 import com.fabiocondo.dto.UserSubjectRankingSummaryDTO;
 import com.fabiocondo.repository.SubjectRepository;
+import com.fabiocondo.repository.TopicRepository;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.repository.UserSubjectScoreRepository;
 import org.springframework.data.domain.Page;
@@ -15,17 +16,16 @@ import org.springframework.stereotype.Service;
 public class RankingService {
 
     private final UserSubjectScoreRepository userSubjectScoreRepository;
-
     private final UserRepository userRepository;
     private final SubjectRepository subjectRepository;
-
+    private final TopicRepository topicRepository;
     private final UserSubjectScoreService userSubjectScoreService;
 
-
-    public RankingService(UserSubjectScoreRepository userSubjectScoreRepository, UserRepository userRepository, SubjectRepository subjectRepository, UserSubjectScoreService userSubjectScoreService) {
+    public RankingService(UserSubjectScoreRepository userSubjectScoreRepository, UserRepository userRepository, SubjectRepository subjectRepository, TopicRepository topicRepository, UserSubjectScoreService userSubjectScoreService) {
         this.userSubjectScoreRepository = userSubjectScoreRepository;
         this.userRepository = userRepository;
         this.subjectRepository = subjectRepository;
+        this.topicRepository = topicRepository;
         this.userSubjectScoreService = userSubjectScoreService;
     }
 
@@ -57,10 +57,10 @@ public class RankingService {
 
         dto.setCurrentUserRank(currentUserRanking);
         dto.setCurrentUserScore(currentUserScore);
-        dto.setTotalTopics(subject.getTopics().size());
+        dto.setTotalTopics(topicRepository.countBySubjectIdAndEnabledTrue(subject.getId()));
 
         dto.setAccuracyRate(20);
-        dto.setAverageScore(30);
+        dto.setAverageScore(userSubjectScoreRepository.getAverageScore());
 
         return dto;
     }

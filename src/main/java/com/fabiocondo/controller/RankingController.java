@@ -4,6 +4,8 @@ import com.fabiocondo.domain.UserSubjectScore;
 import com.fabiocondo.dto.UserSubjectRankingDTO;
 import com.fabiocondo.dto.UserSubjectRankingSummaryDTO;
 import com.fabiocondo.dtoMapper.UserSubjectRankingMapper;
+import com.fabiocondo.exception.domain.SubjectNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.RankingService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +24,7 @@ public class RankingController {
 
     @GetMapping("/subject/{subjectId}")
     public Page<UserSubjectRankingDTO> getRanking(
-            @PathVariable Long subjectId,
+            @PathVariable String subjectId,
             Pageable pageable) {
 
         Page<UserSubjectScore> page =
@@ -33,8 +35,8 @@ public class RankingController {
 
     @GetMapping("/subjects/{subjectId}/users/{userId}/summary")
     public ResponseEntity<UserSubjectRankingSummaryDTO> getSummary(
-            @PathVariable Long subjectId,
-            @PathVariable Long userId) {
+            @PathVariable String subjectId,
+            @PathVariable Long userId) throws SubjectNotFoundException, UserNotFoundException {
 
         return ResponseEntity.ok(
                 rankingService.getRankingSummary(userId, subjectId)

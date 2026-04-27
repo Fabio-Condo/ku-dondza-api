@@ -31,10 +31,10 @@ public interface UserSubjectScoreRepository extends JpaRepository<UserSubjectSco
                      @Param("score") Long score);
 
     @Query("SELECT u FROM UserSubjectScore u " +
-            "WHERE u.subject.id = :subjectId " +
+            "WHERE u.subject.subjectId = :subjectId " +
             "ORDER BY u.score DESC")
     Page<UserSubjectScore> findRankingBySubjectId(
-            @Param("subjectId") Long subjectId,
+            @Param("subjectId") String subjectId,
             Pageable pageable);
 
     // Ranking completo da disciplina

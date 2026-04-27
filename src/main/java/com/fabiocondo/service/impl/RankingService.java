@@ -4,6 +4,8 @@ import com.fabiocondo.domain.Subject;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.domain.UserSubjectScore;
 import com.fabiocondo.dto.UserSubjectRankingSummaryDTO;
+import com.fabiocondo.exception.domain.SubjectNotFoundException;
+import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.SubjectRepository;
 import com.fabiocondo.repository.TopicRepository;
 import com.fabiocondo.repository.UserRepository;
@@ -29,17 +31,17 @@ public class RankingService {
         this.userSubjectScoreService = userSubjectScoreService;
     }
 
-    public Page<UserSubjectScore> getRanking(Long subjectId, Pageable pageable) {
+    public Page<UserSubjectScore> getRanking(String subjectId, Pageable pageable) {
         return userSubjectScoreRepository.findRankingBySubjectId(subjectId, pageable);
     }
 
-    public UserSubjectRankingSummaryDTO getRankingSummary(Long userId, Long subjectId) {
+    public UserSubjectRankingSummaryDTO getRankingSummary(Long userId, String subjectId) throws SubjectNotFoundException, UserNotFoundException {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
-        Subject subject = subjectRepository.findById(subjectId)
-                .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
+        Subject subject = subjectRepository.findSubjectBySubjectId(subjectId)
+                .orElseThrow(() -> new SubjectNotFoundException("Disciplina não encontrada"));
 
         Long currentUserRanking =
                 userSubjectScoreService.getUserRank(user, subject);

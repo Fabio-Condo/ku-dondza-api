@@ -74,4 +74,8 @@ public class UserSubjectScore {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
 }

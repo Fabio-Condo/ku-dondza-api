@@ -3,6 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
+import com.fabiocondo.exception.domain.UserAlreadySubmittedException;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.TopicTestRepository;
 import org.slf4j.Logger;
@@ -34,6 +35,18 @@ public class TestService {
         logger.info("Getting test by id: " + id);
         return topicTestRepository.findById(id)
                 .orElseThrow(() -> new TopicNotFoundException("No test found by id: " + id));
+    }
+
+    public void validateUserHasNotSubmittedQuiz(Long topicTestId, Long userId) throws UserAlreadySubmittedException {
+
+        boolean alreadySubmitted = topicTestRepository
+                .existsQuizInTest(topicTestId, userId);
+
+        if (alreadySubmitted) {
+            throw new UserAlreadySubmittedException(
+                    "Este utilizador já submeteu este teste."
+            );
+        }
     }
 
     public Test save(Test test) {

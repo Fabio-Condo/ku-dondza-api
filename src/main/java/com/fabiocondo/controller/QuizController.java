@@ -5,6 +5,7 @@ import com.fabiocondo.dto.QuizDTO;
 import com.fabiocondo.dtoMapper.QuizMapper;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
+import com.fabiocondo.exception.domain.UserAlreadySubmittedException;
 import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.QuizService;
 import com.fabiocondo.service.impl.TestService;
@@ -72,7 +73,9 @@ public class QuizController {
                                               @RequestParam Set<Long> questionIds,
                                               @RequestParam Set<Long> userAnswerIds,
                                               @RequestParam("topicTestId") Long topicTestId,
-                                              @RequestParam("currentUserId") Long currentUserId) throws TopicNotFoundException {
+                                              @RequestParam("currentUserId") Long currentUserId) throws TopicNotFoundException, UserAlreadySubmittedException {
+
+        testService.validateUserHasNotSubmittedQuiz(currentUserId, topicTestId);
 
         Quiz savedQuiz = quizService.saveQuizTopicTestWithQuestions(quiz, questionIds, userAnswerIds, topicTestId);
 

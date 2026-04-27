@@ -61,8 +61,8 @@ public class RankingService {
         dto.setCurrentUserScore(currentUserScore);
         dto.setTotalTopics(topicRepository.countBySubjectIdAndEnabledTrue(subject.getId()));
 
-        dto.setAccuracyRate(20);
-        dto.setAverageScore(userSubjectScoreRepository.getAverageScore());
+        //dto.setAccuracyRate(20);
+        dto.setAverageScore(userSubjectScoreRepository.getAverageScoreBySubject(subject.getId()));
 
         return dto;
     }

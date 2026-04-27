@@ -17,11 +17,15 @@ public interface UserSubjectScoreRepository extends JpaRepository<UserSubjectSco
     // Buscar score por user + disciplina
     Optional<UserSubjectScore> findByUserAndSubject(User user, Subject subject);
 
-    @Query("SELECT COALESCE(SUM(u.score), 0) FROM UserSubjectScore u")
-    Long getTotalScore();
+    @Query("SELECT COALESCE(SUM(u.score), 0) " +
+            "FROM UserSubjectScore u " +
+            "WHERE u.subject.id = :subjectId")
+    Long getTotalScoreBySubject(@Param("subjectId") Long subjectId);
 
-    @Query("SELECT COALESCE(AVG(u.score), 0) FROM UserSubjectScore u")
-    Double getAverageScore();
+    @Query("SELECT COALESCE(AVG(u.score), 0) " +
+            "FROM UserSubjectScore u " +
+            "WHERE u.subject.id = :subjectId")
+    Double getAverageScoreBySubject(@Param("subjectId") Long subjectId);
 
     // Posição do user no ranking
     @Query("SELECT COUNT(u) + 1 FROM UserSubjectScore u " +

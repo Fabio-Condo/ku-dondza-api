@@ -25,10 +25,19 @@ public class UserSubjectScoreService {
                     s.setUser(user);
                     s.setSubject(subject);
                     s.setScore(0L);
+                    s.setTestsCompleted(0L); // importante
                     return s;
                 });
 
+        // incrementa score
         score.setScore(score.getScore() + points);
+
+        // incrementa testes finalizados
+        if (score.getTestsCompleted() == null) {
+            score.setTestsCompleted(0L);
+        }
+        score.setTestsCompleted(score.getTestsCompleted() + 1);
+
         score.setUpdatedAt(new Date());
 
         userSubjectScoreRepository.save(score);

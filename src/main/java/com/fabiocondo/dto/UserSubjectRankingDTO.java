@@ -6,6 +6,7 @@ public class UserSubjectRankingDTO {
     private String fullName;
     private String profileImageUrl;
     private Long score;
+    private Long testsCompleted;
     private Double accuracyRate;
 
     public UserSubjectRankingDTO() {}
@@ -14,12 +15,12 @@ public class UserSubjectRankingDTO {
                                  String fullName,
                                  String profileImageUrl,
                                  Long score,
-                                 Double accuracyRate) {
+                                 Long testsCompleted) {
         this.userId = userId;
         this.fullName = fullName;
         this.profileImageUrl = profileImageUrl;
         this.score = score;
-        this.accuracyRate = accuracyRate;
+        this.testsCompleted = testsCompleted;
     }
 
     public UserSubjectRankingDTO(Long userId, String fullName, String profileImageUrl, Long score) {
@@ -59,6 +60,14 @@ public class UserSubjectRankingDTO {
 
     public void setScore(Long score) {
         this.score = score;
+    }
+
+    public Long getTestsCompleted() {
+        return testsCompleted;
+    }
+
+    public void setTestsCompleted(Long testsCompleted) {
+        this.testsCompleted = testsCompleted;
     }
 
     public Double getAccuracyRate() {

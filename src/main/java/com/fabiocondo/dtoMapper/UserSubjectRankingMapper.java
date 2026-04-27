@@ -14,7 +14,7 @@ public class UserSubjectRankingMapper {
                 entity.getUser().getFullName(),
                 entity.getUser().getProfileImageUrl(),
                 entity.getScore(),
-                10D // Calcular a taxa de testes finalizados
+                entity.getTestsCompleted()
         );
     }
 }

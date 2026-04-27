@@ -27,15 +27,18 @@ public class UserSubjectScore {
     @Column(nullable = false)
     private Long score = 0L;
 
+    private Long testsCompleted = 0L;
+
     private Date updatedAt;
 
     public UserSubjectScore() {
     }
 
-    public UserSubjectScore(User user, Subject subject, Long score, Date updatedAt) {
+    public UserSubjectScore(User user, Subject subject, Long score, Long testsCompleted, Date updatedAt) {
         this.user = user;
         this.subject = subject;
         this.score = score;
+        this.testsCompleted = testsCompleted;
         this.updatedAt = updatedAt;
     }
 
@@ -69,6 +72,14 @@ public class UserSubjectScore {
 
     public void setScore(Long score) {
         this.score = score;
+    }
+
+    public Long getTestsCompleted() {
+        return testsCompleted;
+    }
+
+    public void setTestsCompleted(Long testsCompleted) {
+        this.testsCompleted = testsCompleted;
     }
 
     public void setUpdatedAt(Date updatedAt) {

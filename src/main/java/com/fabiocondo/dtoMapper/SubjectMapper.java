@@ -248,64 +248,120 @@ public class SubjectMapper {
         User user = new User();
         user.setId(userId);
 
-        return subjects.stream()
-                .map(subject -> {
+        List<SubjectProgressDTO> result = new ArrayList<>(subjects.size());
 
-                    SubjectProgressDTO dto = new SubjectProgressDTO();
+        for (Subject subject : subjects) {
 
-                    dto.setId(subject.getId());
-                    dto.setSubjectId(subject.getSubjectId());
-                    dto.setSubjectName(subject.getName());
-                    dto.setSubjectDescription(subject.getDescription());
-                    dto.setSubjectCategory(subject.getCategory());
-                    dto.setProgressEnabled(subject.isProgressEnabled());
+            SubjectProgressDTO dto = new SubjectProgressDTO();
 
-                    // trazer tudo em batch já filtrado (evita chamadas repetidas)
-                    List<Topic> topics = topicRepository
-                            .findBySubjectIdAndEnabledTrueOrderByPositionAsc(subject.getId());
+            dto.setId(subject.getId());
+            dto.setSubjectId(subject.getSubjectId());
+            dto.setSubjectName(subject.getName());
+            dto.setSubjectDescription(subject.getDescription());
+            dto.setSubjectCategory(subject.getCategory());
+            dto.setProgressEnabled(subject.isProgressEnabled());
 
-                    List<Test> subjectTests = topicTestRepository
-                            .findByTopicSubjectId(subject.getId());
+            // -------------------------
+            // LOAD DATA
+            // -------------------------
+            List<Topic> topics = topicRepository
+                    .findBySubjectIdAndEnabledTrueOrderByPositionAsc(subject.getId());
 
-                    int totalTests = subjectTests.size();
+            List<Test> subjectTests = topicTestRepository
+                    .findByTopicSubjectId(subject.getId());
 
-                    // otimização: evitar stream aninhado pesado
-                    Set<Long> userSubmittedTestIds = subjectTests.stream()
-                            .filter(t -> t.getSubmittedQuizzes() != null)
-                            .filter(t -> t.getSubmittedQuizzes()
-                                    .stream()
-                                    .anyMatch(q -> q.getUser().getId().equals(userId)))
-                            .map(Test::getId)
-                            .collect(Collectors.toSet());
+            dto.setTotalTopics((long) topics.size());
 
-                    long submittedCount = userSubmittedTestIds.size();
+            // -------------------------
+            // USER COMPLETED TESTS (1 QUERY ONLY)
+            // -------------------------
+            Set<Long> submittedTestIds = new HashSet<>(
+                    topicTestRepository.findCompletedTestIds(userId, subject.getId())
+            );
 
-                    // reduzir chamadas repetidas ao service (cache local por subject)
-                    dto.setCurrentUserScore(
-                            userSubjectScoreService.getScore(user, subject)
-                    );
+            int totalTests = subjectTests.size();
+            long submittedCount = submittedTestIds.size();
 
-                    dto.setCurrentUserRank(
-                            userSubjectScoreService.getUserRank(user, subject)
-                    );
+            // -------------------------
+            // SCORE + RANK
+            // -------------------------
+            dto.setCurrentUserScore(
+                    userSubjectScoreService.getScore(user, subject)
+            );
 
-                    dto.setTotalTopics((long) topics.size());
+            dto.setCurrentUserRank(
+                    userSubjectScoreService.getUserRank(user, subject)
+            );
 
-                    dto.setTopicDtoWithTests(
-                            topics.stream()
-                                    .limit(4)
-                                    .map(topic -> testMapper.mapToTopicTestsDTO(topic, subjectTests, userId))
-                                    .collect(Collectors.toList())
-                    );
+            dto.setCurrentUserProgressRate(
+                    totalTests == 0 ? 0 : (submittedCount * 100.0) / totalTests
+            );
 
-                    dto.setCurrentUserProgressRate(
-                            totalTests == 0 ? 0 : (submittedCount * 100.0) / totalTests
-                    );
+            // -------------------------
+            // GROUP TESTS BY TOPIC
+            // -------------------------
+            Map<Long, List<Test>> testsByTopic = new HashMap<>();
 
-                    return dto;
+            for (Test test : subjectTests) {
 
-                })
-                .collect(Collectors.toList());
+                Long topicId = test.getTopic().getId();
+
+                List<Test> list = testsByTopic.get(topicId);
+
+                if (list == null) {
+                    list = new ArrayList<>();
+                    testsByTopic.put(topicId, list);
+                }
+
+                list.add(test);
+            }
+
+            // -------------------------
+            // MAP TOPICS (LIMIT 3)
+            // -------------------------
+            int maxTopics = Math.min(3, topics.size());
+
+            List<TopicDtoWithTests> topicDTOs = new ArrayList<>(maxTopics);
+
+            for (int i = 0; i < maxTopics; i++) {
+
+                Topic topic = topics.get(i);
+
+                List<Test> topicTests = testsByTopic.get(topic.getId());
+
+                if (topicTests == null) {
+                    topicTests = Collections.emptyList();
+                }
+
+                int topicSize = topicTests.size();
+                long topicCompleted = 0;
+
+                for (Test test : topicTests) {
+                    if (submittedTestIds.contains(test.getId())) {
+                        topicCompleted++;
+                    }
+                }
+
+                TopicDtoWithTests tDto = new TopicDtoWithTests();
+                tDto.setTopicId(topic.getId());
+                tDto.setTopicName(topic.getName());
+                tDto.setPremium(topic.isPremium());
+
+                tDto.setProgressRate(
+                        topicSize == 0 ? 0 : (topicCompleted * 100.0) / topicSize
+                );
+
+                tDto.setCompleted(topicSize > 0 && topicCompleted == topicSize);
+
+                topicDTOs.add(tDto);
+            }
+
+            dto.setTopicDtoWithTests(topicDTOs);
+
+            result.add(dto);
+        }
+
+        return result;
     }
 
     public Page<SubjectDto> domainPageToDTOPage(Page<Subject> subjects, Long currentUserId, Pageable pageable) {

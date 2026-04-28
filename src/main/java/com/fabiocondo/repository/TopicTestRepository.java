@@ -24,6 +24,37 @@ public interface TopicTestRepository extends JpaRepository<Test, Long> {
     boolean existsQuizInTest(@Param("topicTestId") Long topicTestId,
                              @Param("userId") Long userId);
 
+    List<Test> findByTopicSubjectId(Long subjectId);
+
+    @Query("SELECT q " +
+            "FROM Test t " +
+            "JOIN t.submittedQuizzes q " +
+            "WHERE t.id = :testId " +
+            "AND q.user.id = :userId")
+    Optional<Quiz> findUserQuizByTest(@Param("testId") Long testId,
+                                      @Param("userId") Long userId);
+
+    @Query("SELECT COUNT(DISTINCT t.id) " +
+            "FROM Test t JOIN t.submittedQuizzes q " +
+            "WHERE q.user.id = :userId " +
+            "AND t.topic.subject.id = :subjectId")
+    Long countCompletedTestsByUserAndSubject(@Param("userId") Long userId,
+                                             @Param("subjectId") Long subjectId);
+
+    @Query("SELECT DISTINCT t.id " +
+            "FROM Test t " +
+            "JOIN t.submittedQuizzes q " +
+            "WHERE q.user.id = :userId " +
+            "AND t.topic.subject.id = :subjectId")
+    List<Long> findCompletedTestIds(@Param("userId") Long userId,
+                                    @Param("subjectId") Long subjectId);
+
+    @Query("SELECT t.id, COUNT(q) " +
+            "FROM Test t JOIN t.questions q " +
+            "WHERE t.topic.subject.id = :subjectId " +
+            "GROUP BY t.id")
+    List<Object[]> countQuestionsPerTest(@Param("subjectId") Long subjectId);
+
     //@Query("SELECT q FROM Test tt JOIN tt.submittedQuizzes q " + "WHERE tt.id IN :topicTestIds AND q.user.id = :userId")
     //List<Quiz> findUserQuizzesByTopicTests(@Param("topicTestIds") List<Long> topicTestIds, @Param("userId") Long userId);
 }

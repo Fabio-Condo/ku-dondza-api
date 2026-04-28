@@ -1,11 +1,9 @@
 package com.fabiocondo.dtoMapper;
 
-import com.fabiocondo.domain.Subject;
-import com.fabiocondo.domain.Test;
-import com.fabiocondo.domain.Topic;
-import com.fabiocondo.domain.User;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.SubjectDto;
 import com.fabiocondo.dto.SubjectProgressDTO;
+import com.fabiocondo.dto.TestDTO;
 import com.fabiocondo.dto.TopicDtoWithTests;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.TopicRepository;
@@ -94,10 +92,8 @@ public class SubjectMapper {
 
     public SubjectProgressDTO mapSubjectToProgressDTO(Subject subject, Long userId) {
 
-        //List<Test> allTests = topicTestRepository.findAll();
-        List<Test> allTests = topicTestRepository.findBySubjectId(subject.getId());
-
         SubjectProgressDTO dto = new SubjectProgressDTO();
+
         dto.setId(subject.getId());
         dto.setSubjectId(subject.getSubjectId());
         dto.setSubjectName(subject.getName());
@@ -107,91 +103,176 @@ public class SubjectMapper {
 
         User user = new User();
         user.setId(userId);
-        dto.setCurrentUserScore(userSubjectScoreService.getScore(user, subject));
-        dto.setCurrentUserRank(userSubjectScoreService.getUserRank(user, subject));
 
+        // SCORE + RANK
+        dto.setCurrentUserScore(
+                userSubjectScoreService.getScore(user, subject)
+        );
+
+        dto.setCurrentUserRank(
+                userSubjectScoreService.getUserRank(user, subject)
+        );
+
+        // TOPICS
         List<Topic> topics = topicRepository
                 .findBySubjectIdAndEnabledTrueOrderByPositionAsc(subject.getId());
 
-        List<TopicDtoWithTests> topicDTOs = topics.stream()
-                .map(topic -> testMapper.mapToTopicTestsDTOWithTests(topic, allTests, userId))
-                .collect(Collectors.toList());
-
-        dto.setTopicDtoWithTests(topicDTOs);
-
         dto.setTotalTopics((long) topics.size());
 
-        // 👇 agora consistente com allTests
-        List<Test> subjectTests = allTests.stream()
-                .filter(test -> test.getTopic().getSubject().getId().equals(subject.getId()))
-                .collect(Collectors.toList());
+        // TESTS (única fonte)
+        List<Test> testsBySubject = topicTestRepository
+                .findBySubjectId(subject.getId());
 
-        long submittedCount = subjectTests.stream()
-                .filter(test -> test.getSubmittedQuizzes()
-                        .stream()
-                        .anyMatch(q -> q.getUser().getId().equals(userId)))
-                .count();
+        int totalTests = testsBySubject.size();
 
-        double progressRate = subjectTests.isEmpty()
-                ? 0
-                : (submittedCount * 100.0) / subjectTests.size();
+        // COMPLETED TESTS (SQL optimized)
+        List<Long> completedTestIdsList =
+                topicTestRepository.findCompletedTestIds(userId, subject.getId());
 
-        dto.setCurrentUserProgressRate(progressRate);
+        Set<Long> completedTestIds = new HashSet<>(completedTestIdsList);
+
+        long submittedCount = completedTestIds.size();
+
+        dto.setCurrentUserProgressRate(
+                totalTests == 0 ? 0 : (submittedCount * 100.0) / totalTests
+        );
+
+        // GROUP BY TOPIC (usa mesma lista única)
+        Map<Long, List<Test>> testsByTopic = new HashMap<>();
+
+        for (Test test : testsBySubject) {
+            Long topicId = test.getTopic().getId();
+
+            testsByTopic
+                    .computeIfAbsent(topicId, k -> new ArrayList<>())
+                    .add(test);
+        }
+
+        // MAP TOPICS
+        List<TopicDtoWithTests> topicDTOs = new ArrayList<>(topics.size());
+
+        for (Topic topic : topics) {
+
+            List<Test> topicTests = testsByTopic
+                    .getOrDefault(topic.getId(), Collections.emptyList());
+
+            TopicDtoWithTests tDto = new TopicDtoWithTests();
+            tDto.setTopicId(topic.getId());
+            tDto.setTopicName(topic.getName());
+            tDto.setPremium(topic.isPremium());
+
+            int topicSize = topicTests.size();
+            long topicCompleted = 0;
+
+            List<TestDTO> testDTOs = new ArrayList<>(topicSize);
+
+            for (Test test : topicTests) {
+
+                boolean completed = completedTestIds.contains(test.getId());
+
+                if (completed) topicCompleted++;
+
+                TestDTO t = new TestDTO();
+                t.setId(test.getId());
+                t.setDifficultyLevel(test.getDifficultyLevel());
+                t.setOrderIndex(test.getOrderIndex());
+
+                // -------------------------
+                // FIX PROBLEMA 2: questions.size()
+                // -------------------------
+                long questionCount = test.getQuestions() != null
+                        ? test.getQuestions().size()
+                        : 0;
+
+                t.setTotalQuestions(questionCount);
+
+                // USER QUIZ (mantido como está)
+                Optional<Quiz> optionalQuiz =
+                        topicTestRepository.findUserQuizByTest(test.getId(), userId);
+
+                if (optionalQuiz.isPresent()) {
+                    Set<Quiz> set = new HashSet<>();
+                    set.add(optionalQuiz.get());
+                    t.setSubmittedQuizzes(set);
+                }
+
+                testDTOs.add(t);
+            }
+
+            tDto.setTests(testDTOs);
+
+            tDto.setProgressRate(
+                    topicSize == 0 ? 0 : (topicCompleted * 100.0) / topicSize
+            );
+
+            tDto.setCompleted(topicCompleted == topicSize);
+
+            topicDTOs.add(tDto);
+        }
+
+        dto.setTopicDtoWithTests(topicDTOs);
 
         return dto;
     }
 
     public List<SubjectProgressDTO> mapSubjectsToProgressDTOs(List<Subject> subjects, Long userId) {
 
-        // buscar TODOS os testes uma vez (evita N+1)
-        List<Test> allTests = topicTestRepository.findAll();
+        User user = new User();
+        user.setId(userId);
 
         return subjects.stream()
                 .map(subject -> {
 
                     SubjectProgressDTO dto = new SubjectProgressDTO();
+
                     dto.setId(subject.getId());
                     dto.setSubjectId(subject.getSubjectId());
                     dto.setSubjectName(subject.getName());
                     dto.setSubjectDescription(subject.getDescription());
                     dto.setSubjectCategory(subject.getCategory());
-
-                    User user = new User();
-                    user.setId(userId);
-                    dto.setCurrentUserScore(userSubjectScoreService.getScore(user, subject));
-                    dto.setCurrentUserRank(userSubjectScoreService.getUserRank(user, subject));
-
                     dto.setProgressEnabled(subject.isProgressEnabled());
 
-                    // buscar tópicos da disciplina
+                    // trazer tudo em batch já filtrado (evita chamadas repetidas)
                     List<Topic> topics = topicRepository
                             .findBySubjectIdAndEnabledTrueOrderByPositionAsc(subject.getId());
 
-                    // limitar a 3 tópicos + reutilizar teu método
-                    List<TopicDtoWithTests> topicDTOs = topics.stream()
-                            .limit(3)
-                            .map(topic -> testMapper.mapToTopicTestsDTO(topic, allTests, userId)).collect(Collectors.toList());
+                    List<Test> subjectTests = topicTestRepository
+                            .findByTopicSubjectId(subject.getId());
 
-                    dto.setTopicDtoWithTests(topicDTOs);
+                    int totalTests = subjectTests.size();
+
+                    // otimização: evitar stream aninhado pesado
+                    Set<Long> userSubmittedTestIds = subjectTests.stream()
+                            .filter(t -> t.getSubmittedQuizzes() != null)
+                            .filter(t -> t.getSubmittedQuizzes()
+                                    .stream()
+                                    .anyMatch(q -> q.getUser().getId().equals(userId)))
+                            .map(Test::getId)
+                            .collect(Collectors.toSet());
+
+                    long submittedCount = userSubmittedTestIds.size();
+
+                    // reduzir chamadas repetidas ao service (cache local por subject)
+                    dto.setCurrentUserScore(
+                            userSubjectScoreService.getScore(user, subject)
+                    );
+
+                    dto.setCurrentUserRank(
+                            userSubjectScoreService.getUserRank(user, subject)
+                    );
 
                     dto.setTotalTopics((long) topics.size());
 
-                    // calcular progresso TOTAL da disciplina (reutilizando lógica)
-                    List<Test> subjectTests = allTests.stream()
-                            .filter(test -> test.getTopic().getSubject().getId().equals(subject.getId()))
-                            .collect(Collectors.toList());
+                    dto.setTopicDtoWithTests(
+                            topics.stream()
+                                    .limit(4)
+                                    .map(topic -> testMapper.mapToTopicTestsDTO(topic, subjectTests, userId))
+                                    .collect(Collectors.toList())
+                    );
 
-                    long submittedCount = subjectTests.stream()
-                            .filter(test -> test.getSubmittedQuizzes()
-                                    .stream()
-                                    .anyMatch(q -> q.getUser().getId().equals(userId)))
-                            .count();
-
-                    double progressRate = subjectTests.isEmpty()
-                            ? 0
-                            : (submittedCount * 100.0) / subjectTests.size();
-
-                    dto.setCurrentUserProgressRate(progressRate);
+                    dto.setCurrentUserProgressRate(
+                            totalTests == 0 ? 0 : (submittedCount * 100.0) / totalTests
+                    );
 
                     return dto;
 

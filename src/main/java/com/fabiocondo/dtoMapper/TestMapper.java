@@ -77,7 +77,8 @@ public class TestMapper {
         return dto;
     }
 
-    TopicDtoWithTests mapToTopicTestsDTOWithTests(Topic topic, List<Test> allTests, Long userId) {
+    // PAREI DE USAR NO mapSubjectToProgressDTO
+    TopicDtoWithTests mapToTopicTestsDTOWithTests(Topic topic, List<Test> topicTests, Long userId) {
 
         TopicDtoWithTests dto = new TopicDtoWithTests();
 
@@ -85,51 +86,44 @@ public class TestMapper {
         dto.setTopicName(topic.getName());
         dto.setPremium(topic.isPremium());
 
-        // filtrar testes do tópico
-        List<Test> topicTests = allTests.stream()
-                .filter(test -> test.getTopic().getId().equals(topic.getId()))
-                .sorted(Comparator.comparingInt(Test::getOrderIndex))
-                .collect(Collectors.toList());
-
-        // converter para DTO completo
         List<TestDTO> testDTOs = topicTests.stream()
+                .sorted(Comparator.comparingInt(Test::getOrderIndex))
                 .map(test -> {
+
                     TestDTO t = new TestDTO();
                     t.setId(test.getId());
                     t.setDifficultyLevel(test.getDifficultyLevel());
                     t.setOrderIndex(test.getOrderIndex());
                     t.setTotalQuestions((long) test.getQuestions().size());
 
-                    // buscar APENAS o quiz do user atual
-                    Optional<Quiz> userQuiz =
-                            topicTestRepository.findUserQuizByTopicTest(test.getId(), userId);
+                    // AGORA EVITA QUERY
+                    boolean completed = test.getSubmittedQuizzes()
+                            .stream()
+                            .anyMatch(q -> q.getUser().getId().equals(userId));
 
-                    userQuiz.ifPresent(quiz -> {
-                        Set<Quiz> quizzes = new HashSet<>();
-                        quizzes.add(quiz);
-                        t.setSubmittedQuizzes(quizzes);
-                    });
+                    if (completed) {
+                        Set<Quiz> set = new HashSet<>();
+                        set.addAll(test.getSubmittedQuizzes());
+                        t.setSubmittedQuizzes(set);
+                    }
 
-                    //t.setSubmittedQuizzes(test.getSubmittedQuizzes());
-                    //t.setAccuracyRate(accuracyRate);
                     return t;
                 })
                 .collect(Collectors.toList());
 
         dto.setTests(testDTOs);
 
-        // progresso do tópico
         long submittedCount = topicTests.stream()
-                .filter(test -> test.getSubmittedQuizzes()
+                .filter(t -> t.getSubmittedQuizzes()
                         .stream()
                         .anyMatch(q -> q.getUser().getId().equals(userId)))
                 .count();
 
-        double progressRate = topicTests.isEmpty()
-                ? 0
-                : (submittedCount * 100.0) / topicTests.size();
+        dto.setProgressRate(
+                topicTests.isEmpty() ? 0 :
+                        (submittedCount * 100.0) / topicTests.size()
+        );
 
-        dto.setProgressRate(progressRate);
         dto.setCompleted(submittedCount == topicTests.size());
 
         return dto;

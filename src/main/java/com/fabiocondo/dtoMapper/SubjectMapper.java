@@ -105,13 +105,8 @@ public class SubjectMapper {
         user.setId(userId);
 
         // SCORE + RANK
-        dto.setCurrentUserScore(
-                userSubjectScoreService.getScore(user, subject)
-        );
-
-        dto.setCurrentUserRank(
-                userSubjectScoreService.getUserRank(user, subject)
-        );
+        dto.setCurrentUserScore(userSubjectScoreService.getScore(user, subject));
+        dto.setCurrentUserRank(userSubjectScoreService.getUserRank(user, subject));
 
         // TOPICS
         List<Topic> topics = topicRepository
@@ -119,7 +114,7 @@ public class SubjectMapper {
 
         dto.setTotalTopics((long) topics.size());
 
-        // TESTS (única fonte)
+        // TESTS
         List<Test> testsBySubject = topicTestRepository
                 .findBySubjectId(subject.getId());
 
@@ -137,7 +132,44 @@ public class SubjectMapper {
                 totalTests == 0 ? 0 : (submittedCount * 100.0) / totalTests
         );
 
-        // GROUP BY TOPIC (usa mesma lista única)
+        // -----------------------------
+        // QUESTIONS COUNT (BATCH)
+        // -----------------------------
+        List<Long> testIds = new ArrayList<>(testsBySubject.size());
+        for (Test t : testsBySubject) {
+            testIds.add(t.getId());
+        }
+
+        Map<Long, Long> questionsCountMap = new HashMap<>();
+
+        if (!testIds.isEmpty()) {
+            List<Object[]> results =
+                    topicTestRepository.countQuestionsByTestIds(testIds);
+
+            for (Object[] row : results) {
+                Long testId = ((Number) row[0]).longValue();
+                Long count = ((Number) row[1]).longValue();
+                questionsCountMap.put(testId, count);
+            }
+        }
+
+        // -----------------------------
+        // QUIZZES (BATCH - FIX N+1)
+        // -----------------------------
+        Map<Long, Quiz> quizByTestId = new HashMap<>();
+
+        List<Object[]> quizResults =
+                topicTestRepository.findUserQuizzesBySubjectGrouped(subject.getId(), userId);
+
+        for (Object[] row : quizResults) {
+            Long testId = ((Number) row[0]).longValue();
+            Quiz quiz = (Quiz) row[1];
+            quizByTestId.put(testId, quiz);
+        }
+
+        // -----------------------------
+        // GROUP BY TOPIC
+        // -----------------------------
         Map<Long, List<Test>> testsByTopic = new HashMap<>();
 
         for (Test test : testsBySubject) {
@@ -148,7 +180,9 @@ public class SubjectMapper {
                     .add(test);
         }
 
+        // -----------------------------
         // MAP TOPICS
+        // -----------------------------
         List<TopicDtoWithTests> topicDTOs = new ArrayList<>(topics.size());
 
         for (Topic topic : topics) {
@@ -177,22 +211,16 @@ public class SubjectMapper {
                 t.setDifficultyLevel(test.getDifficultyLevel());
                 t.setOrderIndex(test.getOrderIndex());
 
-                // -------------------------
-                // FIX PROBLEMA 2: questions.size()
-                // -------------------------
-                long questionCount = test.getQuestions() != null
-                        ? test.getQuestions().size()
-                        : 0;
+                // QUESTIONS (MAP - sem query)
+                Long questionCount = questionsCountMap.get(test.getId());
+                t.setTotalQuestions(questionCount != null ? questionCount : 0);
 
-                t.setTotalQuestions(questionCount);
+                // QUIZ (MAP - sem query)
+                Quiz userQuiz = quizByTestId.get(test.getId());
 
-                // USER QUIZ (mantido como está)
-                Optional<Quiz> optionalQuiz =
-                        topicTestRepository.findUserQuizByTest(test.getId(), userId);
-
-                if (optionalQuiz.isPresent()) {
+                if (userQuiz != null) {
                     Set<Quiz> set = new HashSet<>();
-                    set.add(optionalQuiz.get());
+                    set.add(userQuiz);
                     t.setSubmittedQuizzes(set);
                 }
 

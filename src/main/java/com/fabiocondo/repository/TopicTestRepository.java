@@ -26,6 +26,36 @@ public interface TopicTestRepository extends JpaRepository<Test, Long> {
 
     List<Test> findByTopicSubjectId(Long subjectId);
 
+    @Query("SELECT DISTINCT t.id " +
+            "FROM Test t " +
+            "JOIN t.submittedQuizzes q " +
+            "WHERE q.user.id = :userId " +
+            "AND t.topic.subject.id = :subjectId")
+    List<Long> findCompletedTestIds(@Param("userId") Long userId,
+                                    @Param("subjectId") Long subjectId);
+
+    @Query(value =
+            "SELECT test_id, COUNT(*) " +
+                    "FROM test_questions " +
+                    "WHERE test_id IN :testIds " +
+                    "GROUP BY test_id",
+            nativeQuery = true)
+    List<Object[]> countQuestionsByTestIds(@Param("testIds") List<Long> testIds);
+
+    @Query("SELECT t.id, q " +
+            "FROM Test t " +
+            "JOIN t.submittedQuizzes q " +
+            "WHERE t.topic.subject.id = :subjectId " +
+            "AND q.user.id = :userId")
+    List<Object[]> findUserQuizzesBySubjectGrouped(@Param("subjectId") Long subjectId,
+                                                   @Param("userId") Long userId);
+
+    @Query(value = "SELECT COUNT(*) " +
+            "FROM test_questions " +
+            "WHERE test_id = :testId",
+            nativeQuery = true)
+    Long countQuestionsByTest(@Param("testId") Long testId);
+
     @Query("SELECT q " +
             "FROM Test t " +
             "JOIN t.submittedQuizzes q " +
@@ -40,20 +70,6 @@ public interface TopicTestRepository extends JpaRepository<Test, Long> {
             "AND t.topic.subject.id = :subjectId")
     Long countCompletedTestsByUserAndSubject(@Param("userId") Long userId,
                                              @Param("subjectId") Long subjectId);
-
-    @Query("SELECT DISTINCT t.id " +
-            "FROM Test t " +
-            "JOIN t.submittedQuizzes q " +
-            "WHERE q.user.id = :userId " +
-            "AND t.topic.subject.id = :subjectId")
-    List<Long> findCompletedTestIds(@Param("userId") Long userId,
-                                    @Param("subjectId") Long subjectId);
-
-    @Query("SELECT t.id, COUNT(q) " +
-            "FROM Test t JOIN t.questions q " +
-            "WHERE t.topic.subject.id = :subjectId " +
-            "GROUP BY t.id")
-    List<Object[]> countQuestionsPerTest(@Param("subjectId") Long subjectId);
 
     //@Query("SELECT q FROM Test tt JOIN tt.submittedQuizzes q " + "WHERE tt.id IN :topicTestIds AND q.user.id = :userId")
     //List<Quiz> findUserQuizzesByTopicTests(@Param("topicTestIds") List<Long> topicTestIds, @Param("userId") Long userId);

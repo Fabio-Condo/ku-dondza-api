@@ -1,18 +1,22 @@
 package com.fabiocondo.service.impl;
 
+import com.fabiocondo.aws.model.S3UploadResponse;
+import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
+import com.fabiocondo.enumeration.Category;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.SubjectRepository;
 import com.fabiocondo.repository.TopicContentRepository;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.SubjectService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,13 +30,18 @@ public class SubjectServiceImpl implements SubjectService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private static final String BUCKET_NAME = "dikahub-subject-bucket";
+
+    private final AmazonS3Service amazonS3Service;
+
     SubjectRepository subjectRepository;
 
     UserRepository userRepository;
 
     private final TopicContentRepository contentRepository;
 
-    public SubjectServiceImpl(SubjectRepository subjectRepository, UserRepository userRepository, TopicContentRepository contentRepository) {
+    public SubjectServiceImpl(AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, UserRepository userRepository, TopicContentRepository contentRepository) {
+        this.amazonS3Service = amazonS3Service;
         this.subjectRepository = subjectRepository;
         this.userRepository = userRepository;
         this.contentRepository = contentRepository;
@@ -106,16 +115,53 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public Subject save(Subject subject) {
+    public Subject save(String name, String description, Category category, boolean quizEnabled, boolean courseEnabled, boolean progressEnabled, boolean examEnabled, MultipartFile file) {
+        logger.info("Uploading file: " + file.getOriginalFilename());
+        //String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+        String fileKey = "subject_image_profile_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
+
+        Subject subject = new Subject();
         subject.setSubjectId(UUID.randomUUID().toString());
+        subject.setName(name);
+        subject.setDescription(description);
+        subject.setCategory(category);
+        subject.setQuizEnabled(quizEnabled);
+        subject.setCourseEnabled(courseEnabled);
+        subject.setProgressEnabled(progressEnabled);
+        subject.setExamEnabled(examEnabled);
+        subject.setUrlFile(s3UploadResponse.getFileUrl());
+        subject.setFileName(fileKey);
+
+        logger.info("Saving new subject: " + subject.getName());
         return subjectRepository.save(subject);
     }
 
     @Override
-    public Subject update(Subject subject, Long id) throws SubjectNotFoundException {
+    public Subject update(Long id, String name, String description, Category category, boolean quizEnabled, boolean courseEnabled, boolean progressEnabled, boolean examEnabled, MultipartFile file) throws SubjectNotFoundException {
         Subject existSubject = findById(id);
-        BeanUtils.copyProperties(subject, existSubject, "id", "subjectId", "topics", "students");
-        logger.info("Updating subject: " + subject.getName());
+        existSubject.setName(name);
+        existSubject.setDescription(description);
+        existSubject.setCategory(category);
+        existSubject.setQuizEnabled(quizEnabled);
+        existSubject.setCourseEnabled(courseEnabled);
+        existSubject.setProgressEnabled(progressEnabled);
+        existSubject.setExamEnabled(examEnabled);
+
+        // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
+        if (file != null) {
+            if (existSubject.getFileName() != null) {
+                logger.info("Deleting file: " + existSubject.getFileName());
+                amazonS3Service.deleteFile(existSubject.getFileName(), BUCKET_NAME);
+            }
+            //String newFileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            String newFileKey = "subject_image_profile_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, newFileKey);
+            existSubject.setUrlFile(s3UploadResponse.getFileUrl());
+            existSubject.setFileName(newFileKey);
+        }
+
+        logger.info("Updating subject: " + existSubject.getName());
         return subjectRepository.save(existSubject);
     }
 

@@ -50,6 +50,8 @@ public class SubjectMapper {
         subjectDto.setName(subject.getName());
         subjectDto.setDescription(subject.getDescription());
         subjectDto.setCategory(subject.getCategory());
+        subjectDto.setFileName(subject.getFileName());
+        subjectDto.setUrlFile(subject.getUrlFile());
         subjectDto.setTotalTopics(topicRepository.countBySubjectIdAndEnabledTrue(subject.getId()));
 
         subjectDto.setExamEnabled(subject.isExamEnabled());
@@ -72,6 +74,8 @@ public class SubjectMapper {
         subjectDto.setName(subject.getName());
         subjectDto.setDescription(subject.getDescription());
         subjectDto.setCategory(subject.getCategory());
+        subjectDto.setFileName(subject.getFileName());
+        subjectDto.setUrlFile(subject.getUrlFile());
 
         subjectDto.setExamEnabled(subject.isExamEnabled());
         subjectDto.setCourseEnabled(subject.isCourseEnabled());

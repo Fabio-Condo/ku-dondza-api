@@ -5,6 +5,7 @@ import com.fabiocondo.domain.Subject;
 import com.fabiocondo.dto.SubjectDto;
 import com.fabiocondo.dto.SubjectProgressDTO;
 import com.fabiocondo.dtoMapper.SubjectMapper;
+import com.fabiocondo.enumeration.Category;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.SubjectServiceImpl;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -60,13 +62,32 @@ public class SubjectController {
     }
 
     @PostMapping
-    public ResponseEntity<Subject> save(@RequestBody Subject subject) throws SubjectNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.save(subject));
+    public ResponseEntity<Subject> save(@RequestParam("name") String name,
+                                         @RequestParam("description") String description,
+                                         @RequestParam("category") Category category,
+                                         @RequestParam("quizEnabled") boolean quizEnabled,
+                                         @RequestParam("courseEnabled") boolean courseEnabled,
+                                         @RequestParam("progressEnabled") boolean progressEnabled,
+                                         @RequestParam("examEnabled") boolean examEnabled,
+                                         @RequestParam("file") MultipartFile file) {
+
+        return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.save(name, description, category, quizEnabled, courseEnabled, progressEnabled, examEnabled, file));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Subject> update(@PathVariable("id") Long id, @RequestBody Subject subject) throws SubjectNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.update(subject, id));
+    @PutMapping
+    public ResponseEntity<Subject> update(@RequestParam("id") Long id,
+                                           @RequestParam("name") String name,
+                                           @RequestParam("description") String description,
+                                           @RequestParam("category") Category category,
+
+                                           @RequestParam("quizEnabled") boolean quizEnabled,
+                                           @RequestParam("courseEnabled") boolean courseEnabled,
+                                           @RequestParam("progressEnabled") boolean progressEnabled,
+                                           @RequestParam("examEnabled") boolean examEnabled,
+
+                                           @RequestParam(value = "file", required = false) MultipartFile file) throws SubjectNotFoundException {
+
+        return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.update(id, name, description, category, quizEnabled, courseEnabled, progressEnabled, examEnabled,file));
     }
 
     @GetMapping("/total")

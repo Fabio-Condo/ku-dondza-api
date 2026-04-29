@@ -21,6 +21,10 @@ public class SubjectDto {
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    private String fileName;
+
+    private String urlFile;
+
     // CONTROLO DE MÓDULOS
     private boolean quizEnabled;
     private boolean courseEnabled;
@@ -72,6 +76,22 @@ public class SubjectDto {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getUrlFile() {
+        return urlFile;
+    }
+
+    public void setUrlFile(String urlFile) {
+        this.urlFile = urlFile;
     }
 
     public double getCurrentUserMarkedContentRate() {

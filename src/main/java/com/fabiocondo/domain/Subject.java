@@ -26,6 +26,10 @@ public class Subject {
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    private String fileName;
+
+    private String urlFile;
+
     // CONTROLO DE MÓDULOS
     private boolean quizEnabled;
     private boolean courseEnabled;
@@ -95,6 +99,22 @@ public class Subject {
 
     public void setTopics(List<Topic> topics) {
         this.topics = topics;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getUrlFile() {
+        return urlFile;
+    }
+
+    public void setUrlFile(String urlFile) {
+        this.urlFile = urlFile;
     }
 
     public boolean isQuizEnabled() {

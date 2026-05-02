@@ -6,6 +6,7 @@ import com.fabiocondo.dto.SubjectProgressDTO;
 import com.fabiocondo.dto.TestDTO;
 import com.fabiocondo.dto.TopicDtoWithTests;
 import com.fabiocondo.exception.domain.UserNotFoundException;
+import com.fabiocondo.repository.QuizRepository;
 import com.fabiocondo.repository.TopicRepository;
 import com.fabiocondo.repository.TopicTestRepository;
 import com.fabiocondo.repository.UserRepository;
@@ -30,18 +31,21 @@ public class SubjectMapper {
     private final TopicService topicService;
     public final TopicTestRepository topicTestRepository;
     private final QuizService quizService;
+    private final QuizRepository quizRepository;
+
 
     private final UserSubjectScoreService userSubjectScoreService;
 
     private final TestMapper testMapper;
 
-    public SubjectMapper(UserRepository userRepository, SubjectServiceImpl subjectService, TopicRepository topicRepository, TopicService topicService, TopicTestRepository topicTestRepository, QuizService quizService, UserSubjectScoreService userSubjectScoreService, TestMapper testMapper) {
+    public SubjectMapper(UserRepository userRepository, SubjectServiceImpl subjectService, TopicRepository topicRepository, TopicService topicService, TopicTestRepository topicTestRepository, QuizService quizService, QuizRepository quizRepository, UserSubjectScoreService userSubjectScoreService, TestMapper testMapper) {
         this.userRepository = userRepository;
         this.subjectService = subjectService;
         this.topicRepository = topicRepository;
         this.topicService = topicService;
         this.topicTestRepository = topicTestRepository;
         this.quizService = quizService;
+        this.quizRepository = quizRepository;
         this.userSubjectScoreService = userSubjectScoreService;
         this.testMapper = testMapper;
     }
@@ -142,7 +146,7 @@ public class SubjectMapper {
         // -----------------------------
         // QUESTIONS COUNT (BATCH)
         // -----------------------------
-        List<Long> testIds = new ArrayList<>(testsBySubject.size());
+        List<Long> testIds = new ArrayList<>();
 
         for (Test t : testsBySubject) {
             testIds.add(t.getId());
@@ -163,7 +167,7 @@ public class SubjectMapper {
         }
 
         // -----------------------------
-        // QUIZZES (BATCH - FIX N+1)
+        // QUIZZES (BATCH)
         // -----------------------------
         Map<Long, Quiz> quizByTestId = new HashMap<>();
 
@@ -179,6 +183,12 @@ public class SubjectMapper {
 
             quizByTestId.put(testId, quiz);
         }
+
+        // -----------------------------
+        // ACCURACY MAP (NEW)
+        // -----------------------------
+        Map<Long, Double> accuracyByQuizId =
+                getQuizAccuracyRates(userId, subject.getId());
 
         // -----------------------------
         // GROUP TESTS BY TOPIC
@@ -202,10 +212,7 @@ public class SubjectMapper {
         for (Topic topic : topics) {
 
             List<Test> topicTests = testsByTopic
-                    .getOrDefault(
-                            topic.getId(),
-                            Collections.emptyList()
-                    );
+                    .getOrDefault(topic.getId(), Collections.emptyList());
 
             TopicDtoWithTests tDto = new TopicDtoWithTests();
             tDto.setTopicId(topic.getId());
@@ -229,39 +236,35 @@ public class SubjectMapper {
 
                 TestDTO testDTO = new TestDTO();
                 testDTO.setId(test.getId());
-                testDTO.setDifficultyLevel(
-                        test.getDifficultyLevel()
-                );
-                testDTO.setOrderIndex(
-                        test.getOrderIndex()
-                );
+                testDTO.setDifficultyLevel(test.getDifficultyLevel());
+                testDTO.setOrderIndex(test.getOrderIndex());
 
-                // QUESTIONS (SEM QUERY EXTRA)
+                // QUESTIONS
                 Long questionCount =
                         questionsCountMap.get(test.getId());
 
                 testDTO.setTotalQuestions(
-                        questionCount != null
-                                ? questionCount
-                                : 0
+                        questionCount != null ? questionCount : 0
                 );
 
-                // QUIZ (SEM QUERY EXTRA)
+                // QUIZ + ACCURACY (O(1) lookup)
                 Quiz userQuiz =
                         quizByTestId.get(test.getId());
 
                 if (userQuiz != null) {
 
-                    // CALCULAR TAXA DE ACERTO
-                    double accuracyRate =
-                            quizService.calculateAccuracyRate(userQuiz);
+                    Double accuracy =
+                            accuracyByQuizId.get(userQuiz.getId());
 
-                    // PRINTAR NO CONSOLE
+                    if (accuracy == null) {
+                        accuracy = 0.0;
+                    }
+
                     System.out.println(
                             "Quiz ID: " + userQuiz.getId()
                                     + " | Test ID: " + test.getId()
-                                    + " | Accuracy Rate: "
-                                    + accuracyRate + "%"
+                                    + " | Accuracy: "
+                                    + accuracy + "%"
                     );
 
                     Set<Quiz> submittedQuizzes =
@@ -269,12 +272,8 @@ public class SubjectMapper {
 
                     submittedQuizzes.add(userQuiz);
 
-                    testDTO.setSubmittedQuizzes(
-                            submittedQuizzes
-                    );
-
-                    // opcional: se existir campo no DTO
-                    testDTO.setAccuracyRate(accuracyRate);
+                    testDTO.setSubmittedQuizzes(submittedQuizzes);
+                    testDTO.setAccuracyRate(accuracy);
                 }
 
                 testDTOs.add(testDTO);
@@ -419,6 +418,39 @@ public class SubjectMapper {
         }
 
         return result;
+    }
+
+    // Calculo de taxa de acerto em cada teste
+    public Map<Long, Double> getQuizAccuracyRates(Long userId, Long subjectId) {
+
+        List<Object[]> results =
+                quizRepository.findAccuracyStats(userId, subjectId);
+
+        Map<Long, Double> accuracyMap = new HashMap<>();
+
+        for (Object[] row : results) {
+
+            Long quizId = ((Number) row[0]).longValue();
+            long totalAnswers = ((Number) row[1]).longValue();
+
+            Number correctValue = (Number) row[2];
+            long correctAnswers =
+                    correctValue != null ? correctValue.longValue() : 0;
+
+            double accuracy =
+                    totalAnswers == 0
+                            ? 0.0
+                            : (correctAnswers * 100.0) / totalAnswers;
+
+            accuracyMap.put(quizId, accuracy);
+
+            System.out.println(
+                    "Quiz ID: " + quizId +
+                            " -> Accuracy: " + accuracy + "%"
+            );
+        }
+
+        return accuracyMap;
     }
 
     public Page<SubjectDto> domainPageToDTOPage(Page<Subject> subjects, Long currentUserId, Pageable pageable) {

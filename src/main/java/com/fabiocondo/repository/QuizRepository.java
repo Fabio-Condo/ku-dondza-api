@@ -44,4 +44,18 @@ public interface QuizRepository extends JpaRepository<Quiz, Long>, QuizRepositor
 
     long countByUser(User user);
 
+    @Query(
+            value = "SELECT qa.quiz_id, " +
+                    "COUNT(a.id) AS total_answers, " +
+                    "SUM(CASE WHEN a.is_correct = true THEN 1 ELSE 0 END) AS correct_answers " +
+                    "FROM quiz_answers qa " +
+                    "INNER JOIN answer a ON qa.answer_id = a.id " +
+                    "INNER JOIN quiz q ON q.id = qa.quiz_id " +
+                    "WHERE q.user_id = :userId " +
+                    "AND q.subject_id = :subjectId " +
+                    "GROUP BY qa.quiz_id",
+            nativeQuery = true
+    )
+    List<Object[]> findAccuracyStats(Long userId, Long subjectId);
+
 }

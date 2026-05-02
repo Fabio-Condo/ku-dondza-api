@@ -9,6 +9,7 @@ import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.TopicRepository;
 import com.fabiocondo.repository.TopicTestRepository;
 import com.fabiocondo.repository.UserRepository;
+import com.fabiocondo.service.impl.QuizService;
 import com.fabiocondo.service.impl.SubjectServiceImpl;
 import com.fabiocondo.service.impl.TopicService;
 import com.fabiocondo.service.impl.UserSubjectScoreService;
@@ -28,17 +29,19 @@ public class SubjectMapper {
     private final TopicRepository topicRepository;
     private final TopicService topicService;
     public final TopicTestRepository topicTestRepository;
+    private final QuizService quizService;
 
     private final UserSubjectScoreService userSubjectScoreService;
 
     private final TestMapper testMapper;
 
-    public SubjectMapper(UserRepository userRepository, SubjectServiceImpl subjectService, TopicRepository topicRepository, TopicService topicService, TopicTestRepository topicTestRepository, UserSubjectScoreService userSubjectScoreService, TestMapper testMapper) {
+    public SubjectMapper(UserRepository userRepository, SubjectServiceImpl subjectService, TopicRepository topicRepository, TopicService topicService, TopicTestRepository topicTestRepository, QuizService quizService, UserSubjectScoreService userSubjectScoreService, TestMapper testMapper) {
         this.userRepository = userRepository;
         this.subjectService = subjectService;
         this.topicRepository = topicRepository;
         this.topicService = topicService;
         this.topicTestRepository = topicTestRepository;
+        this.quizService = quizService;
         this.userSubjectScoreService = userSubjectScoreService;
         this.testMapper = testMapper;
     }
@@ -124,7 +127,7 @@ public class SubjectMapper {
 
         int totalTests = testsBySubject.size();
 
-        // COMPLETED TESTS (SQL optimized)
+        // COMPLETED TESTS
         List<Long> completedTestIdsList =
                 topicTestRepository.findCompletedTestIds(userId, subject.getId());
 
@@ -140,6 +143,7 @@ public class SubjectMapper {
         // QUESTIONS COUNT (BATCH)
         // -----------------------------
         List<Long> testIds = new ArrayList<>(testsBySubject.size());
+
         for (Test t : testsBySubject) {
             testIds.add(t.getId());
         }
@@ -153,6 +157,7 @@ public class SubjectMapper {
             for (Object[] row : results) {
                 Long testId = ((Number) row[0]).longValue();
                 Long count = ((Number) row[1]).longValue();
+
                 questionsCountMap.put(testId, count);
             }
         }
@@ -163,16 +168,20 @@ public class SubjectMapper {
         Map<Long, Quiz> quizByTestId = new HashMap<>();
 
         List<Object[]> quizResults =
-                topicTestRepository.findUserQuizzesBySubjectGrouped(subject.getId(), userId);
+                topicTestRepository.findUserQuizzesBySubjectGrouped(
+                        subject.getId(),
+                        userId
+                );
 
         for (Object[] row : quizResults) {
             Long testId = ((Number) row[0]).longValue();
             Quiz quiz = (Quiz) row[1];
+
             quizByTestId.put(testId, quiz);
         }
 
         // -----------------------------
-        // GROUP BY TOPIC
+        // GROUP TESTS BY TOPIC
         // -----------------------------
         Map<Long, List<Test>> testsByTopic = new HashMap<>();
 
@@ -187,12 +196,16 @@ public class SubjectMapper {
         // -----------------------------
         // MAP TOPICS
         // -----------------------------
-        List<TopicDtoWithTests> topicDTOs = new ArrayList<>(topics.size());
+        List<TopicDtoWithTests> topicDTOs =
+                new ArrayList<>(topics.size());
 
         for (Topic topic : topics) {
 
             List<Test> topicTests = testsByTopic
-                    .getOrDefault(topic.getId(), Collections.emptyList());
+                    .getOrDefault(
+                            topic.getId(),
+                            Collections.emptyList()
+                    );
 
             TopicDtoWithTests tDto = new TopicDtoWithTests();
             tDto.setTopicId(topic.getId());
@@ -202,42 +215,82 @@ public class SubjectMapper {
             int topicSize = topicTests.size();
             long topicCompleted = 0;
 
-            List<TestDTO> testDTOs = new ArrayList<>(topicSize);
+            List<TestDTO> testDTOs =
+                    new ArrayList<>(topicSize);
 
             for (Test test : topicTests) {
 
-                boolean completed = completedTestIds.contains(test.getId());
+                boolean completed =
+                        completedTestIds.contains(test.getId());
 
-                if (completed) topicCompleted++;
-
-                TestDTO t = new TestDTO();
-                t.setId(test.getId());
-                t.setDifficultyLevel(test.getDifficultyLevel());
-                t.setOrderIndex(test.getOrderIndex());
-
-                // QUESTIONS (MAP - sem query)
-                Long questionCount = questionsCountMap.get(test.getId());
-                t.setTotalQuestions(questionCount != null ? questionCount : 0);
-
-                // QUIZ (MAP - sem query)
-                Quiz userQuiz = quizByTestId.get(test.getId());
-
-                if (userQuiz != null) {
-                    Set<Quiz> set = new HashSet<>();
-                    set.add(userQuiz);
-                    t.setSubmittedQuizzes(set);
+                if (completed) {
+                    topicCompleted++;
                 }
 
-                testDTOs.add(t);
+                TestDTO testDTO = new TestDTO();
+                testDTO.setId(test.getId());
+                testDTO.setDifficultyLevel(
+                        test.getDifficultyLevel()
+                );
+                testDTO.setOrderIndex(
+                        test.getOrderIndex()
+                );
+
+                // QUESTIONS (SEM QUERY EXTRA)
+                Long questionCount =
+                        questionsCountMap.get(test.getId());
+
+                testDTO.setTotalQuestions(
+                        questionCount != null
+                                ? questionCount
+                                : 0
+                );
+
+                // QUIZ (SEM QUERY EXTRA)
+                Quiz userQuiz =
+                        quizByTestId.get(test.getId());
+
+                if (userQuiz != null) {
+
+                    // CALCULAR TAXA DE ACERTO
+                    double accuracyRate =
+                            quizService.calculateAccuracyRate(userQuiz);
+
+                    // PRINTAR NO CONSOLE
+                    System.out.println(
+                            "Quiz ID: " + userQuiz.getId()
+                                    + " | Test ID: " + test.getId()
+                                    + " | Accuracy Rate: "
+                                    + accuracyRate + "%"
+                    );
+
+                    Set<Quiz> submittedQuizzes =
+                            new HashSet<>();
+
+                    submittedQuizzes.add(userQuiz);
+
+                    testDTO.setSubmittedQuizzes(
+                            submittedQuizzes
+                    );
+
+                    // opcional: se existir campo no DTO
+                    testDTO.setAccuracyRate(accuracyRate);
+                }
+
+                testDTOs.add(testDTO);
             }
 
             tDto.setTests(testDTOs);
 
             tDto.setProgressRate(
-                    topicSize == 0 ? 0 : (topicCompleted * 100.0) / topicSize
+                    topicSize == 0
+                            ? 0
+                            : (topicCompleted * 100.0) / topicSize
             );
 
-            tDto.setCompleted(topicCompleted == topicSize);
+            tDto.setCompleted(
+                    topicCompleted == topicSize
+            );
 
             topicDTOs.add(tDto);
         }

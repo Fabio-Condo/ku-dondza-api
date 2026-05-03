@@ -124,6 +124,20 @@ public class TopicContentService {
         return data;
     }
 
+    public Long getTotalVideoLessons(Long subjectId) {
+        return contentRepository.countBySubjectAndContentType(
+                subjectId,
+                ContentType.VIDEO
+        );
+    }
+
+    public Long getTotalFiles(Long subjectId) {
+        return contentRepository.countBySubjectAndContentType(
+                subjectId,
+                ContentType.FILE
+        );
+    }
+
     public long getTotal(){
         logger.info("Total contents: " + contentRepository.count());
         return contentRepository.count();

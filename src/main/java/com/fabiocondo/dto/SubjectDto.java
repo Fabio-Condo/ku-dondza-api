@@ -38,6 +38,12 @@ public class SubjectDto {
 
     private Long totalTopics;
 
+    private Long durationHours;
+
+    private Long totalLessons;
+
+    private Long totalFiles;
+
     public Long getId() {
         return id;
     }
@@ -118,6 +124,29 @@ public class SubjectDto {
         this.totalTopics = totalTopics;
     }
 
+    public Long getDurationHours() {
+        return durationHours;
+    }
+
+    public void setDurationHours(Long durationHours) {
+        this.durationHours = durationHours;
+    }
+
+    public Long getTotalLessons() {
+        return totalLessons;
+    }
+
+    public void setTotalLessons(Long totalLessons) {
+        this.totalLessons = totalLessons;
+    }
+
+    public Long getTotalFiles() {
+        return totalFiles;
+    }
+
+    public void setTotalFiles(Long totalFiles) {
+        this.totalFiles = totalFiles;
+    }
 
     public boolean isQuizEnabled() {
         return quizEnabled;

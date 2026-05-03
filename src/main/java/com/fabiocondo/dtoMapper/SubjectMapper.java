@@ -10,10 +10,7 @@ import com.fabiocondo.repository.QuizRepository;
 import com.fabiocondo.repository.TopicRepository;
 import com.fabiocondo.repository.TopicTestRepository;
 import com.fabiocondo.repository.UserRepository;
-import com.fabiocondo.service.impl.QuizService;
-import com.fabiocondo.service.impl.SubjectServiceImpl;
-import com.fabiocondo.service.impl.TopicService;
-import com.fabiocondo.service.impl.UserSubjectScoreService;
+import com.fabiocondo.service.impl.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +26,7 @@ public class SubjectMapper {
     private final SubjectServiceImpl subjectService;
     private final TopicRepository topicRepository;
     private final TopicService topicService;
+    private final TopicContentService topicContentService;
     public final TopicTestRepository topicTestRepository;
     private final QuizService quizService;
     private final QuizRepository quizRepository;
@@ -38,11 +36,12 @@ public class SubjectMapper {
 
     private final TestMapper testMapper;
 
-    public SubjectMapper(UserRepository userRepository, SubjectServiceImpl subjectService, TopicRepository topicRepository, TopicService topicService, TopicTestRepository topicTestRepository, QuizService quizService, QuizRepository quizRepository, UserSubjectScoreService userSubjectScoreService, TestMapper testMapper) {
+    public SubjectMapper(UserRepository userRepository, SubjectServiceImpl subjectService, TopicRepository topicRepository, TopicService topicService, TopicContentService topicContentService, TopicTestRepository topicTestRepository, QuizService quizService, QuizRepository quizRepository, UserSubjectScoreService userSubjectScoreService, TestMapper testMapper) {
         this.userRepository = userRepository;
         this.subjectService = subjectService;
         this.topicRepository = topicRepository;
         this.topicService = topicService;
+        this.topicContentService = topicContentService;
         this.topicTestRepository = topicTestRepository;
         this.quizService = quizService;
         this.quizRepository = quizRepository;
@@ -60,6 +59,8 @@ public class SubjectMapper {
         subjectDto.setFileName(subject.getFileName());
         subjectDto.setUrlFile(subject.getUrlFile());
         subjectDto.setTotalTopics(topicRepository.countBySubjectIdAndEnabledTrue(subject.getId()));
+        subjectDto.setTotalLessons(topicContentService.getTotalVideoLessons(subject.getId()));
+        subjectDto.setTotalFiles(topicContentService.getTotalFiles(subject.getId()));
 
         subjectDto.setExamEnabled(subject.isExamEnabled());
         subjectDto.setCourseEnabled(subject.isCourseEnabled());
@@ -92,6 +93,8 @@ public class SubjectMapper {
         //subjectDto.setTopics(subject.getTopics());
         subjectDto.setTopics(topicService.getBySubjectId(subject.getId()));
         subjectDto.setTotalTopics(topicRepository.countBySubjectIdAndEnabledTrue(subject.getId()));
+        subjectDto.setTotalLessons(topicContentService.getTotalVideoLessons(subject.getId()));
+        subjectDto.setTotalFiles(topicContentService.getTotalFiles(subject.getId()));
 
         Optional<User> currentUser = userRepository.findById(currentUserId);
 

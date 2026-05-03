@@ -3,7 +3,7 @@ package com.fabiocondo.dtoMapper;
 import com.fabiocondo.domain.UserSubjectScore;
 import com.fabiocondo.dto.UserSubjectRankingDTO;
 
-public class UserSubjectRankingMapper {
+public class RankingMapper {
 
     public static UserSubjectRankingDTO toDTO(UserSubjectScore entity) {
 

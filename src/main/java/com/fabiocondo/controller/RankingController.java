@@ -3,7 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.UserSubjectScore;
 import com.fabiocondo.dto.UserSubjectRankingDTO;
 import com.fabiocondo.dto.UserSubjectRankingSummaryDTO;
-import com.fabiocondo.dtoMapper.UserSubjectRankingMapper;
+import com.fabiocondo.dtoMapper.RankingMapper;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.RankingService;
@@ -30,7 +30,7 @@ public class RankingController {
         Page<UserSubjectScore> page =
                 rankingService.getRanking(subjectId, pageable);
 
-        return page.map(UserSubjectRankingMapper::toDTO);
+        return page.map(RankingMapper::toDTO);
     }
 
     @GetMapping("/subjects/{subjectId}/users/{userId}/summary")

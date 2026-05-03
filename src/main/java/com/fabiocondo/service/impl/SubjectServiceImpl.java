@@ -110,8 +110,8 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    public Page<Subject> findByName(String name, Pageable pageable) {
-        return subjectRepository.findByName(name, pageable);
+    public Page<Subject> findByName(String name, boolean enabled, Pageable pageable) {
+        return subjectRepository.findByNameAndCourseEnabled(name, enabled, pageable);
     }
 
     @Override

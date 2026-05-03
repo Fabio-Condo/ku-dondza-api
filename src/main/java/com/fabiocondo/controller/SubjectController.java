@@ -42,8 +42,8 @@ public class SubjectController {
     }
 
     @GetMapping("/filter")
-    public Page<SubjectDto> filter(@RequestParam(required = false, defaultValue = "") String name, @RequestParam("currentUserId") Long currentUserId, Pageable pageable) {
-        return subjectMapper.domainPageToDTOPage(subjectServiceImpl.findByName(name, pageable), currentUserId, pageable);
+    public Page<SubjectDto> filter(@RequestParam(required = false, defaultValue = "") String name, @RequestParam("enabled") boolean enabled, @RequestParam("currentUserId") Long currentUserId, Pageable pageable) {
+        return subjectMapper.domainPageToDTOPage(subjectServiceImpl.findByName(name, enabled, pageable), currentUserId, pageable);
     }
 
     @GetMapping("/progress/users")

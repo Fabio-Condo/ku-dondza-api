@@ -16,7 +16,9 @@ public interface SubjectService {
 
     Page<Subject> findAll(Pageable pageable);
 
-    Page<Subject> findByName(String name, Pageable pageable);
+    //Page<Subject> findByName(String name, Pageable pageable);
+
+    Page<Subject> findByName(String name, boolean enabled, Pageable pageable);
 
     Subject save(String name, String description, Category category, boolean quizEnabled, boolean courseEnabled, boolean progressEnabled, boolean examEnabled, MultipartFile file);
 

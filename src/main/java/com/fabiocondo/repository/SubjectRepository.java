@@ -11,8 +11,15 @@ import java.util.Optional;
 
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
 
-    @Query("SELECT s FROM Subject s WHERE s.name LIKE %:name%")
-    public Page<Subject> findByName(@Param("name") String name, Pageable pageable);
+    @Query("SELECT s FROM Subject s " +
+            "WHERE s.name LIKE %:name% " +
+            "AND s.courseEnabled = true")
+    Page<Subject> findByName(@Param("name") String name, Pageable pageable);
+
+    @Query("SELECT s FROM Subject s " +
+            "WHERE s.name LIKE %:name% " +
+            "AND s.courseEnabled = :enabled")
+    Page<Subject> findByNameAndCourseEnabled(@Param("name") String name, @Param("enabled") boolean enabled, Pageable pageable);
 
     Optional<Subject> findSubjectBySubjectId(String subjectId);
 }

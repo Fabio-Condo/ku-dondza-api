@@ -146,9 +146,7 @@ public class SubjectMapper {
                 totalTests == 0 ? 0 : (submittedCount * 100.0) / totalTests
         );
 
-        // -----------------------------
         // QUESTIONS COUNT (BATCH)
-        // -----------------------------
         List<Long> testIds = new ArrayList<>();
 
         for (Test t : testsBySubject) {
@@ -164,14 +162,11 @@ public class SubjectMapper {
             for (Object[] row : results) {
                 Long testId = ((Number) row[0]).longValue();
                 Long count = ((Number) row[1]).longValue();
-
                 questionsCountMap.put(testId, count);
             }
         }
 
-        // -----------------------------
         // QUIZZES (BATCH)
-        // -----------------------------
         Map<Long, Quiz> quizByTestId = new HashMap<>();
 
         List<Object[]> quizResults =
@@ -183,19 +178,14 @@ public class SubjectMapper {
         for (Object[] row : quizResults) {
             Long testId = ((Number) row[0]).longValue();
             Quiz quiz = (Quiz) row[1];
-
             quizByTestId.put(testId, quiz);
         }
 
-        // -----------------------------
-        // ACCURACY MAP (NEW)
-        // -----------------------------
+        // ACCURACY MAP
         Map<Long, Double> accuracyByQuizId =
                 getQuizAccuracyRates(userId, subject.getId());
 
-        // -----------------------------
         // GROUP TESTS BY TOPIC
-        // -----------------------------
         Map<Long, List<Test>> testsByTopic = new HashMap<>();
 
         for (Test test : testsBySubject) {
@@ -206,9 +196,7 @@ public class SubjectMapper {
                     .add(test);
         }
 
-        // -----------------------------
         // MAP TOPICS
-        // -----------------------------
         List<TopicDtoWithTests> topicDTOs =
                 new ArrayList<>(topics.size());
 
@@ -225,8 +213,7 @@ public class SubjectMapper {
             int topicSize = topicTests.size();
             long topicCompleted = 0;
 
-            List<TestDTO> testDTOs =
-                    new ArrayList<>(topicSize);
+            List<TestDTO> testDTOs = new ArrayList<>(topicSize);
 
             for (Test test : topicTests) {
 
@@ -243,40 +230,38 @@ public class SubjectMapper {
                 testDTO.setOrderIndex(test.getOrderIndex());
 
                 // QUESTIONS
-                Long questionCount =
-                        questionsCountMap.get(test.getId());
+                Long questionCount = questionsCountMap.get(test.getId());
 
                 testDTO.setTotalQuestions(
                         questionCount != null ? questionCount : 0
                 );
 
-                // QUIZ + ACCURACY (O(1) lookup)
-                Quiz userQuiz =
-                        quizByTestId.get(test.getId());
+                // QUIZ + ACCURACY + POINTS
+                Quiz userQuiz = quizByTestId.get(test.getId());
 
                 if (userQuiz != null) {
 
-                    Double accuracy =
-                            accuracyByQuizId.get(userQuiz.getId());
+                    Double accuracy = accuracyByQuizId.get(userQuiz.getId());
 
                     if (accuracy == null) {
                         accuracy = 0.0;
                     }
 
-                    System.out.println(
-                            "Quiz ID: " + userQuiz.getId()
-                                    + " | Test ID: " + test.getId()
-                                    + " | Accuracy: "
-                                    + accuracy + "%"
-                    );
+                    int correctAnswers = quizService.countCorrectAnswers(userQuiz);
 
-                    Set<Quiz> submittedQuizzes =
-                            new HashSet<>();
+                    int earnedPoints = 0;
 
+                    // regra: só pontua se >= 80%
+                    if (accuracy >= 80.0) {
+                        earnedPoints = correctAnswers * 10;
+                    }
+
+                    Set<Quiz> submittedQuizzes = new HashSet<>();
                     submittedQuizzes.add(userQuiz);
 
                     testDTO.setSubmittedQuizzes(submittedQuizzes);
                     testDTO.setAccuracyRate(accuracy);
+                    testDTO.setEarnedPoints(earnedPoints);
                 }
 
                 testDTOs.add(testDTO);
@@ -285,14 +270,10 @@ public class SubjectMapper {
             tDto.setTests(testDTOs);
 
             tDto.setProgressRate(
-                    topicSize == 0
-                            ? 0
-                            : (topicCompleted * 100.0) / topicSize
+                    topicSize == 0 ? 0 : (topicCompleted * 100.0) / topicSize
             );
 
-            tDto.setCompleted(
-                    topicCompleted == topicSize
-            );
+            tDto.setCompleted(topicCompleted == topicSize);
 
             topicDTOs.add(tDto);
         }

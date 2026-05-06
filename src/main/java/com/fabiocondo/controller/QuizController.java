@@ -69,20 +69,29 @@ public class QuizController {
     }
 
     @PostMapping("/topic-test")
-    public ResponseEntity<QuizDTO> createQuizTopicTest(@RequestBody Quiz quiz,
-                                              @RequestParam Set<Long> questionIds,
-                                              @RequestParam Set<Long> userAnswerIds,
-                                              @RequestParam("topicTestId") Long topicTestId,
-                                              @RequestParam("currentUserId") Long currentUserId) throws TopicNotFoundException, UserAlreadySubmittedException {
+    public ResponseEntity<QuizDTO> createQuizTopicTest(
+            @RequestBody Quiz quiz,
+            @RequestParam Set<Long> questionIds,
+            @RequestParam Set<Long> userAnswerIds,
+            @RequestParam("topicTestId") Long topicTestId,
+            @RequestParam("currentUserId") Long currentUserId
+    ) throws TopicNotFoundException, UserAlreadySubmittedException {
 
+        // Valida se o utilizador já submeteu o teste
         testService.validateUserHasNotSubmittedQuiz(currentUserId, topicTestId);
 
-        Quiz savedQuiz = quizService.saveQuizTopicTestWithQuestions(quiz, questionIds, userAnswerIds, topicTestId);
+        // Salva quiz com perguntas e respostas
+        Quiz savedQuiz = quizService.saveQuizTopicTestWithQuestions(
+                quiz,
+                questionIds,
+                userAnswerIds,
+                topicTestId
+        );
 
         QuizDTO quizDTO = quizMapper.domainToDTO(savedQuiz);
 
-        // O quiz so eh adicionado se a taxa de acerto for de 85% para cima
-        if (quizDTO.getAccuracyRate() >= 85.0) {
+        // Regra: aprovado com 80% ou mais
+        if (quizDTO.getAccuracyRate() >= 80.0) {
 
             Test test = testService.findById(topicTestId);
 
@@ -92,12 +101,22 @@ public class QuizController {
             User user = savedQuiz.getUser();
             Subject subject = savedQuiz.getSubject();
 
-            long points = userSubjectScoreService.calculate(quizDTO.getAccuracyRate());
+            // quantidade de respostas corretas
+            int correctAnswers = quizService.countCorrectAnswers(savedQuiz);
+
+            // cada acerto vale 10 pontos
+            long points = correctAnswers * 10L;
 
             userSubjectScoreService.addScore(user, subject, points);
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(savedQuiz, currentUserId));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                        quizMapper.domainToDTO_WithQuestionsAndAnswers(
+                                savedQuiz,
+                                currentUserId
+                        )
+                );
     }
 
     @DeleteMapping("/{id}")

@@ -31,6 +31,8 @@ public class TestDTO {
 
     private double accuracyRate;
 
+    private Integer earnedPoints;
+
     private Long totalQuestions;
 
     public TestDTO() {
@@ -99,6 +101,14 @@ public class TestDTO {
 
     public void setAccuracyRate(double accuracyRate) {
         this.accuracyRate = accuracyRate;
+    }
+
+    public Integer getEarnedPoints() {
+        return earnedPoints;
+    }
+
+    public void setEarnedPoints(Integer earnedPoints) {
+        this.earnedPoints = earnedPoints;
     }
 
     public Long getTotalQuestions() {

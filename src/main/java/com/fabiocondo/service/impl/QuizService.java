@@ -143,23 +143,32 @@ public class QuizService {
 
     public double calculateAccuracyRate(Quiz quiz) {
         Set<Question> questions = quiz.getQuestions();
+
+        if (questions.isEmpty()) {
+            return 0.0;
+        }
+
+        int correctAnswers = countCorrectAnswers(quiz);
+
+        return (double) correctAnswers / questions.size() * 100;
+    }
+
+    public int countCorrectAnswers(Quiz quiz) {
+        Set<Question> questions = quiz.getQuestions();
         Set<Answer> userAnswers = quiz.getAnswers();
+
         int correctAnswers = 0;
 
         for (Question question : questions) {
             for (Answer userAnswer : userAnswers) {
                 if (userAnswer.getQuestion().equals(question) && userAnswer.isCorrect()) {
                     correctAnswers++;
-                    break; // encontrou a resposta correta para essa questão
+                    break;
                 }
             }
         }
 
-        if (questions.isEmpty()) {
-            return 0.0;
-        }
-
-        return (double) correctAnswers / questions.size() * 100;
+        return correctAnswers;
     }
 
     public void toggleAnonymous(Long id, Boolean status) throws QuizNotFoundException {

@@ -15,6 +15,7 @@ public class UserSubjectRankingSummaryDTO {
     private double accuracyRate;
     private double averageScore;
     private long totalTopics;
+    private Long totalTests;
 
     public UserSubjectRankingSummaryDTO() {
     }
@@ -97,5 +98,13 @@ public class UserSubjectRankingSummaryDTO {
 
     public void setTotalTopics(long totalTopics) {
         this.totalTopics = totalTopics;
+    }
+
+    public Long getTotalTests() {
+        return totalTests;
+    }
+
+    public void setTotalTests(Long totalTests) {
+        this.totalTests = totalTests;
     }
 }

@@ -31,6 +31,8 @@ public class SubjectProgressDTO {
 
     private Long totalTopics;
 
+    private Long totalTests;
+
     public Long getId() {
         return id;
     }
@@ -109,6 +111,14 @@ public class SubjectProgressDTO {
 
     public void setTotalTopics(Long totalTopics) {
         this.totalTopics = totalTopics;
+    }
+
+    public Long getTotalTests() {
+        return totalTests;
+    }
+
+    public void setTotalTests(Long totalTests) {
+        this.totalTests = totalTests;
     }
 
     public boolean isProgressEnabled() {

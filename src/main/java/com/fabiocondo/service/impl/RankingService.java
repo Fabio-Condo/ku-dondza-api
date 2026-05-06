@@ -6,10 +6,7 @@ import com.fabiocondo.domain.UserSubjectScore;
 import com.fabiocondo.dto.UserSubjectRankingSummaryDTO;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
-import com.fabiocondo.repository.SubjectRepository;
-import com.fabiocondo.repository.TopicRepository;
-import com.fabiocondo.repository.UserRepository;
-import com.fabiocondo.repository.UserSubjectScoreRepository;
+import com.fabiocondo.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,13 +18,15 @@ public class RankingService {
     private final UserRepository userRepository;
     private final SubjectRepository subjectRepository;
     private final TopicRepository topicRepository;
+    private final TopicTestRepository topicTestRepository;
     private final UserSubjectScoreService userSubjectScoreService;
 
-    public RankingService(UserSubjectScoreRepository userSubjectScoreRepository, UserRepository userRepository, SubjectRepository subjectRepository, TopicRepository topicRepository, UserSubjectScoreService userSubjectScoreService) {
+    public RankingService(UserSubjectScoreRepository userSubjectScoreRepository, UserRepository userRepository, SubjectRepository subjectRepository, TopicRepository topicRepository, TopicTestRepository topicTestRepository, UserSubjectScoreService userSubjectScoreService) {
         this.userSubjectScoreRepository = userSubjectScoreRepository;
         this.userRepository = userRepository;
         this.subjectRepository = subjectRepository;
         this.topicRepository = topicRepository;
+        this.topicTestRepository = topicTestRepository;
         this.userSubjectScoreService = userSubjectScoreService;
     }
 
@@ -35,7 +34,8 @@ public class RankingService {
         return userSubjectScoreRepository.findRankingBySubjectId(subjectId, pageable);
     }
 
-    public UserSubjectRankingSummaryDTO getRankingSummary(Long userId, String subjectId) throws SubjectNotFoundException, UserNotFoundException {
+    public UserSubjectRankingSummaryDTO getRankingSummary(Long userId, String subjectId)
+            throws SubjectNotFoundException, UserNotFoundException {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
@@ -50,6 +50,7 @@ public class RankingService {
                 userSubjectScoreService.getScore(user, subject);
 
         UserSubjectRankingSummaryDTO dto = new UserSubjectRankingSummaryDTO();
+
         dto.setSubjectId(subject.getSubjectId());
         dto.setSubjectName(subject.getName());
 
@@ -59,10 +60,20 @@ public class RankingService {
 
         dto.setCurrentUserRank(currentUserRanking);
         dto.setCurrentUserScore(currentUserScore);
-        dto.setTotalTopics(topicRepository.countBySubjectIdAndEnabledTrue(subject.getId()));
 
-        //dto.setAccuracyRate(20);
-        dto.setAverageScore(userSubjectScoreRepository.getAverageScoreBySubject(subject.getId()));
+        // TOPICS
+        dto.setTotalTopics(
+                topicRepository.countBySubjectIdAndEnabledTrue(subject.getId())
+        );
+
+        // TESTS
+        dto.setTotalTests(
+                topicTestRepository.countBySubjectId(subject.getId())
+        );
+
+        dto.setAverageScore(
+                userSubjectScoreRepository.getAverageScoreBySubject(subject.getId())
+        );
 
         return dto;
     }

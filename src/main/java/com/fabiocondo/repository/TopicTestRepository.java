@@ -16,6 +16,11 @@ public interface TopicTestRepository extends JpaRepository<Test, Long> {
     @Query("SELECT q FROM Test tt " + "JOIN tt.submittedQuizzes q " + "WHERE tt.id = :topicTestId " + "AND q.user.id = :userId")
     Optional<Quiz> findUserQuizByTopicTest(@Param("topicTestId") Long topicTestId, @Param("userId") Long userId);
 
+    @Query("SELECT COUNT(t) " +
+            "FROM Test t " +
+            "WHERE t.topic.subject.id = :subjectId")
+    Long countBySubjectId(@Param("subjectId") Long subjectId);
+
     @Query("SELECT CASE WHEN COUNT(q) > 0 THEN true ELSE false END " +
             "FROM Test t " +
             "JOIN t.submittedQuizzes q " +

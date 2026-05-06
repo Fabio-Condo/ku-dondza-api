@@ -312,6 +312,9 @@ public class SubjectMapper {
 
             dto.setTotalTopics((long) topics.size());
 
+            //dto.setTotalTests((long) topics.size());
+            dto.setTotalTests(topicTestRepository.countBySubjectId(subject.getId()));
+
             // -------------------------
             // USER COMPLETED TESTS (1 QUERY ONLY)
             // -------------------------

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -26,4 +27,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Quest
     Optional<Question> findQuestionByQuestionId(String questionId);
 
     Set<Question> findByTopicId(Long topicId);
+
+    List<Question> findByTopicSubjectId(Long subjectId);
 }

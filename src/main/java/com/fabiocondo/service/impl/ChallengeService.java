@@ -40,12 +40,6 @@ public class ChallengeService {
     }
 
     public Page<Challenge> filter(ChallengeFilter challengeFilter, Pageable pageable) {
-        //try {
-        //    Thread.sleep(3000);
-        //} catch (InterruptedException e) {
-        //    Thread.currentThread().interrupt();
-        //    throw new RuntimeException("A operação foi interrompida", e);
-        //}
         return challengeRepository.filter(challengeFilter, pageable);
     }
 

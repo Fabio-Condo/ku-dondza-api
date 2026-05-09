@@ -1,9 +1,11 @@
 package com.fabiocondo.dto;
 
 import com.fabiocondo.domain.Challenge;
+import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Subject;
 import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.repository.ChallengeRepository;
+import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.SubjectRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -17,145 +19,92 @@ public class ChallengeDataLoader {
     @Bean
     CommandLineRunner initChallenges(
             ChallengeRepository challengeRepository,
-            SubjectRepository subjectRepository) {
+            SubjectRepository subjectRepository,
+            QuestionRepository questionRepository
+    ) {
 
         return args -> {
 
-            if (challengeRepository.count() > 0) return;
+            if (challengeRepository.count() > 0) {
+                return;
+            }
 
-            // Subjects (assumindo já existentes)
-            Subject math = subjectRepository.findById(1L).orElse(null);
-            Subject physics = subjectRepository.findById(2L).orElse(null);
-            Subject portuguese = subjectRepository.findById(3L).orElse(null);
-            Subject chemistry = subjectRepository.findById(4L).orElse(null);
-            Subject biology = subjectRepository.findById(5L).orElse(null);
-            Subject history = subjectRepository.findById(6L).orElse(null);
+            List<Subject> subjects = subjectRepository.findAll();
 
             List<Challenge> challenges = new ArrayList<>();
 
-            // =========================
-            // 1. Matemática (UPCOMING)
-            // =========================
-            challenges.add(createChallenge(
-                    "CH-MATH-01",
-                    "Desafio Diário de Matemática",
-                    "Matemática · Ciências Exactas",
-                    DifficultyLevel.INTERMEDIATE
-                    ,
-                    25,
-                    8,
-                    math,
-                    "UPCOMING"
-            ));
+            for (Subject subject : subjects) {
 
-            // =========================
-            // 2. Física (ONGOING)
-            // =========================
-            challenges.add(createChallenge(
-                    "CH-PHY-01",
-                    "Quiz Relâmpago de Física",
-                    "Física · Ciências Exactas",
-                    DifficultyLevel.ADVANCED,
-                    40,
-                    1,
-                    physics,
-                    "ONGOING"
-            ));
+                if (subject == null) continue;
 
-            // =========================
-            // 3. Português (UPCOMING)
-            // =========================
-            challenges.add(createChallenge(
-                    "CH-POR-01",
-                    "Desafio de Português",
-                    "Linguagens · Português",
-                    DifficultyLevel.ADVANCED,
-                    15,
-                    6,
-                    portuguese,
-                    "UPCOMING"
-            ));
-
-            // =========================
-            // 4. Química (UPCOMING)
-            // =========================
-            challenges.add(createChallenge(
-                    "CH-QUIM-01",
-                    "Liga de Química — Temporada 2",
-                    "Química · Ciências Exactas",
-                    DifficultyLevel.ADVANCED,
-                    70,
-                    9,
-                    chemistry,
-                    "UPCOMING"
-            ));
-
-            // =========================
-            // 5. Biologia (DONE)
-            // =========================
-            challenges.add(createChallenge(
-                    "CH-BIO-01",
-                    "Copa de Biologia — Edição Abril",
-                    "Biologia · Ciências Naturais",
-                    DifficultyLevel.BEGINNER,
-                    60,
-                    -10,
-                    biology,
-                    "DONE"
-            ));
-
-            // =========================
-            // 6. História (DONE)
-            // =========================
-            challenges.add(createChallenge(
-                    "CH-HIS-01",
-                    "Desafio de História de Moçambique",
-                    "História · Ciências Sociais",
-                    DifficultyLevel.INTERMEDIATE,
-                    45,
-                    -20,
-                    history,
-                    "DONE"
-            ));
+                challenges.add(createChallengeForSubject(subject, questionRepository));
+            }
 
             challengeRepository.saveAll(challenges);
 
-            System.out.println("✔ Challenges (UPCOMING / ONGOING / DONE) inseridos com sucesso!");
+            System.out.println("✔ Challenges gerados automaticamente para todos os subjects!");
         };
     }
 
-    private Challenge createChallenge(
-            String id,
-            String title,
-            String description,
-            DifficultyLevel difficulty,
-            int xp,
-            int daysOffset,
+    private Challenge createChallengeForSubject(
             Subject subject,
-            String status
+            QuestionRepository questionRepository
     ) {
-        Challenge c = new Challenge();
 
-        c.setChallengeId(id);
-        c.setTitle(title);
-        c.setDescription(description);
-        c.setDifficultyLevel(difficulty);
-        c.setXpReward(xp);
+        Challenge challenge = new Challenge();
+
+        String code = "CH-" + subject.getId();
+
+        challenge.setChallengeId(code);
+        challenge.setTitle("Desafio de " + subject.getName());
+        challenge.setDescription(subject.getName() + " · Preparação de Exame");
+
+        challenge.setDifficultyLevel(randomDifficulty());
+        challenge.setXpReward(randomXP());
 
         Date now = new Date();
-        c.setStartDate(now);
+        challenge.setStartDate(now);
 
-        // calcula data final (simples seed)
-        c.setEndDate(new Date(System.currentTimeMillis() + (86400000L * daysOffset)));
+        // duração aleatória entre 1 e 10 dias
+        int daysOffset = new Random().nextInt(10) + 1;
 
-        c.setSubject(subject);
+        challenge.setEndDate(
+                new Date(System.currentTimeMillis() + (86400000L * daysOffset))
+        );
 
-        // 🔥 STATUS EXPLÍCITO (para frontend bater direto)
-        //c.setStatus(status);
+        challenge.setSubject(subject);
 
-        c.setChallengeQuestions(new HashSet<>());
-        c.setSubmittedChallengeQuizzes(new HashSet<>());
+        // Buscar questões via topic -> subject
+        List<Question> questions =
+                questionRepository.findByTopicSubjectId(subject.getId());
 
-        return c;
+        if (questions.isEmpty()) {
+            challenge.setChallengeQuestions(new HashSet<>());
+            challenge.setSubmittedChallengeQuizzes(new HashSet<>());
+            return challenge;
+        }
+
+        Collections.shuffle(questions);
+
+        // quantidade variável (entre 5 e 12)
+        int questionLimit = new Random().nextInt(8) + 5;
+
+        int totalQuestions = Math.min(questions.size(), questionLimit);
+
+        List<Question> selected = questions.subList(0, totalQuestions);
+
+        challenge.setChallengeQuestions(new HashSet<>(selected));
+        challenge.setSubmittedChallengeQuizzes(new HashSet<>());
+
+        return challenge;
+    }
+
+    private DifficultyLevel randomDifficulty() {
+        DifficultyLevel[] levels = DifficultyLevel.values();
+        return levels[new Random().nextInt(levels.length)];
+    }
+
+    private int randomXP() {
+        return 10 + new Random().nextInt(90); // 10 a 100 XP
     }
 }

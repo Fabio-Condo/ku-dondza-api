@@ -3,34 +3,20 @@ package com.fabiocondo.repository.filter;
 import com.fabiocondo.domain.Subject;
 import com.fabiocondo.enumeration.DifficultyLevel;
 
-import javax.persistence.*;
 import java.util.Date;
 
 public class ChallengeFilter {
 
-    @Column(unique = true, nullable = false)
-    private String challengeId;
-
     private String title;
-
     private String description;
-
     private DifficultyLevel difficultyLevel;
-
-    private Integer xpReward;
-
     private Date startDate;
-
     private Date endDate;
-
     private Subject subject;
+    private String status;
+    private String sort;
 
-    public String getChallengeId() {
-        return challengeId;
-    }
-
-    public void setChallengeId(String challengeId) {
-        this.challengeId = challengeId;
+    public ChallengeFilter() {
     }
 
     public String getTitle() {
@@ -57,14 +43,6 @@ public class ChallengeFilter {
         this.difficultyLevel = difficultyLevel;
     }
 
-    public Integer getXpReward() {
-        return xpReward;
-    }
-
-    public void setXpReward(Integer xpReward) {
-        this.xpReward = xpReward;
-    }
-
     public Date getStartDate() {
         return startDate;
     }
@@ -87,5 +65,21 @@ public class ChallengeFilter {
 
     public void setSubject(Subject subject) {
         this.subject = subject;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getSort() {
+        return sort;
+    }
+
+    public void setSort(String sort) {
+        this.sort = sort;
     }
 }

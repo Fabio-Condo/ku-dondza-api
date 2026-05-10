@@ -47,6 +47,11 @@ public class ExceptionHandling implements ErrorController {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());
     }
 
+    @ExceptionHandler(ChallengeUnavailableException .class)
+    public ResponseEntity<HttpResponse> challengeUnavailableException (ChallengeUnavailableException  exception) {
+        return createHttpResponse(BAD_REQUEST, exception.getMessage());
+    }
+
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<HttpResponse> paymentException(PaymentException exception) {
         return createHttpResponse(BAD_REQUEST, exception.getMessage());

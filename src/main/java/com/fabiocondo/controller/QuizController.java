@@ -3,10 +3,9 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.QuizDTO;
 import com.fabiocondo.dtoMapper.QuizMapper;
-import com.fabiocondo.exception.domain.QuizNotFoundException;
-import com.fabiocondo.exception.domain.TopicNotFoundException;
-import com.fabiocondo.exception.domain.UserAlreadySubmittedException;
+import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.filter.QuizFilter;
+import com.fabiocondo.service.impl.ChallengeService;
 import com.fabiocondo.service.impl.QuizService;
 import com.fabiocondo.service.impl.TestService;
 import com.fabiocondo.service.impl.UserSubjectScoreService;
@@ -28,12 +27,16 @@ public class QuizController {
 
     private final TestService testService;
 
+    private final ChallengeService challengeService;
+
+
     private final UserSubjectScoreService userSubjectScoreService;
 
-    public QuizController(QuizService quizService, QuizMapper quizMapper, TestService testService, UserSubjectScoreService userSubjectScoreService) {
+    public QuizController(QuizService quizService, QuizMapper quizMapper, TestService testService, ChallengeService challengeService, UserSubjectScoreService userSubjectScoreService) {
         this.quizService = quizService;
         this.quizMapper = quizMapper;
         this.testService = testService;
+        this.challengeService = challengeService;
         this.userSubjectScoreService = userSubjectScoreService;
     }
 
@@ -69,7 +72,7 @@ public class QuizController {
     }
 
     @PostMapping("/topic-test")
-    public ResponseEntity<QuizDTO> createQuizTopicTest(
+    public ResponseEntity<QuizDTO> saveQuizTopicTest(
             @RequestBody Quiz quiz,
             @RequestParam Set<Long> questionIds,
             @RequestParam Set<Long> userAnswerIds,
@@ -81,11 +84,10 @@ public class QuizController {
         testService.validateUserHasNotSubmittedQuiz(currentUserId, topicTestId);
 
         // Salva quiz com perguntas e respostas
-        Quiz savedQuiz = quizService.saveQuizTopicTestWithQuestions(
+        Quiz savedQuiz = quizService.saveQuizWithQuestions(
                 quiz,
                 questionIds,
-                userAnswerIds,
-                topicTestId
+                userAnswerIds
         );
 
         QuizDTO quizDTO = quizMapper.domainToDTO(savedQuiz);
@@ -109,6 +111,43 @@ public class QuizController {
 
             userSubjectScoreService.addScore(user, subject, points);
         }
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                        quizMapper.domainToDTO_WithQuestionsAndAnswers(
+                                savedQuiz,
+                                currentUserId
+                        )
+                );
+    }
+
+    @PostMapping("/challenge")
+    public ResponseEntity<QuizDTO> saveQuizChalleng(
+            @RequestBody Quiz quiz,
+            @RequestParam Set<Long> questionIds,
+            @RequestParam Set<Long> userAnswerIds,
+            @RequestParam("challengeId") Long challengeId,
+            @RequestParam("currentUserId") Long currentUserId
+    ) throws UserAlreadySubmittedException,
+            ChallengeNotFoundException,
+            ChallengeUnavailableException {
+
+        // valida se já submeteu
+        challengeService.validateUserHasNotSubmittedQuiz(currentUserId, challengeId);
+
+        // valida tempo do challenge
+        challengeService.validateChallengeAvailability(challengeId);
+
+        Quiz savedQuiz = quizService.saveQuizWithQuestions(
+                quiz,
+                questionIds,
+                userAnswerIds
+        );
+
+        Challenge challenge = challengeService.findById(challengeId);
+
+        challenge.getSubmittedChallengeQuizzes().add(savedQuiz);
+        challengeService.save(challenge);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(

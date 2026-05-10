@@ -1,9 +1,7 @@
 package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.*;
-import com.fabiocondo.dto.TopicDTO;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
-import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
@@ -78,6 +76,7 @@ public class QuizService {
         return quizRepository.save(quiz);
     }
 
+    /*
     @Transactional
     public Quiz saveQuizTopicTestWithQuestions(Quiz quiz, Set<Long> questionIds, Set<Long> userAnswerIds, Long topicTestId) throws TopicNotFoundException {
 
@@ -103,6 +102,7 @@ public class QuizService {
 
         return quizRepository.save(quiz);
     }
+    */
 
     public void delete(Long id) throws QuizNotFoundException {
         Quiz existQuiz = findById(id);

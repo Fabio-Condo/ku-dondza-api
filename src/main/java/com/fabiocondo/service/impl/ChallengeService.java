@@ -3,9 +3,7 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.domain.Challenge;
 import com.fabiocondo.domain.Exam;
 import com.fabiocondo.domain.Question;
-import com.fabiocondo.exception.domain.ChallengeNotFoundException;
-import com.fabiocondo.exception.domain.QuestionNotFoundException;
-import com.fabiocondo.exception.domain.TopicNotFoundException;
+import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.ChallengeRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.filter.ChallengeFilter;
@@ -118,5 +116,37 @@ public class ChallengeService {
         }
         challenge.getChallengeQuestions().remove(question.get());
         return challengeRepository.save(challenge);
+    }
+
+    public void validateUserHasNotSubmittedQuiz(Long challengeId, Long userId) throws UserAlreadySubmittedException {
+
+        boolean alreadySubmitted = challengeRepository
+                .existsQuizInTest(challengeId, userId);
+
+        if (alreadySubmitted) {
+            throw new UserAlreadySubmittedException(
+                    "Este utilizador já submeteu este desafio."
+            );
+        }
+    }
+
+    public void validateChallengeAvailability(Long challengeId)
+            throws ChallengeNotFoundException, ChallengeUnavailableException {
+
+        Challenge challenge = findById(challengeId);
+
+        Date now = new Date();
+
+        if (challenge.getStartDate() != null && now.before(challenge.getStartDate())) {
+            throw new ChallengeUnavailableException(
+                    "Este desafio ainda não começou."
+            );
+        }
+
+        if (challenge.getEndDate() != null && now.after(challenge.getEndDate())) {
+            throw new ChallengeUnavailableException(
+                    "Este desafio já foi encerrado."
+            );
+        }
     }
 }

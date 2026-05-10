@@ -81,7 +81,7 @@ public class QuizController {
     ) throws TopicNotFoundException, UserAlreadySubmittedException {
 
         // Valida se o utilizador já submeteu o teste
-        testService.validateUserHasNotSubmittedQuiz(currentUserId, topicTestId);
+        testService.validateUserHasNotSubmittedQuiz(topicTestId, currentUserId);
 
         // Salva quiz com perguntas e respostas
         Quiz savedQuiz = quizService.saveQuizWithQuestions(

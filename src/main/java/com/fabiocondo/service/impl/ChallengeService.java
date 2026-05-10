@@ -116,6 +116,7 @@ public class ChallengeService {
         challenge.getChallengeQuestions().remove(question.get());
         return challengeRepository.save(challenge);
     }
+
     public void validateUserHasNotSubmittedQuiz(Long challengeId, Long userId) throws UserAlreadySubmittedException {
 
         boolean alreadySubmitted = challengeRepository

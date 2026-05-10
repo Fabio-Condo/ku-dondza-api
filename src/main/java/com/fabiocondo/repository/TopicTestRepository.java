@@ -26,8 +26,7 @@ public interface TopicTestRepository extends JpaRepository<Test, Long> {
             "JOIN t.submittedQuizzes q " +
             "WHERE t.id = :topicTestId " +
             "AND q.user.id = :userId")
-    boolean existsQuizInTest(@Param("topicTestId") Long topicTestId,
-                             @Param("userId") Long userId);
+    boolean existsQuizInTest(@Param("topicTestId") Long topicTestId, @Param("userId") Long userId);
 
     List<Test> findByTopicSubjectId(Long subjectId);
 

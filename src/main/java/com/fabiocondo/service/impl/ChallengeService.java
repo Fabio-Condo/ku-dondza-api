@@ -1,7 +1,6 @@
 package com.fabiocondo.service.impl;
 
 import com.fabiocondo.domain.Challenge;
-import com.fabiocondo.domain.Exam;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.ChallengeRepository;
@@ -117,11 +116,10 @@ public class ChallengeService {
         challenge.getChallengeQuestions().remove(question.get());
         return challengeRepository.save(challenge);
     }
-
     public void validateUserHasNotSubmittedQuiz(Long challengeId, Long userId) throws UserAlreadySubmittedException {
 
         boolean alreadySubmitted = challengeRepository
-                .existsQuizInTest(challengeId, userId);
+                .existsQuizInChallenge(challengeId, userId);
 
         if (alreadySubmitted) {
             throw new UserAlreadySubmittedException(

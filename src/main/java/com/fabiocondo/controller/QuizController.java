@@ -136,10 +136,7 @@ public class QuizController {
         challengeService.validateChallengeAvailability(challengeId);
 
         // valida se utilizador já submeteu
-        challengeService.validateUserHasNotSubmittedQuiz(
-                currentUserId,
-                challengeId
-        );
+        challengeService.validateUserHasNotSubmittedQuiz(challengeId, currentUserId);
 
         // salva quiz
         Quiz savedQuiz = quizService.saveQuizWithQuestions(

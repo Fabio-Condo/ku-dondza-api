@@ -21,6 +21,5 @@ public interface ChallengeRepository extends JpaRepository<Challenge, Long>, Cha
             "JOIN c.submittedChallengeQuizzes q " +
             "WHERE c.id = :challengeId " +
             "AND q.user.id = :userId")
-    boolean existsQuizInTest(@Param("challengeId") Long challengeId,
-                             @Param("userId") Long userId);
+    boolean existsQuizInChallenge(@Param("challengeId") Long challengeId, @Param("userId") Long userId);
 }

@@ -40,7 +40,8 @@ public class Challenge {
     private Set<Question> challengeQuestions = new HashSet<>();
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.DETACH) @JoinTable( name = "submitted_challenge_quizzes", joinColumns = @JoinColumn(name = "challenge_id"), inverseJoinColumns = @JoinColumn(name = "quiz_id") )
+    @ManyToMany(cascade = CascadeType.DETACH)
+    @JoinTable(name = "submitted_challenge_quizzes", joinColumns = @JoinColumn(name = "challenge_id"), inverseJoinColumns = @JoinColumn(name = "quiz_id") )
     private Set<Quiz> submittedChallengeQuizzes = new HashSet<>();
 
     public Challenge() { }

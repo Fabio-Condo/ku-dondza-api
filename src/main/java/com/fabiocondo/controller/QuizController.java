@@ -122,7 +122,7 @@ public class QuizController {
     }
 
     @PostMapping("/challenge")
-    public ResponseEntity<QuizDTO> saveQuizChalleng(
+    public ResponseEntity<QuizDTO> saveQuizChallenge(
             @RequestBody Quiz quiz,
             @RequestParam Set<Long> questionIds,
             @RequestParam Set<Long> userAnswerIds,
@@ -132,30 +132,34 @@ public class QuizController {
             ChallengeNotFoundException,
             ChallengeUnavailableException {
 
-        // valida se já submeteu
-        challengeService.validateUserHasNotSubmittedQuiz(currentUserId, challengeId);
-
-        // valida tempo do challenge
+        // valida se challenge ainda pode ser realizado
         challengeService.validateChallengeAvailability(challengeId);
 
+        // valida se utilizador já submeteu
+        challengeService.validateUserHasNotSubmittedQuiz(
+                currentUserId,
+                challengeId
+        );
+
+        // salva quiz
         Quiz savedQuiz = quizService.saveQuizWithQuestions(
                 quiz,
                 questionIds,
                 userAnswerIds
         );
 
+        // associa quiz ao challenge
         Challenge challenge = challengeService.findById(challengeId);
-
         challenge.getSubmittedChallengeQuizzes().add(savedQuiz);
+
         challengeService.save(challenge);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(
-                        quizMapper.domainToDTO_WithQuestionsAndAnswers(
-                                savedQuiz,
-                                currentUserId
-                        )
-                );
+        return ResponseEntity.ok(
+                quizMapper.domainToDTO_WithQuestionsAndAnswers(
+                        savedQuiz,
+                        currentUserId
+                )
+        );
     }
 
     @DeleteMapping("/{id}")

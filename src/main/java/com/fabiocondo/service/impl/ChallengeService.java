@@ -125,7 +125,7 @@ public class ChallengeService {
 
         if (alreadySubmitted) {
             throw new UserAlreadySubmittedException(
-                    "Este utilizador já submeteu este desafio."
+                    "Voçê já submeteu este desafio."
             );
         }
     }

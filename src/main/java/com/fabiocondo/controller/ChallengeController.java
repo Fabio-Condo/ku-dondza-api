@@ -3,7 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.domain.Challenge;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
-import com.fabiocondo.dto.ChallengeDTO;
+import com.fabiocondo.dto.ChallengeSummaryDTO;
 import com.fabiocondo.dto.ChallengeRankingResultDTO;
 import com.fabiocondo.dtoMapper.ChallengeMapper;
 import com.fabiocondo.exception.domain.ChallengeNotFoundException;
@@ -42,14 +42,14 @@ public class ChallengeController {
     }
 
     @GetMapping("/filter")
-    public Page<ChallengeDTO> filter(ChallengeFilter challengeFilter, Pageable pageable) {
+    public Page<ChallengeSummaryDTO> filter(ChallengeFilter challengeFilter, Pageable pageable) {
         return challengeMapper.toResponsePage(
                 challengeService.filter(challengeFilter, pageable)
         );
     }
 
     @GetMapping("/{challengeId}")
-    public ChallengeDTO getByChallengeId(@PathVariable String challengeId) throws ChallengeNotFoundException {
+    public ChallengeSummaryDTO getByChallengeId(@PathVariable String challengeId) throws ChallengeNotFoundException {
         Challenge challenge = challengeService.findByChallengeId(challengeId);
         return challengeMapper.toResponse(challenge);
     }

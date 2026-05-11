@@ -3,9 +3,8 @@ package com.fabiocondo.dtoMapper;
 import com.fabiocondo.domain.Challenge;
 import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.domain.User;
-import com.fabiocondo.dto.ChallengeDTO;
+import com.fabiocondo.dto.ChallengeSummaryDTO;
 import com.fabiocondo.dto.ChallengeRankingResultDTO;
-import com.fabiocondo.repository.ChallengeRepository;
 import com.fabiocondo.service.impl.ChallengeService;
 import com.fabiocondo.service.impl.QuizService;
 import org.springframework.data.domain.Page;
@@ -24,9 +23,9 @@ public class ChallengeMapper {
         this.quizService = quizService;
     }
 
-    public ChallengeDTO toResponse(Challenge challenge) {
+    public ChallengeSummaryDTO toResponse(Challenge challenge) {
 
-        ChallengeDTO response = new ChallengeDTO();
+        ChallengeSummaryDTO response = new ChallengeSummaryDTO();
 
         response.setId(challenge.getId());
         response.setChallengeId(challenge.getChallengeId());
@@ -49,10 +48,13 @@ public class ChallengeMapper {
             response.setSubjectName(challenge.getSubject().getName());
         }
 
+        //response.setCurrentUserRank();
+        //response.setCurrentUserScore();
+
         return response;
     }
 
-    public Page<ChallengeDTO> toResponsePage(Page<Challenge> page) {
+    public Page<ChallengeSummaryDTO> toResponsePage(Page<Challenge> page) {
         return page.map(this::toResponse);
     }
 

@@ -4,7 +4,7 @@ import com.fabiocondo.enumeration.DifficultyLevel;
 
 import java.util.Date;
 
-public class ChallengeDTO {
+public class ChallengeSummaryDTO {
 
     private Long id;
     private String challengeId;
@@ -33,6 +33,10 @@ public class ChallengeDTO {
     private Integer totalParticipants;
 
     private Integer averageScore;
+
+    private Long currentUserRank;
+
+    private double currentUserScore;
 
     // --- getters & setters ---
 
@@ -154,5 +158,21 @@ public class ChallengeDTO {
 
     public void setAverageScore(Integer averageScore) {
         this.averageScore = averageScore;
+    }
+
+    public Long getCurrentUserRank() {
+        return currentUserRank;
+    }
+
+    public void setCurrentUserRank(Long currentUserRank) {
+        this.currentUserRank = currentUserRank;
+    }
+
+    public double getCurrentUserScore() {
+        return currentUserScore;
+    }
+
+    public void setCurrentUserScore(double currentUserScore) {
+        this.currentUserScore = currentUserScore;
     }
 }

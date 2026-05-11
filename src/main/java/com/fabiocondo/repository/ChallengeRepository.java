@@ -1,6 +1,7 @@
 package com.fabiocondo.repository;
 
 import com.fabiocondo.domain.Challenge;
+import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.repository.query.ChallengeRepositoryQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

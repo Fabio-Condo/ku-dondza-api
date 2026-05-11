@@ -10,9 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class ChallengeService {
@@ -20,6 +18,7 @@ public class ChallengeService {
     private final ChallengeRepository challengeRepository;
 
     private final QuestionRepository questionRepository;
+
 
     public ChallengeService(ChallengeRepository challengeRepository, QuestionRepository questionRepository) {
         this.challengeRepository = challengeRepository;
@@ -31,17 +30,13 @@ public class ChallengeService {
                 .orElseThrow(() -> new ChallengeNotFoundException("Challenge não encontrado: " + id));
     }
 
-    public Challenge findByChallengeId(String challengeId) {
+    public Challenge findByChallengeId(String challengeId) throws ChallengeNotFoundException {
         return challengeRepository.findByChallengeId(challengeId)
-                .orElseThrow(() -> new RuntimeException("Challenge não encontrado: " + challengeId));
+                .orElseThrow(() -> new ChallengeNotFoundException("Challenge não encontrado: " + challengeId));
     }
 
     public Page<Challenge> filter(ChallengeFilter challengeFilter, Pageable pageable) {
         return challengeRepository.filter(challengeFilter, pageable);
-    }
-
-    public Page<Challenge> findAll(Pageable pageable) {
-        return challengeRepository.findAll(pageable);
     }
 
     public Challenge save(Challenge challenge) {

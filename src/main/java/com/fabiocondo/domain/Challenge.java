@@ -17,10 +17,13 @@ public class Challenge {
 
     private String challengeId;
 
-    private String title; @Column(length = 500)
+    private String title;
 
-    private String description; @Enumerated(EnumType.STRING)
+    @Column(length = 500)
 
+    private String description;
+
+    @Enumerated(EnumType.STRING)
     private DifficultyLevel difficultyLevel;
 
     private Integer xpReward;

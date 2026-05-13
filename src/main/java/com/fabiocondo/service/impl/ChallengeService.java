@@ -6,6 +6,7 @@ import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.ChallengeRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.filter.ChallengeFilter;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,17 @@ public class ChallengeService {
                 .orElseThrow(() -> new ChallengeNotFoundException("Challenge não encontrado: " + id));
     }
 
+    public Challenge save(Challenge challenge) {
+        challenge.setChallengeId(UUID.randomUUID().toString());
+        return challengeRepository.save(challenge);
+    }
+
+    public Challenge update(Challenge challenge, Long id) throws ChallengeNotFoundException {
+        Challenge existChallenge = findById(id);
+        BeanUtils.copyProperties(challenge, existChallenge, "id", "challengeId", "challengeQuestions", "submittedChallengeQuizzes");
+        return challengeRepository.save(existChallenge);
+    }
+
     public Challenge findByChallengeId(String challengeId) throws ChallengeNotFoundException {
         return challengeRepository.findByChallengeId(challengeId)
                 .orElseThrow(() -> new ChallengeNotFoundException("Challenge não encontrado: " + challengeId));
@@ -37,10 +49,6 @@ public class ChallengeService {
 
     public Page<Challenge> filter(ChallengeFilter challengeFilter, Pageable pageable) {
         return challengeRepository.filter(challengeFilter, pageable);
-    }
-
-    public Challenge save(Challenge challenge) {
-        return challengeRepository.save(challenge);
     }
 
     public String getStatus(Challenge challenge) {

@@ -46,8 +46,8 @@ public class TopicController {
     }
 
     @PostMapping
-    public ResponseEntity<Topic> save(@RequestBody Topic Topic) throws TopicNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(topicService.save(Topic));
+    public ResponseEntity<Topic> save(@RequestBody Topic topic) throws TopicNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(topicService.save(topic));
     }
 
     @PutMapping("/{id}")

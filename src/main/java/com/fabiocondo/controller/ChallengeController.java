@@ -54,6 +54,16 @@ public class ChallengeController {
         return challengeMapper.toResponse(challenge);
     }
 
+    @PostMapping
+    public ResponseEntity<Challenge> save(@RequestBody Challenge challenge) {
+        return ResponseEntity.status(HttpStatus.OK).body(challengeService.save(challenge));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Challenge> update(@PathVariable("id") Long id, @RequestBody Challenge challenge) throws ChallengeNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(challengeService.update(challenge, id));
+    }
+
     @GetMapping("/{id}/questions")
     public ResponseEntity<Set<Question>> getQuestionsByChallengeId(@PathVariable("id") Long challengeId) throws TopicNotFoundException {
         Set<Question> questions = challengeService.getQuestionsByChallengeId(challengeId);

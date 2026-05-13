@@ -1,5 +1,6 @@
 package com.fabiocondo.dto;
 
+import com.fabiocondo.domain.Subject;
 import com.fabiocondo.enumeration.DifficultyLevel;
 
 import java.util.Date;
@@ -11,6 +12,8 @@ public class ChallengeSummaryDTO {
 
     private String title;
     private String description;
+
+    private Subject subject;
 
     private DifficultyLevel difficultyLevel;
 
@@ -70,6 +73,14 @@ public class ChallengeSummaryDTO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
     }
 
     public DifficultyLevel getDifficultyLevel() {

@@ -31,6 +31,7 @@ public class ChallengeMapper {
         response.setChallengeId(challenge.getChallengeId());
         response.setTitle(challenge.getTitle());
         response.setDescription(challenge.getDescription());
+        response.setSubject(challenge.getSubject());
 
         response.setDifficultyLevel(challenge.getDifficultyLevel());
         response.setXpReward(challenge.getXpReward());

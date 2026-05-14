@@ -48,7 +48,7 @@ public class QuizMapper {
         quiz.setSubject(quizDTO.getSubject());
         quiz.setUser(quizDTO.getUser());
         //quiz.setQuestions(quizDTO.getQuestions());
-        quiz.setAnswers(quizDTO.getAnswers());
+        //quiz.setAnswers(quizDTO.getAnswers());
         return quiz;
     }
 

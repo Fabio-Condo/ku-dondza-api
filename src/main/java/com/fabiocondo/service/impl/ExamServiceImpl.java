@@ -17,6 +17,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -56,13 +57,9 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
+    @Cacheable("exams")
     public Page<Exam> filter(ExamFilter examFilter, Pageable pageable) {
-        //try {
-        //    Thread.sleep(3000);
-        //} catch (InterruptedException e) {
-        //    Thread.currentThread().interrupt();
-        //    throw new RuntimeException("A operação foi interrompida", e);
-        //}
+        logger.info("Getting exams");
         return examRepository.filter(examFilter, pageable);
     }
 

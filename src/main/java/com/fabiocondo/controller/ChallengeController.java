@@ -12,6 +12,7 @@ import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.filter.ChallengeFilter;
 import com.fabiocondo.service.impl.ChallengeService;
 import com.fabiocondo.service.impl.QuizService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -32,8 +33,6 @@ public class ChallengeController {
     private final ChallengeMapper challengeMapper;
     private final QuizService quizService;
 
-
-
     public ChallengeController(ChallengeService challengeService,
                                ChallengeMapper challengeMapper, QuizService quizService) {
         this.challengeService = challengeService;
@@ -49,6 +48,7 @@ public class ChallengeController {
     }
 
     @GetMapping("/{challengeId}")
+    @Cacheable(value = "challengeSummary", key = "#challengeId")
     public ChallengeSummaryDTO getByChallengeId(@PathVariable String challengeId) throws ChallengeNotFoundException {
         Challenge challenge = challengeService.findByChallengeId(challengeId);
         return challengeMapper.toResponse(challenge);
@@ -81,32 +81,26 @@ public class ChallengeController {
     }
 
     @GetMapping("/{challengeId}/ranking")
-    public List<ChallengeRankingResultDTO> getRanking(@PathVariable String challengeId) throws ChallengeNotFoundException {
+    @Cacheable(value = "ranking", key = "#challengeId")
+    public List<ChallengeRankingResultDTO> getRanking(@PathVariable String challengeId)
+            throws ChallengeNotFoundException {
 
         Challenge challenge = challengeService.findByChallengeId(challengeId);
 
         List<Quiz> quizzes = new ArrayList<>(challenge.getSubmittedChallengeQuizzes());
 
-        List<ChallengeRankingResultDTO> ranking = new ArrayList<>();
-
-        int position = 1;
-
-        // ordenar antes de mapear
         quizzes.sort(Comparator
-                // 1. percentagem (maior primeiro)
-                .comparingDouble((Quiz q) -> quizService.calculateAccuracyRate(q)).reversed()
-
-                // 3. mais antigo primeiro
-                .thenComparing(q -> q.getSubmittedAt())
+                .comparingDouble((Quiz q) -> quizService.calculateAccuracyRate(q))
+                .reversed()
+                .thenComparing(Quiz::getSubmittedAt) // mais antigo primeiro
+                .thenComparing(Quiz::getId) // critério de desempate adicional
         );
 
+        List<ChallengeRankingResultDTO> ranking = new ArrayList<>();
+        int position = 1;
+
         for (Quiz quiz : quizzes) {
-            ranking.add(
-                    challengeMapper.toRankingResponse(
-                            quiz,
-                            position++
-                    )
-            );
+            ranking.add(challengeMapper.toRankingResponse(quiz, position++));
         }
 
         return ranking;

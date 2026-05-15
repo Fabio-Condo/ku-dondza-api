@@ -3,13 +3,10 @@ package com.fabiocondo.service.impl;
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.domain.*;
-import com.fabiocondo.enumeration.ContentType;
 import com.fabiocondo.enumeration.ExamType;
 import com.fabiocondo.enumeration.Institution;
 import com.fabiocondo.exception.domain.ExamNotFoundException;
-import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
-import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.ExamRepository;
 import com.fabiocondo.repository.filter.ExamFilter;
 import com.fabiocondo.service.ExamService;
@@ -17,17 +14,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class ExamServiceImpl implements ExamService {
@@ -57,7 +50,6 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    @Cacheable("exams")
     public Page<Exam> filter(ExamFilter examFilter, Pageable pageable) {
         logger.info("Getting exams");
         return examRepository.filter(examFilter, pageable);

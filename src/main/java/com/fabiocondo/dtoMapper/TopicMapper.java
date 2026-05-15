@@ -59,6 +59,26 @@ public class TopicMapper {
         return topicDTO;
     }
 
+    public TopicDTO domainToDTO_2(Topic topic) {
+        TopicDTO topicDTO = new TopicDTO();
+        topicDTO.setId(topic.getId());
+        topicDTO.setTopicId(topic.getTopicId());
+        topicDTO.setName(topic.getName());
+        topicDTO.setDescription(topic.getDescription());
+        topicDTO.setEnabled(topic.isEnabled());
+        topicDTO.setPremium(topic.isPremium());
+        topicDTO.setPosition(topic.getPosition());
+
+        SubjectDto subjectDto = new SubjectDto();
+        subjectDto.setId(topic.getSubject().getId());
+        subjectDto.setSubjectId(topic.getSubject().getSubjectId());
+        subjectDto.setName(topic.getSubject().getName());
+        subjectDto.setDescription(topic.getSubject().getDescription());
+
+        topicDTO.setSubject(subjectDto);
+        return topicDTO;
+    }
+
     //public Page<TopicDTO> domainPageToDTOPage(Page<Topic> topics, Pageable pageable) {
     //    return new PageImpl<>(topics.stream()
     //            .map(this::domainToDTO)

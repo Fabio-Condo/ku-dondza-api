@@ -7,6 +7,7 @@ import com.fabiocondo.dtoMapper.TopicMapper;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.filter.TopicFilter;
 import com.fabiocondo.service.impl.TopicService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/topics")
@@ -70,9 +72,18 @@ public class TopicController {
         return ResponseEntity.status(HttpStatus.OK).body(topicService.findAll());
     }
 
-    @GetMapping("/{id}/subjects")
-    public List<Topic> getBySubjectId(@PathVariable Long id) {
-        return topicService.getBySubjectId(id);
+    @GetMapping("/subjects/{subjectId}")
+    public List<Topic> getBySubjectId(@PathVariable Long subjectId) {
+        return topicService.getBySubjectId(subjectId);
+    }
+
+    //@GetMapping("/subjects/{subjectId}")
+    //@Cacheable(value = "topicsBySubjectId", key = "#subjectId")
+    public List<TopicDTO> getBySubjectId2(Long subjectId) {
+        return topicService.getBySubjectId(subjectId)
+                .stream()
+                .map(topicMapper::domainToDTO_2)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/total")

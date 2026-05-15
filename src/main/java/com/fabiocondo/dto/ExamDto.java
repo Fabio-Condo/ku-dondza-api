@@ -1,19 +1,13 @@
-package com.fabiocondo.domain;
+package com.fabiocondo.dto;
 
+import com.fabiocondo.domain.Subject;
 import com.fabiocondo.enumeration.ExamType;
 import com.fabiocondo.enumeration.Institution;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 
-@Entity
-@Table(name = "exame")
-public class Exam {
+public class ExamDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, updatable=false)
-    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -34,23 +28,7 @@ public class Exam {
 
     private String number; // Se for UEM
 
-    @ManyToOne
-    @JoinColumn(name = "subject_id")
     private Subject subject;
-
-    public Exam() {
-    }
-
-    public Exam(Long id, Subject subject, ExamType examType, boolean premium, String fileName, String urlFile, Long year, Long totalDownloadNumber) {
-        this.id = id;
-        this.subject = subject;
-        this.examType = examType;
-        this.premium = premium;
-        this.fileName = fileName;
-        this.urlFile = urlFile;
-        this.year = year;
-        this.totalDownloadNumber = totalDownloadNumber;
-    }
 
     public Long getId() {
         return id;
@@ -60,28 +38,12 @@ public class Exam {
         this.id = id;
     }
 
-    public Subject getSubject() {
-        return subject;
-    }
-
-    public void setSubject(Subject subject) {
-        this.subject = subject;
-    }
-
     public ExamType getExamType() {
         return examType;
     }
 
     public void setExamType(ExamType examType) {
         this.examType = examType;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
     }
 
     public Institution getInstitution() {
@@ -98,6 +60,14 @@ public class Exam {
 
     public void setPremium(boolean premium) {
         this.premium = premium;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getUrlFile() {
@@ -130,5 +100,13 @@ public class Exam {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
     }
 }

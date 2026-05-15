@@ -6,5 +6,5 @@ spring:
 
   data:
     redis:
-      host: 192.168.11.46
+      host: 192.168.43.2
       port: 6379

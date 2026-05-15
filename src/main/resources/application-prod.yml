@@ -1,5 +1,11 @@
 spring:
   datasource:
-    url: jdbc:mysql://ku-dondza-db.c9syoygge7jk.us-east-1.rds.amazonaws.com:3306/blog
-    username: admin
-    password: fabiocondo123
+    url: jdbc:mysql://${DB_HOST}/e-learning?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Africa/Harare # Docker compose
+    username: root
+    password: root
+
+  data:
+    redis:
+      host: ${REDIS_HOST:kudondza-redis}
+      port: ${REDIS_PORT:6379}
+      timeout: 60000

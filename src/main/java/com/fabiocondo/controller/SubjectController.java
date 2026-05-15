@@ -9,6 +9,7 @@ import com.fabiocondo.enumeration.Category;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.SubjectServiceImpl;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -57,7 +58,9 @@ public class SubjectController {
     }
 
     @GetMapping
+    @Cacheable("subjects")
     public ResponseEntity<List<Subject>> findAll() throws SubjectNotFoundException {
+        System.out.println("Buscando no banco...");
         return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.findAll());
     }
 

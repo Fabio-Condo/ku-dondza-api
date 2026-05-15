@@ -2,9 +2,6 @@ jwt:
   secret: '[a-zA-Z0-9._]^+$Guidelines89797987forAlphabeticalArraNumeralsandOtherSymbo$'
 
 aws:
-  # user: root
-  #accessKeyId: AKIAW3MECWUYACIYYZ2P
-  #secretKey: 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
 
   # user: kudondza-user-production
   accessKeyId: AKIAU6GDVYYOJOHKDO7G
@@ -44,6 +41,7 @@ spring:
 
   profiles:
     active: stage
+    #active: prod
     #active: dev
 
   jpa:
@@ -65,19 +63,3 @@ spring:
   web:
     resources:
       add-mappings: false
-
-  #security:
-  #  oauth2:
-  #    client:
-  #      registration:
-  #        google:
-  #          client-id: SEU_CLIENT_ID
-  #          client-secret: SEU_CLIENT_SECRET
-  #          scope: profile, email
-
-  #redis:
-  #  host: localhost
-  #  port: 6379
-  #  password:
-  #  timeout: 2000
-  #

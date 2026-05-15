@@ -3,3 +3,9 @@ spring:
     url: jdbc:mysql://${DB_HOST}/e-learning?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Africa/Harare # Docker compose
     username: root
     password: root
+
+  data:
+    redis:
+      host: ${REDIS_HOST:kudondza-redis}
+      port: ${REDIS_PORT:6379}
+      timeout: 60000

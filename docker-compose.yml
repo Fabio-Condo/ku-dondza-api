@@ -5,43 +5,47 @@ networks:
     driver: bridge
 
 services:
+
   kudondza-mysql:
     image: mysql:8.0
     command: --default-authentication-plugin=mysql_native_password
     environment:
-      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_ROOT_PASSWORD: root
     ports:
       - "33066:3306"
+    restart: always
+    networks:
+      - kudondza-network
+
+  kudondza-redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: always
     networks:
       - kudondza-network
 
   kudondza-api:
-    #image: kudondza-api  # Usar imagem local
-    image: fabiocondo/kudondza-api # Usar imagem do seu Docker Hub
+    image: fabiocondo/kudondza-api
     environment:
       DB_HOST: kudondza-mysql
       REDIS_HOST: kudondza-redis
       REDIS_PORT: 6379
-    networks:
-      - kudondza-network
     depends_on:
       - kudondza-mysql
       - kudondza-redis
+    restart: always
+    networks:
+      - kudondza-network
 
   kudondza-proxy:
     build: ./nginx
     image: kudondza-proxy
     ports:
       - "80:80"
-    networks:
-      - kudondza-network
     depends_on:
       - kudondza-api
-
-  kudondza-redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
+    restart: always
     networks:
       - kudondza-network
 

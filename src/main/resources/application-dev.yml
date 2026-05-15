@@ -3,3 +3,8 @@ spring:
     url: jdbc:mysql://localhost:3306/e-learning?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Africa/Harare
     username: root
     password: root
+
+  data:
+    redis:
+      host: 192.168.11.46
+      port: 6379

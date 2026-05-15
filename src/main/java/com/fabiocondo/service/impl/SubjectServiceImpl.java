@@ -13,6 +13,7 @@ import com.fabiocondo.service.SubjectService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -100,7 +101,9 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
+    @Cacheable("subjects")
     public List<Subject> findAll() {
+        logger.info("Getting subjects");
         return subjectRepository.findAll();
     }
 

@@ -7,7 +7,6 @@ import com.fabiocondo.dtoMapper.TopicMapper;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.filter.TopicFilter;
 import com.fabiocondo.service.impl.TopicService;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

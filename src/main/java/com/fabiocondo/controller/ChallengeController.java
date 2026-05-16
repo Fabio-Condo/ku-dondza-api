@@ -48,7 +48,7 @@ public class ChallengeController {
     }
 
     @GetMapping("/{challengeId}")
-    @Cacheable(value = "challengeSummary", key = "#challengeId")
+    //@Cacheable(value = "challengeSummary", key = "#challengeId")
     public ChallengeSummaryDTO getByChallengeId(@PathVariable String challengeId) throws ChallengeNotFoundException {
         Challenge challenge = challengeService.findByChallengeId(challengeId);
         return challengeMapper.toResponse(challenge);
@@ -81,7 +81,7 @@ public class ChallengeController {
     }
 
     @GetMapping("/{challengeId}/ranking")
-    @Cacheable(value = "ranking", key = "#challengeId")
+    //@Cacheable(value = "ranking", key = "#challengeId")
     public List<ChallengeRankingResultDTO> getRanking(@PathVariable String challengeId)
             throws ChallengeNotFoundException {
 

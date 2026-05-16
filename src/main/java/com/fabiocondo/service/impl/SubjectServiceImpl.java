@@ -101,7 +101,6 @@ public class SubjectServiceImpl implements SubjectService {
     }
 
     @Override
-    @Cacheable("subjects")
     public List<Subject> findAll() {
         logger.info("Getting subjects");
         return subjectRepository.findAll();

@@ -108,12 +108,14 @@ public class TopicContentService {
 
     public void delete(Long id) throws ContentNotFoundException {
         TopicContent existContent = findById(id);
-        logger.info("Deleting content: " + existContent.getDescription());
-        contentRepository.deleteById(id);
+
         if (existContent.getFileName() != null) {
             logger.info("Deleting file: " + existContent.getFileName());
             amazonS3Service.deleteFile(existContent.getFileName(), BUCKET_NAME);
         }
+
+        logger.info("Deleting content: " + existContent.getDescription());
+        contentRepository.deleteById(id);
     }
 
     public byte[] downloadFile(Long id, @PathVariable String fileName) throws ContentNotFoundException {

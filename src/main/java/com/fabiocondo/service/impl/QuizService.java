@@ -1,6 +1,9 @@
 package com.fabiocondo.service.impl;
 
+import com.fabiocondo.constant.CacheNames;
 import com.fabiocondo.domain.*;
+import com.fabiocondo.dto.PageResponse;
+import com.fabiocondo.dto.QuizDTO;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
@@ -8,12 +11,14 @@ import com.fabiocondo.repository.QuizRepository;
 import com.fabiocondo.repository.filter.QuizFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class QuizService {
@@ -40,8 +45,56 @@ public class QuizService {
                 .orElseThrow(() -> new QuizNotFoundException("No quiz found by id: " + quizId));
     }
 
+    @Cacheable(
+            value = CacheNames.QUIZ_FILTER,
+            key =
+                            "#pageable.pageNumber + '-' +" +
+                            "#pageable.pageSize + '-' +" +
+                            "#pageable.sort.toString()"
+    )
     public Page<Quiz> filter(QuizFilter quizFilter, Pageable pageable) {
         return quizRepository.filter(quizFilter, pageable);
+    }
+
+    @Cacheable(
+            value = CacheNames.QUIZ_FILTER,
+            key =
+                    "#quizFilter.searchParam + '-' +" +
+                            "#quizFilter.subject + '-' +" +
+                            "#quizFilter.user + '-' +" +
+                            "#pageable.pageNumber + '-' +" +
+                            "#pageable.pageSize + '-' +" +
+                            "#pageable.sort.toString()"
+    )
+    public PageResponse<Quiz> filterWithCash(QuizFilter quizFilter, Pageable pageable) {
+        Page<Quiz> page =  quizRepository.filter(quizFilter, pageable);
+
+        return new PageResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements()
+        );
+    }
+
+    public QuizDTO domainToDTO(Quiz quiz) {
+        QuizDTO quizDTO = new QuizDTO();
+        quizDTO.setId(quiz.getId());
+        quizDTO.setQuizId(quiz.getQuizId());
+        quizDTO.setType(quiz.getType());
+        quizDTO.setLimitPerTopic(quiz.getLimitPerTopic());
+        quizDTO.setSubmittedAt(quiz.getSubmittedAt());
+        quizDTO.setTimeLimit(quiz.getTimeLimit());
+        quizDTO.setTimeSpent(quiz.getTimeSpent());
+        quizDTO.setAnonymous(quiz.isAnonymous());
+        quizDTO.setSubject(quiz.getSubject());
+        quizDTO.setUser(quiz.getUser());
+        quizDTO.setTotalQuestions(quizRepository.countQuestionsByQuizId(quiz.getId()));
+        quizDTO.setTopics(getSortedTopics(quiz));
+
+
+        quizDTO.setAccuracyRate(calculateAccuracyRate(quiz));
+        return quizDTO;
     }
 
     public Page<Quiz> getQuizzesByQuestionId(Long questionId, Pageable pageable) throws QuizNotFoundException {

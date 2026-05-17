@@ -1,21 +1,28 @@
 package com.fabiocondo.controller;
 
+import com.fabiocondo.constant.CacheNames;
 import com.fabiocondo.domain.*;
+import com.fabiocondo.dto.PageResponse;
 import com.fabiocondo.dto.QuizDTO;
 import com.fabiocondo.dtoMapper.QuizMapper;
 import com.fabiocondo.exception.domain.*;
+import com.fabiocondo.repository.filter.ExamFilter;
 import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.ChallengeService;
 import com.fabiocondo.service.impl.QuizService;
 import com.fabiocondo.service.impl.TestService;
 import com.fabiocondo.service.impl.UserSubjectScoreService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/quizzes")
@@ -50,6 +57,29 @@ public class QuizController {
         Quiz quiz = quizService.findQuizByQuizId(quizId);
         return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(quiz, currentUserId));
     }
+
+    @GetMapping("/filter-with-cache")
+    public PageResponse<QuizDTO> filterWithCash(QuizFilter quizFilter, Pageable pageable) {
+
+        PageResponse<Quiz> page = quizService.filterWithCash(quizFilter, pageable);
+
+        List<QuizDTO> content = page.getContent()
+                .stream()
+                .map(quizMapper::domainToDTO)
+                .collect(Collectors.toList());
+
+        return new PageResponse<>(
+                content,
+                page.getPage(),
+                page.getSize(),
+                page.getTotalElements()
+        );
+    }
+
+    //@GetMapping("/filter-with-cash")
+    //public PageResponse<QuizDTO> filterWithCash2(QuizFilter quizFilter, Pageable pageable) {
+    //    return quizService.filterWithCash(quizFilter, pageable);
+    //}
 
     @GetMapping("/filter")
     public Page<QuizDTO> filter(QuizFilter quizFilter, Pageable pageable) {

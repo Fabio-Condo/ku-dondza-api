@@ -2,7 +2,9 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
+import com.fabiocondo.constant.CacheNames;
 import com.fabiocondo.domain.*;
+import com.fabiocondo.dto.PageResponse;
 import com.fabiocondo.enumeration.ExamType;
 import com.fabiocondo.enumeration.Institution;
 import com.fabiocondo.exception.domain.ExamNotFoundException;
@@ -14,6 +16,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -55,6 +59,31 @@ public class ExamServiceImpl implements ExamService {
         return examRepository.filter(examFilter, pageable);
     }
 
+    @Cacheable(
+            value = CacheNames.EXAM_FILTER,
+            key =
+                    "#examFilter.searchParam + '-' +" +
+                            "#examFilter.examType + '-' +" +
+                            "#examFilter.institution + '-' +" +
+                            "#examFilter.subject + '-' +" +
+                            "#examFilter.beginYear + '-' +" +
+                            "#examFilter.endYear + '-' +" +
+                            "#pageable.pageNumber + '-' +" +
+                            "#pageable.pageSize + '-' +" +
+                            "#pageable.sort.toString()"
+    )
+    public PageResponse<Exam> filterWithCash(ExamFilter examFilter, Pageable pageable) {
+
+        Page<Exam> page = examRepository.filter(examFilter, pageable);
+
+        return new PageResponse<>(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements()
+        );
+    }
+
     @Override
     public Page<Exam> findAll(Pageable pageable) {
         return examRepository.findAll(pageable);
@@ -66,6 +95,9 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
+    @CacheEvict(value = {
+            CacheNames.EXAM_FILTER,
+    }, allEntries = true)
     public Exam save(ExamType examType, Institution institution, boolean premium, Long year, Long subjectId, String number, MultipartFile file) throws SubjectNotFoundException {
         logger.info("Uploading file: " + file.getOriginalFilename());
         //String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
@@ -90,6 +122,9 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
+    @CacheEvict(value = {
+            CacheNames.EXAM_FILTER,
+    }, allEntries = true)
     public Exam update(Long id, ExamType examType, Institution institution, boolean premium, Long year, Long subjectId, String number, MultipartFile file) throws SubjectNotFoundException, ExamNotFoundException {
         Subject subject = subjectServiceImpl.findById(subjectId);
 
@@ -119,6 +154,9 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
+    @CacheEvict(value = {
+            CacheNames.EXAM_FILTER,
+    }, allEntries = true)
     public void delete(Long id) throws ExamNotFoundException {
         Exam existExam = findById(id);
         logger.info("Deleting exame: " + existExam.getExamType());

@@ -3,17 +3,15 @@ package com.fabiocondo.repository.filter;
 import com.fabiocondo.domain.Subject;
 import com.fabiocondo.enumeration.ExamType;
 import com.fabiocondo.enumeration.Institution;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import java.util.Date;
 
 public class ExamFilter {
 
     private String searchParam;
 
-    private String exameOrderBy;
+    private String sort;
 
     private Subject subject;
 
@@ -37,12 +35,12 @@ public class ExamFilter {
         this.searchParam = searchParam;
     }
 
-    public String getExameOrderBy() {
-        return exameOrderBy;
+    public String getSort() {
+        return sort;
     }
 
-    public void setExameOrderBy(String exameOrderBy) {
-        this.exameOrderBy = exameOrderBy;
+    public void setSort(String sort) {
+        this.sort = sort;
     }
 
     public Subject getSubject() {

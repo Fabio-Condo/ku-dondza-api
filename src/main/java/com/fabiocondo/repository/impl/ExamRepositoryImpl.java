@@ -108,10 +108,10 @@ public class ExamRepositoryImpl implements ExamRepositoryQuery {
     }
 
     public void getSortOrderOLD(ExamFilter examFilter, CriteriaBuilder builder, CriteriaQuery<Exam> criteria, Root<Exam> root){
-        if(Objects.equals(examFilter.getExameOrderBy(), "subject,asc")){
+        if(Objects.equals(examFilter.getSort(), "subject,asc")){
             criteria.orderBy(builder.asc(root.get("subject")));
         }
-        if(Objects.equals(examFilter.getExameOrderBy(), "subject,desc")){
+        if(Objects.equals(examFilter.getSort(), "subject,desc")){
             criteria.orderBy(builder.desc(root.get("subject")));
         }
     }

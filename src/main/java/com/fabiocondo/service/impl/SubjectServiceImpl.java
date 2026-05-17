@@ -2,6 +2,7 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
+import com.fabiocondo.constant.CacheNames;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.Category;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
@@ -13,6 +14,7 @@ import com.fabiocondo.service.SubjectService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,9 +37,9 @@ public class SubjectServiceImpl implements SubjectService {
 
     private final AmazonS3Service amazonS3Service;
 
-    SubjectRepository subjectRepository;
+    private final SubjectRepository subjectRepository;
 
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
     private final TopicContentRepository contentRepository;
 
@@ -58,6 +60,102 @@ public class SubjectServiceImpl implements SubjectService {
     public Subject findSubjectBySubjectId(String subjectId) throws SubjectNotFoundException {
         return subjectRepository.findSubjectBySubjectId(subjectId)
                 .orElseThrow(() -> new SubjectNotFoundException("No subject found by id: " + subjectId));
+    }
+
+    @Override
+    public Page<Subject> findByName(String name, boolean enabled, Pageable pageable) {
+        return subjectRepository.findByNameAndCourseEnabled(name, enabled, pageable);
+    }
+
+    public Page<Subject> findAll(Pageable pageable) {
+        return subjectRepository.findAll(pageable);
+    }
+
+    @Override
+    @Cacheable(value = CacheNames.SUBJECT_LIST, key = "'all'")
+    public List<Subject> findAll() {
+        logger.info("Getting subjects");
+        return subjectRepository.findAll();
+    }
+
+    @Override
+    @CacheEvict(
+            value = {
+                    CacheNames.SUBJECT_LIST,
+            },
+            allEntries = true
+    )
+    public Subject save(String name, String description, Category category, boolean quizEnabled, boolean courseEnabled, boolean progressEnabled, boolean examEnabled, MultipartFile file) {
+        logger.info("Uploading file: " + file.getOriginalFilename());
+        //String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+        String fileKey = "subject_image_profile_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
+        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
+
+        Subject subject = new Subject();
+        subject.setSubjectId(UUID.randomUUID().toString());
+        subject.setName(name);
+        subject.setDescription(description);
+        subject.setCategory(category);
+        subject.setQuizEnabled(quizEnabled);
+        subject.setCourseEnabled(courseEnabled);
+        subject.setProgressEnabled(progressEnabled);
+        subject.setExamEnabled(examEnabled);
+        subject.setUrlFile(s3UploadResponse.getFileUrl());
+        subject.setFileName(fileKey);
+
+        logger.info("Saving new subject: " + subject.getName());
+        return subjectRepository.save(subject);
+    }
+
+    @Override
+    @CacheEvict(
+            value = {
+                    CacheNames.SUBJECT_LIST,
+            },
+            allEntries = true
+    )
+    public Subject update(Long id, String name, String description, Category category, boolean quizEnabled, boolean courseEnabled, boolean progressEnabled, boolean examEnabled, MultipartFile file) throws SubjectNotFoundException {
+        Subject existSubject = findById(id);
+        existSubject.setName(name);
+        existSubject.setDescription(description);
+        existSubject.setCategory(category);
+        existSubject.setQuizEnabled(quizEnabled);
+        existSubject.setCourseEnabled(courseEnabled);
+        existSubject.setProgressEnabled(progressEnabled);
+        existSubject.setExamEnabled(examEnabled);
+
+        // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
+        if (file != null) {
+            if (existSubject.getFileName() != null) {
+                logger.info("Deleting file: " + existSubject.getFileName());
+                amazonS3Service.deleteFile(existSubject.getFileName(), BUCKET_NAME);
+            }
+            //String newFileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
+            String newFileKey = "subject_image_profile_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
+            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, newFileKey);
+            existSubject.setUrlFile(s3UploadResponse.getFileUrl());
+            existSubject.setFileName(newFileKey);
+        }
+
+        logger.info("Updating subject: " + existSubject.getName());
+        return subjectRepository.save(existSubject);
+    }
+
+    @CacheEvict(
+            value = {
+                    CacheNames.SUBJECT_LIST,
+            },
+            allEntries = true
+    )
+    public void delete(Long id) throws SubjectNotFoundException {
+        Subject existSubject = findById(id);
+        if (existSubject.getFileName() != null) {
+            logger.info("Deleting file: " + existSubject.getFileName());
+            amazonS3Service.deleteFile(existSubject.getFileName(), BUCKET_NAME);
+        }
+
+        logger.info("Deleting subject: " + existSubject.getName());
+        subjectRepository.deleteById(id);
     }
 
     public Subject findSubjectBySubjectId(String onlineCourseId, Long currentUserId)
@@ -98,79 +196,6 @@ public class SubjectServiceImpl implements SubjectService {
 
         if (contents.isEmpty()) return 0;
         return (double) totalMarked / contents.size() * 100;
-    }
-
-    @Override
-    public List<Subject> findAll() {
-        logger.info("Getting subjects");
-        return subjectRepository.findAll();
-    }
-
-    @Override
-    public Page<Subject> findAll(Pageable pageable) {
-        return subjectRepository.findAll(pageable);
-    }
-
-    @Override
-    public Page<Subject> findByName(String name, boolean enabled, Pageable pageable) {
-        return subjectRepository.findByNameAndCourseEnabled(name, enabled, pageable);
-    }
-
-    @Override
-    public Subject save(String name, String description, Category category, boolean quizEnabled, boolean courseEnabled, boolean progressEnabled, boolean examEnabled, MultipartFile file) {
-        logger.info("Uploading file: " + file.getOriginalFilename());
-        //String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
-        String fileKey = "subject_image_profile_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
-
-        Subject subject = new Subject();
-        subject.setSubjectId(UUID.randomUUID().toString());
-        subject.setName(name);
-        subject.setDescription(description);
-        subject.setCategory(category);
-        subject.setQuizEnabled(quizEnabled);
-        subject.setCourseEnabled(courseEnabled);
-        subject.setProgressEnabled(progressEnabled);
-        subject.setExamEnabled(examEnabled);
-        subject.setUrlFile(s3UploadResponse.getFileUrl());
-        subject.setFileName(fileKey);
-
-        logger.info("Saving new subject: " + subject.getName());
-        return subjectRepository.save(subject);
-    }
-
-    @Override
-    public Subject update(Long id, String name, String description, Category category, boolean quizEnabled, boolean courseEnabled, boolean progressEnabled, boolean examEnabled, MultipartFile file) throws SubjectNotFoundException {
-        Subject existSubject = findById(id);
-        existSubject.setName(name);
-        existSubject.setDescription(description);
-        existSubject.setCategory(category);
-        existSubject.setQuizEnabled(quizEnabled);
-        existSubject.setCourseEnabled(courseEnabled);
-        existSubject.setProgressEnabled(progressEnabled);
-        existSubject.setExamEnabled(examEnabled);
-
-        // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
-        if (file != null) {
-            if (existSubject.getFileName() != null) {
-                logger.info("Deleting file: " + existSubject.getFileName());
-                amazonS3Service.deleteFile(existSubject.getFileName(), BUCKET_NAME);
-            }
-            //String newFileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
-            String newFileKey = "subject_image_profile_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
-            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, newFileKey);
-            existSubject.setUrlFile(s3UploadResponse.getFileUrl());
-            existSubject.setFileName(newFileKey);
-        }
-
-        logger.info("Updating subject: " + existSubject.getName());
-        return subjectRepository.save(existSubject);
-    }
-
-    public void delete(Long id) throws SubjectNotFoundException {
-        Subject existSubject = findById(id);
-        logger.info("Deleting subject: " + existSubject.getName());
-        subjectRepository.deleteById(id);
     }
 
     public long getTotal(){

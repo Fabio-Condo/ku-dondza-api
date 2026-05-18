@@ -55,21 +55,21 @@ public class RedisConfig {
 
         // SUBJECTS
         cacheConfigs.put(CacheNames.SUBJECT_LIST,
-                baseConfig().entryTtl(Duration.ofMinutes(3)));
+                baseConfig().entryTtl(Duration.ofMinutes(15)));
 
         // TOPICS
         cacheConfigs.put(CacheNames.TOPIC_LIST,
-                baseConfig().entryTtl(Duration.ofMinutes(3)));
+                baseConfig().entryTtl(Duration.ofMinutes(15)));
 
         // EXAMS
         cacheConfigs.put(CacheNames.EXAM_FILTER,
-                baseConfig().entryTtl(Duration.ofMinutes(3)));
+                baseConfig().entryTtl(Duration.ofMinutes(15)));
 
         // QUIZZES
         cacheConfigs.put(CacheNames.QUIZ_FILTER,
-                baseConfig().entryTtl(Duration.ofMinutes(3)));
+                baseConfig().entryTtl(Duration.ofMinutes(15)));
         cacheConfigs.put(CacheNames.QUIZ_DETAILS,
-                baseConfig().entryTtl(Duration.ofMinutes(3)));
+                baseConfig().entryTtl(Duration.ofMinutes(15)));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(baseConfig().entryTtl(Duration.ofMinutes(10))) // fallback

@@ -1,8 +1,5 @@
 package com.fabiocondo.dto;
 
-import com.fabiocondo.domain.Answer;
-import com.fabiocondo.domain.MathExpression;
-import com.fabiocondo.domain.Topic;
 import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -38,7 +35,7 @@ public class QuestionDTO {
     ) // ADICIONANDO PORCAUSA DE TOPIC_TEST (MODULO DE PROGRESSAO) - MELHORAR DEPOIS COM DTO
     private TopicDTO topic;
 
-    private List<MathExpression> mathExpressions; // Se for math
+    private List<MathExpressionDTO> mathExpressions; // Se for math
 
     private List<AnswerDTO> answers;
 
@@ -136,11 +133,11 @@ public class QuestionDTO {
         this.topic = topic;
     }
 
-    public List<MathExpression> getMathExpressions() {
+    public List<MathExpressionDTO> getMathExpressions() {
         return mathExpressions;
     }
 
-    public void setMathExpressions(List<MathExpression> mathExpressions) {
+    public void setMathExpressions(List<MathExpressionDTO> mathExpressions) {
         this.mathExpressions = mathExpressions;
     }
 

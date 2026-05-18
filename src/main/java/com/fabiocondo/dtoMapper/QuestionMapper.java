@@ -1,10 +1,8 @@
 package com.fabiocondo.dtoMapper;
 
-import com.fabiocondo.domain.Answer;
-import com.fabiocondo.domain.Question;
-import com.fabiocondo.domain.Topic;
-import com.fabiocondo.domain.User;
+import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.AnswerDTO;
+import com.fabiocondo.dto.MathExpressionDTO;
 import com.fabiocondo.dto.QuestionDTO;
 import com.fabiocondo.dto.TopicDTO;
 import com.fabiocondo.repository.TopicTestRepository;
@@ -27,14 +25,11 @@ public class QuestionMapper {
     private final CommentService commentService;
     private final UserService userService;
     private final UserRepository userRepository;
-    private final TopicTestRepository topicTestRepository;
 
-
-    public QuestionMapper(CommentService commentService, UserService userService, UserRepository userRepository, TopicTestRepository topicTestRepository) {
+    public QuestionMapper(CommentService commentService, UserService userService, UserRepository userRepository ) {
         this.commentService = commentService;
         this.userService = userService;
         this.userRepository = userRepository;
-        this.topicTestRepository = topicTestRepository;
     }
 
     public Question dtoToDomainObject(QuestionDTO questionDTO) {
@@ -50,21 +45,32 @@ public class QuestionMapper {
         question.setFileName(questionDTO.getFileName());
         question.setUrlFile(questionDTO.getUrlFile());
 
+        // Converter TopicDTO para Topic (entidade)
         if (questionDTO.getTopic() != null) {
             Topic topic = new Topic();
-            topic.setId(question.getTopic().getId());
-            topic.setName(question.getTopic().getName());
-            topic.setDescription(question.getTopic().getDescription());
-            topic.setPosition(question.getTopic().getPosition());
-            // NÃO inclua contents, questions ou outras coleções
+            topic.setId(questionDTO.getTopic().getId());
+            topic.setName(questionDTO.getTopic().getName());
+            topic.setDescription(questionDTO.getTopic().getDescription());
+            topic.setPosition(questionDTO.getTopic().getPosition());
             question.setTopic(topic);
         }
 
-        question.setMathExpressions(questionDTO.getMathExpressions());
+        // Converter MathExpressionDTO para MathExpression (entidade)
+        if (questionDTO.getMathExpressions() != null) {
+            List<MathExpression> mathExpressions = questionDTO.getMathExpressions().stream()
+                    .map(meDTO -> {
+                        MathExpression mathExpression = new MathExpression();
+                        mathExpression.setId(meDTO.getId());
+                        mathExpression.setExpression(meDTO.getExpression());
+                        mathExpression.setName(meDTO.getName());
+                        mathExpression.setQuestion(question); // Seta a referência de volta
+                        return mathExpression;
+                    })
+                    .collect(Collectors.toList());
+            question.setMathExpressions(mathExpressions);
+        }
 
-        //question.setAnswers(questionDTO.getAnswers());
-
-        // CONVERTER Answers para AnswerDTO (NÃO usar entidades diretamente)
+        // Converter AnswerDTO para Answer (entidade)
         if (questionDTO.getAnswers() != null) {
             List<Answer> answers = questionDTO.getAnswers().stream()
                     .map(answerDTO -> {
@@ -72,6 +78,7 @@ public class QuestionMapper {
                         answer.setId(answerDTO.getId());
                         answer.setText(answerDTO.getText());
                         answer.setCorrect(answerDTO.isCorrect());
+                        answer.setQuestion(question); // Seta a referência de volta
                         return answer;
                     })
                     .collect(Collectors.toList());
@@ -104,7 +111,22 @@ public class QuestionMapper {
             questionDTO.setTopic(topicDTO);
         }
 
-        questionDTO.setMathExpressions(question.getMathExpressions());
+        //questionDTO.setMathExpressions(question.getMathExpressions());
+
+        if (question.getMathExpressions() != null) {
+            List<MathExpressionDTO> mathExpressionDTOs = question.getMathExpressions().stream()
+                    .map(me -> {
+                        MathExpressionDTO meDTO = new MathExpressionDTO();
+                        meDTO.setId(me.getId());
+                        meDTO.setName(me.getName());
+                        meDTO.setExpression(me.getExpression());
+                        //meDTO.setQuestion(me.getQuestion()); Recebe DTO
+
+                        return meDTO;
+                    })
+                    .collect(Collectors.toList());
+            questionDTO.setMathExpressions(mathExpressionDTOs);
+        }
 
         //questionDTO.setAnswers(question.getAnswers());
 
@@ -144,7 +166,7 @@ public class QuestionMapper {
         questionDTO.setValidated(question.isValidated());
         questionDTO.setFileName(question.getFileName());
         questionDTO.setUrlFile(question.getUrlFile());
-        questionDTO.setMathExpressions(question.getMathExpressions());
+        //questionDTO.setMathExpressions(question.getMathExpressions());
 
         if (question.getTopic() != null) {
             TopicDTO topicDTO = new TopicDTO();
@@ -157,19 +179,20 @@ public class QuestionMapper {
         }
 
         // MathExpressions - se for entidade, também precisa converter
-        //if (question.getMathExpressions() != null) {
-        //    Set<MathExpressionDTO> mathExpressionDTOs = question.getMathExpressions().stream()
-        //            .map(me -> {
-        //                MathExpressionDTO meDTO = new MathExpressionDTO();
-        //                meDTO.setId(me.getId());
-        //                meDTO.setExpression(me.getExpression());
-        //                meDTO.setLatex(me.getLatex());
-                        // ... outros campos
-        //                return meDTO;
-        //            })
-        //            .collect(Collectors.toSet());
-        //    questionDTO.setMathExpressions(mathExpressionDTOs);
-        //}
+        if (question.getMathExpressions() != null) {
+            List<MathExpressionDTO> mathExpressionDTOs = question.getMathExpressions().stream()
+                    .map(me -> {
+                        MathExpressionDTO meDTO = new MathExpressionDTO();
+                        meDTO.setId(me.getId());
+                        meDTO.setName(me.getName());
+                        meDTO.setExpression(me.getExpression());
+                        //meDTO.setQuestion(me.getQuestion()); Recebe DTO
+
+                        return meDTO;
+                    })
+                    .collect(Collectors.toList());
+            questionDTO.setMathExpressions(mathExpressionDTOs);
+        }
 
         // CONVERTER Answers para AnswerDTO (NÃO usar entidades diretamente)
         if (question.getAnswers() != null) {

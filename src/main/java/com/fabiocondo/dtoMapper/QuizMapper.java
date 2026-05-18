@@ -102,7 +102,7 @@ public class QuizMapper {
         quizDTO.setTimeLimit(quiz.getTimeLimit());
         quizDTO.setTimeSpent(quiz.getTimeSpent());
         quizDTO.setAnonymous(quiz.isAnonymous());
-        quizDTO.setAnswers(quiz.getAnswers());
+        //quizDTO.setAnswers(quiz.getAnswers());
 
         // Subject - converta para DTO
         if (quiz.getSubject() != null) {

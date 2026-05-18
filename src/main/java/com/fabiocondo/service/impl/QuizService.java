@@ -12,6 +12,7 @@ import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.repository.filter.QuizFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,10 +55,10 @@ public class QuizService {
     }
 
     // Método modificado para usar JOIN FETCH e ser cache-safe
-    //@Cacheable(
-    //        value = CacheNames.QUIZ_DETAILS,
-    //        key = "#quizId + '-' + #currentUserId"
-    //)
+    @Cacheable(
+            value = CacheNames.QUIZ_DETAILS,
+            key = "#quizId + '-' + #currentUserId"
+    )
     public QuizDTO getQuizWithDetails(String quizId, Long currentUserId) throws QuizNotFoundException {
         Quiz quiz = quizRepository.findQuizByQuizId(quizId)
                 .orElseThrow(() -> new QuizNotFoundException("No quiz found by id: " + quizId));
@@ -100,6 +101,13 @@ public class QuizService {
         return quizRepository.findAllByQuestions(question, pageable);
     }
 
+    @CacheEvict(
+            value = {
+                    CacheNames.QUIZ_FILTER,
+                    CacheNames.QUIZ_DETAILS
+            },
+            allEntries = true
+    )
     @Transactional
     public Quiz saveQuizWithQuestions(Quiz quiz, Set<Long> questionIds, Set<Long> userAnswerIds) {
 
@@ -285,8 +293,7 @@ public class QuizService {
         quizDTO.setTimeLimit(quiz.getTimeLimit());
         quizDTO.setTimeSpent(quiz.getTimeSpent());
         quizDTO.setAnonymous(quiz.isAnonymous());
-        //quizDTO.setQuestions(quiz.getQuestions());
-        quizDTO.setAnswers(quiz.getAnswers());
+        //quizDTO.setAnswers(quiz.getAnswers());
 
         // Subject - converta para DTO
         if (quiz.getSubject() != null) {
@@ -307,6 +314,38 @@ public class QuizService {
             userDTO.setEmail(quiz.getUser().getEmail());
             userDTO.setProfileImageUrl(quiz.getUser().getProfileImageUrl());
             quizDTO.setUser(userDTO);
+        }
+
+        // CONVERTER Answers para AnswerDTO com QuestionDTO
+        if (quiz.getAnswers() != null) {
+            Set<AnswerDTO> answerDTOs = quiz.getAnswers().stream()
+                    .map(answer -> {
+                        AnswerDTO answerDTO = new AnswerDTO();
+                        answerDTO.setId(answer.getId());
+                        answerDTO.setText(answer.getText());
+                        answerDTO.setCorrect(answer.isCorrect());
+
+                        // Converter Question para QuestionDTO (seguro)
+                        if (answer.getQuestion() != null) {
+                            QuestionDTO questionDTO = new QuestionDTO();
+                            questionDTO.setId(answer.getQuestion().getId());
+                            questionDTO.setQuestionId(answer.getQuestion().getQuestionId());
+                            questionDTO.setText(answer.getQuestion().getText());
+                            questionDTO.setTip(answer.getQuestion().getTip());
+                            questionDTO.setSolution(answer.getQuestion().getSolution());
+                            questionDTO.setDifficultyLevel(answer.getQuestion().getDifficultyLevel());
+                            questionDTO.setTimeLimit(answer.getQuestion().getTimeLimit());
+                            questionDTO.setValidated(answer.getQuestion().isValidated());
+                            // NÃO inclua answers aqui para evitar ciclo infinito
+                            // questionDTO.setAnswers(null);
+
+                            answerDTO.setQuestion(questionDTO);
+                        }
+
+                        return answerDTO;
+                    })
+                    .collect(Collectors.toSet());
+            quizDTO.setAnswers(answerDTOs);
         }
 
         Optional<User> currentUser = userRepository.findById(currentUserId);

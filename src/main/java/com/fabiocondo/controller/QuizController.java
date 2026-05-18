@@ -46,10 +46,18 @@ public class QuizController {
         return ResponseEntity.status(HttpStatus.OK).body(quizService.findById(id));
     }
 
-    @GetMapping("/find-by-quizId/{quizId}")
+    //@GetMapping("/find-by-quizId/{quizId}")
     public ResponseEntity<QuizDTO> findQuizByQuizId(@PathVariable("quizId") String quizId, @RequestParam("currentUserId") Long currentUserId) throws QuizNotFoundException {
         Quiz quiz = quizService.findQuizByQuizId(quizId);
         return ResponseEntity.status(HttpStatus.OK).body(quizService.domainToDTO_WithQuestionsAndAnswers(quiz, currentUserId));
+    }
+
+    @GetMapping("/find-by-quizId/{quizId}")
+    public QuizDTO getQuizById(
+            @PathVariable String quizId,
+            @RequestParam Long currentUserId) throws QuizNotFoundException {
+
+        return quizService.getQuizWithDetails(quizId, currentUserId);
     }
 
     @GetMapping("/filter-with-cach")

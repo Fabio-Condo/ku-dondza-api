@@ -1,6 +1,5 @@
 package com.fabiocondo.dto;
 
-import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.QuizType;
 
 import javax.persistence.*;
@@ -36,7 +35,7 @@ public class QuizDTO {
     //private Set<Question> questions = new HashSet<>();
     private Set<QuestionDTO> questions = new HashSet<>();
 
-    private Set<Answer> answers = new HashSet<>();
+    private Set<AnswerDTO> answers = new HashSet<>();
 
     private Set<TopicDTO> topics = new HashSet<>();
 
@@ -126,11 +125,11 @@ public class QuizDTO {
         this.questions = questions;
     }
 
-    public Set<Answer> getAnswers() {
+    public Set<AnswerDTO> getAnswers() {
         return answers;
     }
 
-    public void setAnswers(Set<Answer> answers) {
+    public void setAnswers(Set<AnswerDTO> answers) {
         this.answers = answers;
     }
 

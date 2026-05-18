@@ -7,6 +7,9 @@ public final class CacheNames {
     // SUBJECTS
     public static final String SUBJECT_LIST = "subjects:list";
 
+    // TOPICS
+    public static final String TOPIC_LIST = "topics:list";
+
     // EXAMS
     public static final String EXAM_FILTER = "exams:filter";
 

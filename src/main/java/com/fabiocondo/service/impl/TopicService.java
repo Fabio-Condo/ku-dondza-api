@@ -60,10 +60,10 @@ public class TopicService {
         return topicRepository.findAll();
     }
 
+
     public List<Topic> getBySubjectId(Long subjectId) {
 
         return topicRepository.findBySubjectIdAndEnabledTrueOrderByPositionAsc(subjectId);
-        //return topicRepository.findBySubjectIdOrderByPositionAsc(subjectId);
     }
 
     public void delete(Long id) throws TopicNotFoundException {

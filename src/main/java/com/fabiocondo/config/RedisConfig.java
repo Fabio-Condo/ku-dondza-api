@@ -57,6 +57,10 @@ public class RedisConfig {
         cacheConfigs.put(CacheNames.SUBJECT_LIST,
                 baseConfig().entryTtl(Duration.ofMinutes(3)));
 
+        // TOPICS
+        cacheConfigs.put(CacheNames.TOPIC_LIST,
+                baseConfig().entryTtl(Duration.ofMinutes(3)));
+
         // EXAMS
         cacheConfigs.put(CacheNames.EXAM_FILTER,
                 baseConfig().entryTtl(Duration.ofMinutes(3)));

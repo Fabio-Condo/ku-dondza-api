@@ -12,4 +12,6 @@ public final class CacheNames {
 
     // QUIZZES
     public static final String QUIZ_FILTER = "quizzes:filter";
+    public static final String QUIZ_DETAILS = "quizzes:details";
+
 }

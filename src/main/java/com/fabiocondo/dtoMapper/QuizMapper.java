@@ -2,10 +2,8 @@ package com.fabiocondo.dtoMapper;
 
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.Quiz;
-import com.fabiocondo.domain.Topic;
 import com.fabiocondo.domain.User;
-import com.fabiocondo.dto.QuestionDTO;
-import com.fabiocondo.dto.QuizDTO;
+import com.fabiocondo.dto.*;
 import com.fabiocondo.repository.QuizRepository;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.impl.QuizService;
@@ -45,8 +43,8 @@ public class QuizMapper {
         quiz.setTimeLimit(quizDTO.getTimeLimit());
         quiz.setTimeSpent(quizDTO.getTimeSpent());
         quiz.setAnonymous(quizDTO.isAnonymous());
-        quiz.setSubject(quizDTO.getSubject());
-        quiz.setUser(quizDTO.getUser());
+        //quiz.setSubject(quizDTO.getSubject());
+        //quiz.setUser(quizDTO.getUser());
         //quiz.setQuestions(quizDTO.getQuestions());
         //quiz.setAnswers(quizDTO.getAnswers());
         return quiz;
@@ -62,17 +60,39 @@ public class QuizMapper {
         quizDTO.setTimeLimit(quiz.getTimeLimit());
         quizDTO.setTimeSpent(quiz.getTimeSpent());
         quizDTO.setAnonymous(quiz.isAnonymous());
-        quizDTO.setSubject(quiz.getSubject());
-        quizDTO.setUser(quiz.getUser());
+
+        // Subject - converta para DTO
+        if (quiz.getSubject() != null) {
+            SubjectDto subjectDTO = new SubjectDto();
+            subjectDTO.setId(quiz.getSubject().getId());
+            subjectDTO.setName(quiz.getSubject().getName());
+            subjectDTO.setDescription(quiz.getSubject().getDescription());
+            subjectDTO.setCategory(quiz.getSubject().getCategory());
+            quizDTO.setSubject(subjectDTO);
+        }
+
+        // Topics - agora as questions já foram carregadas pelo JOIN FETCH
+        Set<TopicDTO> topicDTOs = quizService.getSortedTopicsSafe(quiz);
+        quizDTO.setTopics(new HashSet<>(topicDTOs));
+
         quizDTO.setTotalQuestions(quizRepository.countQuestionsByQuizId(quiz.getId()));
-        quizDTO.setTopics(quizService.getSortedTopics(quiz));
+        quizDTO.setAccuracyRate( quizService.calculateAccuracyRate(quiz));
 
+        // User
+        if (quiz.getUser() != null) {
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(quiz.getUser().getId());
+            userDTO.setUserId(quiz.getUser().getUserId());
+            userDTO.setFullName(quiz.getUser().getFullName());
+            userDTO.setEmail(quiz.getUser().getEmail());
+            userDTO.setProfileImageUrl(quiz.getUser().getProfileImageUrl());
+            quizDTO.setUser(userDTO);
+        }
 
-        quizDTO.setAccuracyRate(quizService.calculateAccuracyRate(quiz));
         return quizDTO;
     }
 
-    public QuizDTO domainToDTO_WithQuestionsAndAnswers(Quiz quiz, Long currentUserId) {
+    public QuizDTO domainToDTO_WithQuestionsAndAnswers_2(Quiz quiz, Long currentUserId) {
         QuizDTO quizDTO = new QuizDTO();
         quizDTO.setId(quiz.getId());
         quizDTO.setQuizId(quiz.getQuizId());
@@ -82,24 +102,35 @@ public class QuizMapper {
         quizDTO.setTimeLimit(quiz.getTimeLimit());
         quizDTO.setTimeSpent(quiz.getTimeSpent());
         quizDTO.setAnonymous(quiz.isAnonymous());
-        quizDTO.setSubject(quiz.getSubject());
-        quizDTO.setUser(quiz.getUser());
         quizDTO.setAnswers(quiz.getAnswers());
+
+        // Subject - converta para DTO
+        if (quiz.getSubject() != null) {
+            SubjectDto subjectDTO = new SubjectDto();
+            subjectDTO.setId(quiz.getSubject().getId());
+            subjectDTO.setName(quiz.getSubject().getName());
+            subjectDTO.setDescription(quiz.getSubject().getDescription());
+            subjectDTO.setCategory(quiz.getSubject().getCategory());
+            quizDTO.setSubject(subjectDTO);
+        }
+
+        // User
+        if (quiz.getUser() != null) {
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(quiz.getUser().getId());
+            userDTO.setUserId(quiz.getUser().getUserId());
+            userDTO.setFullName(quiz.getUser().getFullName());
+            userDTO.setEmail(quiz.getUser().getEmail());
+            userDTO.setProfileImageUrl(quiz.getUser().getProfileImageUrl());
+            quizDTO.setUser(userDTO);
+        }
 
         Optional<User> currentUser = userRepository.findById(currentUserId);
 
         quizDTO.setQuestions(sortQuestionsByTopicPositionAndId(quiz.getQuestions(), currentUser));
 
-
         return quizDTO;
     }
-
-    //public List<Topic> getTopics(QuizDTO quiz) {
-    //    return quiz.getTopics()
-    //            .stream()
-    //            .sorted(Comparator.comparing(Topic::getName)) // ou getOrder(), getId(), etc.
-    //            .collect(Collectors.toList());
-    //}
 
     public Set<QuestionDTO> sortQuestionsByTopicPositionAndId(Set<Question> questions, Optional<User> optionalUser) {
 

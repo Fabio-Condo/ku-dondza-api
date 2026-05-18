@@ -29,16 +29,16 @@ public class QuizDTO {
     @Column(nullable = false)
     private boolean anonymous = false;
 
-    private Subject subject;
+    private SubjectDto subject;
 
-    private User user;
+    private UserDTO user;
 
     //private Set<Question> questions = new HashSet<>();
     private Set<QuestionDTO> questions = new HashSet<>();
 
     private Set<Answer> answers = new HashSet<>();
 
-    private Set<Topic> topics = new HashSet<>();
+    private Set<TopicDTO> topics = new HashSet<>();
 
     private Long totalQuestions;
 
@@ -110,13 +110,13 @@ public class QuizDTO {
         this.anonymous = anonymous;
     }
 
-    public Subject getSubject() { return subject; }
+    public SubjectDto getSubject() { return subject; }
 
-    public void setSubject(Subject subject) { this.subject = subject; }
+    public void setSubject(SubjectDto subject) { this.subject = subject; }
 
-    public User getUser() { return user; }
+    public UserDTO getUser() { return user; }
 
-    public void setUser(User user) { this.user = user; }
+    public void setUser(UserDTO user) { this.user = user; }
 
     public Set<QuestionDTO> getQuestions() {
         return questions;
@@ -134,11 +134,11 @@ public class QuizDTO {
         this.answers = answers;
     }
 
-    public Set<Topic> getTopics() {
+    public Set<TopicDTO> getTopics() {
         return topics;
     }
 
-    public void setTopics(Set<Topic> topics) {
+    public void setTopics(Set<TopicDTO> topics) {
         this.topics = topics;
     }
 

@@ -4,6 +4,7 @@ import com.fabiocondo.enumeration.Plan;
 import com.fabiocondo.enumeration.UserType;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 public class UserDTO {
     private Long id;
@@ -23,6 +24,8 @@ public class UserDTO {
 
     @Enumerated(EnumType.STRING)
     private Plan plan; //FREE or PREMIUM
+
+    private LocalDateTime planExpiresAt;
 
     private double markedContentRate;
 
@@ -90,6 +93,14 @@ public class UserDTO {
 
     public void setPlan(Plan plan) {
         this.plan = plan;
+    }
+
+    public LocalDateTime getPlanExpiresAt() {
+        return planExpiresAt;
+    }
+
+    public void setPlanExpiresAt(LocalDateTime planExpiresAt) {
+        this.planExpiresAt = planExpiresAt;
     }
 
     public double getMarkedContentRate() {

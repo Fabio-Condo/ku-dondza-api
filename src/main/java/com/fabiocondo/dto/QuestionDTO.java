@@ -36,11 +36,11 @@ public class QuestionDTO {
     @JsonIgnoreProperties(
             value = { "questions", "hibernateLazyInitializer", "handler" }
     ) // ADICIONANDO PORCAUSA DE TOPIC_TEST (MODULO DE PROGRESSAO) - MELHORAR DEPOIS COM DTO
-    private Topic topic;
+    private TopicDTO topic;
 
     private List<MathExpression> mathExpressions; // Se for math
 
-    private List<Answer> answers;
+    private List<AnswerDTO> answers;
 
     private boolean savedByUser;
 
@@ -128,11 +128,11 @@ public class QuestionDTO {
         this.urlFile = urlFile;
     }
 
-    public Topic getTopic() {
+    public TopicDTO getTopic() {
         return topic;
     }
 
-    public void setTopic(Topic topic) {
+    public void setTopic(TopicDTO topic) {
         this.topic = topic;
     }
 
@@ -144,11 +144,11 @@ public class QuestionDTO {
         this.mathExpressions = mathExpressions;
     }
 
-    public List<Answer> getAnswers() {
+    public List<AnswerDTO> getAnswers() {
         return answers;
     }
 
-    public void setAnswers(List<Answer> answers) {
+    public void setAnswers(List<AnswerDTO> answers) {
         this.answers = answers;
     }
 

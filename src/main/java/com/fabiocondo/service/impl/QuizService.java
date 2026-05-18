@@ -2,12 +2,13 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.constant.CacheNames;
 import com.fabiocondo.domain.*;
-import com.fabiocondo.dto.PageResponse;
-import com.fabiocondo.dto.QuizDTO;
+import com.fabiocondo.dto.*;
+import com.fabiocondo.dtoMapper.QuestionMapper;
 import com.fabiocondo.exception.domain.QuizNotFoundException;
 import com.fabiocondo.repository.AnswerRepository;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.QuizRepository;
+import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.repository.filter.QuizFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +28,18 @@ public class QuizService {
     private final QuizRepository quizRepository;
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
+    private final QuestionMapper questionMapper;
+    private final UserRepository userRepository;
+    private final UserServiceImpl userService;
 
-    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, AnswerRepository answerRepository) {
+
+    public QuizService(QuizRepository quizRepository, QuestionRepository questionRepository, AnswerRepository answerRepository, QuestionMapper questionMapper, UserRepository userRepository, UserServiceImpl userService) {
         this.quizRepository = quizRepository;
         this.questionRepository = questionRepository;
         this.answerRepository = answerRepository;
+        this.questionMapper = questionMapper;
+        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     public Quiz findById(Long id) throws QuizNotFoundException {
@@ -45,13 +53,17 @@ public class QuizService {
                 .orElseThrow(() -> new QuizNotFoundException("No quiz found by id: " + quizId));
     }
 
-    @Cacheable(
-            value = CacheNames.QUIZ_FILTER,
-            key =
-                            "#pageable.pageNumber + '-' +" +
-                            "#pageable.pageSize + '-' +" +
-                            "#pageable.sort.toString()"
-    )
+    // Método modificado para usar JOIN FETCH e ser cache-safe
+    //@Cacheable(
+    //        value = CacheNames.QUIZ_DETAILS,
+    //        key = "#quizId + '-' + #currentUserId"
+    //)
+    public QuizDTO getQuizWithDetails(String quizId, Long currentUserId) throws QuizNotFoundException {
+        Quiz quiz = quizRepository.findQuizByQuizId(quizId)
+                .orElseThrow(() -> new QuizNotFoundException("No quiz found by id: " + quizId));
+        return domainToDTO_WithQuestionsAndAnswers(quiz, currentUserId);
+    }
+
     public Page<Quiz> filter(QuizFilter quizFilter, Pageable pageable) {
         return quizRepository.filter(quizFilter, pageable);
     }
@@ -66,35 +78,20 @@ public class QuizService {
                             "#pageable.pageSize + '-' +" +
                             "#pageable.sort.toString()"
     )
-    public PageResponse<Quiz> filterWithCash(QuizFilter quizFilter, Pageable pageable) {
-        Page<Quiz> page =  quizRepository.filter(quizFilter, pageable);
+    public PageResponse<QuizDTO> filterWithCash(QuizFilter quizFilter, Pageable pageable) {
+        Page<Quiz> page = quizRepository.filter(quizFilter, pageable);
+
+        // Converte Quiz para QuizDTO
+        List<QuizDTO> content = page.getContent().stream()
+                .map(this::domainToDTO)
+                .collect(Collectors.toList());
 
         return new PageResponse<>(
-                page.getContent(),
+                content,
                 page.getNumber(),
                 page.getSize(),
                 page.getTotalElements()
         );
-    }
-
-    public QuizDTO domainToDTO(Quiz quiz) {
-        QuizDTO quizDTO = new QuizDTO();
-        quizDTO.setId(quiz.getId());
-        quizDTO.setQuizId(quiz.getQuizId());
-        quizDTO.setType(quiz.getType());
-        quizDTO.setLimitPerTopic(quiz.getLimitPerTopic());
-        quizDTO.setSubmittedAt(quiz.getSubmittedAt());
-        quizDTO.setTimeLimit(quiz.getTimeLimit());
-        quizDTO.setTimeSpent(quiz.getTimeSpent());
-        quizDTO.setAnonymous(quiz.isAnonymous());
-        quizDTO.setSubject(quiz.getSubject());
-        quizDTO.setUser(quiz.getUser());
-        quizDTO.setTotalQuestions(quizRepository.countQuestionsByQuizId(quiz.getId()));
-        quizDTO.setTopics(getSortedTopics(quiz));
-
-
-        quizDTO.setAccuracyRate(calculateAccuracyRate(quiz));
-        return quizDTO;
     }
 
     public Page<Quiz> getQuizzesByQuestionId(Long questionId, Pageable pageable) throws QuizNotFoundException {
@@ -128,34 +125,6 @@ public class QuizService {
 
         return quizRepository.save(quiz);
     }
-
-    /*
-    @Transactional
-    public Quiz saveQuizTopicTestWithQuestions(Quiz quiz, Set<Long> questionIds, Set<Long> userAnswerIds, Long topicTestId) throws TopicNotFoundException {
-
-        if (quiz == null) {
-            throw new IllegalArgumentException("O objeto Quiz não pode ser nulo.");
-        }
-
-        if (questionIds == null || questionIds.isEmpty()) {
-            throw new IllegalArgumentException("O Quiz deve ter pelo menos uma questão associada.");
-        }
-
-        Set<Question> questions = new HashSet<>(questionRepository.findAllById(questionIds));
-        Set<Answer> answers = new HashSet<>(answerRepository.findAllById(userAnswerIds));
-
-        if (questions.size() != questionIds.size()) {
-            throw new IllegalArgumentException("Uma ou mais questões não foram encontradas no banco de dados.");
-        }
-
-        quiz.setQuizId(UUID.randomUUID().toString());
-        quiz.setSubmittedAt(new Date());
-        quiz.setQuestions(questions);
-        quiz.setAnswers(answers);
-
-        return quizRepository.save(quiz);
-    }
-    */
 
     public void delete(Long id) throws QuizNotFoundException {
         Quiz existQuiz = findById(id);
@@ -228,6 +197,150 @@ public class QuizService {
         Quiz quiz = findById(id);
         quiz.setAnonymous(status);
         quizRepository.save(quiz);
+    }
+
+    private QuizDTO domainToDTO(Quiz quiz) {
+        QuizDTO quizDTO = new QuizDTO();
+        quizDTO.setId(quiz.getId());
+        quizDTO.setQuizId(quiz.getQuizId());
+        quizDTO.setType(quiz.getType());
+        quizDTO.setLimitPerTopic(quiz.getLimitPerTopic());
+        quizDTO.setSubmittedAt(quiz.getSubmittedAt());
+        quizDTO.setTimeLimit(quiz.getTimeLimit());
+        quizDTO.setTimeSpent(quiz.getTimeSpent());
+        quizDTO.setAnonymous(quiz.isAnonymous());
+
+        // Subject - converta para DTO
+        if (quiz.getSubject() != null) {
+            SubjectDto subjectDTO = new SubjectDto();
+            subjectDTO.setId(quiz.getSubject().getId());
+            subjectDTO.setName(quiz.getSubject().getName());
+            subjectDTO.setDescription(quiz.getSubject().getDescription());
+            subjectDTO.setCategory(quiz.getSubject().getCategory());
+            quizDTO.setSubject(subjectDTO);
+        }
+
+        // Topics - agora as questions já foram carregadas pelo JOIN FETCH
+        Set<TopicDTO> topicDTOs = getSortedTopicsSafe(quiz);
+        quizDTO.setTopics(new HashSet<>(topicDTOs));
+
+        quizDTO.setTotalQuestions(quizRepository.countQuestionsByQuizId(quiz.getId()));
+        quizDTO.setAccuracyRate(calculateAccuracyRate(quiz));
+
+        // User
+        if (quiz.getUser() != null) {
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(quiz.getUser().getId());
+            userDTO.setUserId(quiz.getUser().getUserId());
+            userDTO.setFullName(quiz.getUser().getFullName());
+            userDTO.setEmail(quiz.getUser().getEmail());
+            userDTO.setProfileImageUrl(quiz.getUser().getProfileImageUrl());
+            quizDTO.setUser(userDTO);
+        }
+
+        return quizDTO;
+    }
+
+    // Método seguro para pegar topics (agora com dados carregados)
+    public Set<TopicDTO> getSortedTopicsSafe(Quiz quiz) {
+        Set<TopicDTO> topicDTOs = new HashSet<>();
+
+        if (quiz.getQuestions() != null) {
+            for (Question question : quiz.getQuestions()) {
+                if (question.getTopic() != null) {
+                    Topic topic = question.getTopic();
+                    TopicDTO topicDTO = new TopicDTO();
+                    topicDTO.setId(topic.getId());
+                    topicDTO.setName(topic.getName());
+                    topicDTO.setDescription(topic.getDescription());
+                    topicDTO.setPosition(topic.getPosition());
+                    topicDTOs.add(topicDTO);
+                }
+            }
+        }
+
+        // Converte para List, ordena e remove duplicatas
+        List<TopicDTO> sortedList = new ArrayList<>(
+                topicDTOs.stream()
+                        .collect(Collectors.toMap(
+                                TopicDTO::getId,  // Chave = ID
+                                dto -> dto,        // Valor = próprio DTO
+                                (dto1, dto2) -> dto1  // Em caso de duplicata, mantém o primeiro
+                        ))
+                        .values()
+        );
+
+        sortedList.sort(Comparator.comparing(TopicDTO::getName));
+
+        return new LinkedHashSet<>(sortedList);
+    }
+
+    public QuizDTO domainToDTO_WithQuestionsAndAnswers(Quiz quiz, Long currentUserId) {
+        QuizDTO quizDTO = new QuizDTO();
+        quizDTO.setId(quiz.getId());
+        quizDTO.setQuizId(quiz.getQuizId());
+        quizDTO.setType(quiz.getType());
+        quizDTO.setLimitPerTopic(quiz.getLimitPerTopic());
+        quizDTO.setSubmittedAt(quiz.getSubmittedAt());
+        quizDTO.setTimeLimit(quiz.getTimeLimit());
+        quizDTO.setTimeSpent(quiz.getTimeSpent());
+        quizDTO.setAnonymous(quiz.isAnonymous());
+        //quizDTO.setQuestions(quiz.getQuestions());
+        quizDTO.setAnswers(quiz.getAnswers());
+
+        // Subject - converta para DTO
+        if (quiz.getSubject() != null) {
+            SubjectDto subjectDTO = new SubjectDto();
+            subjectDTO.setId(quiz.getSubject().getId());
+            subjectDTO.setName(quiz.getSubject().getName());
+            subjectDTO.setDescription(quiz.getSubject().getDescription());
+            subjectDTO.setCategory(quiz.getSubject().getCategory());
+            quizDTO.setSubject(subjectDTO);
+        }
+
+        // User
+        if (quiz.getUser() != null) {
+            UserDTO userDTO = new UserDTO();
+            userDTO.setId(quiz.getUser().getId());
+            userDTO.setUserId(quiz.getUser().getUserId());
+            userDTO.setFullName(quiz.getUser().getFullName());
+            userDTO.setEmail(quiz.getUser().getEmail());
+            userDTO.setProfileImageUrl(quiz.getUser().getProfileImageUrl());
+            quizDTO.setUser(userDTO);
+        }
+
+        Optional<User> currentUser = userRepository.findById(currentUserId);
+
+        quizDTO.setQuestions(sortQuestionsByTopicPositionAndId(quiz.getQuestions(), currentUser));
+
+        return quizDTO;
+    }
+
+    public Set<QuestionDTO> sortQuestionsByTopicPositionAndId(Set<Question> questions, Optional<User> optionalUser) {
+
+        return questions.stream()
+                .sorted(
+                        Comparator
+                                .comparing((Question q) -> q.getTopic().getPosition())
+                                .thenComparing(Question::getId)
+                )
+                .map(question -> {
+                    QuestionDTO questionDTO = questionMapper.domainToDTO(question);
+
+                    optionalUser.ifPresent(user ->
+                            questionDTO.setSavedByUser(
+                                    userService.checkIfSavedQuestion(question.getId(), user.getId())
+                            )
+                    );
+
+                    // Se não tiver user, define false (opcional, pode deixar nulo se preferires)
+                    if (!optionalUser.isPresent()) {
+                        questionDTO.setSavedByUser(false);
+                    }
+
+                    return questionDTO;
+                })
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
 }

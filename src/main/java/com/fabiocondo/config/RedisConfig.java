@@ -64,6 +64,8 @@ public class RedisConfig {
         // QUIZZES
         cacheConfigs.put(CacheNames.QUIZ_FILTER,
                 baseConfig().entryTtl(Duration.ofMinutes(3)));
+        cacheConfigs.put(CacheNames.QUIZ_DETAILS,
+                baseConfig().entryTtl(Duration.ofMinutes(3)));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(baseConfig().entryTtl(Duration.ofMinutes(10))) // fallback

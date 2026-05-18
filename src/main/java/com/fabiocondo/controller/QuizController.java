@@ -1,28 +1,22 @@
 package com.fabiocondo.controller;
 
-import com.fabiocondo.constant.CacheNames;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.PageResponse;
 import com.fabiocondo.dto.QuizDTO;
 import com.fabiocondo.dtoMapper.QuizMapper;
 import com.fabiocondo.exception.domain.*;
-import com.fabiocondo.repository.filter.ExamFilter;
 import com.fabiocondo.repository.filter.QuizFilter;
 import com.fabiocondo.service.impl.ChallengeService;
 import com.fabiocondo.service.impl.QuizService;
 import com.fabiocondo.service.impl.TestService;
 import com.fabiocondo.service.impl.UserSubjectScoreService;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/quizzes")
@@ -55,31 +49,13 @@ public class QuizController {
     @GetMapping("/find-by-quizId/{quizId}")
     public ResponseEntity<QuizDTO> findQuizByQuizId(@PathVariable("quizId") String quizId, @RequestParam("currentUserId") Long currentUserId) throws QuizNotFoundException {
         Quiz quiz = quizService.findQuizByQuizId(quizId);
-        return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(quiz, currentUserId));
+        return ResponseEntity.status(HttpStatus.OK).body(quizService.domainToDTO_WithQuestionsAndAnswers(quiz, currentUserId));
     }
 
-    @GetMapping("/filter-with-cache")
-    public PageResponse<QuizDTO> filterWithCash(QuizFilter quizFilter, Pageable pageable) {
-
-        PageResponse<Quiz> page = quizService.filterWithCash(quizFilter, pageable);
-
-        List<QuizDTO> content = page.getContent()
-                .stream()
-                .map(quizMapper::domainToDTO)
-                .collect(Collectors.toList());
-
-        return new PageResponse<>(
-                content,
-                page.getPage(),
-                page.getSize(),
-                page.getTotalElements()
-        );
+    @GetMapping("/filter-with-cach")
+    public PageResponse<QuizDTO> filterWithCash(QuizFilter filter, Pageable pageable) {
+        return quizService.filterWithCash(filter, pageable);
     }
-
-    //@GetMapping("/filter-with-cash")
-    //public PageResponse<QuizDTO> filterWithCash2(QuizFilter quizFilter, Pageable pageable) {
-    //    return quizService.filterWithCash(quizFilter, pageable);
-    //}
 
     @GetMapping("/filter")
     public Page<QuizDTO> filter(QuizFilter quizFilter, Pageable pageable) {
@@ -98,7 +74,7 @@ public class QuizController {
                                                @RequestParam("currentUserId") Long currentUserId) {
 
         Quiz savedQuiz = quizService.saveQuizWithQuestions(quiz, questionIds, userAnswerIds);
-        return ResponseEntity.status(HttpStatus.OK).body(quizMapper.domainToDTO_WithQuestionsAndAnswers(savedQuiz, currentUserId));
+        return ResponseEntity.status(HttpStatus.OK).body(quizService.domainToDTO_WithQuestionsAndAnswers(savedQuiz, currentUserId));
     }
 
     @PostMapping("/topic-test")
@@ -144,7 +120,7 @@ public class QuizController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
-                        quizMapper.domainToDTO_WithQuestionsAndAnswers(
+                        quizService.domainToDTO_WithQuestionsAndAnswers(
                                 savedQuiz,
                                 currentUserId
                         )
@@ -182,7 +158,7 @@ public class QuizController {
         challengeService.save(challenge);
 
         return ResponseEntity.ok(
-                quizMapper.domainToDTO_WithQuestionsAndAnswers(
+                quizService.domainToDTO_WithQuestionsAndAnswers(
                         savedQuiz,
                         currentUserId
                 )

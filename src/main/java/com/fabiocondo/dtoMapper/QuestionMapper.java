@@ -1,11 +1,7 @@
 package com.fabiocondo.dtoMapper;
 
 import com.fabiocondo.domain.*;
-import com.fabiocondo.dto.AnswerDTO;
-import com.fabiocondo.dto.MathExpressionDTO;
-import com.fabiocondo.dto.QuestionDTO;
-import com.fabiocondo.dto.TopicDTO;
-import com.fabiocondo.repository.TopicTestRepository;
+import com.fabiocondo.dto.*;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.UserService;
 import com.fabiocondo.service.impl.CommentService;
@@ -105,9 +101,19 @@ public class QuestionMapper {
             TopicDTO topicDTO = new TopicDTO();
             topicDTO.setId(question.getTopic().getId());
             topicDTO.setName(question.getTopic().getName());
+
+            // CONVERTER Subject para SubjectDTO
+            if (question.getTopic().getSubject() != null) {
+                SubjectDto subjectDTO = new SubjectDto();
+                subjectDTO.setId(question.getTopic().getSubject().getId());
+                subjectDTO.setName(question.getTopic().getSubject().getName());
+                subjectDTO.setDescription(question.getTopic().getSubject().getDescription());
+                subjectDTO.setCategory(question.getTopic().getSubject().getCategory());
+                topicDTO.setSubject(subjectDTO);
+            }
+
             topicDTO.setDescription(question.getTopic().getDescription());
             topicDTO.setPosition(question.getTopic().getPosition());
-            // NÃO inclua contents, questions ou outras coleções
             questionDTO.setTopic(topicDTO);
         }
 

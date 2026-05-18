@@ -25,28 +25,21 @@ public class SubjectMapper {
     private final UserRepository userRepository;
     private final SubjectServiceImpl subjectService;
     private final TopicRepository topicRepository;
-    private final TopicService topicService;
     private final TopicContentService topicContentService;
     public final TopicTestRepository topicTestRepository;
     private final QuizService quizService;
     private final QuizRepository quizRepository;
-
-
     private final UserSubjectScoreService userSubjectScoreService;
 
-    private final TestMapper testMapper;
-
-    public SubjectMapper(UserRepository userRepository, SubjectServiceImpl subjectService, TopicRepository topicRepository, TopicService topicService, TopicContentService topicContentService, TopicTestRepository topicTestRepository, QuizService quizService, QuizRepository quizRepository, UserSubjectScoreService userSubjectScoreService, TestMapper testMapper) {
+    public SubjectMapper(UserRepository userRepository, SubjectServiceImpl subjectService, TopicRepository topicRepository, TopicService topicService, TopicContentService topicContentService, TopicTestRepository topicTestRepository, QuizService quizService, QuizRepository quizRepository, UserSubjectScoreService userSubjectScoreService) {
         this.userRepository = userRepository;
         this.subjectService = subjectService;
         this.topicRepository = topicRepository;
-        this.topicService = topicService;
         this.topicContentService = topicContentService;
         this.topicTestRepository = topicTestRepository;
         this.quizService = quizService;
         this.quizRepository = quizRepository;
         this.userSubjectScoreService = userSubjectScoreService;
-        this.testMapper = testMapper;
     }
 
     public SubjectDto domainToDto(Subject subject, Long currentUserId) throws UserNotFoundException {
@@ -91,7 +84,7 @@ public class SubjectMapper {
         subjectDto.setQuizEnabled(subject.isQuizEnabled());
 
         //subjectDto.setTopics(subject.getTopics());
-        subjectDto.setTopics(topicService.getBySubjectId(subject.getId()));
+        //subjectDto.setTopics(topicService.getBySubjectId(subject.getId()));
         subjectDto.setTotalTopics(topicRepository.countBySubjectIdAndEnabledTrue(subject.getId()));
         subjectDto.setTotalLessons(topicContentService.getTotalVideoLessons(subject.getId()));
         subjectDto.setTotalFiles(topicContentService.getTotalFiles(subject.getId()));

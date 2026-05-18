@@ -2,6 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Subject;
+import com.fabiocondo.dto.PageResponse;
 import com.fabiocondo.dto.SubjectDto;
 import com.fabiocondo.dto.SubjectProgressDTO;
 import com.fabiocondo.dtoMapper.SubjectMapper;
@@ -9,7 +10,6 @@ import com.fabiocondo.enumeration.Category;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.service.impl.SubjectServiceImpl;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,14 +36,29 @@ public class SubjectController {
     }
 
     @GetMapping("/find-by-subjectId/{subjectId}")
-    public ResponseEntity<SubjectDto> findSubjectBySubjectId(@PathVariable("subjectId") String subjectId, @RequestParam("currentUserId") Long currentUserId) throws SubjectNotFoundException, UserNotFoundException {
-        Subject subject = subjectServiceImpl.findSubjectBySubjectId(subjectId, currentUserId);
-        return ResponseEntity.status(HttpStatus.OK).body(subjectMapper.domainToDtoWithTopics(subject, currentUserId));
+    public ResponseEntity<SubjectDto> findSubjectBySubjectIdWithCash(
+            @PathVariable String subjectId,
+            @RequestParam Long currentUserId) throws SubjectNotFoundException, UserNotFoundException {
+
+        return ResponseEntity.ok(
+                subjectServiceImpl.findSubjectBySubjectIdWithCash(subjectId, currentUserId)
+        );
     }
 
+    // GET com cache
     @GetMapping("/filter")
-    public Page<SubjectDto> filter(@RequestParam(required = false, defaultValue = "") String name, @RequestParam("enabled") boolean enabled, @RequestParam("currentUserId") Long currentUserId, Pageable pageable) {
-        return subjectMapper.domainPageToDTOPage(subjectServiceImpl.findByName(name, enabled, pageable), currentUserId, pageable);
+    public PageResponse<SubjectDto> filterWithCash(
+            @RequestParam(required = false, defaultValue = "") String name,
+            @RequestParam("enabled") boolean enabled,
+            @RequestParam("currentUserId") Long currentUserId,
+            Pageable pageable
+    ) {
+        return subjectServiceImpl.findByNameWithCache(
+                name,
+                enabled,
+                currentUserId,
+                pageable
+        );
     }
 
     @GetMapping("/progress/users")
@@ -88,11 +103,6 @@ public class SubjectController {
                                            @RequestParam(value = "file", required = false) MultipartFile file) throws SubjectNotFoundException {
 
         return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.update(id, name, description, category, quizEnabled, courseEnabled, progressEnabled, examEnabled,file));
-    }
-
-    @GetMapping("/total")
-    public ResponseEntity<Long> getTotal(){
-        return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.getTotal());
     }
 
     @DeleteMapping("/{id}")

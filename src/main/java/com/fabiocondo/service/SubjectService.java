@@ -14,8 +14,6 @@ public interface SubjectService {
 
     List<Subject> findAll();
 
-    Page<Subject> findAll(Pageable pageable);
-
     //Page<Subject> findByName(String name, Pageable pageable);
 
     Page<Subject> findByName(String name, boolean enabled, Pageable pageable);

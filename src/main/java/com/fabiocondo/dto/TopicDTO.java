@@ -26,7 +26,7 @@ public class TopicDTO {
 
     private List<Question> questions;
 
-    private List<TopicContent> contents;
+    private List<TopicContentDTO> contents;
 
     public Long getId() {
         return id;
@@ -100,11 +100,11 @@ public class TopicDTO {
         this.questions = questions;
     }
 
-    public List<TopicContent> getContents() {
+    public List<TopicContentDTO> getContents() {
         return contents;
     }
 
-    public void setContents(List<TopicContent> contents) {
+    public void setContents(List<TopicContentDTO> contents) {
         this.contents = contents;
     }
 }

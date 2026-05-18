@@ -34,7 +34,7 @@ public class SubjectDto {
     private double currentUserMarkedContentRate;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private List<Topic> topics;
+    private List<TopicDTO> topics;
 
     private Long totalTopics;
 
@@ -108,11 +108,11 @@ public class SubjectDto {
         this.currentUserMarkedContentRate = currentUserMarkedContentRate;
     }
 
-    public List<Topic> getTopics() {
+    public List<TopicDTO> getTopics() {
         return topics;
     }
 
-    public void setTopics(List<Topic> topics) {
+    public void setTopics(List<TopicDTO> topics) {
         this.topics = topics;
     }
 

@@ -54,8 +54,12 @@ public class RedisConfig {
         Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
 
         // SUBJECTS
+        cacheConfigs.put(CacheNames.SUBJECT_FILTER,
+                baseConfig().entryTtl(Duration.ofMinutes(1)));
         cacheConfigs.put(CacheNames.SUBJECT_LIST,
                 baseConfig().entryTtl(Duration.ofMinutes(15)));
+        cacheConfigs.put(CacheNames.SUBJECT_DETAIL,
+                baseConfig().entryTtl(Duration.ofMinutes(1)));
 
         // TOPICS
         cacheConfigs.put(CacheNames.TOPIC_LIST,
@@ -69,7 +73,7 @@ public class RedisConfig {
         cacheConfigs.put(CacheNames.QUIZ_FILTER,
                 baseConfig().entryTtl(Duration.ofMinutes(15)));
         cacheConfigs.put(CacheNames.QUIZ_DETAILS,
-                baseConfig().entryTtl(Duration.ofMinutes(15)));
+                baseConfig().entryTtl(Duration.ofMinutes(1)));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(baseConfig().entryTtl(Duration.ofMinutes(10))) // fallback

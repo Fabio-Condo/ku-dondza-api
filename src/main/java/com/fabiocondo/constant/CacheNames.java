@@ -6,6 +6,8 @@ public final class CacheNames {
 
     // SUBJECTS
     public static final String SUBJECT_LIST = "subjects:list";
+    public static final String SUBJECT_FILTER = "subjects:filter";
+    public static final String SUBJECT_DETAIL = "subjects:details";
 
     // TOPICS
     public static final String TOPIC_LIST = "topics:list";

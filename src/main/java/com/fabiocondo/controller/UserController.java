@@ -1,6 +1,7 @@
 package com.fabiocondo.controller;
 
 
+import com.fabiocondo.constant.CacheNames;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.UserDTO;
 import com.fabiocondo.dtoMapper.UserMapper;
@@ -13,6 +14,7 @@ import com.fabiocondo.security.utility.JWTTokenProvider;
 import com.fabiocondo.service.impl.AuthServiceImpl;
 import com.fabiocondo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -215,6 +217,14 @@ public class UserController {
         return ResponseEntity.status(OK).body(userService.toggleTopicContentMarkedStatus(userId, contentId));
     }
 
+    @CacheEvict(
+            value = {
+                    CacheNames.SUBJECT_LIST,
+                    CacheNames.SUBJECT_FILTER,
+                    CacheNames.SUBJECT_DETAIL,
+            },
+            allEntries = true
+    )
     @PutMapping("/{userId}/marked-topic-contents/{contentId}/toggle")
     public ResponseEntity<UserDTO> toggleMarkedContent(
             @PathVariable Long userId,

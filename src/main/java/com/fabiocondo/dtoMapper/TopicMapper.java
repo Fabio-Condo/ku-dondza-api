@@ -33,7 +33,7 @@ public class TopicMapper {
         topic.setPremium(topicDTO.isPremium());
         topic.setPosition(topicDTO.getPosition());
         topic.setQuestions(topicDTO.getQuestions());
-        topic.setContents(topicDTO.getContents());
+        //topic.setContents(topicDTO.getContents());
         return topic;
     }
 
@@ -47,7 +47,7 @@ public class TopicMapper {
         topicDTO.setPremium(topic.isPremium());
         topicDTO.setPosition(topic.getPosition());
         topicDTO.setQuestions(topic.getQuestions());
-        topicDTO.setContents(topic.getContents());
+        //topicDTO.setContents(topic.getContents());
 
         SubjectDto subjectDto = new SubjectDto();
         subjectDto.setId(topic.getSubject().getId());

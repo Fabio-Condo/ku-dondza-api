@@ -51,32 +51,40 @@ public class RedisConfig {
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
 
+        RedisCacheConfiguration base = baseConfig()
+                .prefixCacheNameWith("dikahub::")
+                .disableCachingNullValues();
+
         Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
 
-        // SUBJECTS
-        cacheConfigs.put(CacheNames.SUBJECT_FILTER,
-                baseConfig().entryTtl(Duration.ofMinutes(1)));
+        // SUBJECTS (quase estático, mas pode mudar admin ocasionalmente)
         cacheConfigs.put(CacheNames.SUBJECT_LIST,
-                baseConfig().entryTtl(Duration.ofMinutes(15)));
+                base.entryTtl(Duration.ofDays(7)));
+
         cacheConfigs.put(CacheNames.SUBJECT_DETAIL,
-                baseConfig().entryTtl(Duration.ofMinutes(1)));
+                base.entryTtl(Duration.ofDays(7)));
 
-        // TOPICS
+        // TOPICS (muito estável)
         cacheConfigs.put(CacheNames.TOPIC_LIST,
-                baseConfig().entryTtl(Duration.ofMinutes(15)));
+                base.entryTtl(Duration.ofDays(7)));
 
-        // EXAMS
+        // EXAMS (histórico → praticamente imutável)
         cacheConfigs.put(CacheNames.EXAM_FILTER,
-                baseConfig().entryTtl(Duration.ofMinutes(15)));
+                base.entryTtl(Duration.ofDays(7)));
 
-        // QUIZZES
+        // QUIZZES (histórico de testes → imutável após criação)
         cacheConfigs.put(CacheNames.QUIZ_FILTER,
-                baseConfig().entryTtl(Duration.ofMinutes(15)));
+                base.entryTtl(Duration.ofDays(7)));
+
         cacheConfigs.put(CacheNames.QUIZ_DETAILS,
-                baseConfig().entryTtl(Duration.ofMinutes(1)));
+                base.entryTtl(Duration.ofDays(7)));
+
+        // FILTROS (dependem de queries e podem variar)
+        cacheConfigs.put(CacheNames.SUBJECT_FILTER,
+                base.entryTtl(Duration.ofHours(3)));
 
         return RedisCacheManager.builder(connectionFactory)
-                .cacheDefaults(baseConfig().entryTtl(Duration.ofMinutes(10))) // fallback
+                .cacheDefaults(base.entryTtl(Duration.ofDays(1)))
                 .withInitialCacheConfigurations(cacheConfigs)
                 .build();
     }

@@ -65,7 +65,7 @@ public class ExamServiceImpl implements ExamService {
                     "#examFilter.searchParam + '-' +" +
                             "#examFilter.examType + '-' +" +
                             "#examFilter.institution + '-' +" +
-                            "#examFilter.subject + '-' +" +
+                            "#examFilter.subjectId + '-' +" +
                             "#examFilter.beginYear + '-' +" +
                             "#examFilter.endYear + '-' +" +
                             "#pageable.pageNumber + '-' +" +

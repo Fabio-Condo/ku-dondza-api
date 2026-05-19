@@ -85,9 +85,9 @@ public class ExamRepositoryImpl implements ExamRepositoryQuery {
                     builder.lower(root.get("subject").get("name")), "%" + examFilter.getSearchParam().toLowerCase() + "%");
             predicates.add(builder.or(subject));
         }
-        if(!ObjectUtils.isEmpty(examFilter.getSubject())) {
+        if(!ObjectUtils.isEmpty(examFilter.getSubjectId())) {
             predicates.add(builder.equal(
-                    builder.lower(root.get("subject").get("id")), examFilter.getSubject().getId()));
+                    builder.lower(root.get("subject").get("id")), examFilter.getSubjectId()));
         }
         if (examFilter.getExamType() != null) {
             predicates.add(builder.equal(

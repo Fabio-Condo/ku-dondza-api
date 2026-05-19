@@ -86,14 +86,14 @@ public class QuizRepositoryImpl implements QuizRepositoryQuery {
             predicates.add(builder.or(subject, title));
         }
 
-        if(!ObjectUtils.isEmpty(quizFilter.getSubject())) {
+        if(!ObjectUtils.isEmpty(quizFilter.getSubjectId())) {
             predicates.add(builder.equal(
-                    builder.lower(root.get("subject").get("id")), quizFilter.getSubject().getId()));
+                    builder.lower(root.get("subject").get("id")), quizFilter.getSubjectId()));
         }
 
-        if(!ObjectUtils.isEmpty(quizFilter.getUser())) {
+        if(!ObjectUtils.isEmpty(quizFilter.getUserId())) {
             predicates.add(builder.equal(
-                    builder.lower(root.get("user").get("id")), quizFilter.getUser().getId()));
+                    builder.lower(root.get("user").get("id")), quizFilter.getUserId()));
         }
     }
 

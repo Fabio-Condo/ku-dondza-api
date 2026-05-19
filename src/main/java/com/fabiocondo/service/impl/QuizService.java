@@ -73,8 +73,8 @@ public class QuizService {
             value = CacheNames.QUIZ_FILTER,
             key =
                     "#quizFilter.searchParam + '-' +" +
-                            "#quizFilter.subject + '-' +" +
-                            "#quizFilter.user + '-' +" +
+                            "#quizFilter.subjectId + '-' +" +
+                            "#quizFilter.userId + '-' +" +
                             "#pageable.pageNumber + '-' +" +
                             "#pageable.pageSize + '-' +" +
                             "#pageable.sort.toString()"

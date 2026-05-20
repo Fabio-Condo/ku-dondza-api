@@ -37,7 +37,7 @@ public class SubjectController {
 
     @GetMapping("/find-by-subjectId/{subjectId}")
     public ResponseEntity<SubjectDto> findSubjectBySubjectIdWithCash(
-            @RequestParam String subjectId,
+            @PathVariable String subjectId,
             @RequestParam Long currentUserId) throws SubjectNotFoundException, UserNotFoundException {
 
         return ResponseEntity.ok(

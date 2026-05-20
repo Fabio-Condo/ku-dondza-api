@@ -21,5 +21,13 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
             "AND s.courseEnabled = :enabled")
     Page<Subject> findByNameAndCourseEnabled(@Param("name") String name, @Param("enabled") boolean enabled, Pageable pageable);
 
+    @Query("SELECT s FROM Subject s " +
+            "WHERE (:subjectId IS NULL OR s.id = :subjectId) " +
+            "AND s.courseEnabled = :enabled")
+    Page<Subject> findByIdAndCourseEnabled(
+            @Param("subjectId") Long subjectId,
+            @Param("enabled") boolean enabled,
+            Pageable pageable);
+
     Optional<Subject> findSubjectBySubjectId(String subjectId);
 }

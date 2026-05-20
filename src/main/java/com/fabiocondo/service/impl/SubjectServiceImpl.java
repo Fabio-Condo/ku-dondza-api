@@ -87,17 +87,17 @@ public class SubjectServiceImpl implements SubjectService {
     @Cacheable(
             value = CacheNames.SUBJECT_FILTER,
             key =
-                    "(#name ?: '') + '-' +" +
-                            "#enabled + '-' +" +
+                    "#enabled + '-' +" +
+                            "#subjectId + '-' +" +
                             "#currentUserId + '-' +" +
                             "#pageable.pageNumber + '-' +" +
                             "#pageable.pageSize + '-' +" +
                             "#pageable.sort.toString()",
             unless = "#result == null"
     )
-    public PageResponse<SubjectDto> findByNameWithCache(String name, boolean enabled, Long currentUserId, Pageable pageable) {
+    public PageResponse<SubjectDto> findByNameWithCache(Long subjectId, boolean enabled, Long currentUserId, Pageable pageable) {
 
-        Page<Subject> subjects = subjectRepository.findByNameAndCourseEnabled(name, enabled, pageable);
+        Page<Subject> subjects = subjectRepository.findByIdAndCourseEnabled(subjectId, enabled, pageable);
 
         List<SubjectDto> content = subjects.getContent()
                 .stream()

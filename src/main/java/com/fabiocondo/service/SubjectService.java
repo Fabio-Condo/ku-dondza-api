@@ -12,12 +12,11 @@ import java.util.List;
 public interface SubjectService {
     Subject findById(Long id) throws SubjectNotFoundException;
 
+    Page<Subject> findByName(String name, boolean enabled, Pageable pageable);
+
     List<Subject> findAll();
 
     //Page<Subject> findByName(String name, Pageable pageable);
-
-    Page<Subject> findByName(String name, boolean enabled, Pageable pageable);
-
     Subject save(String name, String description, Category category, boolean quizEnabled, boolean courseEnabled, boolean progressEnabled, boolean examEnabled, MultipartFile file);
 
     Subject update(Long id, String name, String description, Category category, boolean quizEnabled, boolean courseEnabled, boolean progressEnabled, boolean examEnabled, MultipartFile file) throws SubjectNotFoundException;

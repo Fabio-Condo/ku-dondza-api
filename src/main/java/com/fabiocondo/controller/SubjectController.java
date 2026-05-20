@@ -37,7 +37,7 @@ public class SubjectController {
 
     @GetMapping("/find-by-subjectId/{subjectId}")
     public ResponseEntity<SubjectDto> findSubjectBySubjectIdWithCash(
-            @PathVariable String subjectId,
+            @RequestParam String subjectId,
             @RequestParam Long currentUserId) throws SubjectNotFoundException, UserNotFoundException {
 
         return ResponseEntity.ok(
@@ -48,13 +48,13 @@ public class SubjectController {
     // GET com cache
     @GetMapping("/filter")
     public PageResponse<SubjectDto> filterWithCash(
-            @RequestParam(required = false, defaultValue = "") String name,
-            @RequestParam("enabled") boolean enabled,
+            @RequestParam(required = false) Long subjectId,
             @RequestParam("currentUserId") Long currentUserId,
+            @RequestParam("enabled") boolean enabled,
             Pageable pageable
     ) {
         return subjectServiceImpl.findByNameWithCache(
-                name,
+                subjectId,
                 enabled,
                 currentUserId,
                 pageable

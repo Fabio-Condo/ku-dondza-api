@@ -70,11 +70,11 @@ public class SubjectServiceImpl implements SubjectService {
         return subjectRepository.findByNameAndCourseEnabled(name, enabled, pageable);
     }
 
-    /*@Cacheable(
+    @Cacheable(
             value = CacheNames.SUBJECT_DETAIL,
             key = "#subjectId + '-' + #currentUserId",
             unless = "#result == null"
-    )*/
+    )
     public SubjectDto findSubjectBySubjectIdWithCash(String subjectId, Long currentUserId)
             throws SubjectNotFoundException, UserNotFoundException {
 

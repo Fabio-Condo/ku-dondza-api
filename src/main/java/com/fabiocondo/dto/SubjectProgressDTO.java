@@ -13,6 +13,8 @@ public class SubjectProgressDTO {
 
     private String subjectName;
 
+    private String subjectUrlFile;
+
     private String subjectDescription;
 
     @Enumerated(EnumType.STRING)
@@ -55,6 +57,14 @@ public class SubjectProgressDTO {
 
     public void setSubjectName(String subjectName) {
         this.subjectName = subjectName;
+    }
+
+    public String getSubjectUrlFile() {
+        return subjectUrlFile;
+    }
+
+    public void setSubjectUrlFile(String subjectUrlFile) {
+        this.subjectUrlFile = subjectUrlFile;
     }
 
     public String getSubjectDescription() {

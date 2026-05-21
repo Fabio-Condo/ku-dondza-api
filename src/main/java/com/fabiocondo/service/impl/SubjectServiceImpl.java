@@ -95,7 +95,7 @@ public class SubjectServiceImpl implements SubjectService {
                             "#pageable.sort.toString()",
             unless = "#result == null"
     )
-    public PageResponse<SubjectDto> findByNameWithCache(Long subjectId, boolean enabled, Long currentUserId, Pageable pageable) {
+    public PageResponse<SubjectDto> findBySubjectIdWithCache(Long subjectId, boolean enabled, Long currentUserId, Pageable pageable) {
 
         Page<Subject> subjects = subjectRepository.findByIdAndCourseEnabled(subjectId, enabled, pageable);
 

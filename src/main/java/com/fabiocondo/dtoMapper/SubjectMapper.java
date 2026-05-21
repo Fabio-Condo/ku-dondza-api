@@ -290,6 +290,7 @@ public class SubjectMapper {
             dto.setId(subject.getId());
             dto.setSubjectId(subject.getSubjectId());
             dto.setSubjectName(subject.getName());
+            dto.setSubjectUrlFile(subject.getUrlFile());
             dto.setSubjectDescription(subject.getDescription());
             dto.setSubjectCategory(subject.getCategory());
             dto.setProgressEnabled(subject.isProgressEnabled());

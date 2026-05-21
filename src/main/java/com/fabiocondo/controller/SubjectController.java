@@ -53,7 +53,7 @@ public class SubjectController {
             @RequestParam("enabled") boolean enabled,
             Pageable pageable
     ) {
-        return subjectServiceImpl.findByNameWithCache(
+        return subjectServiceImpl.findBySubjectIdWithCache(
                 subjectId,
                 enabled,
                 currentUserId,

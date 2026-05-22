@@ -27,6 +27,8 @@ public class ChallengeMapper {
 
         ChallengeSummaryDTO response = new ChallengeSummaryDTO();
 
+        int totalQuestions = challengeService.getTotalQuestions(challenge);
+
         response.setId(challenge.getId());
         response.setChallengeId(challenge.getChallengeId());
         response.setTitle(challenge.getTitle());
@@ -34,13 +36,13 @@ public class ChallengeMapper {
         response.setSubject(challenge.getSubject());
 
         response.setDifficultyLevel(challenge.getDifficultyLevel());
-        response.setXpReward(challenge.getXpReward());
+        response.setXpReward(totalQuestions * 10);
 
         response.setStartDate(challenge.getStartDate());
         response.setEndDate(challenge.getEndDate());
 
         response.setStatus(challengeService.getStatus(challenge));
-        response.setTotalQuestions(challengeService.getTotalQuestions(challenge));
+        response.setTotalQuestions(totalQuestions);
         response.setRemainingHours(challengeService.getRemainingHours(challenge));
         response.setSubmitted(challengeService.isSubmitted(challenge));
         response.setTotalParticipants(challengeService.getTotalParticipants(challenge));

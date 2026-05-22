@@ -41,17 +41,18 @@ public class ChallengeController {
     }
 
     @GetMapping("/filter")
-    public Page<ChallengeSummaryDTO> filter(ChallengeFilter challengeFilter, Pageable pageable) {
+    public Page<ChallengeSummaryDTO> filter(ChallengeFilter challengeFilter, @RequestParam("currentUserId") Long currentUserId, Pageable pageable) {
         return challengeMapper.toResponsePage(
-                challengeService.filter(challengeFilter, pageable)
+                challengeService.filter(challengeFilter, pageable),
+                currentUserId
         );
     }
 
     @GetMapping("/{challengeId}")
     //@Cacheable(value = "challengeSummary", key = "#challengeId")
-    public ChallengeSummaryDTO getByChallengeId(@PathVariable String challengeId) throws ChallengeNotFoundException {
+    public ChallengeSummaryDTO getByChallengeId(@PathVariable String challengeId, @RequestParam("currentUserId") Long currentUserId) throws ChallengeNotFoundException {
         Challenge challenge = challengeService.findByChallengeId(challengeId);
-        return challengeMapper.toResponse(challenge);
+        return challengeMapper.toResponse(challenge, currentUserId);
     }
 
     @PostMapping

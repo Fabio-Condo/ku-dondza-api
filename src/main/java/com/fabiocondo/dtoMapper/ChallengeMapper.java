@@ -5,10 +5,13 @@ import com.fabiocondo.domain.Quiz;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.dto.ChallengeSummaryDTO;
 import com.fabiocondo.dto.ChallengeRankingResultDTO;
+import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.impl.ChallengeService;
 import com.fabiocondo.service.impl.QuizService;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 
 @Component
@@ -18,16 +21,24 @@ public class ChallengeMapper {
 
     private final QuizService quizService;
 
-    public ChallengeMapper(ChallengeService challengeService, QuizService quizService) {
+    private final UserRepository userRepository;
+
+    public ChallengeMapper(ChallengeService challengeService, QuizService quizService, UserRepository userRepository) {
         this.challengeService = challengeService;
         this.quizService = quizService;
+        this.userRepository = userRepository;
     }
 
-    public ChallengeSummaryDTO toResponse(Challenge challenge) {
+    public ChallengeSummaryDTO toResponse(Challenge challenge, Long currentUserId) {
 
         ChallengeSummaryDTO response = new ChallengeSummaryDTO();
 
         int totalQuestions = challengeService.getTotalQuestions(challenge);
+        Optional<User> currentUser = userRepository.findById(currentUserId);
+
+        if(currentUser.isPresent()){
+            response.setHasCurrentUserSubmitted(challengeService.hasUserSubmitted(challenge, currentUserId));
+        }
 
         response.setId(challenge.getId());
         response.setChallengeId(challenge.getChallengeId());
@@ -44,7 +55,6 @@ public class ChallengeMapper {
         response.setStatus(challengeService.getStatus(challenge));
         response.setTotalQuestions(totalQuestions);
         response.setRemainingHours(challengeService.getRemainingHours(challenge));
-        response.setSubmitted(challengeService.isSubmitted(challenge));
         response.setTotalParticipants(challengeService.getTotalParticipants(challenge));
 
         if (challenge.getSubject() != null) {
@@ -57,8 +67,8 @@ public class ChallengeMapper {
         return response;
     }
 
-    public Page<ChallengeSummaryDTO> toResponsePage(Page<Challenge> page) {
-        return page.map(this::toResponse);
+    public Page<ChallengeSummaryDTO> toResponsePage(Page<Challenge> page, Long currentUserId) {
+        return page.map(challenge -> toResponse(challenge, currentUserId));
     }
 
     public ChallengeRankingResultDTO toRankingResponse(Quiz quiz, Integer rankingPosition) {

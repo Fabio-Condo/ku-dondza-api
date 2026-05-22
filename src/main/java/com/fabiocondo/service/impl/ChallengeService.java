@@ -132,6 +132,20 @@ public class ChallengeService {
         }
     }
 
+    public boolean hasUserSubmitted(Challenge challenge, Long currentUserId) {
+
+        if (challenge == null
+                || challenge.getId() == null
+                || currentUserId == null) {
+            return false;
+        }
+
+        return challengeRepository.existsQuizInChallenge(
+                challenge.getId(),
+                currentUserId
+        );
+    }
+
     public void validateChallengeAvailability(Long challengeId)
             throws ChallengeNotFoundException, ChallengeUnavailableException {
 

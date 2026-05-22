@@ -29,7 +29,7 @@ public class ChallengeSummaryDTO {
 
     private String status; // OPEN, ONGOING, DONE
 
-    private Boolean submitted;
+    private Boolean hasCurrentUserSubmitted;
 
     private String subjectName;
 
@@ -139,12 +139,12 @@ public class ChallengeSummaryDTO {
         this.status = status;
     }
 
-    public Boolean getSubmitted() {
-        return submitted;
+    public Boolean getHasCurrentUserSubmitted() {
+        return hasCurrentUserSubmitted;
     }
 
-    public void setSubmitted(Boolean submitted) {
-        this.submitted = submitted;
+    public void setHasCurrentUserSubmitted(Boolean hasCurrentUserSubmitted) {
+        this.hasCurrentUserSubmitted = hasCurrentUserSubmitted;
     }
 
     public String getSubjectName() {

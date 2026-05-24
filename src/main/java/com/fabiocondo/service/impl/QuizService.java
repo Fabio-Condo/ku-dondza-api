@@ -299,6 +299,7 @@ public class QuizService {
         if (quiz.getSubject() != null) {
             SubjectDto subjectDTO = new SubjectDto();
             subjectDTO.setId(quiz.getSubject().getId());
+            subjectDTO.setSubjectId(quiz.getSubject().getSubjectId());
             subjectDTO.setName(quiz.getSubject().getName());
             subjectDTO.setDescription(quiz.getSubject().getDescription());
             subjectDTO.setCategory(quiz.getSubject().getCategory());

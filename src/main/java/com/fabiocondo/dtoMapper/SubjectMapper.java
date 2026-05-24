@@ -135,6 +135,8 @@ public class SubjectMapper {
 
         long submittedCount = completedTestIds.size();
 
+        dto.setCurrentUserTotalTestsScore(submittedCount);
+
         dto.setCurrentUserProgressRate(
                 totalTests == 0 ? 0 : (submittedCount * 100.0) / totalTests
         );
@@ -318,6 +320,8 @@ public class SubjectMapper {
 
             int totalTests = subjectTests.size();
             long submittedCount = submittedTestIds.size();
+
+            dto.setCurrentUserTotalTestsScore(submittedCount);
 
             // -------------------------
             // SCORE + RANK

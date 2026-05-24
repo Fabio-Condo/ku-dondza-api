@@ -25,6 +25,8 @@ public class SubjectProgressDTO {
 
     private List<TopicDtoWithTests> topicDtoWithTests;
 
+    private double currentUserTotalTestsScore;
+
     private double currentUserProgressRate;
 
     private Long currentUserScore = 0L;
@@ -89,6 +91,14 @@ public class SubjectProgressDTO {
 
     public void setTopicDtoWithTests(List<TopicDtoWithTests> topicDtoWithTests) {
         this.topicDtoWithTests = topicDtoWithTests;
+    }
+
+    public double getCurrentUserTotalTestsScore() {
+        return currentUserTotalTestsScore;
+    }
+
+    public void setCurrentUserTotalTestsScore(double currentUserTotalTestsScore) {
+        this.currentUserTotalTestsScore = currentUserTotalTestsScore;
     }
 
     public double getCurrentUserProgressRate() {

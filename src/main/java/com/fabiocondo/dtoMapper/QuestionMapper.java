@@ -180,6 +180,17 @@ public class QuestionMapper {
             topicDTO.setName(question.getTopic().getName());
             topicDTO.setDescription(question.getTopic().getDescription());
             topicDTO.setPosition(question.getTopic().getPosition());
+
+            // Subject - converta para DTO
+            if (question.getTopic().getSubject() != null) {
+                SubjectDto subjectDTO = new SubjectDto();
+                subjectDTO.setId(question.getTopic().getSubject().getId());
+                subjectDTO.setName(question.getTopic().getSubject().getName());
+                subjectDTO.setDescription(question.getTopic().getSubject().getDescription());
+                subjectDTO.setCategory(question.getTopic().getSubject().getCategory());
+                topicDTO.setSubject(subjectDTO);
+            }
+
             // NÃO inclua contents, questions ou outras coleções
             questionDTO.setTopic(topicDTO);
         }

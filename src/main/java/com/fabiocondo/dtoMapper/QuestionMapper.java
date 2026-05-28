@@ -96,6 +96,7 @@ public class QuestionMapper {
         questionDTO.setValidated(question.isValidated());
         questionDTO.setFileName(question.getFileName());
         questionDTO.setUrlFile(question.getUrlFile());
+        questionDTO.setHighlighted(question.isHighlighted());
 
         if (question.getTopic() != null) {
             TopicDTO topicDTO = new TopicDTO();

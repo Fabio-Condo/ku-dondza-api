@@ -40,6 +40,8 @@ public class Question {
 
     private String urlFile;
 
+    private boolean highlighted;
+
     @ManyToOne
     //@JsonIgnoreProperties("questions")
     @JsonIgnoreProperties(
@@ -139,6 +141,14 @@ public class Question {
 
     public void setUrlFile(String urlFile) {
         this.urlFile = urlFile;
+    }
+
+    public boolean isHighlighted() {
+        return highlighted;
+    }
+
+    public void setHighlighted(boolean highlighted) {
+        this.highlighted = highlighted;
     }
 
     public Topic getTopic() {

@@ -68,6 +68,10 @@ public class QuestionService {
         return questionRepository.filter(questionFilter, pageable);
     }
 
+    public Page<Question> getHighlightedQuestions(Pageable pageable) {
+        return questionRepository.findByHighlightedTrue(pageable);
+    }
+
     public List<Question> findAll() {
         return questionRepository.findAll();
     }

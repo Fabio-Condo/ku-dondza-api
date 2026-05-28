@@ -24,6 +24,8 @@ public class QuestionFilter {
 
     private Long userId;
 
+    private Boolean  highlighted;
+
     public String getSearchParam() {
         return searchParam;
     }
@@ -78,5 +80,13 @@ public class QuestionFilter {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Boolean isHighlighted() {
+        return highlighted;
+    }
+
+    public void setHighlighted(Boolean highlighted) {
+        this.highlighted = highlighted;
     }
 }

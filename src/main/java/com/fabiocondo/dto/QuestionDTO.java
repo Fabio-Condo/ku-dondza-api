@@ -30,6 +30,8 @@ public class QuestionDTO {
 
     private String urlFile;
 
+    private boolean highlighted;
+
     @JsonIgnoreProperties(
             value = { "questions", "hibernateLazyInitializer", "handler" }
     ) // ADICIONANDO PORCAUSA DE TOPIC_TEST (MODULO DE PROGRESSAO) - MELHORAR DEPOIS COM DTO
@@ -123,6 +125,14 @@ public class QuestionDTO {
 
     public void setUrlFile(String urlFile) {
         this.urlFile = urlFile;
+    }
+
+    public boolean isHighlighted() {
+        return highlighted;
+    }
+
+    public void setHighlighted(boolean highlighted) {
+        this.highlighted = highlighted;
     }
 
     public TopicDTO getTopic() {

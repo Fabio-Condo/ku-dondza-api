@@ -114,6 +114,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
                     builder.lower(root.get("difficultyLevel")), questionFilter.getDifficultyLevel()));
         }
 
+        // Destacados
+        if (questionFilter.isHighlighted() != null) {
+            predicates.add(
+                    builder.equal(root.get("highlighted"), questionFilter.isHighlighted())
+            );
+        }
+
         // Filtro: questions salvos por um usuário específico
         if (questionFilter.getUserId() != null) {
             // Criação da subquery

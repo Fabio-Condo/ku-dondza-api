@@ -3,12 +3,15 @@ package com.fabiocondo.dtoMapper;
 import com.fabiocondo.domain.Topic;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.dto.SubjectDto;
+import com.fabiocondo.dto.TopicContentDTO;
 import com.fabiocondo.dto.TopicDTO;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.impl.SubjectServiceImpl;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class TopicMapper {
@@ -38,7 +41,9 @@ public class TopicMapper {
     }
 
     public TopicDTO domainToDTO(Topic topic) {
+
         TopicDTO topicDTO = new TopicDTO();
+
         topicDTO.setId(topic.getId());
         topicDTO.setTopicId(topic.getTopicId());
         topicDTO.setName(topic.getName());
@@ -47,8 +52,8 @@ public class TopicMapper {
         topicDTO.setPremium(topic.isPremium());
         topicDTO.setPosition(topic.getPosition());
         topicDTO.setQuestions(topic.getQuestions());
-        //topicDTO.setContents(topic.getContents());
 
+        // SUBJECT
         SubjectDto subjectDto = new SubjectDto();
         subjectDto.setId(topic.getSubject().getId());
         subjectDto.setSubjectId(topic.getSubject().getSubjectId());
@@ -56,6 +61,32 @@ public class TopicMapper {
         subjectDto.setDescription(topic.getSubject().getDescription());
 
         topicDTO.setSubject(subjectDto);
+
+        // CONTENTS
+        if (topic.getContents() != null) {
+
+            List<TopicContentDTO> contentDTOList = topic.getContents()
+                    .stream()
+                    .map(content -> {
+
+                        TopicContentDTO dto = new TopicContentDTO();
+
+                        dto.setId(content.getId());
+                        dto.setDescription(content.getDescription());
+                        dto.setContentType(content.getContentType());
+                        dto.setTime(content.getTime());
+                        dto.setFileName(content.getFileName());
+                        dto.setUrlFile(content.getUrlFile());
+                        dto.setPosition(content.getPosition());
+                        dto.setMarkedByUser(content.isMarkedByUser());
+
+                        return dto;
+                    })
+                    .collect(Collectors.toList());
+
+            topicDTO.setContents(contentDTOList);
+        }
+
         return topicDTO;
     }
 

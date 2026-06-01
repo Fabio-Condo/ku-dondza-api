@@ -28,6 +28,8 @@ public interface QuestionRepository extends JpaRepository<Question, Long>, Quest
 
     Set<Question> findByTopicId(Long topicId);
 
+    long countByTopicId(Long topicId);
+
     List<Question> findByTopicSubjectId(Long subjectId);
 
     Page<Question> findByHighlightedTrue(Pageable pageable);

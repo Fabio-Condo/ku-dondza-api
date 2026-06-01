@@ -3,6 +3,7 @@ package com.fabiocondo.controller;
 import com.fabiocondo.constant.CacheNames;
 import com.fabiocondo.domain.HttpResponse;
 import com.fabiocondo.domain.Topic;
+import com.fabiocondo.dto.PageResponse;
 import com.fabiocondo.dto.TopicDTO;
 import com.fabiocondo.dtoMapper.TopicMapper;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
@@ -37,16 +38,21 @@ public class TopicController {
     }
 
     //@GetMapping("/find-by-topicId/{topicId}")
-    //public ResponseEntity<Topic> findTopicByTopicId(@PathVariable("topicId") String topicId) throws TopicNotFoundException {
-    //    Topic topic = topicService.findTopicByTopicId(topicId);
-    //    return ResponseEntity.status(HttpStatus.OK).body(topic);
-    //}
+    public ResponseEntity<Topic> findTopicByTopicId(@PathVariable("topicId") String topicId) throws TopicNotFoundException {
+        Topic topic = topicService.findTopicByTopicId(topicId);
+        return ResponseEntity.status(HttpStatus.OK).body(topic);
+    }
 
     @GetMapping("/find-by-topicId/{topicId}")
-    public ResponseEntity<TopicDTO> findTopicByTopicId(@PathVariable("topicId") String topicId) throws TopicNotFoundException {
-        Topic topic = topicService.findTopicByTopicId(topicId);
-        return ResponseEntity.status(HttpStatus.OK).body(topicMapper.domainToDTO(topic));
+    public ResponseEntity<TopicDTO> findTopicByTopicId_WithCache(@PathVariable("topicId") String topicId) throws TopicNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(topicService.findTopicByTopicId_WithCache(topicId));
     }
+
+    //@GetMapping("/find-by-topicId/{topicId}")
+    //public ResponseEntity<TopicDTO> findTopicByTopicId(@PathVariable("topicId") String topicId) throws TopicNotFoundException {
+    //    Topic topic = topicService.findTopicByTopicId(topicId);
+    //    return ResponseEntity.status(HttpStatus.OK).body(topicMapper.domainToDTO(topic));
+    //}
 
     @PostMapping
     public ResponseEntity<Topic> save(@RequestBody Topic topic) throws TopicNotFoundException {
@@ -59,8 +65,8 @@ public class TopicController {
     }
 
     @GetMapping("/filter")
-    public Page<Topic> filter(TopicFilter topicFilter, Pageable pageable) {
-        return topicService.filter(topicFilter, pageable);
+    public PageResponse<TopicDTO> filter(TopicFilter topicFilter, Pageable pageable) {
+        return topicService.filterWithCash(topicFilter, pageable);
     }
 
     //@GetMapping("/filter")

@@ -11,6 +11,8 @@ public final class CacheNames {
 
     // TOPICS
     public static final String TOPIC_LIST = "topics:list";
+    public static final String TOPIC_FILTER = "topics:filter";
+    public static final String TOPIC_DETAIL = "topics:details";
 
     // EXAMS
     public static final String EXAM_FILTER = "exams:filter";

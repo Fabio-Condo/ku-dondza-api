@@ -54,13 +54,14 @@ public class TopicMapper {
         topicDTO.setQuestions(topic.getQuestions());
 
         // SUBJECT
-        SubjectDto subjectDto = new SubjectDto();
-        subjectDto.setId(topic.getSubject().getId());
-        subjectDto.setSubjectId(topic.getSubject().getSubjectId());
-        subjectDto.setName(topic.getSubject().getName());
-        subjectDto.setDescription(topic.getSubject().getDescription());
-
-        topicDTO.setSubject(subjectDto);
+        if (topic.getSubject() != null) {
+            SubjectDto subjectDTO = new SubjectDto();
+            subjectDTO.setId(topic.getSubject().getId());
+            subjectDTO.setSubjectId(topic.getSubject().getSubjectId());
+            subjectDTO.setName(topic.getSubject().getName());
+            subjectDTO.setDescription(topic.getSubject().getDescription());
+            topicDTO.setSubject(subjectDTO);
+        }
 
         // CONTENTS
         if (topic.getContents() != null) {
@@ -100,13 +101,15 @@ public class TopicMapper {
         topicDTO.setPremium(topic.isPremium());
         topicDTO.setPosition(topic.getPosition());
 
-        SubjectDto subjectDto = new SubjectDto();
-        subjectDto.setId(topic.getSubject().getId());
-        subjectDto.setSubjectId(topic.getSubject().getSubjectId());
-        subjectDto.setName(topic.getSubject().getName());
-        subjectDto.setDescription(topic.getSubject().getDescription());
+        if (topic.getSubject() != null) {
+            SubjectDto subjectDTO = new SubjectDto();
+            subjectDTO.setId(topic.getSubject().getId());
+            subjectDTO.setSubjectId(topic.getSubject().getSubjectId());
+            subjectDTO.setName(topic.getSubject().getName());
+            subjectDTO.setDescription(topic.getSubject().getDescription());
+            topicDTO.setSubject(subjectDTO);
+        }
 
-        topicDTO.setSubject(subjectDto);
         return topicDTO;
     }
 

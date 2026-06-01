@@ -24,6 +24,8 @@ public class TopicDTO {
 
     private Integer position;
 
+    private Long totalQuestions;
+
     private List<Question> questions;
 
     private List<TopicContentDTO> contents;
@@ -90,6 +92,14 @@ public class TopicDTO {
 
     public void setPosition(Integer position) {
         this.position = position;
+    }
+
+    public Long getTotalQuestions() {
+        return totalQuestions;
+    }
+
+    public void setTotalQuestions(Long totalQuestions) {
+        this.totalQuestions = totalQuestions;
     }
 
     public List<Question> getQuestions() {

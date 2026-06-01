@@ -91,13 +91,9 @@ public class QuestionService {
                             "#pageable.pageSize + '-' +" +
                             "#pageable.sort.toString()"
     )
-    public PageResponse<QuestionDTO> filterWithCash(
-            QuestionFilter questionFilter,
-            Long currentUserId,
-            Pageable pageable) {
+    public PageResponse<QuestionDTO> filterWithCash(QuestionFilter questionFilter, Long currentUserId, Pageable pageable) {
 
-        Page<Question> page =
-                questionRepository.filter(questionFilter, pageable);
+        Page<Question> page = questionRepository.filter(questionFilter, pageable);
 
         List<QuestionDTO> content =
                 page.getContent()

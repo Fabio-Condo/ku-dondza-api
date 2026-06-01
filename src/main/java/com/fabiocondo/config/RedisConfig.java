@@ -67,6 +67,8 @@ public class RedisConfig {
         // TOPICS (muito estável)
         cacheConfigs.put(CacheNames.TOPIC_LIST,
                 base.entryTtl(Duration.ofDays(7)));
+        cacheConfigs.put(CacheNames.TOPIC_FILTER,
+                base.entryTtl(Duration.ofDays(7)));
 
         // EXAMS (histórico → praticamente imutável)
         cacheConfigs.put(CacheNames.EXAM_FILTER,

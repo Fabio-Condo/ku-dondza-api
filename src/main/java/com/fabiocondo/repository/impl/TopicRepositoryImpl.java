@@ -89,9 +89,9 @@ public class TopicRepositoryImpl implements TopicRepositoryQuery {
             predicates.add(builder.like(
                     builder.lower(root.get("name")), "%" + topicFilter.getName().toLowerCase() + "%"));
         }
-        if(!ObjectUtils.isEmpty(topicFilter.getSubject())) {
+        if(!ObjectUtils.isEmpty(topicFilter.getSubjectId())) {
             predicates.add(builder.equal(
-                    builder.lower(root.get("subject").get("id")), topicFilter.getSubject().getId()));
+                    builder.lower(root.get("subject").get("id")), topicFilter.getSubjectId()));
         }
 
         // Adiciona filtro para enabled = true

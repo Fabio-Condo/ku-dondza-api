@@ -1,7 +1,6 @@
 package com.fabiocondo.repository.filter;
 
 import com.fabiocondo.domain.Subject;
-import com.fabiocondo.domain.Topic;
 
 public class TopicFilter {
 
@@ -9,7 +8,7 @@ public class TopicFilter {
 
     private String sort;
 
-    private Subject subject;
+    private Long subjectId;
 
     private String name;
 
@@ -29,12 +28,12 @@ public class TopicFilter {
         this.sort = sort;
     }
 
-    public Subject getSubject() {
-        return subject;
+    public Long getSubjectId() {
+        return subjectId;
     }
 
-    public void setSubject(Subject subject) {
-        this.subject = subject;
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
     }
 
     public String getName() {

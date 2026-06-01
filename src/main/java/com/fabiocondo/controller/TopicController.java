@@ -37,12 +37,6 @@ public class TopicController {
         return ResponseEntity.status(HttpStatus.OK).body(topicService.findById(id));
     }
 
-    //@GetMapping("/find-by-topicId/{topicId}")
-    public ResponseEntity<Topic> findTopicByTopicId(@PathVariable("topicId") String topicId) throws TopicNotFoundException {
-        Topic topic = topicService.findTopicByTopicId(topicId);
-        return ResponseEntity.status(HttpStatus.OK).body(topic);
-    }
-
     @GetMapping("/find-by-topicId/{topicId}")
     public ResponseEntity<TopicDTO> findTopicByTopicId_WithCache(@PathVariable("topicId") String topicId) throws TopicNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(topicService.findTopicByTopicId_WithCache(topicId));

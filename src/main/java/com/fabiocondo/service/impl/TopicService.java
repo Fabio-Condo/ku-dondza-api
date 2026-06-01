@@ -70,10 +70,6 @@ public class TopicService {
         return topicRepository.save(existTopic);
     }
 
-    public Page<Topic> filter(TopicFilter topicFilter, Pageable pageable) {
-        return topicRepository.filter(topicFilter, pageable);
-    }
-
     @Cacheable(
             value = CacheNames.QUESTION_FILTER,
             key =

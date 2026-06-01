@@ -83,6 +83,11 @@ public class RedisConfig {
         cacheConfigs.put(CacheNames.SUBJECT_FILTER,
                 base.entryTtl(Duration.ofHours(3)));
 
+        // FILTROS (dependem de queries e podem variar)
+        cacheConfigs.put(CacheNames.QUESTION_FILTER,
+                base.entryTtl(Duration.ofMinutes(1)));
+
+
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(base.entryTtl(Duration.ofDays(1)))
                 .withInitialCacheConfigurations(cacheConfigs)

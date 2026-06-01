@@ -13,9 +13,9 @@ public class QuestionFilter {
 
     private String sort;
 
-    private Subject subject;
+    private Long subjectId;
 
-    private Topic topic;
+    private Long topicId;
 
     private String text;
 
@@ -42,20 +42,20 @@ public class QuestionFilter {
         this.sort = sort;
     }
 
-    public Subject getSubject() {
-        return subject;
+    public Long getSubjectId() {
+        return subjectId;
     }
 
-    public void setSubject(Subject subject) {
-        this.subject = subject;
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
     }
 
-    public Topic getTopic() {
-        return topic;
+    public Long getTopicId() {
+        return topicId;
     }
 
-    public void setTopic(Topic topic) {
-        this.topic = topic;
+    public void setTopicId(Long topicId) {
+        this.topicId = topicId;
     }
 
     public String getText() {

@@ -101,13 +101,13 @@ public class QuestionRepositoryImpl implements QuestionRepositoryQuery {
             predicates.add(builder.like(
                     builder.lower(root.get("text")), "%" + questionFilter.getText().toLowerCase() + "%"));
         }
-        if(!ObjectUtils.isEmpty(questionFilter.getSubject())) {
+        if(!ObjectUtils.isEmpty(questionFilter.getSubjectId())) {
             predicates.add(builder.equal(
-                    builder.lower(root.get("topic").get("subject").get("id")), questionFilter.getSubject().getId()));
+                    builder.lower(root.get("topic").get("subject").get("id")), questionFilter.getSubjectId()));
         }
-        if(!ObjectUtils.isEmpty(questionFilter.getTopic())) {
+        if(!ObjectUtils.isEmpty(questionFilter.getTopicId())) {
             predicates.add(builder.equal(
-                    builder.lower(root.get("topic").get("id")), questionFilter.getTopic().getId()));
+                    builder.lower(root.get("topic").get("id")), questionFilter.getTopicId()));
         }
         if(!ObjectUtils.isEmpty(questionFilter.getDifficultyLevel())) {
             predicates.add(builder.equal(

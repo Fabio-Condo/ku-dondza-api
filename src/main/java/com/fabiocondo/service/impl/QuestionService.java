@@ -2,15 +2,18 @@ package com.fabiocondo.service.impl;
 
 import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
+import com.fabiocondo.constant.CacheNames;
 import com.fabiocondo.domain.*;
-import com.fabiocondo.dto.QuestionDTO;
+import com.fabiocondo.dto.*;
 import com.fabiocondo.dtoMapper.QuestionMapper;
 import com.fabiocondo.enumeration.DifficultyLevel;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
 import com.fabiocondo.repository.TopicTestRepository;
+import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.repository.filter.QuestionFilter;
+import com.fabiocondo.service.UserService;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,16 +21,15 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,18 +40,22 @@ public class QuestionService {
     private final AmazonS3Service amazonS3Service;
     private final QuestionRepository questionRepository;
     private final TopicService topicService;
-
     private final TopicTestRepository topicTestRepository;
-
     private final QuestionMapper questionMapper; // ou onde está o domainToDTO
+    private final CommentService commentService;
+    private final UserService userService;
+    private final UserRepository userRepository;
     private final GptService gptService;
 
-    public QuestionService(AmazonS3Service amazonS3Service, QuestionRepository questionRepository, TopicService topicService, TopicTestRepository topicTestRepository, QuestionMapper questionMapper, GptService gptService) {
+    public QuestionService(AmazonS3Service amazonS3Service, QuestionRepository questionRepository, TopicService topicService, TopicTestRepository topicTestRepository, QuestionMapper questionMapper, CommentService commentService, UserService userService, UserRepository userRepository, GptService gptService) {
         this.amazonS3Service = amazonS3Service;
         this.questionRepository = questionRepository;
         this.topicService = topicService;
         this.topicTestRepository = topicTestRepository;
         this.questionMapper = questionMapper;
+        this.commentService = commentService;
+        this.userService = userService;
+        this.userRepository = userRepository;
         this.gptService = gptService;
     }
 
@@ -64,8 +70,39 @@ public class QuestionService {
                 .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
     }
 
-    public Page<Question> filter(QuestionFilter questionFilter, Pageable pageable) {
-        return questionRepository.filter(questionFilter, pageable);
+    @Cacheable(
+            value = CacheNames.QUESTION_FILTER,
+            key =
+                    "#questionFilter.searchParam + '-' +" +
+                            "#questionFilter.topicId + '-' +" +
+                            "#questionFilter.subjectId + '-' +" +
+                            "#questionFilter.difficultyLevel + '-' +" +
+                            "#questionFilter.highlighted + '-' +" +
+                            "#currentUserId + '-' +" +
+                            "#pageable.pageNumber + '-' +" +
+                            "#pageable.pageSize + '-' +" +
+                            "#pageable.sort.toString()"
+    )
+    public PageResponse<QuestionDTO> filterWithCash(
+            QuestionFilter questionFilter,
+            Long currentUserId,
+            Pageable pageable) {
+
+        Page<Question> page =
+                questionRepository.filter(questionFilter, pageable);
+
+        List<QuestionDTO> content =
+                page.getContent()
+                        .stream()
+                        .map(q -> domainToDTO(q, currentUserId))
+                        .collect(Collectors.toList());
+
+        return new PageResponse<>(
+                content,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements()
+        );
     }
 
     public Page<Question> getHighlightedQuestions(Pageable pageable) {
@@ -389,6 +426,93 @@ public class QuestionService {
         } catch (Exception e) {
             throw new RuntimeException("Falha ao extrair JSON da resposta da IA", e);
         }
+    }
+
+    public QuestionDTO domainToDTO(Question question, Long currentUserId) {
+        QuestionDTO questionDTO = new QuestionDTO();
+        questionDTO.setId(question.getId());
+        questionDTO.setQuestionId(question.getQuestionId());
+        questionDTO.setText(question.getText());
+        questionDTO.setTip(question.getTip());
+        questionDTO.setSolution(question.getSolution());
+        questionDTO.setDifficultyLevel(question.getDifficultyLevel());
+        questionDTO.setTimeLimit(question.getTimeLimit());
+        questionDTO.setValidated(question.isValidated());
+        questionDTO.setFileName(question.getFileName());
+        questionDTO.setUrlFile(question.getUrlFile());
+        questionDTO.setHighlighted(question.isHighlighted());
+
+        if (question.getTopic() != null) {
+            TopicDTO topicDTO = new TopicDTO();
+            topicDTO.setId(question.getTopic().getId());
+            topicDTO.setName(question.getTopic().getName());
+
+            // CONVERTER Subject para SubjectDTO
+            if (question.getTopic().getSubject() != null) {
+                SubjectDto subjectDTO = new SubjectDto();
+                subjectDTO.setId(question.getTopic().getSubject().getId());
+                subjectDTO.setName(question.getTopic().getSubject().getName());
+                subjectDTO.setDescription(question.getTopic().getSubject().getDescription());
+                subjectDTO.setCategory(question.getTopic().getSubject().getCategory());
+                topicDTO.setSubject(subjectDTO);
+            }
+
+            topicDTO.setDescription(question.getTopic().getDescription());
+            topicDTO.setPosition(question.getTopic().getPosition());
+            questionDTO.setTopic(topicDTO);
+        }
+
+        //questionDTO.setMathExpressions(question.getMathExpressions());
+
+        if (question.getMathExpressions() != null) {
+            List<MathExpressionDTO> mathExpressionDTOs = question.getMathExpressions().stream()
+                    .map(me -> {
+                        MathExpressionDTO meDTO = new MathExpressionDTO();
+                        meDTO.setId(me.getId());
+                        meDTO.setName(me.getName());
+                        meDTO.setExpression(me.getExpression());
+                        //meDTO.setQuestion(me.getQuestion()); Recebe DTO
+
+                        return meDTO;
+                    })
+                    .collect(Collectors.toList());
+            questionDTO.setMathExpressions(mathExpressionDTOs);
+        }
+
+        //questionDTO.setAnswers(question.getAnswers());
+
+        // CONVERTER Answers para AnswerDTO (NÃO usar entidades diretamente)
+        if (question.getAnswers() != null) {
+            List<AnswerDTO> answerDTOs = question.getAnswers().stream()
+                    .map(answer -> {
+                        AnswerDTO answerDTO = new AnswerDTO();
+                        answerDTO.setId(answer.getId());
+                        answerDTO.setText(answer.getText());
+                        answerDTO.setCorrect(answer.isCorrect());
+                        return answerDTO;
+                    })
+                    .collect(Collectors.toList());
+            questionDTO.setAnswers(answerDTOs);
+        }
+
+        Optional<User> currentUser = userRepository.findById(currentUserId);
+
+        if(currentUser.isPresent()){
+            questionDTO.setSavedByUser(userService.checkIfSavedQuestion(question.getId(), currentUserId));
+        }
+
+        questionDTO.setNumberOfComments(commentService.countCommentsByQuestionId(question.getId()));
+        return questionDTO;
+    }
+
+    public Page<QuestionDTO> domainPageToDTOPage(Page<Question> questions, Long currentUserId, Pageable pageable) {
+        return new PageImpl<>(
+                questions.stream()
+                        .map(question -> domainToDTO(question, currentUserId))
+                        .collect(Collectors.toList()),
+                pageable,
+                questions.getTotalElements()
+        );
     }
 
     // TODO: Criar um metodo de validacao e identificacao de erros

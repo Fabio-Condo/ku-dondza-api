@@ -1,6 +1,7 @@
 package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.*;
+import com.fabiocondo.dto.PageResponse;
 import com.fabiocondo.dto.QuestionDTO;
 import com.fabiocondo.dtoMapper.QuestionMapper;
 import com.fabiocondo.enumeration.DifficultyLevel;
@@ -44,8 +45,8 @@ public class QuestionController {
     }
 
     @GetMapping("/filter")
-    public Page<QuestionDTO> filter(QuestionFilter questionFilter, @RequestParam("currentUserId") Long currentUserId, Pageable pageable) {
-        return questionMapper.domainPageToDTOPage(questionService.filter(questionFilter, pageable), currentUserId, pageable);
+    public PageResponse<QuestionDTO> filter(QuestionFilter questionFilter, @RequestParam("currentUserId") Long currentUserId, Pageable pageable) {
+        return questionService.filterWithCash(questionFilter, currentUserId, pageable);
     }
 
     @GetMapping

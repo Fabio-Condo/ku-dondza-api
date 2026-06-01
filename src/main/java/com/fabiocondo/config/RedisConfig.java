@@ -57,40 +57,36 @@ public class RedisConfig {
 
         Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
 
-        // SUBJECTS (quase estático, mas pode mudar admin ocasionalmente)
+        // SUBJECTS
         cacheConfigs.put(CacheNames.SUBJECT_LIST,
                 base.entryTtl(Duration.ofDays(7)));
-
+        cacheConfigs.put(CacheNames.SUBJECT_FILTER,
+                base.entryTtl(Duration.ofHours(3)));
         cacheConfigs.put(CacheNames.SUBJECT_DETAIL,
                 base.entryTtl(Duration.ofDays(7)));
 
-        // TOPICS (muito estável)
+
+        // TOPICS
         cacheConfigs.put(CacheNames.TOPIC_LIST,
                 base.entryTtl(Duration.ofDays(7)));
         cacheConfigs.put(CacheNames.TOPIC_FILTER,
                 base.entryTtl(Duration.ofDays(7)));
 
-        // EXAMS (histórico → praticamente imutável)
+        // EXAMS
         cacheConfigs.put(CacheNames.EXAM_FILTER,
                 base.entryTtl(Duration.ofDays(7)));
 
-        // QUIZZES (histórico de testes → imutável após criação)
+        // QUIZZES
         cacheConfigs.put(CacheNames.QUIZ_FILTER,
                 base.entryTtl(Duration.ofDays(7)));
-
         cacheConfigs.put(CacheNames.QUIZ_DETAILS,
                 base.entryTtl(Duration.ofDays(7)));
 
-        // FILTROS (dependem de queries e podem variar)
-        cacheConfigs.put(CacheNames.SUBJECT_FILTER,
-                base.entryTtl(Duration.ofHours(3)));
-
-        // FILTROS (dependem de queries e podem variar)
+        // QUESTIONS
         cacheConfigs.put(CacheNames.QUESTION_FILTER,
                 base.entryTtl(Duration.ofDays(7)));
         cacheConfigs.put(CacheNames.QUESTION_DETAIL,
                 base.entryTtl(Duration.ofDays(7)));
-
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(base.entryTtl(Duration.ofDays(1)))

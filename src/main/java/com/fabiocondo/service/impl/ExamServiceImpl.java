@@ -4,7 +4,9 @@ import com.fabiocondo.aws.model.S3UploadResponse;
 import com.fabiocondo.aws.service.AmazonS3Service;
 import com.fabiocondo.constant.CacheNames;
 import com.fabiocondo.domain.*;
+import com.fabiocondo.dto.ExamDto;
 import com.fabiocondo.dto.PageResponse;
+import com.fabiocondo.dto.SubjectDto;
 import com.fabiocondo.enumeration.ExamType;
 import com.fabiocondo.enumeration.Institution;
 import com.fabiocondo.exception.domain.ExamNotFoundException;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ExamServiceImpl implements ExamService {
@@ -72,12 +75,17 @@ public class ExamServiceImpl implements ExamService {
                             "#pageable.pageSize + '-' +" +
                             "#pageable.sort.toString()"
     )
-    public PageResponse<Exam> filterWithCash(ExamFilter examFilter, Pageable pageable) {
+    public PageResponse<ExamDto> filterWithCash(ExamFilter examFilter, Pageable pageable) {
 
         Page<Exam> page = examRepository.filter(examFilter, pageable);
 
+        List<ExamDto> examsDTO = page.getContent()
+                .stream()
+                .map(this::domainToDTO)
+                .collect(Collectors.toList());
+
         return new PageResponse<>(
-                page.getContent(),
+                examsDTO,
                 page.getNumber(),
                 page.getSize(),
                 page.getTotalElements()
@@ -182,5 +190,30 @@ public class ExamServiceImpl implements ExamService {
     public long getTotal(){
         logger.info("Total exames: " + examRepository.count());
         return examRepository.count();
+    }
+
+    public ExamDto domainToDTO(Exam exam) {
+        ExamDto examDto = new ExamDto();
+        examDto.setId(exam.getId());
+        examDto.setExamType(exam.getExamType());
+        examDto.setInstitution(exam.getInstitution());
+        examDto.setPremium(exam.isPremium());
+        examDto.setFileName(exam.getFileName());
+        examDto.setUrlFile(exam.getUrlFile());
+        examDto.setYear(exam.getYear());
+        examDto.setTotalDownloadNumber(exam.getTotalDownloadNumber());
+        examDto.setNumber(exam.getNumber());
+
+        // CONVERTER Subject para SubjectDTO
+        if (exam.getSubject() != null) {
+            SubjectDto subjectDTO = new SubjectDto();
+            subjectDTO.setId(exam.getSubject().getId());
+            subjectDTO.setName(exam.getSubject().getName());
+            subjectDTO.setDescription(exam.getSubject().getDescription());
+            subjectDTO.setCategory(exam.getSubject().getCategory());
+            examDto.setSubject(subjectDTO);
+        }
+
+        return examDto;
     }
 }

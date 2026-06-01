@@ -2,6 +2,7 @@ package com.fabiocondo.controller;
 
 import com.fabiocondo.domain.Exam;
 import com.fabiocondo.domain.HttpResponse;
+import com.fabiocondo.dto.ExamDto;
 import com.fabiocondo.dto.PageResponse;
 import com.fabiocondo.enumeration.ExamType;
 import com.fabiocondo.enumeration.Institution;
@@ -39,7 +40,7 @@ public class ExamController {
     }
 
     @GetMapping("/filter-with-cash")
-    public PageResponse<Exam> filterWithCash(ExamFilter filter, Pageable pageable) {
+    public PageResponse<ExamDto> filterWithCash(ExamFilter filter, Pageable pageable) {
         return exameServiceImpl.filterWithCash(filter, pageable);
     }
 

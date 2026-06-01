@@ -1,6 +1,5 @@
 package com.fabiocondo.dto;
 
-import com.fabiocondo.domain.Subject;
 import com.fabiocondo.enumeration.ExamType;
 import com.fabiocondo.enumeration.Institution;
 
@@ -28,7 +27,7 @@ public class ExamDto {
 
     private String number; // Se for UEM
 
-    private Subject subject;
+    private SubjectDto subject;
 
     public Long getId() {
         return id;
@@ -102,11 +101,11 @@ public class ExamDto {
         this.number = number;
     }
 
-    public Subject getSubject() {
+    public SubjectDto getSubject() {
         return subject;
     }
 
-    public void setSubject(Subject subject) {
+    public void setSubject(SubjectDto subject) {
         this.subject = subject;
     }
 }

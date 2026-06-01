@@ -2,6 +2,7 @@ package com.fabiocondo.dtoMapper;
 
 import com.fabiocondo.domain.Exam;
 import com.fabiocondo.dto.ExamDto;
+import com.fabiocondo.dto.SubjectDto;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,7 +19,17 @@ public class ExamMapper {
         exam.setYear(examDto.getYear());
         exam.setTotalDownloadNumber(examDto.getTotalDownloadNumber());
         exam.setNumber(examDto.getNumber());
-        exam.setSubject(examDto.getSubject());
+
+        // CONVERTER Subject para SubjectDTO
+        if (exam.getSubject() != null) {
+            SubjectDto subjectDTO = new SubjectDto();
+            subjectDTO.setId(exam.getSubject().getId());
+            subjectDTO.setName(exam.getSubject().getName());
+            subjectDTO.setDescription(exam.getSubject().getDescription());
+            subjectDTO.setCategory(exam.getSubject().getCategory());
+            examDto.setSubject(subjectDTO);
+        }
+
         return exam;
     }
 
@@ -33,7 +44,17 @@ public class ExamMapper {
         examDto.setYear(exam.getYear());
         examDto.setTotalDownloadNumber(exam.getTotalDownloadNumber());
         examDto.setNumber(exam.getNumber());
-        examDto.setSubject(exam.getSubject());
+
+        // CONVERTER Subject para SubjectDTO
+        if (exam.getSubject() != null) {
+            SubjectDto subjectDTO = new SubjectDto();
+            subjectDTO.setId(exam.getSubject().getId());
+            subjectDTO.setName(exam.getSubject().getName());
+            subjectDTO.setDescription(exam.getSubject().getDescription());
+            subjectDTO.setCategory(exam.getSubject().getCategory());
+            examDto.setSubject(subjectDTO);
+        }
+
         return examDto;
     }
 }

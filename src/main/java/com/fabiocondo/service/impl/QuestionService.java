@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -65,9 +66,16 @@ public class QuestionService {
                 .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + id));
     }
 
-    public Question findQuestionByQuestionId(String questionId) throws QuestionNotFoundException {
-        return questionRepository.findQuestionByQuestionId(questionId)
+    @Cacheable(
+            value = CacheNames.QUESTION_DETAIL,
+            key = "#questionId + '-' + #currentUserId",
+            unless = "#result == null"
+    )
+    public QuestionDTO findQuestionByQuestionId(String questionId, Long currentUserId) throws QuestionNotFoundException {
+        Question question = questionRepository.findQuestionByQuestionId(questionId)
                 .orElseThrow(() -> new QuestionNotFoundException("No question found by id: " + questionId));
+
+        return domainToDTO(question, currentUserId);
     }
 
     @Cacheable(
@@ -158,6 +166,13 @@ public class QuestionService {
         return questionRepository.findByTopicId(topicId);
     }
 
+    @CacheEvict(
+            value = {
+                    CacheNames.QUESTION_FILTER,
+                    CacheNames.QUESTION_DETAIL,
+            },
+            allEntries = true
+    )
     public Question save(Question question) {
         question.setQuestionId(UUID.randomUUID().toString());
         question.getAnswers().forEach(answer -> answer.setQuestion(question));
@@ -166,6 +181,13 @@ public class QuestionService {
         return questionRepository.save(question);
     }
 
+    @CacheEvict(
+            value = {
+                    CacheNames.QUESTION_FILTER,
+                    CacheNames.QUESTION_DETAIL,
+            },
+            allEntries = true
+    )
     public Question update(Question question, Long id) throws QuestionNotFoundException {
         Question existQuestion = findById(id);
 

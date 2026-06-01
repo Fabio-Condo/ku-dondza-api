@@ -85,7 +85,9 @@ public class RedisConfig {
 
         // FILTROS (dependem de queries e podem variar)
         cacheConfigs.put(CacheNames.QUESTION_FILTER,
-                base.entryTtl(Duration.ofMinutes(1)));
+                base.entryTtl(Duration.ofDays(7)));
+        cacheConfigs.put(CacheNames.QUESTION_DETAIL,
+                base.entryTtl(Duration.ofDays(7)));
 
 
         return RedisCacheManager.builder(connectionFactory)

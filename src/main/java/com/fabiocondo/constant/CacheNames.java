@@ -19,7 +19,10 @@ public final class CacheNames {
     public static final String QUIZ_FILTER = "quizzes:filter";
     public static final String QUIZ_DETAILS = "quizzes:details";
 
+    // QUESTIONS
     public static final String QUESTION_FILTER = "questions:filter";
+    public static final String QUESTION_DETAIL = "questions:details";
+
 
 
 }

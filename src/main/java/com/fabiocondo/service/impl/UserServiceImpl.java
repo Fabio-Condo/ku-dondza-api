@@ -58,10 +58,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final WalletService walletService;
     private final PaymentService paymentService;
     private final MpesaPaymentService mpesaPaymentService;
+    private  final ImageProcessingService imageProcessingService;
 
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository, WalletService walletService, PaymentService paymentService, MpesaPaymentService mpesaPaymentService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository, WalletService walletService, PaymentService paymentService, MpesaPaymentService mpesaPaymentService, ImageProcessingService imageProcessingService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
@@ -73,6 +74,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.walletService = walletService;
         this.paymentService = paymentService;
         this.mpesaPaymentService = mpesaPaymentService;
+        this.imageProcessingService = imageProcessingService;
     }
 
     public Page<User> searchUsers(String query, Pageable pageable) {
@@ -130,64 +132,105 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User addNewUser(String firstName, String email, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, MessagingException {
+    public User addNewUser(
+            String firstName,
+            String email,
+            String role,
+            UserType userType,
+            boolean isNonLocked,
+            boolean isActive,
+            MultipartFile profileImage
+    ) throws UserNotFoundException, EmailExistException, MessagingException, IOException {
+
         validateNewEmail(EMPTY, email);
 
         logger.info("Uploading file: " + profileImage.getOriginalFilename());
-        //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
 
-        String fileKey = UUID.randomUUID() + "-" + profileImage.getOriginalFilename();
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME, fileKey);
+        // 1. processar imagem antes do upload
+        byte[] processedImage =
+                imageProcessingService.processImage(profileImage, ImageType.PROFILE);
 
-        // Adicionar funcao que diminue o tamanho da imagem
+        // 2. gerar chave
+        String fileKey = UUID.randomUUID() + "-profile.jpg";
+
+        // 3. upload otimizado (byte[])
+        S3UploadResponse s3UploadResponse =
+                amazonS3Service.uploadFileBytes(
+                        processedImage,
+                        "image/jpeg",
+                        BUCKET_NAME,
+                        fileKey
+                );
+
         User user = new User();
+
         String password = generatePassword();
+
         user.setUserId(UUID.randomUUID().toString());
         user.setFullName(firstName);
         user.setJoinDate(new Date());
         user.setEmail(email);
         user.setPassword(encodePassword(password));
-        //user.setActive(isActive);
-        //user.setNotLocked(isNonLocked);
+
         user.setActive(true);
         user.setNotLocked(true);
+
         user.setUserType(userType);
         user.setRole(getRoleEnumName(role).name());
         user.setAuthorities(getRoleEnumName(role).getAuthorities());
+
         user.setProfileImageUrl(s3UploadResponse.getFileUrl());
         user.setFileName(fileKey);
+
         userRepository.save(user);
+
         emailService.sendOtpCodeEmail(email, password);
+
         logger.info("New user password: " + password);
+
         return user;
     }
 
     @Override
-    public User updateUser(String currentEmail, String newFullName, String newEmail, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException {
+    public User updateUser(String currentEmail, String newFullName, String newEmail, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, IOException {
+
         User currentUser = validateNewEmail(currentEmail, newEmail);
-        // Adicionar funcao que diminue o tamanho da imagem
+
         currentUser.setFullName(newFullName);
         currentUser.setEmail(newEmail);
-        //currentUser.setActive(isActive);
-        //currentUser.setNotLocked(isNonLocked);
+
         currentUser.setUserType(userType);
         currentUser.setActive(true);
         currentUser.setNotLocked(true);
         currentUser.setRole(getRoleEnumName(role).name());
         currentUser.setAuthorities(getRoleEnumName(role).getAuthorities());
 
-        // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
-        if (profileImage != null) {
+        // Se nova imagem for enviada
+        if (profileImage != null && !profileImage.isEmpty()) {
+
+            // 1. apagar imagem antiga
             if (currentUser.getFileName() != null) {
                 logger.info("Deleting file: " + currentUser.getFileName());
                 amazonS3Service.deleteFile(currentUser.getFileName(), BUCKET_NAME);
             }
-            //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
-            //currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
-            //currentUser.setFileName(profileImage.getOriginalFilename());
 
-            String newFileKey = UUID.randomUUID() + "-" + profileImage.getOriginalFilename();
-            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME, newFileKey);
+            // 2. processar imagem (resize/compress)
+            byte[] processedImage =
+                    imageProcessingService.processImage(profileImage, ImageType.PROFILE);
+
+            // 3. novo nome
+            String newFileKey = UUID.randomUUID() + "-profile.jpg";
+
+            // 4. upload já otimizado
+            S3UploadResponse s3UploadResponse =
+                    amazonS3Service.uploadFileBytes(
+                            processedImage,
+                            "image/jpeg",
+                            BUCKET_NAME,
+                            newFileKey
+                    );
+
+            // 🧠 5. atualizar user
             currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
             currentUser.setFileName(newFileKey);
         }
@@ -197,9 +240,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateUserProfile(String currentEmail, String newFullName, String newEmail, String newBio, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException {
+    public User updateUserProfile(String currentEmail, String newFullName, String newEmail, String newBio, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, IOException {
+
         User currentUser = validateNewEmail(currentEmail, newEmail);
-        // Adicionar funcao que diminue o tamanho da imagem
+
         currentUser.setFullName(newFullName);
         currentUser.setEmail(newEmail);
         currentUser.setBio(newBio);
@@ -208,18 +252,31 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         currentUser.setRole(getRoleEnumName(role).name());
         currentUser.setAuthorities(getRoleEnumName(role).getAuthorities());
 
-        // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
-        if (profileImage != null) {
+        // 🧠 Se nova imagem for enviada
+        if (profileImage != null && !profileImage.isEmpty()) {
+
+            // 1. apagar imagem antiga
             if (currentUser.getFileName() != null) {
                 logger.info("Deleting file: " + currentUser.getFileName());
                 amazonS3Service.deleteFile(currentUser.getFileName(), BUCKET_NAME);
             }
-            //S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME);
-            //currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
-            //currentUser.setFileName(profileImage.getOriginalFilename());
 
-            String newFileKey = UUID.randomUUID() + "-" + profileImage.getOriginalFilename();
-            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME, newFileKey);
+            // 2. processar imagem (resize + compress)
+            byte[] processedImage =
+                    imageProcessingService.processImage(profileImage, ImageType.PROFILE);
+
+            // 3. gerar novo nome
+            String newFileKey = UUID.randomUUID() + "-profile.jpg";
+
+            // 4. upload otimizado
+            S3UploadResponse s3UploadResponse =
+                    amazonS3Service.uploadFileBytes(
+                            processedImage,
+                            "image/jpeg",
+                            BUCKET_NAME,
+                            newFileKey
+                    );
+
             currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
             currentUser.setFileName(newFileKey);
         }
@@ -237,13 +294,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User updateUserProfilePhoto(String currentEmail, MultipartFile profileImage) throws IOException, EmailNotFoundException {
-        // Adicionar funcao que diminue o tamanho da imagem
+    public User updateUserProfilePhoto(String currentEmail, MultipartFile profileImage)
+            throws IOException, EmailNotFoundException {
 
         User currentUser = userRepository.findUserByEmail(currentEmail);
         if (currentUser == null) {
             throw new EmailNotFoundException(NO_USER_FOUND_BY_EMAIL + currentEmail);
-
         }
 
         if (profileImage == null || profileImage.isEmpty()) {
@@ -256,8 +312,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             amazonS3Service.deleteFile(currentUser.getFileName(), BUCKET_NAME);
         }
 
-        String newFileKey = UUID.randomUUID() + "-" + profileImage.getOriginalFilename();
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(profileImage, BUCKET_NAME, newFileKey);
+        byte[] processedImage = imageProcessingService.processImage(profileImage, ImageType.PROFILE);
+
+        String newFileKey = UUID.randomUUID() + "-profile.jpg";
+
+        S3UploadResponse s3UploadResponse =
+                amazonS3Service.uploadFileBytes(processedImage, "image/jpeg", BUCKET_NAME, newFileKey);
+
         currentUser.setProfileImageUrl(s3UploadResponse.getFileUrl());
         currentUser.setFileName(newFileKey);
 

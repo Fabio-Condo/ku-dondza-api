@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -49,6 +50,33 @@ public class AmazonS3Service {
         }
     }
 
+    public S3UploadResponse uploadFileBytes(
+            byte[] data,
+            String contentType,
+            String bucketName,
+            String keyName
+    ) {
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(contentType);
+        metadata.setContentLength(data.length);
+        metadata.setCacheControl("public, max-age=31536000");
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
+
+        PutObjectRequest putRequest =
+                new PutObjectRequest(bucketName, keyName, inputStream, metadata);
+
+        amazonS3.putObject(putRequest);
+
+        return new S3UploadResponse(
+                keyName,
+                bucketName,
+                data.length,
+                LocalDateTime.now(),
+                getUrl(keyName, bucketName)
+        );
+    }
 
     public S3UploadResponse uploadFile2(MultipartFile file, String bucketName) {
         String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();

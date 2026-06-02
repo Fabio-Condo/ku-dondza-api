@@ -22,11 +22,11 @@ public interface UserService {
 
     User register(String fullName, String email, String profileImageUrl) throws UserNotFoundException, MessagingException, EmailExistException;
 
-    User updateUserProfile(String currentEmail, String fullName, String newEmail, String newBio, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException;
+    User updateUserProfile(String currentEmail, String fullName, String newEmail, String newBio, String role, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, IOException;
 
-    User addNewUser(String fullName, String email, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, MessagingException;
+    User addNewUser(String fullName, String email, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, MessagingException, IOException;
 
-    User updateUser(String currentEmail, String fullName, String newEmail, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException;
+    User updateUser(String currentEmail, String fullName, String newEmail, String role, UserType userType, boolean isNonLocked, boolean isActive, MultipartFile profileImage) throws UserNotFoundException, EmailExistException, IOException;
 
     User update(User user, Long id) throws UserNotFoundException;
 

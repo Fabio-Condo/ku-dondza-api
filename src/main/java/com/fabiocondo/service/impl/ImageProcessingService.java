@@ -10,9 +10,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static com.fabiocondo.enumeration.ImageType.COURSE;
-import static com.fabiocondo.enumeration.ImageType.PROFILE;
-
 @Service
 public class ImageProcessingService {
 
@@ -25,7 +22,7 @@ public class ImageProcessingService {
             case PROFILE:
                 width = 300; height = 300;
                 break;
-            case COURSE:
+            case SUBJECT:
                 width = 800; height = 450;
                 break;
             default:

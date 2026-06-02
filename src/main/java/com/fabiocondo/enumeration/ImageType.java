@@ -2,5 +2,5 @@ package com.fabiocondo.enumeration;
 
 public enum ImageType {
     PROFILE,
-    COURSE
+    SUBJECT
 }

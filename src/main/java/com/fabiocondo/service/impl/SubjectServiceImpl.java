@@ -9,6 +9,7 @@ import com.fabiocondo.dto.SubjectDto;
 import com.fabiocondo.dto.TopicContentDTO;
 import com.fabiocondo.dto.TopicDTO;
 import com.fabiocondo.enumeration.Category;
+import com.fabiocondo.enumeration.ImageType;
 import com.fabiocondo.exception.domain.SubjectNotFoundException;
 import com.fabiocondo.exception.domain.UserNotFoundException;
 import com.fabiocondo.repository.SubjectRepository;
@@ -26,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,15 +44,17 @@ public class SubjectServiceImpl implements SubjectService {
     private final TopicContentRepository contentRepository;
     private final TopicRepository topicRepository;
     private final TopicContentService topicContentService;
+    private final ImageProcessingService imageProcessingService;
 
 
-    public SubjectServiceImpl(AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, UserRepository userRepository, TopicContentRepository contentRepository, TopicRepository topicRepository, TopicContentService topicContentService) {
+    public SubjectServiceImpl(AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, UserRepository userRepository, TopicContentRepository contentRepository, TopicRepository topicRepository, TopicContentService topicContentService, ImageProcessingService imageProcessingService) {
         this.amazonS3Service = amazonS3Service;
         this.subjectRepository = subjectRepository;
         this.userRepository = userRepository;
         this.contentRepository = contentRepository;
         this.topicRepository = topicRepository;
         this.topicContentService = topicContentService;
+        this.imageProcessingService = imageProcessingService;
     }
 
     @Override
@@ -134,12 +138,31 @@ public class SubjectServiceImpl implements SubjectService {
             allEntries = true
     )
     @Override
-    public Subject save(String name, String description, Category category, boolean quizEnabled, boolean courseEnabled, boolean progressEnabled, boolean examEnabled, MultipartFile file) {
-        logger.info("Uploading file: " + file.getOriginalFilename());
-        //String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
-        String fileKey = "subject_image_profile_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
+    public Subject save(String name, String description, Category category, boolean quizEnabled, boolean courseEnabled, boolean progressEnabled, boolean examEnabled, MultipartFile file) throws IOException {
 
+        logger.info("Uploading file: " + file.getOriginalFilename());
+
+        // 1. processar imagem antes do upload
+        byte[] processedImage =
+                imageProcessingService.processImage(file, ImageType.SUBJECT);
+
+        // 2. gerar fileKey
+        String fileKey =
+                "subject_image_profile_" +
+                        RandomStringUtils.randomNumeric(4).toLowerCase() +
+                        "_" +
+                        file.getOriginalFilename();
+
+        // 3. upload otimizado (byte[])
+        S3UploadResponse s3UploadResponse =
+                amazonS3Service.uploadFileBytes(
+                        processedImage,
+                        "image/jpeg",
+                        BUCKET_NAME,
+                        fileKey
+                );
+
+        // 4. criar subject
         Subject subject = new Subject();
         subject.setSubjectId(UUID.randomUUID().toString());
         subject.setName(name);
@@ -153,6 +176,7 @@ public class SubjectServiceImpl implements SubjectService {
         subject.setFileName(fileKey);
 
         logger.info("Saving new subject: " + subject.getName());
+
         return subjectRepository.save(subject);
     }
 
@@ -165,8 +189,10 @@ public class SubjectServiceImpl implements SubjectService {
             allEntries = true
     )
     @Override
-    public Subject update(Long id, String name, String description, Category category, boolean quizEnabled, boolean courseEnabled, boolean progressEnabled, boolean examEnabled, MultipartFile file) throws SubjectNotFoundException {
+    public Subject update(Long id, String name, String description, Category category, boolean quizEnabled, boolean courseEnabled, boolean progressEnabled, boolean examEnabled, MultipartFile file) throws SubjectNotFoundException, IOException {
+
         Subject existSubject = findById(id);
+
         existSubject.setName(name);
         existSubject.setDescription(description);
         existSubject.setCategory(category);
@@ -175,20 +201,41 @@ public class SubjectServiceImpl implements SubjectService {
         existSubject.setProgressEnabled(progressEnabled);
         existSubject.setExamEnabled(examEnabled);
 
-        // Se um novo arquivo é fornecido, atualiza o arquivo no serviço Amazon S3 e atualiza o nome e a URL do arquivo
-        if (file != null) {
+        // Se nova imagem for enviada
+        if (file != null && !file.isEmpty()) {
+
+            // 1. apagar imagem antiga
             if (existSubject.getFileName() != null) {
                 logger.info("Deleting file: " + existSubject.getFileName());
                 amazonS3Service.deleteFile(existSubject.getFileName(), BUCKET_NAME);
             }
-            //String newFileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
-            String newFileKey = "subject_image_profile_" + RandomStringUtils.randomNumeric(4).toLowerCase() + "_" + file.getOriginalFilename();
-            S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, newFileKey);
+
+            // 2. processar imagem (resize + compress)
+            byte[] processedImage =
+                    imageProcessingService.processImage(file, ImageType.SUBJECT); // ou método genérico
+
+            // 3. gerar novo nome
+            String newFileKey =
+                    "subject_image_profile_" +
+                            RandomStringUtils.randomNumeric(4).toLowerCase() +
+                            "_" +
+                            file.getOriginalFilename();
+
+            // 4. upload otimizado
+            S3UploadResponse s3UploadResponse =
+                    amazonS3Service.uploadFileBytes(
+                            processedImage,
+                            "image/jpeg",
+                            BUCKET_NAME,
+                            newFileKey
+                    );
+
             existSubject.setUrlFile(s3UploadResponse.getFileUrl());
             existSubject.setFileName(newFileKey);
         }
 
         logger.info("Updating subject: " + existSubject.getName());
+
         return subjectRepository.save(existSubject);
     }
 

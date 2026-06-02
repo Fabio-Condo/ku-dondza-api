@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -84,7 +85,7 @@ public class SubjectController {
                                          @RequestParam("courseEnabled") boolean courseEnabled,
                                          @RequestParam("progressEnabled") boolean progressEnabled,
                                          @RequestParam("examEnabled") boolean examEnabled,
-                                         @RequestParam("file") MultipartFile file) {
+                                         @RequestParam("file") MultipartFile file) throws IOException {
 
         return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.save(name, description, category, quizEnabled, courseEnabled, progressEnabled, examEnabled, file));
     }
@@ -100,7 +101,7 @@ public class SubjectController {
                                            @RequestParam("progressEnabled") boolean progressEnabled,
                                            @RequestParam("examEnabled") boolean examEnabled,
 
-                                           @RequestParam(value = "file", required = false) MultipartFile file) throws SubjectNotFoundException {
+                                           @RequestParam(value = "file", required = false) MultipartFile file) throws SubjectNotFoundException, IOException {
 
         return ResponseEntity.status(HttpStatus.OK).body(subjectServiceImpl.update(id, name, description, category, quizEnabled, courseEnabled, progressEnabled, examEnabled,file));
     }

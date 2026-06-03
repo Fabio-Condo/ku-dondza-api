@@ -59,9 +59,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final PaymentService paymentService;
     private final MpesaPaymentService mpesaPaymentService;
     private final ImageProcessingService imageProcessingService;
+    private final WalletRepository walletRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository, WalletService walletService, PaymentService paymentService, MpesaPaymentService mpesaPaymentService, ImageProcessingService imageProcessingService) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository, WalletService walletService, PaymentService paymentService, MpesaPaymentService mpesaPaymentService, ImageProcessingService imageProcessingService, WalletRepository walletRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loginAttemptService = loginAttemptService;
@@ -74,6 +75,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         this.paymentService = paymentService;
         this.mpesaPaymentService = mpesaPaymentService;
         this.imageProcessingService = imageProcessingService;
+        this.walletRepository = walletRepository;
     }
 
     public Page<User> searchUsers(String query, Pageable pageable) {
@@ -457,7 +459,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional
-    public User activatePlanByPhoneNumber(Long userId, Plan plan, String phoneNumber, WalletType walletType)
+    public User activatePlanByPhoneNumber(Long userId, Plan plan,
+                                          String phoneNumber,
+                                          WalletType walletType)
             throws UserNotFoundException, PaymentException {
 
         final int DAYS_VALID = 30;
@@ -468,30 +472,47 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         try {
 
-            // 1. Criar wallet (SEM salvar ainda)
+            // Wallet temporária para processar pagamento
             Wallet wallet = new Wallet();
             wallet.setPhoneNumber(phoneNumber);
             wallet.setType(walletType);
 
-            // 2. Processar pagamento primeiro
+            // Processar pagamento
             String transactionId = processPayment(wallet, PLAN_PRICE);
 
-            // 3. Agora sim persistir wallet (após sucesso)
-            Wallet savedWallet = walletService.addWallet(userId, wallet);
+            // Procurar wallet já existente
+            Wallet savedWallet = walletRepository
+                    .findByUserIdAndPhoneNumberAndType(
+                            userId,
+                            phoneNumber,
+                            walletType)
+                    .orElseGet(() -> {
+                        Wallet newWallet = new Wallet();
+                        newWallet.setPhoneNumber(phoneNumber);
+                        newWallet.setType(walletType);
 
-            // 4. Atualizar plano
-            LocalDateTime baseDate = (user.getPlanExpiresAt() != null &&
-                    user.getPlanExpiresAt().isAfter(now))
-                    ? user.getPlanExpiresAt()
-                    : now;
+                        try {
+                            return walletService.addWallet(userId, newWallet);
+                        } catch (UserNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+            // Calcular nova expiração
+            LocalDateTime baseDate =
+                    user.getPlanExpiresAt() != null &&
+                            user.getPlanExpiresAt().isAfter(now)
+                            ? user.getPlanExpiresAt()
+                            : now;
 
             LocalDateTime newExpiration = baseDate.plusDays(DAYS_VALID);
 
+            // Atualizar utilizador
             user.setPlan(plan);
             user.setPlanExpiresAt(newExpiration);
             User savedUser = userRepository.save(user);
 
-            // 5. Criar payment
+            // Registar pagamento
             Payment payment = new Payment();
             payment.setUser(savedUser);
             payment.setWallet(savedWallet);
@@ -505,14 +526,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
             paymentService.save(payment);
 
-            // 6. Email não bloqueia fluxo
-            sendConfirmationEmailSafely(savedUser, PLAN_PRICE, savedWallet, transactionId, now);
+            sendConfirmationEmailSafely(
+                    savedUser,
+                    PLAN_PRICE,
+                    savedWallet,
+                    transactionId,
+                    now);
 
             return savedUser;
 
         } catch (Exception e) {
-            logger.error("Falha ao ativar plano para user {}: {}", userId, e.getMessage());
-            throw new PaymentException("Falha ao processar pagamento M-Pesa.");
+            logger.error("Falha ao ativar plano para user {}",
+                    userId, e);
+
+            throw new PaymentException("Falha ao processar pagamento.");
         }
     }
 

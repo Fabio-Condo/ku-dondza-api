@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface WalletRepository extends JpaRepository<Wallet, Long> {
     List<Wallet> findByUserId(Long userId);
     Optional<Wallet> findByUserIdAndPhoneNumberAndType(Long userId, String phoneNumber, WalletType type);
-    Wallet findByUserIdAndIsDefaultTrue(Long userId);
-    boolean existsByUserIdAndPhoneNumber(Long userId, String phoneNumber);
+    //Wallet findByUserIdAndIsDefaultTrue(Long userId);
+    //boolean existsByUserIdAndPhoneNumber(Long userId, String phoneNumber);
 }
 

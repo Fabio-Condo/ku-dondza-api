@@ -7,6 +7,7 @@ import com.fabiocondo.dto.UserDTO;
 import com.fabiocondo.dtoMapper.UserMapper;
 import com.fabiocondo.enumeration.Plan;
 import com.fabiocondo.enumeration.UserType;
+import com.fabiocondo.enumeration.WalletType;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.TopicContentRepository;
 import com.fabiocondo.repository.filter.UserFilter;
@@ -168,14 +169,14 @@ public class UserController {
         userService.updatePropertyActive(newEmail, active);
     }
 
-    @PutMapping("/activate-plan/{userId}")
-    public ResponseEntity<User> activatePlan(
+    @PutMapping("/{userId}/activate-plan-by-wallet-id")
+    public ResponseEntity<User> activatePlanByWalletId(
             @PathVariable Long userId,
             @RequestParam Plan plan,
             @RequestParam Long walletId) throws UserNotFoundException, WalletNotFoundException, PaymentException, MessagingException {
 
         // Ativar plano com a carteira selecionada
-        User user = userService.activatePlan(userId, plan, walletId);
+        User user = userService.activatePlanByWalletId(userId, plan, walletId);
 
         // 🔹 Gerar JWT e cabeçalhos
         UserPrincipal userPrincipal = new UserPrincipal(user);
@@ -184,6 +185,22 @@ public class UserController {
         return new ResponseEntity<>(user, jwtHeader, HttpStatus.OK);
     }
 
+    @PutMapping("/{userId}/activate-plan-by-phone-number")
+    public ResponseEntity<User> activatePlanByPhoneNumber(
+            @PathVariable Long userId,
+            @RequestParam Plan plan,
+            @RequestParam String phoneNumber,
+            @RequestParam WalletType walletType) throws UserNotFoundException, WalletNotFoundException, PaymentException, MessagingException {
+
+        // Ativar plano com a carteira selecionada
+        User user = userService.activatePlanByPhoneNumber(userId, plan, phoneNumber, walletType);
+
+        // 🔹 Gerar JWT e cabeçalhos
+        UserPrincipal userPrincipal = new UserPrincipal(user);
+        HttpHeaders jwtHeader = getJwtHeader(userPrincipal);
+
+        return new ResponseEntity<>(user, jwtHeader, HttpStatus.OK);
+    }
     private HttpHeaders getJwtHeader(UserPrincipal user) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(JWT_TOKEN_HEADER, jwtTokenProvider.generateJwtToken(user));

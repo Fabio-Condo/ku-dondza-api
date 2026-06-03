@@ -58,8 +58,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final WalletService walletService;
     private final PaymentService paymentService;
     private final MpesaPaymentService mpesaPaymentService;
-    private  final ImageProcessingService imageProcessingService;
-
+    private final ImageProcessingService imageProcessingService;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, LoginAttemptService loginAttemptService, EmailService emailService, AmazonS3Service amazonS3Service, SubjectRepository subjectRepository, QuestionRepository questionRepository, TopicContentRepository topicContentRepository, WalletService walletService, PaymentService paymentService, MpesaPaymentService mpesaPaymentService, ImageProcessingService imageProcessingService) {
@@ -381,7 +380,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional
-    public User activatePlan(Long userId, Plan plan, Long walletId)
+    public User activatePlanByWalletId(Long userId, Plan plan, Long walletId)
             throws UserNotFoundException, WalletNotFoundException, PaymentException {
 
         final int DAYS_VALID = 30;
@@ -453,6 +452,67 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             logger.error("Falha ao ativar plano para user {}: {}", userId, e.getMessage());
 
             throw new PaymentException("Falha ao processar pagamento.");
+        }
+    }
+
+    @Override
+    @Transactional
+    public User activatePlanByPhoneNumber(Long userId, Plan plan, String phoneNumber, WalletType walletType)
+            throws UserNotFoundException, PaymentException {
+
+        final int DAYS_VALID = 30;
+        final BigDecimal PLAN_PRICE = new BigDecimal("299.00");
+
+        User user = findById(userId);
+        LocalDateTime now = LocalDateTime.now();
+
+        try {
+
+            // 1. Criar wallet (SEM salvar ainda)
+            Wallet wallet = new Wallet();
+            wallet.setPhoneNumber(phoneNumber);
+            wallet.setType(walletType);
+
+            // 2. Processar pagamento primeiro
+            String transactionId = processPayment(wallet, PLAN_PRICE);
+
+            // 3. Agora sim persistir wallet (após sucesso)
+            Wallet savedWallet = walletService.addWallet(userId, wallet);
+
+            // 4. Atualizar plano
+            LocalDateTime baseDate = (user.getPlanExpiresAt() != null &&
+                    user.getPlanExpiresAt().isAfter(now))
+                    ? user.getPlanExpiresAt()
+                    : now;
+
+            LocalDateTime newExpiration = baseDate.plusDays(DAYS_VALID);
+
+            user.setPlan(plan);
+            user.setPlanExpiresAt(newExpiration);
+            User savedUser = userRepository.save(user);
+
+            // 5. Criar payment
+            Payment payment = new Payment();
+            payment.setUser(savedUser);
+            payment.setWallet(savedWallet);
+            payment.setPlan(plan);
+            payment.setAmount(PLAN_PRICE);
+            payment.setStatus(PaymentStatus.SUCCESS);
+            payment.setTransactionId(transactionId);
+            payment.setPlanExpiresAt(newExpiration);
+            payment.setCreatedAt(now);
+            payment.setUpdatedAt(now);
+
+            paymentService.save(payment);
+
+            // 6. Email não bloqueia fluxo
+            sendConfirmationEmailSafely(savedUser, PLAN_PRICE, savedWallet, transactionId, now);
+
+            return savedUser;
+
+        } catch (Exception e) {
+            logger.error("Falha ao ativar plano para user {}: {}", userId, e.getMessage());
+            throw new PaymentException("Falha ao processar pagamento M-Pesa.");
         }
     }
 

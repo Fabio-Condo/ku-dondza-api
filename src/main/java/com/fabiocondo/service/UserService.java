@@ -3,6 +3,7 @@ package com.fabiocondo.service;
 import com.fabiocondo.domain.*;
 import com.fabiocondo.enumeration.Plan;
 import com.fabiocondo.enumeration.UserType;
+import com.fabiocondo.enumeration.WalletType;
 import com.fabiocondo.exception.domain.*;
 import com.fabiocondo.repository.filter.UserFilter;
 import org.springframework.data.domain.Page;
@@ -40,7 +41,13 @@ public interface UserService {
 
     User updateProfileImage(String email, MultipartFile profileImage) throws EmailExistException, IOException, UserNotFoundException;
 
-    User activatePlan(Long userId, Plan plan, Long walletId) throws UserNotFoundException, WalletNotFoundException, PaymentException, MessagingException;
+    @Transactional
+    User activatePlanByWalletId(Long userId, Plan plan, Long walletId)
+            throws UserNotFoundException, WalletNotFoundException, PaymentException;
+
+    @Transactional
+    User activatePlanByPhoneNumber(Long userId, Plan plan, String phoneNumber, WalletType walletType)
+            throws UserNotFoundException, WalletNotFoundException, PaymentException;
 
     boolean isPlanActive(User user, Plan plan);
 

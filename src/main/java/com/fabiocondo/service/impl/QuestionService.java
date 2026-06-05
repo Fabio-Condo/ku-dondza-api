@@ -215,6 +215,13 @@ public class QuestionService {
         return questionRepository.count();
     }
 
+    @CacheEvict(
+            value = {
+                    CacheNames.QUESTION_FILTER,
+                    CacheNames.QUESTION_DETAIL,
+            },
+            allEntries = true
+    )
     @Transactional
     public Question updateQuestionImage(Long questionId, MultipartFile file)
             throws QuestionNotFoundException, IOException {

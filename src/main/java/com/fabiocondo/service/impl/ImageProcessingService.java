@@ -15,37 +15,95 @@ public class ImageProcessingService {
 
     public byte[] processImage(MultipartFile file, ImageType type) throws IOException {
 
-        int width;
-        int height;
+        int maxWidth;
+        int maxHeight;
 
         switch (type) {
             case PROFILE:
-                width = 300; height = 300;
+                maxWidth = 300;
+                maxHeight = 300;
                 break;
+
             case SUBJECT:
-                width = 800; height = 450;
+                maxWidth = 800;
+                maxHeight = 450;
                 break;
+
+            case QUESTION:
+                maxWidth = 1000;
+                maxHeight = 1000;
+                break;
+
             default:
-                throw new IllegalArgumentException("Unknown type");
+                throw new IllegalArgumentException("Unknown image type: " + type);
         }
 
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
-        BufferedImage resized = resize(originalImage, width, height);
+
+        if (originalImage == null) {
+            throw new IOException("Invalid image file");
+        }
+
+        BufferedImage resizedImage =
+                resizeKeepingAspectRatio(originalImage, maxWidth, maxHeight);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ImageIO.write(resized, "jpg", outputStream);
+
+        // Mantém JPEG para compatibilidade com o teu sistema atual
+        ImageIO.write(resizedImage, "jpg", outputStream);
 
         return outputStream.toByteArray();
     }
 
-    private BufferedImage resize(BufferedImage original, int width, int height) {
-        Image tmp = original.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+    private BufferedImage resizeKeepingAspectRatio(BufferedImage original, int maxWidth, int maxHeight) {
 
-        BufferedImage resized = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        int originalWidth = original.getWidth();
+        int originalHeight = original.getHeight();
 
-        Graphics2D g2d = resized.createGraphics();
-        g2d.drawImage(tmp, 0, 0, null);
-        g2d.dispose();
+        // Não ampliar imagens pequenas
+        if (originalWidth <= maxWidth && originalHeight <= maxHeight) {
+            return original;
+        }
+
+        double widthRatio = (double) maxWidth / originalWidth;
+        double heightRatio = (double) maxHeight / originalHeight;
+
+        double scale = Math.min(widthRatio, heightRatio);
+
+        int newWidth = (int) Math.round(originalWidth * scale);
+        int newHeight = (int) Math.round(originalHeight * scale);
+
+        Image scaledImage = original.getScaledInstance(
+                newWidth,
+                newHeight,
+                Image.SCALE_SMOOTH
+        );
+
+        BufferedImage resized = new BufferedImage(
+                newWidth,
+                newHeight,
+                BufferedImage.TYPE_INT_RGB
+        );
+
+        Graphics2D graphics = resized.createGraphics();
+
+        graphics.setRenderingHint(
+                RenderingHints.KEY_INTERPOLATION,
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR
+        );
+
+        graphics.setRenderingHint(
+                RenderingHints.KEY_RENDERING,
+                RenderingHints.VALUE_RENDER_QUALITY
+        );
+
+        graphics.setRenderingHint(
+                RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON
+        );
+
+        graphics.drawImage(scaledImage, 0, 0, null);
+        graphics.dispose();
 
         return resized;
     }

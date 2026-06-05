@@ -7,6 +7,7 @@ import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.*;
 import com.fabiocondo.dtoMapper.QuestionMapper;
 import com.fabiocondo.enumeration.DifficultyLevel;
+import com.fabiocondo.enumeration.ImageType;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
 import com.fabiocondo.exception.domain.TopicNotFoundException;
 import com.fabiocondo.repository.QuestionRepository;
@@ -46,9 +47,10 @@ public class QuestionService {
     private final CommentService commentService;
     private final UserService userService;
     private final UserRepository userRepository;
+    private final ImageProcessingService imageProcessingService;
     private final GptService gptService;
 
-    public QuestionService(AmazonS3Service amazonS3Service, QuestionRepository questionRepository, TopicService topicService, TopicTestRepository topicTestRepository, QuestionMapper questionMapper, CommentService commentService, UserService userService, UserRepository userRepository, GptService gptService) {
+    public QuestionService(AmazonS3Service amazonS3Service, QuestionRepository questionRepository, TopicService topicService, TopicTestRepository topicTestRepository, QuestionMapper questionMapper, CommentService commentService, UserService userService, UserRepository userRepository, ImageProcessingService imageProcessingService, GptService gptService) {
         this.amazonS3Service = amazonS3Service;
         this.questionRepository = questionRepository;
         this.topicService = topicService;
@@ -57,6 +59,7 @@ public class QuestionService {
         this.commentService = commentService;
         this.userService = userService;
         this.userRepository = userRepository;
+        this.imageProcessingService = imageProcessingService;
         this.gptService = gptService;
     }
 
@@ -211,8 +214,8 @@ public class QuestionService {
         return questionRepository.count();
     }
 
-    public Question updateQuestionImage(Long questionId, MultipartFile file) throws QuestionNotFoundException, IOException {
-        // Adicionar funcao que diminue o tamanho da imagem
+    public Question updateQuestionImage(Long questionId, MultipartFile file)
+            throws QuestionNotFoundException, IOException {
 
         Question question = findById(questionId);
 
@@ -220,18 +223,31 @@ public class QuestionService {
             throw new IOException("The file is null or empty");
         }
 
-        // Deleta o arquivo antigo do S3
+        // Remove imagem anterior
         if (question.getFileName() != null) {
             logger.info("Deleting file: " + question.getFileName());
             amazonS3Service.deleteFile(question.getFileName(), BUCKET_NAME);
         }
 
-        String fileKey = UUID.randomUUID() + "-" + file.getOriginalFilename();
-        S3UploadResponse s3UploadResponse = amazonS3Service.uploadFile(file, BUCKET_NAME, fileKey);
+        // Processa a imagem antes do upload
+        byte[] processedImage = imageProcessingService.processImage(file, ImageType.QUESTION);
+
+        String fileKey = UUID.randomUUID() + "-question.jpg";
+
+        // Upload da versão otimizada
+        S3UploadResponse s3UploadResponse =
+                amazonS3Service.uploadFileBytes(
+                        processedImage,
+                        "image/jpeg",
+                        BUCKET_NAME,
+                        fileKey
+                );
+
         question.setUrlFile(s3UploadResponse.getFileUrl());
         question.setFileName(fileKey);
 
         questionRepository.save(question);
+
         return question;
     }
 

@@ -26,8 +26,10 @@ public class GptService {
         // REQUEST BODY
         // =========================
         Map<String, Object> requestBodyMap = new HashMap<>();
-        //requestBodyMap.put("model", "gpt-5");
-        requestBodyMap.put("model", "gpt-3.5-turbo");
+        //requestBodyMap.put("model", "gpt-3.5-turbo"); // Funciona muito bem
+        requestBodyMap.put("model", "gpt-4o"); // Funciona muito bem
+        //requestBodyMap.put("model", "gpt-5"); // Devo ajustar na resposta para na retornar null
+
         requestBodyMap.put("input", prompt);
 
         HttpHeaders headers = new HttpHeaders();

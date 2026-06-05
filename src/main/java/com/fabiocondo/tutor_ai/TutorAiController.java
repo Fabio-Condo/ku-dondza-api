@@ -1,12 +1,12 @@
 package com.fabiocondo.tutor_ai;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.fabiocondo.domain.HttpResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/tutor")
+@RequestMapping("/tutor-ai")
 public class TutorAiController {
 
     private final TutorAiService tutorAiService;
@@ -16,7 +16,13 @@ public class TutorAiController {
     }
 
     @PostMapping("/ask")
-    public String ask(@RequestBody TutorRequest request) throws Exception {
-        return tutorAiService.ask(request);
+    public ResponseEntity<String> ask(@RequestBody TutorRequest request) throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(tutorAiService.ask(request));
+    }
+
+    private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {
+        return new ResponseEntity<>(
+                new HttpResponse(httpStatus.value(), httpStatus, httpStatus.getReasonPhrase().toUpperCase(), message),
+                httpStatus);
     }
 }

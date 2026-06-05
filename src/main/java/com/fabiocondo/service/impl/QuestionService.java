@@ -30,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -214,17 +215,9 @@ public class QuestionService {
         return questionRepository.count();
     }
 
-    @CacheEvict(
-            value = {
-                    CacheNames.QUESTION_FILTER,
-                    CacheNames.QUESTION_DETAIL,
-            },
-            allEntries = true
-    )
+    @Transactional
     public Question updateQuestionImage(Long questionId, MultipartFile file)
             throws QuestionNotFoundException, IOException {
-
-        System.out.println("Passando daqui...");
 
         Question question = findById(questionId);
 
@@ -232,30 +225,34 @@ public class QuestionService {
             throw new IOException("The file is null or empty");
         }
 
-        // Remove imagem anterior
-        if (question.getFileName() != null) {
-            logger.info("Deleting file: " + question.getFileName());
-            amazonS3Service.deleteFile(question.getFileName(), BUCKET_NAME);
-        }
-
-        // Processa a imagem antes do upload
+        // 1. processa imagem
         byte[] processedImage = imageProcessingService.processImage(file, ImageType.QUESTION);
 
-        String fileKey = UUID.randomUUID() + "-question.jpg";
+        String newFileKey = UUID.randomUUID() + "-question.jpg";
 
-        // Upload da versão otimizada
-        S3UploadResponse s3UploadResponse =
-                amazonS3Service.uploadFileBytes(
-                        processedImage,
-                        "image/jpeg",
-                        BUCKET_NAME,
-                        fileKey
-                );
+        // 2. upload primeiro
+        S3UploadResponse uploadResponse = amazonS3Service.uploadFileBytes(
+                processedImage,
+                "image/jpeg",
+                BUCKET_NAME,
+                newFileKey
+        );
 
-        question.setUrlFile(s3UploadResponse.getFileUrl());
-        question.setFileName(fileKey);
+        String oldFileName = question.getFileName();
 
+        // 3. atualiza BD
+        question.setUrlFile(uploadResponse.getFileUrl());
+        question.setFileName(newFileKey);
         questionRepository.save(question);
+
+        // 4. só depois tenta apagar antigo
+        if (oldFileName != null) {
+            try {
+                amazonS3Service.deleteFile(oldFileName, BUCKET_NAME);
+            } catch (Exception e) {
+                logger.warn("Failed to delete old image: " + oldFileName, e);
+            }
+        }
 
         return question;
     }

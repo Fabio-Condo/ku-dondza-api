@@ -199,7 +199,7 @@ public class QuestionService {
         existQuestion.getMathExpressions().addAll(question.getMathExpressions());
         existQuestion.getMathExpressions().forEach(mathExpression -> mathExpression.setQuestion(existQuestion));
 
-        BeanUtils.copyProperties(question, existQuestion, "answers", "mathExpressions");
+        BeanUtils.copyProperties(question, existQuestion, "answers", "mathExpressions", "fileName", "urlFile");
         logger.info("Updating question: " + existQuestion.getText());
         return questionRepository.save(existQuestion);
     }

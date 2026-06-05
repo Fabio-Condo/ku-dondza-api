@@ -21,23 +21,32 @@ public class TutorAiService {
 
     public String ask(TutorRequest request) throws Exception {
 
-        Question question = questionService.findById(request.getQuestionId());
+        if (request == null) {
+            throw new RuntimeException("Request inválido");
+        }
+
+        Question question =
+                questionService.findById(request.getQuestionId());
 
         if (question == null) {
             throw new RuntimeException("Questão não encontrada");
         }
 
-        Answer selectedAnswer = question.getAnswers()
-                .stream()
-                .filter(a -> a.getId().equals(request.getSelectedAnswerId()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Resposta selecionada não encontrada"));
+        Answer selectedAnswer =
+                question.getAnswers()
+                        .stream()
+                        .filter(a -> a.getId().equals(request.getSelectedAnswerId()))
+                        .findFirst()
+                        .orElseThrow(() ->
+                                new RuntimeException("Resposta selecionada não encontrada"));
 
-        Answer correctAnswer = question.getAnswers()
-                .stream()
-                .filter(Answer::isCorrect)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Resposta correta não encontrada"));
+        Answer correctAnswer =
+                question.getAnswers()
+                        .stream()
+                        .filter(Answer::isCorrect)
+                        .findFirst()
+                        .orElseThrow(() ->
+                                new RuntimeException("Resposta correta não encontrada"));
 
         String prompt = buildPrompt(
                 question,

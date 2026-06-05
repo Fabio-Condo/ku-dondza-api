@@ -1,70 +1,110 @@
 package com.fabiocondo.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class GptService {
 
     private static final String API_KEY = "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"; // Substitua pela sua chave
-    private static final String CHAT_API_URL = "https://api.openai.com/v1/chat/completions";
-    private final Semaphore rateLimiter = new Semaphore(10); // 10 req/min
+
+    private static final String CHAT_API_URL =
+            "https://api.openai.com/v1/responses";
+
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public String askAssistant(String prompt) throws Exception {
-        // Controle de limite de requisições
-        if (!rateLimiter.tryAcquire(1, TimeUnit.MINUTES)) {
-            throw new RuntimeException("Limite de requisições excedido. Tente novamente mais tarde.");
+
+        // =========================
+        // REQUEST BODY
+        // =========================
+        Map<String, Object> requestBodyMap = new HashMap<>();
+        //requestBodyMap.put("model", "gpt-5");
+        requestBodyMap.put("model", "gpt-3.5-turbo");
+        requestBodyMap.put("input", prompt);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + API_KEY);
+
+        HttpEntity<Map<String, Object>> entity =
+                new HttpEntity<>(requestBodyMap, headers);
+
+        // =========================
+        // API CALL
+        // =========================
+        ResponseEntity<String> response = restTemplate.exchange(
+                CHAT_API_URL,
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Erro OpenAI: " + response.getBody());
         }
 
-        try {
-            // Monta o corpo da requisição
-            Map<String, Object> requestBodyMap = new HashMap<>();
-            //requestBodyMap.put("model", "gpt-3.5-turbo");
-            //requestBodyMap.put("model", "gpt-4.1"); // Boa alternativa se não tiver GPT-5
-            requestBodyMap.put("model", "gpt-5"); // Melhor versão para geração de questões inteligentes
-            requestBodyMap.put("messages", new Object[]{
-                    new HashMap<String, String>() {{
-                        put("role", "user");
-                        put("content", prompt);
-                    }}
-            });
+        JsonNode root = mapper.readTree(response.getBody());
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            String requestBody = objectMapper.writeValueAsString(requestBodyMap);
+        // =========================
+        // SAFE EXTRACTION
+        // =========================
+        JsonNode output = root.path("output");
 
-            // Headers
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("Authorization", "Bearer " + API_KEY);
-
-            // HTTP Entity
-            HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-            RestTemplate restTemplate = new RestTemplate();
-
-            // Chamada à API
-            ResponseEntity<String> response = restTemplate.exchange(
-                    CHAT_API_URL, HttpMethod.POST, entity, String.class
+        if (!output.isArray() || output.size() == 0) {
+            throw new RuntimeException(
+                    "OpenAI retornou output vazio: " + response.getBody()
             );
-
-            if (response.getStatusCode() == HttpStatus.OK) {
-                return response.getBody();
-            } else {
-                throw new RuntimeException("Erro ao chamar API da OpenAI: " + response.getBody());
-            }
-        } finally {
-            rateLimiter.release();
         }
-    }
 
-    public String generateText(@RequestBody String prompt) {
-        return "";
+        JsonNode firstOutput = output.get(0);
+
+        if (firstOutput == null) {
+            throw new RuntimeException(
+                    "Output inválido da OpenAI: " + response.getBody()
+            );
+        }
+
+        JsonNode content = firstOutput.path("content");
+
+        if (!content.isArray() || content.size() == 0) {
+            throw new RuntimeException(
+                    "OpenAI retornou content vazio: " + response.getBody()
+            );
+        }
+
+        JsonNode firstContent = content.get(0);
+
+        if (firstContent == null) {
+            throw new RuntimeException(
+                    "Content inválido da OpenAI: " + response.getBody()
+            );
+        }
+
+        // =========================
+        // TEXT EXTRACTION (SAFE)
+        // =========================
+        JsonNode textNode = firstContent.get("text");
+
+        if (textNode == null || textNode.asText().isEmpty()) {
+            JsonNode fallback = firstContent.get("output_text");
+
+            if (fallback != null && !fallback.asText().isEmpty()) {
+                return fallback.asText();
+            }
+
+            throw new RuntimeException(
+                    "Texto não encontrado na resposta OpenAI: " + response.getBody()
+            );
+        }
+
+        return textNode.asText();
     }
 }

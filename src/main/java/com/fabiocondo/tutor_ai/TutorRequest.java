@@ -6,6 +6,8 @@ public class TutorRequest {
 
     private Long selectedAnswerId;
 
+    private Long userId;
+
     private String message;
 
     public Long getQuestionId() {
@@ -22,6 +24,14 @@ public class TutorRequest {
 
     public void setSelectedAnswerId(Long selectedAnswerId) {
         this.selectedAnswerId = selectedAnswerId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getMessage() {

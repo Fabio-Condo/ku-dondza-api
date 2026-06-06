@@ -70,7 +70,7 @@ public class TutorConversationService {
             );
         }
 
-        return messageRepository.findByConversationIdOrderByCreatedAtAsc(
+        return messageRepository.findByConversationIdOrderByCreatedAtDesc(
                 conversationOpt.get().getId(),
                 pageable
         );

@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface TutorMessageRepository extends JpaRepository<TutorMessage, Long> {
     List<TutorMessage> findByConversationIdOrderByCreatedAtAsc(Long conversationId);
-
     Page<TutorMessage> findByConversationIdOrderByCreatedAtAsc(Long conversationId, Pageable pageable);
+
+    Page<TutorMessage> findByConversationIdOrderByCreatedAtDesc(Long conversationId, Pageable pageable);
 }

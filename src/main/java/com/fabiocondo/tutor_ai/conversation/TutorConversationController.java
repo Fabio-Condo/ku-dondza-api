@@ -29,10 +29,7 @@ public class TutorConversationController {
     public Page<TutorMessageResponse> getConversationsMessages(
             @RequestParam Long userId,
             @RequestParam Long questionId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
-        Pageable pageable = PageRequest.of(page, size);
+            Pageable pageable) {
 
         return conversationService
                 .findMessagesByUserAndQuestion(userId, questionId, pageable)

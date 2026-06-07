@@ -3,13 +3,12 @@ package com.fabiocondo.tutor_ai.conversation;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.tutor_ai.message.TutorMessage;
 import com.fabiocondo.tutor_ai.message.TutorMessageRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -54,10 +53,7 @@ public class TutorConversationService {
         return conversationRepository.findById(id).orElseThrow(() -> new RuntimeException("Conversa não encontrada"));
     }
 
-    public Page<TutorMessage> findMessagesByUserAndQuestion(
-            Long userId,
-            Long questionId,
-            Pageable pageable) {
+    public Page<TutorMessage> findMessagesByUserAndQuestion(Long userId, Long questionId, Pageable pageable) {
 
         Optional<TutorConversation> conversationOpt =
                 conversationRepository.findByUserIdAndQuestionId(userId, questionId);
@@ -74,5 +70,28 @@ public class TutorConversationService {
                 conversationOpt.get().getId(),
                 pageable
         );
+    }
+
+    public List<TutorMessage> getLastMessages(Long userId, Long questionId, int limit) {
+
+        Pageable pageable = PageRequest.of(
+                0,
+                limit,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        Page<TutorMessage> page =
+                findMessagesByUserAndQuestion(
+                        userId,
+                        questionId,
+                        pageable
+                );
+
+        List<TutorMessage> messages =
+                new ArrayList<>(page.getContent());
+
+        Collections.reverse(messages);
+
+        return messages;
     }
 }

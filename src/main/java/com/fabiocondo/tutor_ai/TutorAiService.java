@@ -1,7 +1,6 @@
 package com.fabiocondo.tutor_ai;
 
 import com.fabiocondo.domain.Answer;
-import com.fabiocondo.domain.MathExpression;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
@@ -19,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -56,6 +56,44 @@ public class TutorAiService {
     }
 
     // =========================================================
+    // HELPER: Normalize text (remove accents, lowercase)
+    // =========================================================
+    private String normalizeText(String text) {
+        if (text == null) return "";
+        // Remove acentos
+        String normalized = Normalizer.normalize(text.toLowerCase(), Normalizer.Form.NFD);
+        normalized = normalized.replaceAll("\\p{M}", "");
+        // Remove pontuação extra, mas mantém essencial
+        normalized = normalized.replaceAll("[?¿!¡;:,.()\\[\\]{}<>]", " ");
+        // Remove espaços extras
+        normalized = normalized.replaceAll("\\s+", " ").trim();
+        return normalized;
+    }
+
+    // =========================================================
+    // HELPER: Check if message contains word with variations
+    // =========================================================
+    private boolean containsWord(String message, String... words) {
+        String normalizedMsg = normalizeText(message);
+        for (String word : words) {
+            String normalizedWord = normalizeText(word);
+            // Verifica como palavra completa
+            if (normalizedMsg.matches(".*\\b" + Pattern.quote(normalizedWord) + "\\b.*")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // =========================================================
+    // HELPER: Check if message matches pattern with variations
+    // =========================================================
+    private boolean matchesPattern(String message, String pattern) {
+        String normalizedMsg = normalizeText(message);
+        return normalizedMsg.matches(pattern);
+    }
+
+    // =========================================================
     // HELPER: Get first name
     // =========================================================
     private String getFirstName(User user) {
@@ -68,58 +106,80 @@ public class TutorAiService {
     }
 
     // =========================================================
-    // SIMPLE INTENT DETECTION (rule-based, mais estável)
+    // HELPER: Get topic name
+    // =========================================================
+    private String getTopicName(Question question) {
+        if (question.getTopic() != null && question.getTopic().getName() != null) {
+            return question.getTopic().getName();
+        }
+        return "este tópico";
+    }
+
+    // =========================================================
+    // SIMPLE INTENT DETECTION (rule-based, mais estável e tolerante)
     // =========================================================
     private TutorIntent detectIntentSimple(String message) {
         if (message == null || message.trim().isEmpty()) {
             return TutorIntent.HINT;
         }
 
-        String msg = message.toLowerCase().trim();
+        String rawMsg = message.trim();
 
-        // Detectar mensagens confusas primeiro
-        if (VERY_SHORT_PATTERN.matcher(msg).matches()) {
+        // Detectar mensagens confusas primeiro (usando texto original)
+        if (VERY_SHORT_PATTERN.matcher(rawMsg).matches()) {
             return TutorIntent.UNCLEAR;
         }
 
-        if (GIBBERISH_PATTERN.matcher(msg).matches()) {
+        if (GIBBERISH_PATTERN.matcher(rawMsg).matches()) {
             return TutorIntent.UNCLEAR;
         }
 
-        // Greetings
-        if (msg.matches("^(oi|ol[aá]|bom dia|boa tarde|boa noite|hey|hi|e aí|opa|fala|beleza|td bem|tudo bem|salve).*")) {
+        // Usar texto normalizado para as comparações
+        String msg = normalizeText(rawMsg);
+
+        // How is the tutor? (perguntas sobre o estado do tutor - com variações)
+        if (msg.matches(".*(como (esta|vc esta|voce esta|ta)|tudo bem|beleza|como vai|como anda|como estao as coisas|como funciona|como voce esta).*") ||
+                containsWord(rawMsg, "como está", "como esta", "como voce esta", "como você está", "tudo bem", "beleza")) {
+            return TutorIntent.HOW_ARE_YOU;
+        }
+
+        // Greetings (com variações de escrita)
+        if (msg.matches("^(oi|ola|bom dia|boa tarde|boa noite|hey|hi|e ai|opa|fala|beleza|td bem|tudo bem|salve|iae|iae beleza).*") ||
+                containsWord(rawMsg, "oi", "olá", "ola", "bom dia", "boa tarde", "boa noite", "e aí", "e ai")) {
             return TutorIntent.GREETING;
         }
 
-        // Thanks
-        if (msg.matches("^(obrigado|obrigada|valeu|agradeço|muito obrigado|brigado|brigada|vlw).*")) {
+        // Thanks (com variações)
+        if (containsWord(rawMsg, "obrigado", "obrigada", "valeu", "agradeço", "muito obrigado", "brigado", "brigada", "vlw", "obg", "obgd")) {
             return TutorIntent.THANKS;
         }
 
-        // Praise
-        if (msg.matches(".*(você é (ótimo|bom|excelente|incrível)|gostei (da explicação|da aula)|bom tutor|muito bom).*")) {
+        // Praise (com variações)
+        if (containsWord(rawMsg, "você é ótimo", "voce é otimo", "bom tutor", "muito bom", "excelente", "incrível", "incrivel", "gostei da explicação", "gostei da explicacao")) {
             return TutorIntent.PRAISE;
         }
 
-        // Step by step
-        if (msg.contains("passo a passo") || msg.contains("resolver comigo") || msg.contains("guia") || msg.contains("me orienta")) {
+        // Step by step (com variações)
+        if (containsWord(rawMsg, "passo a passo", "resolver comigo", "me guia", "me orienta", "passo a passo", "me ajuda a resolver")) {
             return TutorIntent.STEP_BY_STEP;
         }
 
-        // Verify reasoning
-        if (msg.contains("acho que") || msg.contains("meu raciocínio") || msg.contains("está certo") || msg.contains("correto")) {
+        // Verify reasoning (com variações)
+        if (containsWord(rawMsg, "acho que", "meu raciocínio", "meu raciocinio", "está certo", "esta certo", "correto", "fiz certo", "esta correto")) {
             return TutorIntent.VERIFY_REASONING;
         }
 
-        // Hint
-        if (msg.contains("dica") || msg.contains("ajuda") || msg.contains("como começo") || msg.contains("por onde começar")) {
+        // Hint (com variações)
+        if (containsWord(rawMsg, "dica", "ajuda", "como começo", "como comeco", "por onde começar", "por onde comecar", "me ajuda")) {
             return TutorIntent.HINT;
         }
 
         // Out of scope (palavras comuns fora do contexto educacional)
-        if (msg.matches(".*(clima|tempo|futebol|notícias|política|preço|dinheiro|comprar|vender).*") &&
-                !msg.matches(".*(questão|exercício|prova|estudo|matéria|aula|conteúdo).*")) {
-            return TutorIntent.OUT_OF_SCOPE;
+        if (containsWord(rawMsg, "clima", "tempo", "futebol", "notícias", "noticias", "política", "politica", "preço", "preco", "dinheiro", "comprar", "vender")) {
+            // Verifica se também não tem palavras do contexto educacional
+            if (!containsWord(rawMsg, "questão", "questao", "exercício", "exercicio", "prova", "estudo", "matéria", "materia", "aula", "conteúdo", "conteudo")) {
+                return TutorIntent.OUT_OF_SCOPE;
+            }
         }
 
         // Default para explicação
@@ -151,8 +211,10 @@ public class TutorAiService {
 
         // Detect intent (usando regras simples, sem chamar IA)
         TutorIntent intent = detectIntentSimple(request.getMessage());
-        log.info("Usuário {} - Questão {} - Intent detectada: {}",
-                request.getUserId(), request.getQuestionId(), intent);
+        String topicName = getTopicName(question);
+
+        log.info("Usuário {} - Questão {} (Tópico: {}) - Intent detectada: {}",
+                request.getUserId(), request.getQuestionId(), topicName, intent);
 
         // =====================================================
         // UNCLEAR MESSAGE (rápido, sem chamar GPT)
@@ -162,6 +224,18 @@ public class TutorAiService {
             messageService.saveUserMessage(conversation, request.getMessage());
             messageService.saveAssistantMessage(conversation, response);
             conversation.setUpdatedAt(LocalDateTime.now());
+            return response;
+        }
+
+        // =====================================================
+        // HOW ARE YOU (perguntas sobre o estado do tutor)
+        // =====================================================
+        if (intent == TutorIntent.HOW_ARE_YOU) {
+            String response = buildHowAreYouResponse(getFirstName(user));
+            messageService.saveUserMessage(conversation, request.getMessage());
+            messageService.saveAssistantMessage(conversation, response);
+            conversation.setUpdatedAt(LocalDateTime.now());
+            log.info("How are you response para usuário {}", request.getUserId());
             return response;
         }
 
@@ -181,11 +255,10 @@ public class TutorAiService {
         // OUT OF SCOPE (resposta rápida, sem GPT)
         // =====================================================
         if (intent == TutorIntent.OUT_OF_SCOPE) {
-            String subject = question.getTopic().getSubject().getName();
             String response = String.format(
-                    "Olá %s! Posso ajudar apenas com dúvidas relacionadas a esta questão de %s. Vamos focar no assunto? 😊",
+                    "Olá %s! Posso ajudar apenas com dúvidas relacionadas a **%s**. Vamos focar neste tópico? 😊",
                     getFirstName(user),
-                    subject != null ? subject : "esta disciplina"
+                    topicName
             );
             messageService.saveUserMessage(conversation, request.getMessage());
             messageService.saveAssistantMessage(conversation, response);
@@ -214,7 +287,7 @@ public class TutorAiService {
         List<TutorMessage> history = conversationService.getLastMessages(
                 request.getUserId(),
                 request.getQuestionId(),
-                8  // Reduzido de 12 para 8 para economizar tokens
+                8
         );
 
         if (request.getMessage() != null && !request.getMessage().trim().isEmpty()) {
@@ -228,7 +301,8 @@ public class TutorAiService {
                 request.getMessage(),
                 history,
                 intent,
-                user
+                user,
+                topicName
         );
 
         if (log.isDebugEnabled()) {
@@ -243,11 +317,25 @@ public class TutorAiService {
     }
 
     // =========================================================
+    // HOW ARE YOU RESPONSE BUILDER
+    // =========================================================
+    private String buildHowAreYouResponse(String firstName) {
+        String[] responses = {
+                String.format("Estou muito bem, %s! Obrigado por perguntar. Pronto para ajudar você com os estudos? 😊", firstName),
+                String.format("Tudo ótimo, %s! Estou aqui funcionando perfeitamente. Qual sua dúvida hoje? 🚀", firstName),
+                String.format("Estou bem, sim! E você, %s? Preparado para resolver mais essa questão? 💪", firstName),
+                String.format("Tudo certo por aqui, %s! Ansioso para ajudar você. Qual a dificuldade que está enfrentando? 📚", firstName),
+                String.format("Estou ótimo, %s! Obrigado por perguntar. Vamos focar na questão? 🎯", firstName)
+        };
+        return responses[(int) (Math.random() * responses.length)];
+    }
+
+    // =========================================================
     // UNCLEAR RESPONSE BUILDER
     // =========================================================
     private String buildUnclearResponse(String firstName) {
         String[] responses = {
-                String.format("Desculpe, %s, não consegui entender. Pode reformular sua pergunta? 🤔", firstName),
+                String.format("Desculpe, %s, não consegui entender. Pode reformular sua pergunta ou resposta? 🤔", firstName),
                 String.format("%s, sua pergunta ficou um pouco confusa. Você poderia explicar melhor? 😊", firstName),
                 String.format("Não entendi completamente, %s. Pode dar mais detalhes? 📝", firstName),
                 String.format("%s, não ficou claro o que você precisa. Pode me dizer com mais detalhes? 🎓", firstName),
@@ -261,7 +349,12 @@ public class TutorAiService {
     private String buildSocialResponse(TutorIntent intent, String firstName) {
         switch (intent) {
             case GREETING:
-                return String.format("Olá %s! Como posso ajudar você com os estudos hoje? 😊", firstName);
+                String[] greetings = {
+                        String.format("Olá %s! Como posso ajudar você com os estudos hoje? 😊", firstName),
+                        String.format("Oi %s! Estou aqui para ajudar. Qual sua dúvida? 📚", firstName),
+                        String.format("Fala, %s! Vamos resolver essa questão? 💪", firstName)
+                };
+                return greetings[(int) (Math.random() * greetings.length)];
             case THANKS:
                 String[] thanks = {
                         String.format("Por nada, %s! Estou aqui para ajudar. Mais alguma dúvida? 📚", firstName),
@@ -292,14 +385,14 @@ public class TutorAiService {
             String userMessage,
             List<TutorMessage> history,
             TutorIntent intent,
-            User user) {
+            User user,
+            String topicName) {
 
         StringBuilder prompt = new StringBuilder();
-        String subject = question.getTopic().getSubject().getName();
         String firstName = getFirstName(user);
 
         prompt.append("Você é o Tutor AI da plataforma Dikahub.\n");
-        prompt.append("Está ajudando ").append(firstName).append(" com uma questão de ").append(subject).append(".\n\n");
+        prompt.append("Está ajudando ").append(firstName).append(" com uma questão sobre **").append(topicName).append("**.\n\n");
 
         prompt.append("REGRAS:\n");
         prompt.append("- Seja pedagógico e acolhedor\n");
@@ -322,6 +415,7 @@ public class TutorAiService {
                 prompt.append("Explique o conceito necessário.\n\n");
         }
 
+        prompt.append("TÓPICO: ").append(topicName).append("\n\n");
         prompt.append("QUESTÃO:\n").append(question.getText()).append("\n\n");
 
         prompt.append("ALTERNATIVAS:\n");
@@ -358,6 +452,7 @@ public class TutorAiService {
     // =========================================================
     public enum TutorIntent {
         GREETING,
+        HOW_ARE_YOU,
         THANKS,
         PRAISE,
         HINT,

@@ -40,8 +40,8 @@ server:
 spring:
 
   profiles:
-    #active: dev
-    active: stage
+    active: dev
+    #active: stage
     #active: prod
 
   jpa:

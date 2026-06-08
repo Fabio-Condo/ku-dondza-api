@@ -419,7 +419,7 @@ public class TutorAiService {
     }
 
     // =========================================================
-    // PROMPT BUILDER
+    // PROMPT BUILDER (com regras de formatação para tabelas e divisão sintética)
     // =========================================================
     private String buildPrompt(
             Question question,
@@ -437,26 +437,103 @@ public class TutorAiService {
         prompt.append("Você é o Tutor AI da plataforma Dikahub.\n");
         prompt.append("Está ajudando ").append(firstName).append(" com uma questão sobre **").append(topicName).append("**.\n\n");
 
-        prompt.append("REGRAS:\n");
-        prompt.append("- Seja pedagógico e acolhedor\n");
+        prompt.append("REGRAS GERAIS:\n");
+        prompt.append("- Seja pedagógico, acolhedor e paciente\n");
         prompt.append("- Use o nome ").append(firstName).append(" na conversa\n");
-        prompt.append("- Não dê a resposta pronta\n");
-        prompt.append("- Estimule o raciocínio\n");
-        prompt.append("- Se o aluno perguntar algo fora do tópico, redirecione educadamente de volta para **").append(topicName).append("**\n\n");
+        prompt.append("- Não dê a resposta pronta, estimule o raciocínio\n");
+        prompt.append("- Se o aluno perguntar algo fora do tópico, redirecione educadamente\n\n");
 
-        prompt.append("TIPO DE AJUDA:\n");
+        prompt.append("REGRAS DE FORMATAÇÃO (IMPORTANTE):\n");
+        prompt.append("- Use **negrito** para destacar conceitos importantes\n");
+        prompt.append("- Use *itálico* para ênfase ou termos estrangeiros\n");
+        prompt.append("- Use `código` para expressões matemáticas, fórmulas ou comandos\n\n");
+
+        prompt.append("- Para TABELAS, use obrigatoriamente o formato LaTeX com array:\n");
+        prompt.append("  ```\n");
+        prompt.append("  \\[\n");
+        prompt.append("  \\begin{array}{|c|c|c|}\n");
+        prompt.append("  \\hline\n");
+        prompt.append("  Coluna 1 & Coluna 2 & Coluna 3 \\\\\n");
+        prompt.append("  \\hline\n");
+        prompt.append("  Dado 1 & Dado 2 & Dado 3 \\\\\n");
+        prompt.append("  Dado 4 & Dado 5 & Dado 6 \\\\\n");
+        prompt.append("  \\hline\n");
+        prompt.append("  \\end{array}\n");
+        prompt.append("  \\]\n");
+        prompt.append("  ```\n");
+        prompt.append("- Exemplo real de tabela científica:\n");
+        prompt.append("  ```\n");
+        prompt.append("  \\[\n");
+        prompt.append("  \\begin{array}{|c|c|c|}\n");
+        prompt.append("  \\hline\n");
+        prompt.append("  [A]_0\\ (mol/L) & [B_2]_0\\ (mol/L) & v_0\\ (mol \\cdot L^{-1} \\cdot s^{-1}) \\\\\n");
+        prompt.append("  \\hline\n");
+        prompt.append("  0,10 & 0,10 & 2,53 \\times 10^{-6} \\\\\n");
+        prompt.append("  0,10 & 0,20 & 5,06 \\times 10^{-6} \\\\\n");
+        prompt.append("  0,20 & 0,10 & 10,01 \\times 10^{-6} \\\\\n");
+        prompt.append("  \\hline\n");
+        prompt.append("  \\end{array}\n");
+        prompt.append("  \\]\n");
+        prompt.append("  ```\n");
+        prompt.append("- Sempre inclua linhas horizontais (\\hline) para separar cabeçalho e dados\n");
+        prompt.append("- Use barras verticais (|) nas colunas para definir bordas\n\n");
+
+        prompt.append("- Para DIVISÃO SINTÉTICA (Regra de Ruffini) em exercícios de matemática, use o formato:\n");
+        prompt.append("  ```\n");
+        prompt.append("  Coeficientes: 1, 3, -4, -12\n");
+        prompt.append("  Divisão sintética por 2:\n");
+        prompt.append("  \\[\n");
+        prompt.append("  \\begin{array}{r|rrrr}\n");
+        prompt.append("  2 & 1 & 3 & -4 & -12 \\\\\n");
+        prompt.append("    &   & 2 & 10 & 12 \\\\\n");
+        prompt.append("  \\hline\n");
+        prompt.append("    & 1 & 5 & 6 & 0\n");
+        prompt.append("  \\end{array}\n");
+        prompt.append("  \\]\n");
+        prompt.append("  ```\n");
+        prompt.append("- Explicação do formato:\n");
+        prompt.append("  * O número à esquerda (2) é a raiz ou valor que está sendo testado\n");
+        prompt.append("  * A primeira linha contém os coeficientes do polinômio\n");
+        prompt.append("  * A segunda linha mostra os produtos acumulados\n");
+        prompt.append("  * A linha final mostra os coeficientes do quociente e o resto (último número)\n");
+        prompt.append("  * Se o resto for 0, o número testado é raiz do polinômio\n\n");
+
+        prompt.append("- Use listas numeradas para passos sequenciais:\n");
+        prompt.append("  1. Primeiro passo\n");
+        prompt.append("  2. Segundo passo\n");
+        prompt.append("  3. Terceiro passo\n");
+        prompt.append("- Use listas com marcadores (-) para itens não ordenados\n");
+        prompt.append("- Use quebras de linha (linha em branco) entre parágrafos para facilitar a leitura\n");
+        prompt.append("- Para equações matemáticas em linha, use $...$ ou $$...$$ para equações destacadas\n");
+        prompt.append("- Para blocos de código ou fórmulas multi-linha, use ``` ```\n");
+        prompt.append("- Evite respostas muito longas sem pausas (máximo 4-5 linhas por parágrafo)\n");
+        prompt.append("- Use emojis com moderação para tornar a conversa mais amigável (😊, 📚, 💪, 🎯)\n");
+        prompt.append("- Se for explicar um conceito complexo, use títulos com ###\n");
+        prompt.append("- Sempre revise a formatação antes de responder\n\n");
+
+        prompt.append("TIPO DE AJUDA SOLICITADA:\n");
         switch (intent) {
             case HINT:
-                prompt.append("Dê apenas uma dica curta.\n\n");
+                prompt.append("Dê apenas uma dica curta e objetiva.\n");
+                prompt.append("Use formatação simples, sem tabelas ou listas longas.\n\n");
                 break;
             case STEP_BY_STEP:
-                prompt.append("Guie o aluno passo a passo.\n\n");
+                prompt.append("Guie o aluno passo a passo.\n");
+                prompt.append("Use lista numerada para cada passo.\n");
+                prompt.append("Para exercícios matemáticos que envolvem polinômios, considere usar o formato de divisão sintética.\n");
+                prompt.append("Exemplo de formato:\n");
+                prompt.append("  1. Primeiro, vamos identificar...\n");
+                prompt.append("  2. Em seguida, calculamos...\n");
+                prompt.append("  3. Por fim, concluímos que...\n\n");
                 break;
             case VERIFY_REASONING:
-                prompt.append("Analise o raciocínio do aluno.\n\n");
+                prompt.append("Analise o raciocínio do aluno.\n");
+                prompt.append("Use formato de diálogo, citando o raciocínio do aluno entre aspas.\n");
+                prompt.append("Se houver erro, explique usando marcadores ou lista numerada.\n\n");
                 break;
             default:
-                prompt.append("Explique o conceito necessário.\n\n");
+                prompt.append("Explique o conceito necessário de forma clara.\n");
+                prompt.append("Use títulos e sub-títulos quando apropriado (### para seções).\n\n");
         }
 
         prompt.append("TÓPICO: ").append(topicName).append("\n\n");
@@ -471,22 +548,33 @@ public class TutorAiService {
         if (selectedAnswer != null) {
             prompt.append("RESPOSTA DO ALUNO: ").append(selectedAnswer.getText()).append("\n\n");
             if (intent == TutorIntent.VERIFY_REASONING && correctAnswer != null) {
-                prompt.append("(Referência - resposta correta: ").append(correctAnswer.getText()).append(")\n");
-                prompt.append("NÃO revele esta resposta ao aluno.\n\n");
+                prompt.append("(Referência interna - resposta correta: ").append(correctAnswer.getText()).append(")\n");
+                prompt.append("NÃO revele esta resposta ao aluno. Use apenas para avaliar.\n\n");
             }
         }
 
         if (!history.isEmpty()) {
-            prompt.append("HISTÓRICO:\n");
+            prompt.append("HISTÓRICO DA CONVERSA:\n");
             for (TutorMessage msg : history.subList(Math.max(0, history.size() - 6), history.size())) {
                 String role = msg.getRole() == MessageRole.USER ? firstName : "TUTOR";
-                prompt.append(role).append(": ").append(msg.getContent()).append("\n");
+                String content = msg.getContent();
+                if (content != null && content.length() > 200) {
+                    content = content.substring(0, 200) + "...";
+                }
+                prompt.append(role).append(": ").append(content).append("\n");
             }
             prompt.append("\n");
         }
 
-        prompt.append("PERGUNTA: ").append(userMessage).append("\n\n");
-        prompt.append("Responda de forma educada e didática, sempre estimulando o raciocínio do aluno.\n");
+        prompt.append("PERGUNTA DO ALUNO: ").append(userMessage).append("\n\n");
+
+        prompt.append("INSTRUÇÕES FINAIS:\n");
+        prompt.append("1. Responda de forma educada e didática\n");
+        prompt.append("2. Use o formato LaTeX com array para TODAS as tabelas\n");
+        prompt.append("3. Para divisão sintética (Ruffini), use o formato mostrado com array r|rrrr\n");
+        prompt.append("4. Sempre inclua \\hline para linhas horizontais nas tabelas\n");
+        prompt.append("5. Mantenha o foco no tópico: **").append(topicName).append("**\n");
+        prompt.append("6. Revise a formatação antes de enviar a resposta\n");
 
         return prompt.toString();
     }

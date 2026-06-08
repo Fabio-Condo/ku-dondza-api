@@ -17,6 +17,7 @@ import com.fabiocondo.tutor_ai.message.TutorMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
 import java.text.Normalizer;
@@ -41,6 +42,11 @@ public class TutorAiService {
     );
 
     private static final Pattern VERY_SHORT_PATTERN = Pattern.compile("^.{1,2}$");
+
+    // Pattern para detectar extensões de imagem na URL
+    private static final Pattern IMAGE_EXTENSION_PATTERN = Pattern.compile(
+            "(?i)\\.(jpg|jpeg|png|gif|bmp|svg|webp)(\\?|$)"
+    );
 
     public TutorAiService(
             QuestionService questionService,
@@ -114,6 +120,39 @@ public class TutorAiService {
             return question.getTopic().getName();
         }
         return "este tópico";
+    }
+
+    // =========================================================
+    // HELPER: Check if question has image (based on urlFile)
+    // =========================================================
+    private boolean hasImage(Question question) {
+        if (question.getUrlFile() == null || question.getUrlFile().trim().isEmpty()) {
+            return false;
+        }
+        String urlFile = question.getUrlFile().trim();
+        // Verifica se a URL parece ser de uma imagem
+        return IMAGE_EXTENSION_PATTERN.matcher(urlFile).find() ||
+                urlFile.contains("image") ||
+                urlFile.contains("img") ||
+                urlFile.contains("upload");
+    }
+
+    // =========================================================
+    // HELPER: Get image type description based on question text
+    // =========================================================
+    private String getImageTypeDescription(Question question) {
+        String text = question.getText().toLowerCase();
+        if (text.contains("triângulo") || text.contains("triangulo")) return "figura geométrica (triângulo)";
+        if (text.contains("quadrado")) return "figura geométrica (quadrado)";
+        if (text.contains("círculo") || text.contains("circulo")) return "figura geométrica (círculo)";
+        if (text.contains("retângulo") || text.contains("retangulo")) return "figura geométrica (retângulo)";
+        if (text.contains("polígono") || text.contains("poligono")) return "figura geométrica (polígono)";
+        if (text.contains("gráfico") || text.contains("grafico")) return "gráfico";
+        if (text.contains("desenho")) return "ilustração";
+        if (text.contains("figura")) return "figura";
+        if (text.contains("esquema")) return "esquema";
+        if (text.contains("diagrama")) return "diagrama";
+        return "imagem";
     }
 
     // =========================================================
@@ -219,9 +258,11 @@ public class TutorAiService {
         // Detect intent (usando regras simples, sem chamar IA)
         TutorIntent intent = detectIntentSimple(request.getMessage());
         String topicName = getTopicName(question);
+        boolean hasMathExpressions = question.getMathExpressions() != null && !question.getMathExpressions().isEmpty();
+        boolean hasImage = hasImage(question);
 
-        log.info("Usuário {} - Questão {} (Tópico: {}) - Intent detectada: {}",
-                request.getUserId(), request.getQuestionId(), topicName, intent);
+        log.info("Usuário {} - Questão {} (Tópico: {}) - Intent: {} - Tem expressões: {} - Tem imagem: {}",
+                request.getUserId(), request.getQuestionId(), topicName, intent, hasMathExpressions, hasImage);
 
         // =====================================================
         // UNCLEAR MESSAGE (rápido, sem chamar GPT)
@@ -318,7 +359,9 @@ public class TutorAiService {
                 history,
                 intent,
                 user,
-                topicName
+                topicName,
+                hasMathExpressions,
+                hasImage
         );
 
         if (log.isDebugEnabled()) {
@@ -420,11 +463,8 @@ public class TutorAiService {
     }
 
     // =========================================================
-    // PROMPT BUILDER (com regras de formatação para tabelas e divisão sintética)
+    // PROMPT BUILDER (com regras para imagens, solution e tip)
     // =========================================================
-    // =========================================================
-// PROMPT BUILDER (com regras para não mostrar expressões matemáticas)
-// =========================================================
     private String buildPrompt(
             Question question,
             Answer selectedAnswer,
@@ -433,13 +473,12 @@ public class TutorAiService {
             List<TutorMessage> history,
             TutorIntent intent,
             User user,
-            String topicName) {
+            String topicName,
+            boolean hasMathExpressions,
+            boolean hasImage) {
 
         StringBuilder prompt = new StringBuilder();
         String firstName = getFirstName(user);
-
-        // Verificar se a questão tem expressões matemáticas (que são usadas para gerar gráficos)
-        boolean hasMathExpressions = question.getMathExpressions() != null && !question.getMathExpressions().isEmpty();
 
         prompt.append("Você é o Tutor AI da plataforma Dikahub.\n");
         prompt.append("Está ajudando ").append(firstName).append(" com uma questão sobre **").append(topicName).append("**.\n\n");
@@ -451,16 +490,35 @@ public class TutorAiService {
         prompt.append("- Se o aluno perguntar algo fora do tópico, redirecione educadamente\n\n");
 
         // =====================================================
-        // REGRAS ESPECÍFICAS PARA QUESTÕES COM GRÁFICOS
+        // REGRAS ESPECÍFICAS PARA QUESTÕES COM IMAGENS (urlFile)
+        // =====================================================
+        if (hasImage) {
+            String imageType = getImageTypeDescription(question);
+            prompt.append("🖼️ REGRAS ESPECIAIS PARA ESTA QUESTÃO (IMAGEM/ILUSTRAÇÃO):\n");
+            prompt.append("- Esta questão contém uma ").append(imageType).append("\n");
+            prompt.append("- O aluno pode visualizar esta imagem na tela através da URL: ").append(question.getUrlFile()).append("\n");
+            prompt.append("- Você (tutor) NÃO tem acesso visual a esta imagem\n");
+            prompt.append("- Você deve ajudar o aluno baseado na DESCRIÇÃO que ele fizer da imagem\n");
+            prompt.append("- Peça para o aluno DESCREVER o que ele está vendo na ").append(imageType).append("\n");
+            prompt.append("- Faça perguntas como: \"O que você observa na figura?\", \"Como são os ângulos?\", \"Quais medidas estão indicadas?\"\n");
+            prompt.append("- Para figuras geométricas, pergunte sobre: lados, ângulos, vértices, diagonais, simetrias\n");
+            prompt.append("- Para gráficos, pergunte sobre: formato da curva, pontos de intersecção, tendências\n");
+            prompt.append("- Para diagramas, pergunte sobre: componentes, relações, fluxos\n");
+            prompt.append("- NUNCA assuma características da imagem que o aluno não descreveu\n");
+            prompt.append("- Incentive o aluno a ser detalhista na descrição visual\n\n");
+        }
+
+        // =====================================================
+        // REGRAS ESPECÍFICAS PARA QUESTÕES COM GRÁFICOS (expressões)
         // =====================================================
         if (hasMathExpressions) {
-            prompt.append("⚠️ REGRAS ESPECIAIS PARA ESTA QUESTÃO (GRÁFICOS):\n");
-            prompt.append("- Esta questão contém **GRÁFICOS** que o aluno pode visualizar na tela\n");
+            prompt.append("📈 REGRAS ESPECIAIS PARA ESTA QUESTÃO (GRÁFICOS DE FUNÇÕES):\n");
+            prompt.append("- Esta questão contém **GRÁFICOS** gerados a partir de expressões matemáticas\n");
             prompt.append("- As expressões matemáticas são usadas APENAS para gerar os gráficos\n");
             prompt.append("- O aluno NÃO vê as expressões matemáticas, apenas os gráficos\n");
             prompt.append("- Você NUNCA deve mencionar, citar ou revelar as expressões matemáticas\n");
             prompt.append("- Sua análise deve ser baseada EXCLUSIVAMENTE na interpretação visual dos gráficos\n");
-            prompt.append("- Fale sobre: formato da curva, pontos de intersecção, tendências, máximos/mínimos, etc.\n");
+            prompt.append("- Fale sobre: formato da curva, pontos de intersecção, tendências, máximos/mínimos\n");
             prompt.append("- Exemplo do que NÃO fazer: \"A função f(x) = x² + 2x - 3 tem raízes...\"\n");
             prompt.append("- Exemplo do que FAZER: \"Observando o gráfico, a curva toca o eixo x em dois pontos...\"\n");
             prompt.append("- Incentive o aluno a descrever o que ele enxerga no gráfico\n\n");
@@ -538,6 +596,9 @@ public class TutorAiService {
         switch (intent) {
             case HINT:
                 prompt.append("Dê apenas uma dica curta e objetiva.\n");
+                if (hasImage) {
+                    prompt.append("Peça para o aluno descrever um aspecto específico da imagem.\n");
+                }
                 if (hasMathExpressions) {
                     prompt.append("Baseie a dica na análise visual do gráfico.\n");
                 }
@@ -546,6 +607,10 @@ public class TutorAiService {
             case STEP_BY_STEP:
                 prompt.append("Guie o aluno passo a passo.\n");
                 prompt.append("Use lista numerada para cada passo.\n");
+                if (hasImage) {
+                    prompt.append("Cada passo deve começar com uma pergunta sobre a imagem.\n");
+                    prompt.append("Exemplo: \"1. Observe a figura. Quantos lados tem o polígono?\"\n");
+                }
                 if (hasMathExpressions) {
                     prompt.append("Cada passo deve ser baseado na observação do gráfico.\n");
                     prompt.append("Peça ao aluno para descrever o que ele vê no gráfico a cada etapa.\n");
@@ -559,6 +624,10 @@ public class TutorAiService {
             case VERIFY_REASONING:
                 prompt.append("Analise o raciocínio do aluno.\n");
                 prompt.append("Use formato de diálogo, citando o raciocínio do aluno entre aspas.\n");
+                if (hasImage) {
+                    prompt.append("Verifique se a descrição da imagem pelo aluno está correta.\n");
+                    prompt.append("Se a descrição estiver errada, peça para ele observar novamente.\n");
+                }
                 if (hasMathExpressions) {
                     prompt.append("Se o aluno mencionar expressões matemáticas, redirecione para a análise do gráfico.\n");
                 }
@@ -566,6 +635,9 @@ public class TutorAiService {
                 break;
             default:
                 prompt.append("Explique o conceito necessário de forma clara.\n");
+                if (hasImage) {
+                    prompt.append("Use a imagem como referência para a explicação.\n");
+                }
                 if (hasMathExpressions) {
                     prompt.append("Use exemplos baseados na interpretação de gráficos.\n");
                 }
@@ -582,20 +654,36 @@ public class TutorAiService {
         prompt.append("\n");
 
         // =====================================================
-        // NÃO MOSTRAR AS EXPRESSÕES MATEMÁTICAS NO PROMPT
-        // Elas são usadas apenas para gerar gráficos, mas o tutor não deve vê-las
+        // DICA OFICIAL (tip)
+        // =====================================================
+        if (question.getTip() != null && !question.getTip().trim().isEmpty()) {
+            prompt.append("💡 DICA OFICIAL DA QUESTÃO (use se apropriado):\n");
+            prompt.append(question.getTip()).append("\n\n");
+        }
+
+        // =====================================================
+        // SOLUÇÃO OFICIAL (para referência do tutor, NÃO mostrar ao aluno)
+        // =====================================================
+        if (question.getSolution() != null && !question.getSolution().trim().isEmpty()) {
+            prompt.append("🔒 SOLUÇÃO OFICIAL (REFERÊNCIA INTERNA - NÃO REVELAR AO ALUNO):\n");
+            prompt.append(question.getSolution()).append("\n\n");
+            prompt.append("Use esta solução APENAS para verificar se o raciocínio do aluno está correto.\n");
+            prompt.append("NUNCA copie ou revele esta solução diretamente ao aluno.\n\n");
+        }
+
+        // =====================================================
+        // INFORMAÇÕES SOBRE EXPRESSÕES (sem revelar as expressões)
         // =====================================================
         if (hasMathExpressions) {
-            prompt.append("⚠️ IMPORTANTE: Esta questão contém gráficos gerados a partir de expressões matemáticas.\n");
+            prompt.append("⚠️ INFORMAÇÃO SOBRE GRÁFICOS:\n");
+            prompt.append("Esta questão contém gráficos gerados a partir de expressões matemáticas.\n");
             prompt.append("O aluno NÃO tem acesso às expressões, apenas aos gráficos.\n");
             prompt.append("Você NUNCA deve mencionar as expressões em suas respostas.\n");
             prompt.append("Baseie sua análise APENAS na interpretação visual do gráfico.\n\n");
 
-            // Opcional: mostrar apenas os tipos de gráficos (não as expressões)
             prompt.append("TIPOS DE GRÁFICOS DISPONÍVEIS PARA O ALUNO:\n");
             for (MathExpression exp : question.getMathExpressions()) {
                 String expr = exp.getExpression();
-                // Não mostrar a expressão completa, apenas o tipo
                 if (expr.contains("=") || expr.contains("x") || expr.contains("y")) {
                     prompt.append("- Gráfico de função (curva no plano cartesiano)\n");
                 } else {
@@ -603,6 +691,21 @@ public class TutorAiService {
                 }
             }
             prompt.append("(O aluno vê esses gráficos visualmente, não as expressões)\n\n");
+        }
+
+        // =====================================================
+        // INFORMAÇÕES SOBRE IMAGEM (via urlFile)
+        // =====================================================
+        if (hasImage) {
+            String imageType = getImageTypeDescription(question);
+            prompt.append("🖼️ INFORMAÇÃO SOBRE IMAGEM:\n");
+            prompt.append("Esta questão contém uma ").append(imageType).append("\n");
+            prompt.append("URL da imagem: ").append(question.getUrlFile()).append("\n");
+            prompt.append("O aluno pode visualizar esta imagem na tela.\n");
+            prompt.append("Você NÃO tem acesso visual a esta imagem.\n");
+            prompt.append("Confie na descrição que o aluno fizer da imagem.\n");
+            prompt.append("Faça perguntas para ajudá-lo a observar detalhes importantes.\n");
+            prompt.append("Exemplo de pergunta: \"O que você pode me dizer sobre a forma que está desenhada?\"\n\n");
         }
 
         if (selectedAnswer != null) {
@@ -634,15 +737,24 @@ public class TutorAiService {
         prompt.append("3. Para divisão sintética (Ruffini), use o formato mostrado com array r|rrrr\n");
         prompt.append("4. Sempre inclua \\hline para linhas horizontais nas tabelas\n");
 
-        if (hasMathExpressions) {
-            prompt.append("5. NUNCA mencione expressões matemáticas - fale apenas sobre os GRÁFICOS\n");
-            prompt.append("6. O aluno só vê os gráficos, não as funções que os geraram\n");
-            prompt.append("7. Mantenha o foco no tópico: **").append(topicName).append("**\n");
-            prompt.append("8. Revise a formatação antes de enviar a resposta\n");
-        } else {
-            prompt.append("5. Mantenha o foco no tópico: **").append(topicName).append("**\n");
-            prompt.append("6. Revise a formatação antes de enviar a resposta\n");
+        if (hasImage) {
+            prompt.append("5. Peça para o aluno DESCREVER a imagem antes de tentar resolver\n");
+            prompt.append("6. Faça perguntas específicas sobre a figura geométrica ou ilustração\n");
+            prompt.append("7. Lembre-se: você NÃO vê a imagem, apenas o aluno\n");
         }
+
+        if (hasMathExpressions) {
+            prompt.append("8. NUNCA mencione expressões matemáticas - fale apenas sobre os GRÁFICOS\n");
+            prompt.append("9. O aluno só vê os gráficos, não as funções que os geraram\n");
+        }
+
+        if (question.getSolution() != null && !question.getSolution().trim().isEmpty()) {
+            prompt.append("10. Use a solução oficial APENAS como referência para avaliar o aluno\n");
+            prompt.append("11. NUNCA copie ou revele a solução oficial diretamente\n");
+        }
+
+        prompt.append("12. Mantenha o foco no tópico: **").append(topicName).append("**\n");
+        prompt.append("13. Revise a formatação antes de enviar a resposta\n");
 
         return prompt.toString();
     }

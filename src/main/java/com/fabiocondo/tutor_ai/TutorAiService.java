@@ -72,8 +72,8 @@ public class TutorAiService {
 
         // Detect intent using AI
         TutorIntent intent = detectIntentWithAI(request.getMessage(), question);
-        log.info("Usuário {} - Questão {} - Intent detectada: {}",
-                request.getUserId(), request.getQuestionId(), intent);
+        log.info("Usuário {} - Questão {} (Disciplina: {}) - Intent detectada: {}",
+                request.getUserId(), request.getQuestionId(), question.getTopic().getSubject().getName(), intent);
 
         // =====================================================
         // OUT OF SCOPE (bloqueio inteligente)
@@ -81,9 +81,10 @@ public class TutorAiService {
         if (intent == TutorIntent.OUT_OF_SCOPE) {
 
             String response = String.format(
-                    "Olá %s! Posso ajudar apenas com dúvidas relacionadas a esta questão ou aos conceitos matemáticos envolvidos. " +
-                            "Vamos focar na matemática? 😊",
-                    user.getFullName()
+                    "Olá %s! Posso ajudar apenas com dúvidas relacionadas a esta questão de %s ou aos conceitos envolvidos. " +
+                            "Vamos focar no assunto? 😊",
+                    user.getFullName(),
+                    question.getTopic().getSubject().getName() != null ? question.getTopic().getSubject().getName() : "esta disciplina"
             );
 
             messageService.saveUserMessage(conversation, request.getMessage());
@@ -129,7 +130,7 @@ public class TutorAiService {
                 request.getMessage(),
                 history,
                 intent,
-                user  // Pass user object to prompt builder
+                user
         );
 
         // Log prompt for debugging (optional, can be removed in production)
@@ -160,15 +161,18 @@ public class TutorAiService {
                 ? question.getText().substring(0, 200) + "..."
                 : question.getText();
 
+        String subject = question.getTopic().getSubject().getName() != null ? question.getTopic().getSubject().getName() : "esta disciplina";
+
         String classificationPrompt = String.format(
-                "Você é um classificador de intenções para um tutor de matemática.\n" +
+                "Você é um classificador de intenções para um tutor educacional.\n" +
+                        "A questão atual é de %s.\n" +
                         "Classifique a mensagem do aluno em uma das seguintes categorias:\n" +
                         "\n" +
                         "HINT - o aluno pede uma dica ou ajuda inicial (ex: \"me dá uma dica\", \"pode ajudar?\", \"como começo?\")\n" +
-                        "EXPLANATION - pede explicação de um conceito matemático (ex: \"o que é logaritmo?\", \"por que isso acontece?\")\n" +
+                        "EXPLANATION - pede explicação de um conceito (ex: \"o que é verbo?\", \"explique a fotossíntese\", \"por que isso acontece?\")\n" +
                         "STEP_BY_STEP - quer resolver passo a passo com o tutor (ex: \"vamos resolver juntos\", \"passo a passo\", \"me guia\")\n" +
                         "VERIFY_REASONING - quer que o tutor verifique um raciocínio (ex: \"acho que é assim...\", \"meu raciocínio está certo?\", \"resolvi dessa forma\")\n" +
-                        "OUT_OF_SCOPE - pergunta totalmente fora da matemática ou da questão (ex: \"qual a capital do Brasil?\", \"que horas são?\", \"como está o tempo?\")\n" +
+                        "OUT_OF_SCOPE - pergunta totalmente fora do contexto da disciplina ou da questão (ex: \"qual a capital do Brasil?\", \"que horas são?\", \"como está o tempo?\")\n" +
                         "\n" +
                         "Contexto da questão (apenas para referência): %s\n" +
                         "\n" +
@@ -176,6 +180,7 @@ public class TutorAiService {
                         "\n" +
                         "Retorne APENAS uma das palavras: HINT, EXPLANATION, STEP_BY_STEP, VERIFY_REASONING, OUT_OF_SCOPE.\n" +
                         "Não adicione nenhuma outra explicação ou texto.",
+                subject,
                 questionShort,
                 message
         );
@@ -216,13 +221,15 @@ public class TutorAiService {
 
         StringBuilder prompt = new StringBuilder();
 
+        String subject = question.getTopic().getSubject().getName() != null ? question.getTopic().getSubject().getName() : "esta disciplina";
+
         // ========================
         // MISSÃO
         // ========================
         prompt.append("MISSÃO:\n");
         prompt.append("Você é o Tutor AI da plataforma Dikahub.\n");
         prompt.append("Seu nome é Tutor AI e você está ajudando ").append(user.getFullName()).append(".\n");
-        prompt.append("Sua única função é ajudar o aluno a resolver esta questão.\n");
+        prompt.append("Sua única função é ajudar o aluno a resolver esta questão de ").append(subject).append(".\n");
         prompt.append("Não responda perguntas fora do contexto.\n\n");
 
         // ========================
@@ -233,7 +240,7 @@ public class TutorAiService {
         if (user.getEmail() != null && !user.getEmail().isEmpty()) {
             prompt.append("Email: ").append(user.getEmail()).append("\n");
         }
-        prompt.append("\n");
+        prompt.append("Disciplina atual: ").append(subject).append("\n\n");
 
         // ========================
         // REGRAS
@@ -241,15 +248,16 @@ public class TutorAiService {
         prompt.append("REGRAS:\n");
         prompt.append("- Seja pedagógico e acolhedor\n");
         prompt.append("- Sempre que apropriado, use o nome do aluno para tornar a conversa mais pessoal\n");
-        prompt.append("- Explique de forma simples e clara\n");
+        prompt.append("- Explique de forma simples e clara, adequada à disciplina de ").append(subject).append("\n");
         prompt.append("- Não revele a resposta imediatamente\n");
         prompt.append("- Incentive o raciocínio do aluno\n");
-        prompt.append("- Use exemplos quando necessário\n");
-        prompt.append("- Use LaTeX quando apropriado\n");
+        prompt.append("- Use exemplos relacionados à disciplina quando necessário\n");
+        prompt.append("- Use LaTeX apenas quando houver fórmulas matemáticas ou expressões científicas\n");
         prompt.append("- Considere o histórico da conversa\n");
-        prompt.append("- Redirecione assuntos fora do contexto matemático educadamente\n");
+        prompt.append("- Redirecione assuntos fora do contexto da disciplina educadamente\n");
         prompt.append("- Seja paciente e encorajador\n");
-        prompt.append("- Elogie os acertos e esforços do aluno\n\n");
+        prompt.append("- Elogie os acertos e esforços do aluno\n");
+        prompt.append("- Adapte sua linguagem para a disciplina: para exatas use termos técnicos, para humanas use contextualização histórica/social\n\n");
 
         // ========================
         // CONTEXTO INTELIGENTE
@@ -268,7 +276,7 @@ public class TutorAiService {
                 prompt.append("O aluno quer resolver PASSO A PASSO com você.\n");
                 prompt.append("Guie o aluno passo a passo sem revelar tudo de uma vez.\n");
                 prompt.append("Use o nome do aluno e faça perguntas para estimular o raciocínio.\n");
-                prompt.append("Exemplo: \"").append(user.getFullName()).append(", vamos juntos? Primeiro, o que você observa?\"\n\n");
+                prompt.append("Exemplo: \"").append(user.getFullName()).append(", vamos juntos? Primeiro, o que você entende deste problema?\"\n\n");
                 break;
 
             case VERIFY_REASONING:
@@ -282,9 +290,9 @@ public class TutorAiService {
 
             case EXPLANATION:
                 prompt.append("O aluno pediu EXPLICAÇÃO de um conceito.\n");
-                prompt.append("Explique o conceito matemático necessário de forma clara e didática.\n");
+                prompt.append("Explique o conceito necessário de forma clara e didática, adequada à disciplina de ").append(subject).append(".\n");
                 prompt.append("Use o nome do aluno para engajar: \"").append(user.getFullName()).append(", este conceito funciona assim...\"\n");
-                prompt.append("Use exemplos relacionados à questão.\n\n");
+                prompt.append("Use exemplos relacionados à questão e à disciplina.\n\n");
                 break;
 
             default:
@@ -295,7 +303,7 @@ public class TutorAiService {
         // ========================
         // QUESTÃO
         // ========================
-        prompt.append("QUESTÃO:\n")
+        prompt.append("QUESTÃO (Disciplina: ").append(subject).append("):\n")
                 .append(question.getText())
                 .append("\n\n");
 
@@ -306,10 +314,10 @@ public class TutorAiService {
         prompt.append("\n");
 
         // ========================
-        // EXPRESSÕES
+        // EXPRESSÕES (se houver)
         // ========================
         if (question.getMathExpressions() != null && !question.getMathExpressions().isEmpty()) {
-            prompt.append("EXPRESSÕES MATEMÁTICAS:\n");
+            prompt.append("EXPRESSÕES/FÓRMULAS:\n");
             for (MathExpression exp : question.getMathExpressions()) {
                 prompt.append("- ").append(exp.getExpression()).append("\n");
             }
@@ -348,7 +356,7 @@ public class TutorAiService {
         // ========================
         if (selectedAnswer == null) {
             prompt.append("CONTEXTO: AJUDA INICIAL\n");
-            prompt.append("O aluno ainda não respondeu à questão.\n");
+            prompt.append("O aluno ainda não respondeu à questão de ").append(subject).append(".\n");
             prompt.append("Forneça orientação sem dar a resposta.\n");
             prompt.append("Use o nome ").append(user.getFullName()).append(" para motivá-lo.\n\n");
         } else {
@@ -389,6 +397,8 @@ public class TutorAiService {
         prompt.append("Seja educado, paciente e didático.\n");
         prompt.append("Use o nome do aluno (").append(user.getFullName()).append(") naturalmente na conversa.\n");
         prompt.append("Mantenha um tom acolhedor e encorajador.\n");
+        prompt.append("Adapte sua resposta para a disciplina de ").append(subject).append(".\n");
+        prompt.append("Se for exatas, use linguagem técnica e precisa. Se for humanas, use contextualização e exemplos do dia a dia.\n");
 
         return prompt.toString();
     }
@@ -401,6 +411,6 @@ public class TutorAiService {
         EXPLANATION,    // Explicação de conceito
         STEP_BY_STEP,   // Resolução guiada passo a passo
         VERIFY_REASONING, // Verificar raciocínio do aluno
-        OUT_OF_SCOPE    // Pergunta fora do contexto matemático
+        OUT_OF_SCOPE    // Pergunta fora do contexto da disciplina
     }
 }

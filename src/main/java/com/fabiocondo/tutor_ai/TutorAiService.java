@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class TutorAiService {
@@ -32,6 +33,13 @@ public class TutorAiService {
     private final TutorConversationService conversationService;
     private final TutorMessageService messageService;
     private final UserServiceImpl userService;
+
+    // Pattern para detectar mensagens muito curtas ou sem sentido
+    private static final Pattern GIBBERISH_PATTERN = Pattern.compile(
+            "^(?i)(asdf|qwerty|zxcv|teste?|kkk|rsrs|h{2,}|[?]{2,}|[!]{2,}|[.]{3,})$"
+    );
+
+    private static final Pattern VERY_SHORT_PATTERN = Pattern.compile("^.{1,2}$");
 
     public TutorAiService(
             QuestionService questionService,
@@ -60,6 +68,65 @@ public class TutorAiService {
     }
 
     // =========================================================
+    // SIMPLE INTENT DETECTION (rule-based, mais estável)
+    // =========================================================
+    private TutorIntent detectIntentSimple(String message) {
+        if (message == null || message.trim().isEmpty()) {
+            return TutorIntent.HINT;
+        }
+
+        String msg = message.toLowerCase().trim();
+
+        // Detectar mensagens confusas primeiro
+        if (VERY_SHORT_PATTERN.matcher(msg).matches()) {
+            return TutorIntent.UNCLEAR;
+        }
+
+        if (GIBBERISH_PATTERN.matcher(msg).matches()) {
+            return TutorIntent.UNCLEAR;
+        }
+
+        // Greetings
+        if (msg.matches("^(oi|ol[aá]|bom dia|boa tarde|boa noite|hey|hi|e aí|opa|fala|beleza|td bem|tudo bem|salve).*")) {
+            return TutorIntent.GREETING;
+        }
+
+        // Thanks
+        if (msg.matches("^(obrigado|obrigada|valeu|agradeço|muito obrigado|brigado|brigada|vlw).*")) {
+            return TutorIntent.THANKS;
+        }
+
+        // Praise
+        if (msg.matches(".*(você é (ótimo|bom|excelente|incrível)|gostei (da explicação|da aula)|bom tutor|muito bom).*")) {
+            return TutorIntent.PRAISE;
+        }
+
+        // Step by step
+        if (msg.contains("passo a passo") || msg.contains("resolver comigo") || msg.contains("guia") || msg.contains("me orienta")) {
+            return TutorIntent.STEP_BY_STEP;
+        }
+
+        // Verify reasoning
+        if (msg.contains("acho que") || msg.contains("meu raciocínio") || msg.contains("está certo") || msg.contains("correto")) {
+            return TutorIntent.VERIFY_REASONING;
+        }
+
+        // Hint
+        if (msg.contains("dica") || msg.contains("ajuda") || msg.contains("como começo") || msg.contains("por onde começar")) {
+            return TutorIntent.HINT;
+        }
+
+        // Out of scope (palavras comuns fora do contexto educacional)
+        if (msg.matches(".*(clima|tempo|futebol|notícias|política|preço|dinheiro|comprar|vender).*") &&
+                !msg.matches(".*(questão|exercício|prova|estudo|matéria|aula|conteúdo).*")) {
+            return TutorIntent.OUT_OF_SCOPE;
+        }
+
+        // Default para explicação
+        return TutorIntent.EXPLANATION;
+    }
+
+    // =========================================================
     // MAIN METHOD
     // =========================================================
     @Transactional
@@ -82,62 +149,54 @@ public class TutorAiService {
         TutorConversation conversation =
                 conversationService.getOrCreate(request.getUserId(), question);
 
-        // Detect intent using AI
-        TutorIntent intent = detectIntentWithAI(request.getMessage(), question);
-        log.info("Usuário {} - Questão {} (Disciplina: {}) - Intent detectada: {}",
-                request.getUserId(), request.getQuestionId(), question.getTopic().getSubject().getName(), intent);
+        // Detect intent (usando regras simples, sem chamar IA)
+        TutorIntent intent = detectIntentSimple(request.getMessage());
+        log.info("Usuário {} - Questão {} - Intent detectada: {}",
+                request.getUserId(), request.getQuestionId(), intent);
 
         // =====================================================
-        // UNCLEAR MESSAGE (mensagem confusa ou incompreensível)
+        // UNCLEAR MESSAGE (rápido, sem chamar GPT)
         // =====================================================
         if (intent == TutorIntent.UNCLEAR) {
             String response = buildUnclearResponse(getFirstName(user));
-
             messageService.saveUserMessage(conversation, request.getMessage());
             messageService.saveAssistantMessage(conversation, response);
             conversation.setUpdatedAt(LocalDateTime.now());
-
-            log.info("Mensagem confusa detectada para usuário {}", request.getUserId());
             return response;
         }
 
         // =====================================================
-        // SOCIAL INTERACTIONS (agradecimentos, cumprimentos, elogios)
+        // SOCIAL INTERACTIONS (respostas rápidas, sem GPT)
         // =====================================================
         if (intent == TutorIntent.GREETING || intent == TutorIntent.THANKS || intent == TutorIntent.PRAISE) {
             String response = buildSocialResponse(intent, getFirstName(user));
-
             messageService.saveUserMessage(conversation, request.getMessage());
             messageService.saveAssistantMessage(conversation, response);
             conversation.setUpdatedAt(LocalDateTime.now());
-
-            log.info("Resposta social para usuário {}: {}", request.getUserId(), intent);
+            log.info("Resposta social para usuário {}", request.getUserId());
             return response;
         }
 
         // =====================================================
-        // OUT OF SCOPE (bloqueio inteligente)
+        // OUT OF SCOPE (resposta rápida, sem GPT)
         // =====================================================
         if (intent == TutorIntent.OUT_OF_SCOPE) {
-
+            String subject = question.getTopic().getSubject().getName();
             String response = String.format(
-                    "Olá %s! Posso ajudar apenas com dúvidas relacionadas a esta questão de %s ou aos conceitos envolvidos. " +
-                            "Vamos focar no assunto? 😊",
+                    "Olá %s! Posso ajudar apenas com dúvidas relacionadas a esta questão de %s. Vamos focar no assunto? 😊",
                     getFirstName(user),
-                    question.getTopic().getSubject().getName() != null ? question.getTopic().getSubject().getName() : "esta disciplina"
+                    subject != null ? subject : "esta disciplina"
             );
-
             messageService.saveUserMessage(conversation, request.getMessage());
             messageService.saveAssistantMessage(conversation, response);
-
             conversation.setUpdatedAt(LocalDateTime.now());
-
-            log.info("Out of scope detectado para usuário {}", request.getUserId());
             return response;
         }
 
+        // =====================================================
+        // PROCESSAMENTO NORMAL (chama GPT)
+        // =====================================================
         Answer selectedAnswer = null;
-
         if (request.getSelectedAnswerId() != null) {
             selectedAnswer = question.getAnswers()
                     .stream()
@@ -152,12 +211,11 @@ public class TutorAiService {
                 .findFirst()
                 .orElse(null);
 
-        List<TutorMessage> history =
-                conversationService.getLastMessages(
-                        request.getUserId(),
-                        request.getQuestionId(),
-                        12
-                );
+        List<TutorMessage> history = conversationService.getLastMessages(
+                request.getUserId(),
+                request.getQuestionId(),
+                8  // Reduzido de 12 para 8 para economizar tokens
+        );
 
         if (request.getMessage() != null && !request.getMessage().trim().isEmpty()) {
             messageService.saveUserMessage(conversation, request.getMessage());
@@ -173,13 +231,11 @@ public class TutorAiService {
                 user
         );
 
-        // Log prompt for debugging (optional, can be removed in production)
         if (log.isDebugEnabled()) {
             log.debug("Prompt enviado ao GPT: {}", prompt.substring(0, Math.min(500, prompt.length())));
         }
 
         String aiResponse = gptService.askAssistant(prompt);
-
         messageService.saveAssistantMessage(conversation, aiResponse);
         conversation.setUpdatedAt(LocalDateTime.now());
 
@@ -190,15 +246,13 @@ public class TutorAiService {
     // UNCLEAR RESPONSE BUILDER
     // =========================================================
     private String buildUnclearResponse(String firstName) {
-        String[] unclearResponses = {
-                String.format("Desculpe, %s, não consegui entender muito bem sua pergunta. Pode reformular ou dar mais detalhes? 🤔", firstName),
-                String.format("Oi %s, sua mensagem ficou um pouco confusa para mim. Você poderia explicar de outra forma? Vou adorar ajudar! 😊", firstName),
-                String.format("Não entendi completamente, %s. Você poderia ser mais específico sobre sua dúvida? 📝", firstName),
-                String.format("Hmm, %s, não ficou claro o que você precisa. Pode me dizer com mais detalhes qual é sua dificuldade? 🎓", firstName),
-                String.format("Peço desculpas, %s, mas não consegui compreender sua pergunta. Poderia reformular, por favor? Vamos resolver isso juntos! 💪", firstName),
-                String.format("Olá %s, sua mensagem está um pouco ambígua. Pode me explicar melhor qual é sua dúvida em relação a esta questão? 📚", firstName)
+        String[] responses = {
+                String.format("Desculpe, %s, não consegui entender. Pode reformular sua pergunta? 🤔", firstName),
+                String.format("%s, sua pergunta ficou um pouco confusa. Você poderia explicar melhor? 😊", firstName),
+                String.format("Não entendi completamente, %s. Pode dar mais detalhes? 📝", firstName),
+                String.format("%s, não ficou claro o que você precisa. Pode me dizer com mais detalhes? 🎓", firstName),
         };
-        return unclearResponses[(int) (Math.random() * unclearResponses.length)];
+        return responses[(int) (Math.random() * responses.length)];
     }
 
     // =========================================================
@@ -208,137 +262,24 @@ public class TutorAiService {
         switch (intent) {
             case GREETING:
                 return String.format("Olá %s! Como posso ajudar você com os estudos hoje? 😊", firstName);
-
             case THANKS:
-                String[] thanksResponses = {
-                        String.format("Por nada, %s! Estou aqui para ajudar. Tem mais alguma dúvida? 📚", firstName),
-                        String.format("Disponha, %s! Que bom que pude ajudar. Precisa de mais alguma coisa? 🎓", firstName),
-                        String.format("Fico feliz em ajudar, %s! Continue com os estudos. Mais alguma questão? 💪", firstName),
-                        String.format("Imagina, %s! Para isso que estou aqui. Vamos em frente! 🚀", firstName)
+                String[] thanks = {
+                        String.format("Por nada, %s! Estou aqui para ajudar. Mais alguma dúvida? 📚", firstName),
+                        String.format("Disponha, %s! Precisa de ajuda com mais alguma coisa? 🎓", firstName),
+                        String.format("Fico feliz em ajudar, %s! Continue estudando! 💪", firstName),
+                        String.format("Imagina, %s! Vamos em frente! 🚀", firstName)
                 };
-                return thanksResponses[(int) (Math.random() * thanksResponses.length)];
-
+                return thanks[(int) (Math.random() * thanks.length)];
             case PRAISE:
-                String[] praiseResponses = {
-                        String.format("Obrigado, %s! Fico feliz que está gostando da ajuda. Vamos continuar? 😊", firstName),
-                        String.format("Que legal, %s! Seu esforço é o que mais importa. Posso ajudar em algo mais? 🌟", firstName),
-                        String.format("Valeu, %s! É muito bom ajudar quem está engajado. Tem mais alguma dúvida? 📖", firstName),
-                        String.format("Agradeço, %s! Vamos manter esse ritmo de estudos. Precisa de ajuda com mais alguma questão? 🎯", firstName)
+                String[] praise = {
+                        String.format("Obrigado, %s! Fico feliz que está gostando. Vamos continuar? 😊", firstName),
+                        String.format("Que legal, %s! Posso ajudar em algo mais? 🌟", firstName),
+                        String.format("Valeu, %s! Tem mais alguma dúvida? 📖", firstName),
                 };
-                return praiseResponses[(int) (Math.random() * praiseResponses.length)];
-
+                return praise[(int) (Math.random() * praise.length)];
             default:
-                return String.format("Olá %s! Como posso ajudar você hoje? 😊", firstName);
+                return String.format("Olá %s! Como posso ajudar? 😊", firstName);
         }
-    }
-
-    // =========================================================
-    // INTENT DETECTOR VIA IA
-    // =========================================================
-    private TutorIntent detectIntentWithAI(String message, Question question) {
-
-        // Handle empty message
-        if (message == null || message.trim().isEmpty()) {
-            return TutorIntent.UNCLEAR;
-        }
-
-        // Check for very short or gibberish messages
-        String trimmedMessage = message.trim();
-        if (trimmedMessage.length() < 3) {
-            return TutorIntent.UNCLEAR;
-        }
-
-        // Check for messages with too many special characters or gibberish
-        if (isGibberish(trimmedMessage)) {
-            return TutorIntent.UNCLEAR;
-        }
-
-        // Prepare a short version of the question (first 200 chars)
-        String questionShort = question.getText().length() > 200
-                ? question.getText().substring(0, 200) + "..."
-                : question.getText();
-
-        String subject = question.getTopic().getSubject().getName() != null ? question.getTopic().getSubject().getName() : "esta disciplina";
-
-        String classificationPrompt = String.format(
-                "Você é um classificador de intenções para um tutor educacional.\n" +
-                        "A questão atual é de %s.\n" +
-                        "Classifique a mensagem do aluno em uma das seguintes categorias:\n" +
-                        "\n" +
-                        "GREETING - o aluno cumprimenta (ex: \"oi\", \"olá\", \"bom dia\", \"boa tarde\", \"e aí\")\n" +
-                        "THANKS - o aluno agradece (ex: \"obrigado\", \"valeu\", \"agradeço\", \"muito obrigado\")\n" +
-                        "PRAISE - o aluno elogia o tutor (ex: \"você é ótimo\", \"bom tutor\", \"gostei da explicação\")\n" +
-                        "HINT - o aluno pede uma dica ou ajuda inicial (ex: \"me dá uma dica\", \"pode ajudar?\", \"como começo?\")\n" +
-                        "EXPLANATION - pede explicação de um conceito (ex: \"o que é verbo?\", \"explique a fotossíntese\", \"por que isso acontece?\")\n" +
-                        "STEP_BY_STEP - quer resolver passo a passo com o tutor (ex: \"vamos resolver juntos\", \"passo a passo\", \"me guia\")\n" +
-                        "VERIFY_REASONING - quer que o tutor verifique um raciocínio (ex: \"acho que é assim...\", \"meu raciocínio está certo?\", \"resolvi dessa forma\")\n" +
-                        "OUT_OF_SCOPE - pergunta totalmente fora do contexto da disciplina ou da questão (ex: \"qual a capital do Brasil?\", \"que horas são?\", \"como está o tempo?\")\n" +
-                        "UNCLEAR - mensagem confusa, incompreensível, ambígua ou sem sentido (ex: \"asdf\", \"???\", \"não sei o que\", \"ajuda\", apenas \"hmm\")\n" +
-                        "\n" +
-                        "Contexto da questão (apenas para referência): %s\n" +
-                        "\n" +
-                        "Mensagem do aluno: \"%s\"\n" +
-                        "\n" +
-                        "Retorne APENAS uma das palavras: GREETING, THANKS, PRAISE, HINT, EXPLANATION, STEP_BY_STEP, VERIFY_REASONING, OUT_OF_SCOPE, UNCLEAR.\n" +
-                        "Não adicione nenhuma outra explicação ou texto.",
-                subject,
-                questionShort,
-                message
-        );
-
-        try {
-            String aiResponse = gptService.askAssistant(classificationPrompt).trim().toUpperCase();
-
-            // Validate if the response is a valid enum value
-            for (TutorIntent intent : TutorIntent.values()) {
-                if (intent.name().equals(aiResponse)) {
-                    log.debug("Intenção classificada como: {}", intent);
-                    return intent;
-                }
-            }
-
-            // If response is not valid, fallback to EXPLANATION
-            log.warn("Resposta inesperada da IA na classificação: {}, usando fallback EXPLANATION", aiResponse);
-            return TutorIntent.EXPLANATION;
-
-        } catch (Exception e) {
-            log.error("Erro ao classificar intenção via IA", e);
-            // Fallback seguro em caso de erro
-            return TutorIntent.EXPLANATION;
-        }
-    }
-
-    // =========================================================
-    // HELPER: Check if message is gibberish
-    // =========================================================
-    private boolean isGibberish(String message) {
-        // Check if message has too many non-alphabetic characters
-        int letterCount = 0;
-        for (char c : message.toCharArray()) {
-            if (Character.isLetter(c)) {
-                letterCount++;
-            }
-        }
-
-        // If less than 30% are letters, likely gibberish
-        if (letterCount < message.length() * 0.3) {
-            return true;
-        }
-
-        // Check for common gibberish patterns
-        String lowerMsg = message.toLowerCase();
-        String[] gibberishPatterns = {
-                "asdf", "qwerty", "zxcv", "teste", "test", "123", "???", "!!!",
-                "kkk", "rsrs", "hmm", "hum", "ahn", "ehh", "uhh"
-        };
-
-        for (String pattern : gibberishPatterns) {
-            if (lowerMsg.equals(pattern) || lowerMsg.matches(".*\\b" + pattern + "\\b.*")) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     // =========================================================
@@ -354,93 +295,34 @@ public class TutorAiService {
             User user) {
 
         StringBuilder prompt = new StringBuilder();
-
-        String subject = question.getTopic().getSubject().getName() != null ? question.getTopic().getSubject().getName() : "esta disciplina";
+        String subject = question.getTopic().getSubject().getName();
         String firstName = getFirstName(user);
 
-        // ========================
-        // MISSÃO
-        // ========================
-        prompt.append("MISSÃO:\n");
         prompt.append("Você é o Tutor AI da plataforma Dikahub.\n");
-        prompt.append("Seu nome é Tutor AI e você está ajudando ").append(firstName).append(".\n");
-        prompt.append("Sua única função é ajudar o aluno a resolver esta questão de ").append(subject).append(".\n");
-        prompt.append("Não responda perguntas fora do contexto.\n\n");
+        prompt.append("Está ajudando ").append(firstName).append(" com uma questão de ").append(subject).append(".\n\n");
 
-        // ========================
-        // INFORMAÇÕES DO ALUNO
-        // ========================
-        prompt.append("INFORMAÇÕES DO ALUNO:\n");
-        prompt.append("Nome: ").append(firstName).append("\n");
-        if (user.getEmail() != null && !user.getEmail().isEmpty()) {
-            prompt.append("Email: ").append(user.getEmail()).append("\n");
-        }
-        prompt.append("Disciplina atual: ").append(subject).append("\n\n");
-
-        // ========================
-        // REGRAS
-        // ========================
         prompt.append("REGRAS:\n");
         prompt.append("- Seja pedagógico e acolhedor\n");
-        prompt.append("- Sempre que apropriado, use o nome do aluno (").append(firstName).append(") para tornar a conversa mais pessoal\n");
-        prompt.append("- Explique de forma simples e clara, adequada à disciplina de ").append(subject).append("\n");
-        prompt.append("- Não revele a resposta imediatamente\n");
-        prompt.append("- Incentive o raciocínio do aluno\n");
-        prompt.append("- Use exemplos relacionados à disciplina quando necessário\n");
-        prompt.append("- Use LaTeX apenas quando houver fórmulas matemáticas ou expressões científicas\n");
-        prompt.append("- Considere o histórico da conversa\n");
-        prompt.append("- Redirecione assuntos fora do contexto da disciplina educadamente\n");
-        prompt.append("- Seja paciente e encorajador\n");
-        prompt.append("- Elogie os acertos e esforços do aluno\n");
-        prompt.append("- Adapte sua linguagem para a disciplina: para exatas use termos técnicos, para humanas use contextualização histórica/social\n\n");
+        prompt.append("- Use o nome ").append(firstName).append(" na conversa\n");
+        prompt.append("- Não dê a resposta pronta\n");
+        prompt.append("- Estimule o raciocínio\n\n");
 
-        // ========================
-        // CONTEXTO INTELIGENTE
-        // ========================
-        prompt.append("TIPO DE AJUDA SOLICITADA:\n");
-
+        prompt.append("TIPO DE AJUDA:\n");
         switch (intent) {
             case HINT:
-                prompt.append("O aluno pediu uma DICA. Dê apenas uma dica curta e objetiva.\n");
-                prompt.append("Use o nome do aluno para tornar a dica mais pessoal.\n");
-                prompt.append("Exemplo: \"").append(firstName).append(", que tal começar observando...\"\n");
-                prompt.append("NÃO dê a resposta completa.\n\n");
+                prompt.append("Dê apenas uma dica curta.\n\n");
                 break;
-
             case STEP_BY_STEP:
-                prompt.append("O aluno quer resolver PASSO A PASSO com você.\n");
-                prompt.append("Guie o aluno passo a passo sem revelar tudo de uma vez.\n");
-                prompt.append("Use o nome do aluno e faça perguntas para estimular o raciocínio.\n");
-                prompt.append("Exemplo: \"").append(firstName).append(", vamos juntos? Primeiro, o que você entende deste problema?\"\n\n");
+                prompt.append("Guie o aluno passo a passo.\n\n");
                 break;
-
             case VERIFY_REASONING:
-                prompt.append("O aluno quer que você VERIFIQUE o raciocínio dele.\n");
-                prompt.append("Analise o raciocínio apresentado pelo aluno com cuidado.\n");
-                prompt.append("Use o nome do aluno ao responder.\n");
-                prompt.append("Se estiver correto, confirme e explique por quê: \"").append(firstName).append(", excelente raciocínio!\"\n");
-                prompt.append("Se estiver errado, mostre gentilmente onde está o erro: \"").append(firstName).append(", quase lá! Vamos revisar...\"\n");
-                prompt.append("Dê dicas para corrigir sem dar a resposta pronta.\n\n");
+                prompt.append("Analise o raciocínio do aluno.\n\n");
                 break;
-
-            case EXPLANATION:
-                prompt.append("O aluno pediu EXPLICAÇÃO de um conceito.\n");
-                prompt.append("Explique o conceito necessário de forma clara e didática, adequada à disciplina de ").append(subject).append(".\n");
-                prompt.append("Use o nome do aluno para engajar: \"").append(firstName).append(", este conceito funciona assim...\"\n");
-                prompt.append("Use exemplos relacionados à questão e à disciplina.\n\n");
-                break;
-
             default:
-                prompt.append("Explique o conceito necessário de forma pedagógica.\n");
-                prompt.append("Use o nome do aluno sempre que apropriado.\n\n");
+                prompt.append("Explique o conceito necessário.\n\n");
         }
 
-        // ========================
-        // QUESTÃO
-        // ========================
-        prompt.append("QUESTÃO (Disciplina: ").append(subject).append("):\n")
-                .append(question.getText())
-                .append("\n\n");
+        prompt.append("QUESTÃO:\n").append(question.getText()).append("\n\n");
 
         prompt.append("ALTERNATIVAS:\n");
         for (Answer answer : question.getAnswers()) {
@@ -448,92 +330,25 @@ public class TutorAiService {
         }
         prompt.append("\n");
 
-        // ========================
-        // EXPRESSÕES (se houver)
-        // ========================
-        if (question.getMathExpressions() != null && !question.getMathExpressions().isEmpty()) {
-            prompt.append("EXPRESSÕES/FÓRMULAS:\n");
-            for (MathExpression exp : question.getMathExpressions()) {
-                prompt.append("- ").append(exp.getExpression()).append("\n");
-            }
-            prompt.append("\n");
-        }
-
-        // ========================
-        // DICA FIXA (se disponível)
-        // ========================
-        if (question.getTip() != null && !question.getTip().isEmpty()) {
-            prompt.append("DICA DISPONÍVEL:\n").append(question.getTip()).append("\n\n");
-        }
-
-        // ========================
-        // HISTÓRICO DA CONVERSA
-        // ========================
-        if (!history.isEmpty()) {
-            prompt.append("HISTÓRICO DA CONVERSA:\n");
-            prompt.append("(Últimas ").append(history.size()).append(" mensagens)\n");
-
-            for (TutorMessage msg : history) {
-                String role = msg.getRole() == MessageRole.USER ? "ALUNO" : "TUTOR";
-                String content = msg.getContent();
-
-                // Truncate very long messages but keep context
-                if (content != null && content.length() > 300) {
-                    content = content.substring(0, 300) + "...";
-                }
-                prompt.append(role).append(": ").append(content).append("\n");
-            }
-            prompt.append("\n");
-        }
-
-        // ========================
-        // CONTEXTO DA RESPOSTA DO ALUNO
-        // ========================
-        if (selectedAnswer == null) {
-            prompt.append("CONTEXTO: AJUDA INICIAL\n");
-            prompt.append("O aluno ainda não respondeu à questão de ").append(subject).append(".\n");
-            prompt.append("Forneça orientação sem dar a resposta.\n");
-            prompt.append("Use o nome ").append(firstName).append(" para motivá-lo.\n\n");
-        } else {
-            prompt.append("CONTEXTO: CORREÇÃO DE RESPOSTA\n");
-            prompt.append("Resposta selecionada pelo aluno: ")
-                    .append(selectedAnswer.getText())
-                    .append("\n\n");
-
-            // Only show correct answer if the student explicitly wants verification
-            // This prevents accidentally revealing the answer
+        if (selectedAnswer != null) {
+            prompt.append("RESPOSTA DO ALUNO: ").append(selectedAnswer.getText()).append("\n\n");
             if (intent == TutorIntent.VERIFY_REASONING && correctAnswer != null) {
-                prompt.append("(Para referência do tutor - resposta correta: ")
-                        .append(correctAnswer.getText())
-                        .append(")\n");
-                prompt.append("Use esta informação APENAS para avaliar o raciocínio do aluno.\n");
-                prompt.append("NÃO revele esta resposta diretamente ao aluno.\n");
-                prompt.append("Ao responder, use o nome ").append(firstName).append(".\n\n");
-            } else if (correctAnswer != null && intent != TutorIntent.VERIFY_REASONING) {
-                prompt.append("Nota: O aluno ainda não pediu verificação formal.\n");
-                prompt.append("NÃO revele se a resposta está certa ou errada ainda.\n");
-                prompt.append("Ajude o aluno a chegar à conclusão por conta própria.\n");
-                prompt.append("Use o nome ").append(firstName).append(" para encorajá-lo.\n\n");
+                prompt.append("(Referência - resposta correta: ").append(correctAnswer.getText()).append(")\n");
+                prompt.append("NÃO revele esta resposta ao aluno.\n\n");
             }
         }
 
-        // ========================
-        // PERGUNTA DO ALUNO
-        // ========================
-        prompt.append("PERGUNTA DO ALUNO:\n")
-                .append(userMessage)
-                .append("\n\n");
+        if (!history.isEmpty()) {
+            prompt.append("HISTÓRICO:\n");
+            for (TutorMessage msg : history.subList(Math.max(0, history.size() - 6), history.size())) {
+                String role = msg.getRole() == MessageRole.USER ? firstName : "TUTOR";
+                prompt.append(role).append(": ").append(msg.getContent()).append("\n");
+            }
+            prompt.append("\n");
+        }
 
-        // ========================
-        // INSTRUÇÃO FINAL
-        // ========================
-        prompt.append("INSTRUÇÃO FINAL:\n");
-        prompt.append("Responda de acordo com o tipo de ajuda solicitado, seguindo todas as regras acima.\n");
-        prompt.append("Seja educado, paciente e didático.\n");
-        prompt.append("Use o nome do aluno (").append(firstName).append(") naturalmente na conversa.\n");
-        prompt.append("Mantenha um tom acolhedor e encorajador.\n");
-        prompt.append("Adapte sua resposta para a disciplina de ").append(subject).append(".\n");
-        prompt.append("Se for exatas, use linguagem técnica e precisa. Se for humanas, use contextualização e exemplos do dia a dia.\n");
+        prompt.append("PERGUNTA: ").append(userMessage).append("\n\n");
+        prompt.append("Responda de forma educada e didática, sempre estimulando o raciocínio do aluno.\n");
 
         return prompt.toString();
     }
@@ -542,14 +357,14 @@ public class TutorAiService {
     // INTENT ENUM
     // =========================================================
     public enum TutorIntent {
-        GREETING,       // Cumprimento ("oi", "olá", "bom dia")
-        THANKS,         // Agradecimento ("obrigado", "valeu")
-        PRAISE,         // Elogio ao tutor ("você é ótimo")
-        HINT,           // Apenas uma dica curta
-        EXPLANATION,    // Explicação de conceito
-        STEP_BY_STEP,   // Resolução guiada passo a passo
-        VERIFY_REASONING, // Verificar raciocínio do aluno
-        OUT_OF_SCOPE,   // Pergunta fora do contexto da disciplina
-        UNCLEAR         // Mensagem confusa, incompreensível ou ambígua
+        GREETING,
+        THANKS,
+        PRAISE,
+        HINT,
+        EXPLANATION,
+        STEP_BY_STEP,
+        VERIFY_REASONING,
+        OUT_OF_SCOPE,
+        UNCLEAR
     }
 }

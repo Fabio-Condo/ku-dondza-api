@@ -88,6 +88,34 @@ public class TutorAiService {
                 request.getUserId(), request.getQuestionId(), question.getTopic().getSubject().getName(), intent);
 
         // =====================================================
+        // UNCLEAR MESSAGE (mensagem confusa ou incompreensível)
+        // =====================================================
+        if (intent == TutorIntent.UNCLEAR) {
+            String response = buildUnclearResponse(getFirstName(user));
+
+            messageService.saveUserMessage(conversation, request.getMessage());
+            messageService.saveAssistantMessage(conversation, response);
+            conversation.setUpdatedAt(LocalDateTime.now());
+
+            log.info("Mensagem confusa detectada para usuário {}", request.getUserId());
+            return response;
+        }
+
+        // =====================================================
+        // SOCIAL INTERACTIONS (agradecimentos, cumprimentos, elogios)
+        // =====================================================
+        if (intent == TutorIntent.GREETING || intent == TutorIntent.THANKS || intent == TutorIntent.PRAISE) {
+            String response = buildSocialResponse(intent, getFirstName(user));
+
+            messageService.saveUserMessage(conversation, request.getMessage());
+            messageService.saveAssistantMessage(conversation, response);
+            conversation.setUpdatedAt(LocalDateTime.now());
+
+            log.info("Resposta social para usuário {}: {}", request.getUserId(), intent);
+            return response;
+        }
+
+        // =====================================================
         // OUT OF SCOPE (bloqueio inteligente)
         // =====================================================
         if (intent == TutorIntent.OUT_OF_SCOPE) {
@@ -159,13 +187,70 @@ public class TutorAiService {
     }
 
     // =========================================================
+    // UNCLEAR RESPONSE BUILDER
+    // =========================================================
+    private String buildUnclearResponse(String firstName) {
+        String[] unclearResponses = {
+                String.format("Desculpe, %s, não consegui entender muito bem sua pergunta. Pode reformular ou dar mais detalhes? 🤔", firstName),
+                String.format("Oi %s, sua mensagem ficou um pouco confusa para mim. Você poderia explicar de outra forma? Vou adorar ajudar! 😊", firstName),
+                String.format("Não entendi completamente, %s. Você poderia ser mais específico sobre sua dúvida? 📝", firstName),
+                String.format("Hmm, %s, não ficou claro o que você precisa. Pode me dizer com mais detalhes qual é sua dificuldade? 🎓", firstName),
+                String.format("Peço desculpas, %s, mas não consegui compreender sua pergunta. Poderia reformular, por favor? Vamos resolver isso juntos! 💪", firstName),
+                String.format("Olá %s, sua mensagem está um pouco ambígua. Pode me explicar melhor qual é sua dúvida em relação a esta questão? 📚", firstName)
+        };
+        return unclearResponses[(int) (Math.random() * unclearResponses.length)];
+    }
+
+    // =========================================================
+    // SOCIAL RESPONSE BUILDER
+    // =========================================================
+    private String buildSocialResponse(TutorIntent intent, String firstName) {
+        switch (intent) {
+            case GREETING:
+                return String.format("Olá %s! Como posso ajudar você com os estudos hoje? 😊", firstName);
+
+            case THANKS:
+                String[] thanksResponses = {
+                        String.format("Por nada, %s! Estou aqui para ajudar. Tem mais alguma dúvida? 📚", firstName),
+                        String.format("Disponha, %s! Que bom que pude ajudar. Precisa de mais alguma coisa? 🎓", firstName),
+                        String.format("Fico feliz em ajudar, %s! Continue com os estudos. Mais alguma questão? 💪", firstName),
+                        String.format("Imagina, %s! Para isso que estou aqui. Vamos em frente! 🚀", firstName)
+                };
+                return thanksResponses[(int) (Math.random() * thanksResponses.length)];
+
+            case PRAISE:
+                String[] praiseResponses = {
+                        String.format("Obrigado, %s! Fico feliz que está gostando da ajuda. Vamos continuar? 😊", firstName),
+                        String.format("Que legal, %s! Seu esforço é o que mais importa. Posso ajudar em algo mais? 🌟", firstName),
+                        String.format("Valeu, %s! É muito bom ajudar quem está engajado. Tem mais alguma dúvida? 📖", firstName),
+                        String.format("Agradeço, %s! Vamos manter esse ritmo de estudos. Precisa de ajuda com mais alguma questão? 🎯", firstName)
+                };
+                return praiseResponses[(int) (Math.random() * praiseResponses.length)];
+
+            default:
+                return String.format("Olá %s! Como posso ajudar você hoje? 😊", firstName);
+        }
+    }
+
+    // =========================================================
     // INTENT DETECTOR VIA IA
     // =========================================================
     private TutorIntent detectIntentWithAI(String message, Question question) {
 
         // Handle empty message
         if (message == null || message.trim().isEmpty()) {
-            return TutorIntent.HINT;
+            return TutorIntent.UNCLEAR;
+        }
+
+        // Check for very short or gibberish messages
+        String trimmedMessage = message.trim();
+        if (trimmedMessage.length() < 3) {
+            return TutorIntent.UNCLEAR;
+        }
+
+        // Check for messages with too many special characters or gibberish
+        if (isGibberish(trimmedMessage)) {
+            return TutorIntent.UNCLEAR;
         }
 
         // Prepare a short version of the question (first 200 chars)
@@ -180,17 +265,21 @@ public class TutorAiService {
                         "A questão atual é de %s.\n" +
                         "Classifique a mensagem do aluno em uma das seguintes categorias:\n" +
                         "\n" +
+                        "GREETING - o aluno cumprimenta (ex: \"oi\", \"olá\", \"bom dia\", \"boa tarde\", \"e aí\")\n" +
+                        "THANKS - o aluno agradece (ex: \"obrigado\", \"valeu\", \"agradeço\", \"muito obrigado\")\n" +
+                        "PRAISE - o aluno elogia o tutor (ex: \"você é ótimo\", \"bom tutor\", \"gostei da explicação\")\n" +
                         "HINT - o aluno pede uma dica ou ajuda inicial (ex: \"me dá uma dica\", \"pode ajudar?\", \"como começo?\")\n" +
                         "EXPLANATION - pede explicação de um conceito (ex: \"o que é verbo?\", \"explique a fotossíntese\", \"por que isso acontece?\")\n" +
                         "STEP_BY_STEP - quer resolver passo a passo com o tutor (ex: \"vamos resolver juntos\", \"passo a passo\", \"me guia\")\n" +
                         "VERIFY_REASONING - quer que o tutor verifique um raciocínio (ex: \"acho que é assim...\", \"meu raciocínio está certo?\", \"resolvi dessa forma\")\n" +
                         "OUT_OF_SCOPE - pergunta totalmente fora do contexto da disciplina ou da questão (ex: \"qual a capital do Brasil?\", \"que horas são?\", \"como está o tempo?\")\n" +
+                        "UNCLEAR - mensagem confusa, incompreensível, ambígua ou sem sentido (ex: \"asdf\", \"???\", \"não sei o que\", \"ajuda\", apenas \"hmm\")\n" +
                         "\n" +
                         "Contexto da questão (apenas para referência): %s\n" +
                         "\n" +
                         "Mensagem do aluno: \"%s\"\n" +
                         "\n" +
-                        "Retorne APENAS uma das palavras: HINT, EXPLANATION, STEP_BY_STEP, VERIFY_REASONING, OUT_OF_SCOPE.\n" +
+                        "Retorne APENAS uma das palavras: GREETING, THANKS, PRAISE, HINT, EXPLANATION, STEP_BY_STEP, VERIFY_REASONING, OUT_OF_SCOPE, UNCLEAR.\n" +
                         "Não adicione nenhuma outra explicação ou texto.",
                 subject,
                 questionShort,
@@ -217,6 +306,39 @@ public class TutorAiService {
             // Fallback seguro em caso de erro
             return TutorIntent.EXPLANATION;
         }
+    }
+
+    // =========================================================
+    // HELPER: Check if message is gibberish
+    // =========================================================
+    private boolean isGibberish(String message) {
+        // Check if message has too many non-alphabetic characters
+        int letterCount = 0;
+        for (char c : message.toCharArray()) {
+            if (Character.isLetter(c)) {
+                letterCount++;
+            }
+        }
+
+        // If less than 30% are letters, likely gibberish
+        if (letterCount < message.length() * 0.3) {
+            return true;
+        }
+
+        // Check for common gibberish patterns
+        String lowerMsg = message.toLowerCase();
+        String[] gibberishPatterns = {
+                "asdf", "qwerty", "zxcv", "teste", "test", "123", "???", "!!!",
+                "kkk", "rsrs", "hmm", "hum", "ahn", "ehh", "uhh"
+        };
+
+        for (String pattern : gibberishPatterns) {
+            if (lowerMsg.equals(pattern) || lowerMsg.matches(".*\\b" + pattern + "\\b.*")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // =========================================================
@@ -420,10 +542,14 @@ public class TutorAiService {
     // INTENT ENUM
     // =========================================================
     public enum TutorIntent {
+        GREETING,       // Cumprimento ("oi", "olá", "bom dia")
+        THANKS,         // Agradecimento ("obrigado", "valeu")
+        PRAISE,         // Elogio ao tutor ("você é ótimo")
         HINT,           // Apenas uma dica curta
         EXPLANATION,    // Explicação de conceito
         STEP_BY_STEP,   // Resolução guiada passo a passo
         VERIFY_REASONING, // Verificar raciocínio do aluno
-        OUT_OF_SCOPE    // Pergunta fora do contexto da disciplina
+        OUT_OF_SCOPE,   // Pergunta fora do contexto da disciplina
+        UNCLEAR         // Mensagem confusa, incompreensível ou ambígua
     }
 }

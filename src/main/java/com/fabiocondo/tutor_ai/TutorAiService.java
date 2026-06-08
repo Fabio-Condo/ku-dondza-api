@@ -1,6 +1,7 @@
 package com.fabiocondo.tutor_ai;
 
 import com.fabiocondo.domain.Answer;
+import com.fabiocondo.domain.MathExpression;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
@@ -421,6 +422,9 @@ public class TutorAiService {
     // =========================================================
     // PROMPT BUILDER (com regras de formatação para tabelas e divisão sintética)
     // =========================================================
+    // =========================================================
+// PROMPT BUILDER (com regras para não mostrar expressões matemáticas)
+// =========================================================
     private String buildPrompt(
             Question question,
             Answer selectedAnswer,
@@ -434,6 +438,9 @@ public class TutorAiService {
         StringBuilder prompt = new StringBuilder();
         String firstName = getFirstName(user);
 
+        // Verificar se a questão tem expressões matemáticas (que são usadas para gerar gráficos)
+        boolean hasMathExpressions = question.getMathExpressions() != null && !question.getMathExpressions().isEmpty();
+
         prompt.append("Você é o Tutor AI da plataforma Dikahub.\n");
         prompt.append("Está ajudando ").append(firstName).append(" com uma questão sobre **").append(topicName).append("**.\n\n");
 
@@ -442,6 +449,22 @@ public class TutorAiService {
         prompt.append("- Use o nome ").append(firstName).append(" na conversa\n");
         prompt.append("- Não dê a resposta pronta, estimule o raciocínio\n");
         prompt.append("- Se o aluno perguntar algo fora do tópico, redirecione educadamente\n\n");
+
+        // =====================================================
+        // REGRAS ESPECÍFICAS PARA QUESTÕES COM GRÁFICOS
+        // =====================================================
+        if (hasMathExpressions) {
+            prompt.append("⚠️ REGRAS ESPECIAIS PARA ESTA QUESTÃO (GRÁFICOS):\n");
+            prompt.append("- Esta questão contém **GRÁFICOS** que o aluno pode visualizar na tela\n");
+            prompt.append("- As expressões matemáticas são usadas APENAS para gerar os gráficos\n");
+            prompt.append("- O aluno NÃO vê as expressões matemáticas, apenas os gráficos\n");
+            prompt.append("- Você NUNCA deve mencionar, citar ou revelar as expressões matemáticas\n");
+            prompt.append("- Sua análise deve ser baseada EXCLUSIVAMENTE na interpretação visual dos gráficos\n");
+            prompt.append("- Fale sobre: formato da curva, pontos de intersecção, tendências, máximos/mínimos, etc.\n");
+            prompt.append("- Exemplo do que NÃO fazer: \"A função f(x) = x² + 2x - 3 tem raízes...\"\n");
+            prompt.append("- Exemplo do que FAZER: \"Observando o gráfico, a curva toca o eixo x em dois pontos...\"\n");
+            prompt.append("- Incentive o aluno a descrever o que ele enxerga no gráfico\n\n");
+        }
 
         prompt.append("REGRAS DE FORMATAÇÃO (IMPORTANTE):\n");
         prompt.append("- Use **negrito** para destacar conceitos importantes\n");
@@ -515,11 +538,18 @@ public class TutorAiService {
         switch (intent) {
             case HINT:
                 prompt.append("Dê apenas uma dica curta e objetiva.\n");
+                if (hasMathExpressions) {
+                    prompt.append("Baseie a dica na análise visual do gráfico.\n");
+                }
                 prompt.append("Use formatação simples, sem tabelas ou listas longas.\n\n");
                 break;
             case STEP_BY_STEP:
                 prompt.append("Guie o aluno passo a passo.\n");
                 prompt.append("Use lista numerada para cada passo.\n");
+                if (hasMathExpressions) {
+                    prompt.append("Cada passo deve ser baseado na observação do gráfico.\n");
+                    prompt.append("Peça ao aluno para descrever o que ele vê no gráfico a cada etapa.\n");
+                }
                 prompt.append("Para exercícios matemáticos que envolvem polinômios, considere usar o formato de divisão sintética.\n");
                 prompt.append("Exemplo de formato:\n");
                 prompt.append("  1. Primeiro, vamos identificar...\n");
@@ -529,10 +559,16 @@ public class TutorAiService {
             case VERIFY_REASONING:
                 prompt.append("Analise o raciocínio do aluno.\n");
                 prompt.append("Use formato de diálogo, citando o raciocínio do aluno entre aspas.\n");
+                if (hasMathExpressions) {
+                    prompt.append("Se o aluno mencionar expressões matemáticas, redirecione para a análise do gráfico.\n");
+                }
                 prompt.append("Se houver erro, explique usando marcadores ou lista numerada.\n\n");
                 break;
             default:
                 prompt.append("Explique o conceito necessário de forma clara.\n");
+                if (hasMathExpressions) {
+                    prompt.append("Use exemplos baseados na interpretação de gráficos.\n");
+                }
                 prompt.append("Use títulos e sub-títulos quando apropriado (### para seções).\n\n");
         }
 
@@ -544,6 +580,30 @@ public class TutorAiService {
             prompt.append("- ").append(answer.getText()).append("\n");
         }
         prompt.append("\n");
+
+        // =====================================================
+        // NÃO MOSTRAR AS EXPRESSÕES MATEMÁTICAS NO PROMPT
+        // Elas são usadas apenas para gerar gráficos, mas o tutor não deve vê-las
+        // =====================================================
+        if (hasMathExpressions) {
+            prompt.append("⚠️ IMPORTANTE: Esta questão contém gráficos gerados a partir de expressões matemáticas.\n");
+            prompt.append("O aluno NÃO tem acesso às expressões, apenas aos gráficos.\n");
+            prompt.append("Você NUNCA deve mencionar as expressões em suas respostas.\n");
+            prompt.append("Baseie sua análise APENAS na interpretação visual do gráfico.\n\n");
+
+            // Opcional: mostrar apenas os tipos de gráficos (não as expressões)
+            prompt.append("TIPOS DE GRÁFICOS DISPONÍVEIS PARA O ALUNO:\n");
+            for (MathExpression exp : question.getMathExpressions()) {
+                String expr = exp.getExpression();
+                // Não mostrar a expressão completa, apenas o tipo
+                if (expr.contains("=") || expr.contains("x") || expr.contains("y")) {
+                    prompt.append("- Gráfico de função (curva no plano cartesiano)\n");
+                } else {
+                    prompt.append("- Gráfico de ").append(expr.substring(0, Math.min(30, expr.length()))).append("\n");
+                }
+            }
+            prompt.append("(O aluno vê esses gráficos visualmente, não as expressões)\n\n");
+        }
 
         if (selectedAnswer != null) {
             prompt.append("RESPOSTA DO ALUNO: ").append(selectedAnswer.getText()).append("\n\n");
@@ -573,8 +633,16 @@ public class TutorAiService {
         prompt.append("2. Use o formato LaTeX com array para TODAS as tabelas\n");
         prompt.append("3. Para divisão sintética (Ruffini), use o formato mostrado com array r|rrrr\n");
         prompt.append("4. Sempre inclua \\hline para linhas horizontais nas tabelas\n");
-        prompt.append("5. Mantenha o foco no tópico: **").append(topicName).append("**\n");
-        prompt.append("6. Revise a formatação antes de enviar a resposta\n");
+
+        if (hasMathExpressions) {
+            prompt.append("5. NUNCA mencione expressões matemáticas - fale apenas sobre os GRÁFICOS\n");
+            prompt.append("6. O aluno só vê os gráficos, não as funções que os geraram\n");
+            prompt.append("7. Mantenha o foco no tópico: **").append(topicName).append("**\n");
+            prompt.append("8. Revise a formatação antes de enviar a resposta\n");
+        } else {
+            prompt.append("5. Mantenha o foco no tópico: **").append(topicName).append("**\n");
+            prompt.append("6. Revise a formatação antes de enviar a resposta\n");
+        }
 
         return prompt.toString();
     }

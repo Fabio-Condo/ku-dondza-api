@@ -137,6 +137,12 @@ public class TutorAiService {
         // Usar texto normalizado para as comparações
         String msg = normalizeText(rawMsg);
 
+        // Acknowledgment (confirmações simples)
+        if (msg.matches("^(ok|esta bem|ta bem|tá bem|entendi|compreendi|percebi|sei|aham|hum|sim|claro|certo|certo|beleza|show|perfeito|excelente|maravilha|blz|boto|saquei|entendido).*") ||
+                containsWord(rawMsg, "esta bem", "tá bem", "ta bem", "tah bem", "ok", "blz", "beleza")) {
+            return TutorIntent.ACKNOWLEDGMENT;
+        }
+
         // How is the tutor? (perguntas sobre o estado do tutor - com variações)
         if (msg.matches(".*(como (esta|vc esta|voce esta|ta)|tudo bem|beleza|como vai|como anda|como estao as coisas|como funciona|como voce esta).*") ||
                 containsWord(rawMsg, "como está", "como esta", "como voce esta", "como você está", "tudo bem", "beleza")) {
@@ -150,7 +156,7 @@ public class TutorAiService {
         }
 
         // Thanks (com variações)
-        if (containsWord(rawMsg, "obrigado", "obrigada", "valeu", "agradeço", "muito obrigado", "brigado", "brigada", "vlw", "obg", "obgd")) {
+        if (containsWord(rawMsg, "thanks", "tks", "obrigado", "obrigada", "valeu", "agradeço", "muito obrigado", "brigado", "brigada", "vlw", "obg", "obgd")) {
             return TutorIntent.THANKS;
         }
 
@@ -224,6 +230,18 @@ public class TutorAiService {
             messageService.saveUserMessage(conversation, request.getMessage());
             messageService.saveAssistantMessage(conversation, response);
             conversation.setUpdatedAt(LocalDateTime.now());
+            return response;
+        }
+
+        // =====================================================
+        // ACKNOWLEDGMENT (confirmações simples como "ok", "entendi")
+        // =====================================================
+        if (intent == TutorIntent.ACKNOWLEDGMENT) {
+            String response = buildAcknowledgmentResponse(getFirstName(user), topicName);
+            messageService.saveUserMessage(conversation, request.getMessage());
+            messageService.saveAssistantMessage(conversation, response);
+            conversation.setUpdatedAt(LocalDateTime.now());
+            log.info("Acknowledgment para usuário {}", request.getUserId());
             return response;
         }
 
@@ -311,6 +329,20 @@ public class TutorAiService {
         conversation.setUpdatedAt(LocalDateTime.now());
 
         return aiResponse;
+    }
+
+    // =========================================================
+    // ACKNOWLEDGMENT RESPONSE BUILDER
+    // =========================================================
+    private String buildAcknowledgmentResponse(String firstName, String topicName) {
+        String[] responses = {
+                String.format("Que bom, %s! Continue assim. Tem mais alguma dúvida sobre **%s**? 😊", firstName, topicName),
+                String.format("Ótimo! Estou aqui para ajudar com **%s**. Qual o próximo passo? 📚", firstName, topicName),
+                String.format("Fico feliz que entendeu, %s! Precisando, estou aqui para ajudar com **%s**. 🎯", firstName, topicName),
+                String.format("Perfeito! Vamos continuar então. Alguma outra dúvida sobre **%s**? 💪", firstName, topicName),
+                String.format("Bom saber, %s! Se precisar de mais ajuda com **%s**, é só chamar. 🚀", firstName, topicName)
+        };
+        return responses[(int) (Math.random() * responses.length)];
     }
 
     // =========================================================
@@ -467,6 +499,7 @@ public class TutorAiService {
         HOW_ARE_YOU,
         THANKS,
         PRAISE,
+        ACKNOWLEDGMENT,
         HINT,
         EXPLANATION,
         STEP_BY_STEP,

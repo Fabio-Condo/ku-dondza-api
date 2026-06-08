@@ -175,7 +175,7 @@ public class TutorAiService {
         }
 
         // Out of scope (palavras comuns fora do contexto educacional)
-        if (containsWord(rawMsg, "clima", "tempo", "futebol", "notícias", "noticias", "política", "politica", "preço", "preco", "dinheiro", "comprar", "vender")) {
+        if (containsWord(rawMsg, "clima", "tempo", "futebol", "notícias", "noticias", "política", "politica", "preço", "preco", "dinheiro", "comprar", "vender", "filme", "serie", "música", "musica", "jogo", "viagem", "fim de semana", "feriado")) {
             // Verifica se também não tem palavras do contexto educacional
             if (!containsWord(rawMsg, "questão", "questao", "exercício", "exercicio", "prova", "estudo", "matéria", "materia", "aula", "conteúdo", "conteudo")) {
                 return TutorIntent.OUT_OF_SCOPE;
@@ -252,17 +252,14 @@ public class TutorAiService {
         }
 
         // =====================================================
-        // OUT OF SCOPE (resposta rápida, sem GPT)
+        // OUT OF SCOPE (resposta rápida e amigável, sem GPT)
         // =====================================================
         if (intent == TutorIntent.OUT_OF_SCOPE) {
-            String response = String.format(
-                    "Olá %s! Posso ajudar apenas com dúvidas relacionadas a **%s**. Vamos focar neste tópico? 😊",
-                    getFirstName(user),
-                    topicName
-            );
+            String response = buildOutOfScopeResponse(getFirstName(user), topicName);
             messageService.saveUserMessage(conversation, request.getMessage());
             messageService.saveAssistantMessage(conversation, response);
             conversation.setUpdatedAt(LocalDateTime.now());
+            log.info("Out of scope detectado para usuário {}", request.getUserId());
             return response;
         }
 
@@ -314,6 +311,20 @@ public class TutorAiService {
         conversation.setUpdatedAt(LocalDateTime.now());
 
         return aiResponse;
+    }
+
+    // =========================================================
+    // OUT OF SCOPE RESPONSE BUILDER
+    // =========================================================
+    private String buildOutOfScopeResponse(String firstName, String topicName) {
+        String[] responses = {
+                String.format("Olá %s! Posso ajudar apenas com dúvidas relacionadas a **%s**. Vamos focar neste tópico? 😊", firstName, topicName),
+                String.format("%s, minha especialidade é ajudar com **%s**. Que tal voltarmos para a questão? 📚", firstName, topicName),
+                String.format("Entendo sua curiosidade, %s, mas sou especializado em **%s**. Posso ajudar com isso? 🎯", firstName, topicName),
+                String.format("Essa é uma pergunta interessante, %s! Porém, meu foco é auxiliar em **%s**. Vamos continuar com a questão? 💪", firstName, topicName),
+                String.format("Sinto muito, %s, mas só posso ajudar com **%s**. Tem alguma dúvida sobre este tópico? 🤔", firstName, topicName)
+        };
+        return responses[(int) (Math.random() * responses.length)];
     }
 
     // =========================================================
@@ -398,7 +409,8 @@ public class TutorAiService {
         prompt.append("- Seja pedagógico e acolhedor\n");
         prompt.append("- Use o nome ").append(firstName).append(" na conversa\n");
         prompt.append("- Não dê a resposta pronta\n");
-        prompt.append("- Estimule o raciocínio\n\n");
+        prompt.append("- Estimule o raciocínio\n");
+        prompt.append("- Se o aluno perguntar algo fora do tópico, redirecione educadamente de volta para **").append(topicName).append("**\n\n");
 
         prompt.append("TIPO DE AJUDA:\n");
         switch (intent) {

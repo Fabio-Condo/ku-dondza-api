@@ -48,6 +48,18 @@ public class TutorAiService {
     }
 
     // =========================================================
+    // HELPER: Get first name
+    // =========================================================
+    private String getFirstName(User user) {
+        if (user.getFullName() == null || user.getFullName().trim().isEmpty()) {
+            return "aluno";
+        }
+        String fullName = user.getFullName().trim();
+        int spaceIndex = fullName.indexOf(' ');
+        return spaceIndex > 0 ? fullName.substring(0, spaceIndex) : fullName;
+    }
+
+    // =========================================================
     // MAIN METHOD
     // =========================================================
     @Transactional
@@ -83,7 +95,7 @@ public class TutorAiService {
             String response = String.format(
                     "Olá %s! Posso ajudar apenas com dúvidas relacionadas a esta questão de %s ou aos conceitos envolvidos. " +
                             "Vamos focar no assunto? 😊",
-                    user.getFullName(),
+                    getFirstName(user),
                     question.getTopic().getSubject().getName() != null ? question.getTopic().getSubject().getName() : "esta disciplina"
             );
 
@@ -222,13 +234,14 @@ public class TutorAiService {
         StringBuilder prompt = new StringBuilder();
 
         String subject = question.getTopic().getSubject().getName() != null ? question.getTopic().getSubject().getName() : "esta disciplina";
+        String firstName = getFirstName(user);
 
         // ========================
         // MISSÃO
         // ========================
         prompt.append("MISSÃO:\n");
         prompt.append("Você é o Tutor AI da plataforma Dikahub.\n");
-        prompt.append("Seu nome é Tutor AI e você está ajudando ").append(user.getFullName()).append(".\n");
+        prompt.append("Seu nome é Tutor AI e você está ajudando ").append(firstName).append(".\n");
         prompt.append("Sua única função é ajudar o aluno a resolver esta questão de ").append(subject).append(".\n");
         prompt.append("Não responda perguntas fora do contexto.\n\n");
 
@@ -236,7 +249,7 @@ public class TutorAiService {
         // INFORMAÇÕES DO ALUNO
         // ========================
         prompt.append("INFORMAÇÕES DO ALUNO:\n");
-        prompt.append("Nome: ").append(user.getFullName()).append("\n");
+        prompt.append("Nome: ").append(firstName).append("\n");
         if (user.getEmail() != null && !user.getEmail().isEmpty()) {
             prompt.append("Email: ").append(user.getEmail()).append("\n");
         }
@@ -247,7 +260,7 @@ public class TutorAiService {
         // ========================
         prompt.append("REGRAS:\n");
         prompt.append("- Seja pedagógico e acolhedor\n");
-        prompt.append("- Sempre que apropriado, use o nome do aluno para tornar a conversa mais pessoal\n");
+        prompt.append("- Sempre que apropriado, use o nome do aluno (").append(firstName).append(") para tornar a conversa mais pessoal\n");
         prompt.append("- Explique de forma simples e clara, adequada à disciplina de ").append(subject).append("\n");
         prompt.append("- Não revele a resposta imediatamente\n");
         prompt.append("- Incentive o raciocínio do aluno\n");
@@ -268,7 +281,7 @@ public class TutorAiService {
             case HINT:
                 prompt.append("O aluno pediu uma DICA. Dê apenas uma dica curta e objetiva.\n");
                 prompt.append("Use o nome do aluno para tornar a dica mais pessoal.\n");
-                prompt.append("Exemplo: \"").append(user.getFullName()).append(", que tal começar observando...\"\n");
+                prompt.append("Exemplo: \"").append(firstName).append(", que tal começar observando...\"\n");
                 prompt.append("NÃO dê a resposta completa.\n\n");
                 break;
 
@@ -276,22 +289,22 @@ public class TutorAiService {
                 prompt.append("O aluno quer resolver PASSO A PASSO com você.\n");
                 prompt.append("Guie o aluno passo a passo sem revelar tudo de uma vez.\n");
                 prompt.append("Use o nome do aluno e faça perguntas para estimular o raciocínio.\n");
-                prompt.append("Exemplo: \"").append(user.getFullName()).append(", vamos juntos? Primeiro, o que você entende deste problema?\"\n\n");
+                prompt.append("Exemplo: \"").append(firstName).append(", vamos juntos? Primeiro, o que você entende deste problema?\"\n\n");
                 break;
 
             case VERIFY_REASONING:
                 prompt.append("O aluno quer que você VERIFIQUE o raciocínio dele.\n");
                 prompt.append("Analise o raciocínio apresentado pelo aluno com cuidado.\n");
                 prompt.append("Use o nome do aluno ao responder.\n");
-                prompt.append("Se estiver correto, confirme e explique por quê: \"").append(user.getFullName()).append(", excelente raciocínio!\"\n");
-                prompt.append("Se estiver errado, mostre gentilmente onde está o erro: \"").append(user.getFullName()).append(", quase lá! Vamos revisar...\"\n");
+                prompt.append("Se estiver correto, confirme e explique por quê: \"").append(firstName).append(", excelente raciocínio!\"\n");
+                prompt.append("Se estiver errado, mostre gentilmente onde está o erro: \"").append(firstName).append(", quase lá! Vamos revisar...\"\n");
                 prompt.append("Dê dicas para corrigir sem dar a resposta pronta.\n\n");
                 break;
 
             case EXPLANATION:
                 prompt.append("O aluno pediu EXPLICAÇÃO de um conceito.\n");
                 prompt.append("Explique o conceito necessário de forma clara e didática, adequada à disciplina de ").append(subject).append(".\n");
-                prompt.append("Use o nome do aluno para engajar: \"").append(user.getFullName()).append(", este conceito funciona assim...\"\n");
+                prompt.append("Use o nome do aluno para engajar: \"").append(firstName).append(", este conceito funciona assim...\"\n");
                 prompt.append("Use exemplos relacionados à questão e à disciplina.\n\n");
                 break;
 
@@ -358,7 +371,7 @@ public class TutorAiService {
             prompt.append("CONTEXTO: AJUDA INICIAL\n");
             prompt.append("O aluno ainda não respondeu à questão de ").append(subject).append(".\n");
             prompt.append("Forneça orientação sem dar a resposta.\n");
-            prompt.append("Use o nome ").append(user.getFullName()).append(" para motivá-lo.\n\n");
+            prompt.append("Use o nome ").append(firstName).append(" para motivá-lo.\n\n");
         } else {
             prompt.append("CONTEXTO: CORREÇÃO DE RESPOSTA\n");
             prompt.append("Resposta selecionada pelo aluno: ")
@@ -373,12 +386,12 @@ public class TutorAiService {
                         .append(")\n");
                 prompt.append("Use esta informação APENAS para avaliar o raciocínio do aluno.\n");
                 prompt.append("NÃO revele esta resposta diretamente ao aluno.\n");
-                prompt.append("Ao responder, use o nome ").append(user.getFullName()).append(".\n\n");
+                prompt.append("Ao responder, use o nome ").append(firstName).append(".\n\n");
             } else if (correctAnswer != null && intent != TutorIntent.VERIFY_REASONING) {
                 prompt.append("Nota: O aluno ainda não pediu verificação formal.\n");
                 prompt.append("NÃO revele se a resposta está certa ou errada ainda.\n");
                 prompt.append("Ajude o aluno a chegar à conclusão por conta própria.\n");
-                prompt.append("Use o nome ").append(user.getFullName()).append(" para encorajá-lo.\n\n");
+                prompt.append("Use o nome ").append(firstName).append(" para encorajá-lo.\n\n");
             }
         }
 
@@ -395,7 +408,7 @@ public class TutorAiService {
         prompt.append("INSTRUÇÃO FINAL:\n");
         prompt.append("Responda de acordo com o tipo de ajuda solicitado, seguindo todas as regras acima.\n");
         prompt.append("Seja educado, paciente e didático.\n");
-        prompt.append("Use o nome do aluno (").append(user.getFullName()).append(") naturalmente na conversa.\n");
+        prompt.append("Use o nome do aluno (").append(firstName).append(") naturalmente na conversa.\n");
         prompt.append("Mantenha um tom acolhedor e encorajador.\n");
         prompt.append("Adapte sua resposta para a disciplina de ").append(subject).append(".\n");
         prompt.append("Se for exatas, use linguagem técnica e precisa. Se for humanas, use contextualização e exemplos do dia a dia.\n");

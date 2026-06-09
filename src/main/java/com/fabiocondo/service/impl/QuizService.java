@@ -56,7 +56,7 @@ public class QuizService {
 
     // Método modificado para usar JOIN FETCH e ser cache-safe
     @Cacheable(
-            value = CacheNames.QUIZ_DETAILS,
+            value = CacheNames.QUIZ_DETAIL,
             key = "#quizId + '-' + #currentUserId"
     )
     public QuizDTO getQuizWithDetails(String quizId, Long currentUserId) throws QuizNotFoundException {
@@ -104,7 +104,7 @@ public class QuizService {
     @CacheEvict(
             value = {
                     CacheNames.QUIZ_FILTER,
-                    CacheNames.QUIZ_DETAILS
+                    CacheNames.QUIZ_DETAIL
             },
             allEntries = true
     )

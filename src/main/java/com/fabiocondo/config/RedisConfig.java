@@ -79,7 +79,7 @@ public class RedisConfig {
         // QUIZZES
         cacheConfigs.put(CacheNames.QUIZ_FILTER,
                 base.entryTtl(Duration.ofDays(7)));
-        cacheConfigs.put(CacheNames.QUIZ_DETAILS,
+        cacheConfigs.put(CacheNames.QUIZ_DETAIL,
                 base.entryTtl(Duration.ofDays(7)));
 
         // QUESTIONS

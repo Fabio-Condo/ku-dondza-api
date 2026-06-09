@@ -265,6 +265,15 @@ public class UserController {
         return ResponseEntity.ok(userDTO);
     }
 
+    @CacheEvict(
+            value = {
+                    CacheNames.QUESTION_FILTER,
+                    CacheNames.QUESTION_DETAIL,
+                    CacheNames.QUIZ_FILTER,
+                    CacheNames.QUIZ_DETAIL,
+            },
+            allEntries = true
+    )
     @PutMapping("/{userId}/saved-questions/{questionId}/toggle")
     public ResponseEntity<Question> toggleSaveQuestion(@PathVariable Long userId, @PathVariable Long questionId) throws QuestionNotFoundException {
         return ResponseEntity.status(OK).body(userService.toggleSaveQuestion(userId, questionId));

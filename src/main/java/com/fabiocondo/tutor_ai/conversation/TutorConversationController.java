@@ -25,14 +25,25 @@ public class TutorConversationController {
         return ResponseEntity.ok(conversationService.findByUser(userId, pageable));
     }
 
-    @GetMapping("/{id}/messages")
-    public Page<TutorMessageResponse> getConversationsMessages(
+    @GetMapping("/{id}/messages/question")
+    public Page<TutorMessageResponse> getQuestionConversationsMessages(
             @RequestParam Long userId,
             @RequestParam Long questionId,
             Pageable pageable) {
 
         return conversationService
                 .findMessagesByUserAndQuestion(userId, questionId, pageable)
+                .map(this::toResponse);
+    }
+
+    @GetMapping("/{id}/messages/topic")
+    public Page<TutorMessageResponse> getTopicConversationsMessages(
+            @RequestParam Long userId,
+            @RequestParam Long topicId,
+            Pageable pageable) {
+
+        return conversationService
+                .findMessagesByUserAndTopic(userId, topicId, pageable)
                 .map(this::toResponse);
     }
 

@@ -1,6 +1,7 @@
 package com.fabiocondo.tutor_ai.conversation;
 
 import com.fabiocondo.domain.Question;
+import com.fabiocondo.domain.Topic;
 import com.fabiocondo.tutor_ai.message.TutorMessage;
 import com.fabiocondo.tutor_ai.message.TutorMessageRepository;
 import org.springframework.data.domain.*;
@@ -25,22 +26,6 @@ public class TutorConversationService {
         this.messageRepository = messageRepository;
     }
 
-    public TutorConversation getOrCreate(Long userId, Question question) {
-
-        return conversationRepository.findByUserIdAndQuestionId(userId, question.getId())
-                .orElseGet(() -> {
-
-                    TutorConversation c = new TutorConversation();
-
-                    c.setUserId(userId);
-                    c.setQuestion(question);
-                    c.setCreatedAt(LocalDateTime.now());
-                    c.setUpdatedAt(LocalDateTime.now());
-
-                    return conversationRepository.save(c);
-                });
-    }
-
     public TutorConversation save(TutorConversation conversation) {
         return conversationRepository.save(conversation);
     }
@@ -53,10 +38,37 @@ public class TutorConversationService {
         return conversationRepository.findById(id).orElseThrow(() -> new RuntimeException("Conversa não encontrada"));
     }
 
-    public Page<TutorMessage> findMessagesByUserAndQuestion(Long userId, Long questionId, Pageable pageable) {
+    public TutorConversation getOrCreateForTopic(Long userId, Topic topic) {
+        // CORREÇÃO: usar o método correto com topic.getId()
+        return conversationRepository.findByUserIdAndTopicIdAndType(userId, topic.getId(), ConversationType.TOPIC)
+                .orElseGet(() -> {
+                    TutorConversation conversation = new TutorConversation();
+                    conversation.setUserId(userId);
+                    conversation.setTopic(topic);
+                    conversation.setType(ConversationType.TOPIC);
+                    conversation.setCreatedAt(LocalDateTime.now());
+                    conversation.setUpdatedAt(LocalDateTime.now());
+                    return conversationRepository.save(conversation);
+                });
+    }
 
+    public TutorConversation getOrCreateForQuestion(Long userId, Question question) {
+        // CORREÇÃO: usar o método correto com question.getId()
+        return conversationRepository.findByUserIdAndQuestionIdAndType(userId, question.getId(), ConversationType.QUESTION)
+                .orElseGet(() -> {
+                    TutorConversation conversation = new TutorConversation();
+                    conversation.setUserId(userId);
+                    conversation.setQuestion(question);
+                    conversation.setType(ConversationType.QUESTION);
+                    conversation.setCreatedAt(LocalDateTime.now());
+                    conversation.setUpdatedAt(LocalDateTime.now());
+                    return conversationRepository.save(conversation);
+                });
+    }
+
+    public Page<TutorMessage> findMessagesByUserAndQuestion(Long userId, Long questionId, Pageable pageable) {
         Optional<TutorConversation> conversationOpt =
-                conversationRepository.findByUserIdAndQuestionId(userId, questionId);
+                conversationRepository.findByUserIdAndQuestionIdAndType(userId, questionId, ConversationType.QUESTION);
 
         if (!conversationOpt.isPresent()) {
             return new PageImpl<>(
@@ -72,24 +84,49 @@ public class TutorConversationService {
         );
     }
 
-    public List<TutorMessage> getLastMessages(Long userId, Long questionId, int limit) {
+    public Page<TutorMessage> findMessagesByUserAndTopic(Long userId, Long topicId, Pageable pageable) {
+        Optional<TutorConversation> conversationOpt =
+                conversationRepository.findByUserIdAndTopicIdAndType(userId, topicId, ConversationType.TOPIC);
 
+        if (!conversationOpt.isPresent()) {
+            return new PageImpl<>(
+                    Collections.emptyList(),
+                    pageable,
+                    0
+            );
+        }
+
+        return messageRepository.findByConversationId(
+                conversationOpt.get().getId(),
+                pageable
+        );
+    }
+
+    public List<TutorMessage> getLastQuestionMessages(Long userId, Long questionId, int limit) {
         Pageable pageable = PageRequest.of(
                 0,
                 limit,
                 Sort.by(Sort.Direction.DESC, "createdAt")
         );
 
-        Page<TutorMessage> page =
-                findMessagesByUserAndQuestion(
-                        userId,
-                        questionId,
-                        pageable
-                );
+        Page<TutorMessage> page = findMessagesByUserAndQuestion(userId, questionId, pageable);
 
-        List<TutorMessage> messages =
-                new ArrayList<>(page.getContent());
+        List<TutorMessage> messages = new ArrayList<>(page.getContent());
+        Collections.reverse(messages);
 
+        return messages;
+    }
+
+    public List<TutorMessage> getLastTopicMessages(Long userId, Long topicId, int limit) {
+        Pageable pageable = PageRequest.of(
+                0,
+                limit,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        Page<TutorMessage> page = findMessagesByUserAndTopic(userId, topicId, pageable);
+
+        List<TutorMessage> messages = new ArrayList<>(page.getContent());
         Collections.reverse(messages);
 
         return messages;

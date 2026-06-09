@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @Service
-public class TutorAiService {
+public class TutorQuestionService {
 
-    private static final Logger log = LoggerFactory.getLogger(TutorAiService.class);
+    private static final Logger log = LoggerFactory.getLogger(TutorQuestionService.class);
 
     private final QuestionService questionService;
     private final GptService gptService;
@@ -38,7 +38,13 @@ public class TutorAiService {
             "(?i)\\.(jpg|jpeg|png|gif|bmp|svg|webp)(\\?|$)"
     );
 
-    public TutorAiService(QuestionService questionService, GptService gptService, TutorConversationService conversationService, TutorMessageService messageService, UserServiceImpl userService) {
+    public TutorQuestionService(
+            QuestionService questionService,
+            GptService gptService,
+            TutorConversationService conversationService,
+            TutorMessageService messageService,
+            UserServiceImpl userService) {
+
         this.questionService = questionService;
         this.gptService = gptService;
         this.conversationService = conversationService;
@@ -92,7 +98,7 @@ public class TutorAiService {
             throw new QuestionNotFoundException("Questão não encontrada");
         }
 
-        TutorConversation conversation = conversationService.getOrCreate(request.getUserId(), question);
+        TutorConversation conversation = conversationService.getOrCreateForQuestion(request.getUserId(), question);
 
         String topicName = getTopicName(question);
         boolean hasGraph = hasGraph(question);
@@ -107,7 +113,7 @@ public class TutorAiService {
         }
 
         // Busca histórico recente
-        List<TutorMessage> history = conversationService.getLastMessages(
+        List<TutorMessage> history = conversationService.getLastQuestionMessages(
                 request.getUserId(),
                 request.getQuestionId(),
                 10
@@ -152,7 +158,16 @@ public class TutorAiService {
         return aiResponse;
     }
 
-    private String buildPrompt(Question question, Answer selectedAnswer, Answer correctAnswer, String userMessage, List<TutorMessage> history, User user, String topicName, boolean hasGraph, boolean hasImage) {
+    private String buildPrompt(
+            Question question,
+            Answer selectedAnswer,
+            Answer correctAnswer,
+            String userMessage,
+            List<TutorMessage> history,
+            User user,
+            String topicName,
+            boolean hasGraph,
+            boolean hasImage) {
 
         StringBuilder prompt = new StringBuilder();
         String firstName = getFirstName(user);
@@ -302,12 +317,5 @@ public class TutorAiService {
         prompt.append("5. Use a formatação adequada quando necessário\n");
 
         return prompt.toString();
-    }
-
-    public enum TutorIntent {
-        // Mantido apenas para compatibilidade, mas não usado mais
-        GREETING, HOW_ARE_YOU, THANKS, PRAISE, ACKNOWLEDGMENT,
-        HINT, EXPLANATION, STEP_BY_STEP, VERIFY_REASONING,
-        OUT_OF_SCOPE, UNCLEAR
     }
 }

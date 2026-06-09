@@ -2,13 +2,23 @@ package com.fabiocondo.tutor_ai;
 
 public class TutorRequest {
 
-    private Long questionId;
+    private Long topicId; // Se for conversa sobre topico - para topicos dentro do curso
 
-    private Long selectedAnswerId;
+    private Long questionId; // Se for conversa sobre question - para exercicios e quizzes
+
+    private Long selectedAnswerId; // Se for conversa sobre question - para exercicios e quizzes
 
     private Long userId;
 
     private String message;
+
+    public Long getTopicId() {
+        return topicId;
+    }
+
+    public void setTopicId(Long topicId) {
+        this.topicId = topicId;
+    }
 
     public Long getQuestionId() {
         return questionId;

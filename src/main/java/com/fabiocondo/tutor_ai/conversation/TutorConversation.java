@@ -1,6 +1,7 @@
 package com.fabiocondo.tutor_ai.conversation;
 
 import com.fabiocondo.domain.Question;
+import com.fabiocondo.domain.Topic;
 import com.fabiocondo.tutor_ai.message.TutorMessage;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -19,11 +20,20 @@ public class TutorConversation {
 
     private Long userId;
 
+    @Enumerated(EnumType.STRING)
+    private ConversationType type;
+
     @JsonIgnoreProperties(
             value = { "fileName", "urlFile", "topic", "timeLimit", "validated", "highlighted", "hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
     private Question question;
+
+    @JsonIgnoreProperties(
+            value = { "position", "enabled", "premium", "position", "questions", "contents", "tests"})
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "topic_id")
+    private Topic topic;
 
     private LocalDateTime createdAt;
 
@@ -53,12 +63,28 @@ public class TutorConversation {
         this.userId = userId;
     }
 
+    public ConversationType getType() {
+        return type;
+    }
+
+    public void setType(ConversationType type) {
+        this.type = type;
+    }
+
     public Question getQuestion() {
         return question;
     }
 
     public void setQuestion(Question question) {
         this.question = question;
+    }
+
+    public Topic getTopic() {
+        return topic;
+    }
+
+    public void setTopic(Topic topic) {
+        this.topic = topic;
     }
 
     public LocalDateTime getCreatedAt() {

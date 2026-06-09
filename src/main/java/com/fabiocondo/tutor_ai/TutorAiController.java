@@ -9,15 +9,23 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/tutor-ai")
 public class TutorAiController {
 
-    private final TutorAiService tutorAiService;
+    private final TutorQuestionService tutorQuestionService;
+    private final TutorTopicService tutorTopicService;
 
-    public TutorAiController(TutorAiService tutorAiService) {
-        this.tutorAiService = tutorAiService;
+
+    public TutorAiController(TutorQuestionService tutorQuestionService, TutorTopicService tutorTopicService) {
+        this.tutorQuestionService = tutorQuestionService;
+        this.tutorTopicService = tutorTopicService;
     }
 
-    @PostMapping("/ask")
-    public ResponseEntity<String> ask(@RequestBody TutorRequest request) throws Exception {
-        return ResponseEntity.status(HttpStatus.OK).body(tutorAiService.ask(request));
+    @PostMapping("/ask/question")
+    public ResponseEntity<String> askQuestions(@RequestBody TutorRequest request) throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(tutorQuestionService.ask(request));
+    }
+
+    @PostMapping("/ask/topic")
+    public ResponseEntity<String> askTopics(@RequestBody TutorRequest request) throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(tutorTopicService.ask(request));
     }
 
     private ResponseEntity<HttpResponse> response(HttpStatus httpStatus, String message) {

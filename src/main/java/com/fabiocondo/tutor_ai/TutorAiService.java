@@ -1,7 +1,6 @@
 package com.fabiocondo.tutor_ai;
 
 import com.fabiocondo.domain.Answer;
-import com.fabiocondo.domain.MathExpression;
 import com.fabiocondo.domain.Question;
 import com.fabiocondo.domain.User;
 import com.fabiocondo.exception.domain.QuestionNotFoundException;
@@ -39,13 +38,7 @@ public class TutorAiService {
             "(?i)\\.(jpg|jpeg|png|gif|bmp|svg|webp)(\\?|$)"
     );
 
-    public TutorAiService(
-            QuestionService questionService,
-            GptService gptService,
-            TutorConversationService conversationService,
-            TutorMessageService messageService,
-            UserServiceImpl userService) {
-
+    public TutorAiService(QuestionService questionService, GptService gptService, TutorConversationService conversationService, TutorMessageService messageService, UserServiceImpl userService) {
         this.questionService = questionService;
         this.gptService = gptService;
         this.conversationService = conversationService;
@@ -159,16 +152,7 @@ public class TutorAiService {
         return aiResponse;
     }
 
-    private String buildPrompt(
-            Question question,
-            Answer selectedAnswer,
-            Answer correctAnswer,
-            String userMessage,
-            List<TutorMessage> history,
-            User user,
-            String topicName,
-            boolean hasGraph,
-            boolean hasImage) {
+    private String buildPrompt(Question question, Answer selectedAnswer, Answer correctAnswer, String userMessage, List<TutorMessage> history, User user, String topicName, boolean hasGraph, boolean hasImage) {
 
         StringBuilder prompt = new StringBuilder();
         String firstName = getFirstName(user);

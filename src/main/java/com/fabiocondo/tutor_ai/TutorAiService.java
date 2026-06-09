@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -35,12 +34,7 @@ public class TutorAiService {
     private final TutorMessageService messageService;
     private final UserServiceImpl userService;
 
-    private static final Pattern GIBBERISH_PATTERN = Pattern.compile(
-            "^(?i)(asdf|qwerty|zxcv|teste?|kkk|rsrs|h{2,}|[?]{2,}|[!]{2,}|[.]{3,})$"
-    );
-
-    private static final Pattern VERY_SHORT_PATTERN = Pattern.compile("^.{1,2}$");
-
+    // Apenas padrões básicos para detecção inicial (evitar chamadas desnecessárias ao GPT)
     private static final Pattern IMAGE_EXTENSION_PATTERN = Pattern.compile(
             "(?i)\\.(jpg|jpeg|png|gif|bmp|svg|webp)(\\?|$)"
     );
@@ -57,31 +51,6 @@ public class TutorAiService {
         this.conversationService = conversationService;
         this.messageService = messageService;
         this.userService = userService;
-    }
-
-    private String normalizeText(String text) {
-        if (text == null) return "";
-        String normalized = Normalizer.normalize(text.toLowerCase(), Normalizer.Form.NFD);
-        normalized = normalized.replaceAll("\\p{M}", "");
-        normalized = normalized.replaceAll("[?¿!¡;:,.()\\[\\]{}<>]", " ");
-        normalized = normalized.replaceAll("\\s+", " ").trim();
-        return normalized;
-    }
-
-    private boolean containsWord(String message, String... words) {
-        String normalizedMsg = normalizeText(message);
-        for (String word : words) {
-            String normalizedWord = normalizeText(word);
-            if (normalizedMsg.matches(".*\\b" + Pattern.quote(normalizedWord) + "\\b.*")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean matchesPattern(String message, String pattern) {
-        String normalizedMsg = normalizeText(message);
-        return normalizedMsg.matches(pattern);
     }
 
     private String getFirstName(User user) {
@@ -113,67 +82,6 @@ public class TutorAiService {
         return question.getMathExpressions() != null && !question.getMathExpressions().isEmpty();
     }
 
-    private TutorIntent detectIntentSimple(String message) {
-        if (message == null || message.trim().isEmpty()) {
-            return TutorIntent.HINT;
-        }
-
-        String rawMsg = message.trim();
-
-        if (VERY_SHORT_PATTERN.matcher(rawMsg).matches()) {
-            return TutorIntent.UNCLEAR;
-        }
-
-        if (GIBBERISH_PATTERN.matcher(rawMsg).matches()) {
-            return TutorIntent.UNCLEAR;
-        }
-
-        String msg = normalizeText(rawMsg);
-
-        if (msg.matches("^(ok|esta bem|ta bem|tá bem|entendi|compreendi|percebi|sei|aham|hum|sim|claro|certo|certo|beleza|show|perfeito|excelente|maravilha|blz|boto|saquei|entendido).*") ||
-                containsWord(rawMsg, "esta bem", "tá bem", "ta bem", "tah bem", "ok", "blz", "beleza")) {
-            return TutorIntent.ACKNOWLEDGMENT;
-        }
-
-        if (msg.matches(".*(como (esta|vc esta|voce esta|ta)|tudo bem|beleza|como vai|como anda|como estao as coisas|como funciona|como voce esta).*") ||
-                containsWord(rawMsg, "como está", "como esta", "como voce esta", "como você está", "tudo bem", "beleza")) {
-            return TutorIntent.HOW_ARE_YOU;
-        }
-
-        if (msg.matches("^(oi|ola|bom dia|boa tarde|boa noite|hey|hi|e ai|opa|fala|beleza|td bem|tudo bem|salve|iae|iae beleza).*") ||
-                containsWord(rawMsg, "oi", "olá", "ola", "bom dia", "boa tarde", "boa noite", "e aí", "e ai")) {
-            return TutorIntent.GREETING;
-        }
-
-        if (containsWord(rawMsg, "thanks", "tks", "obrigado", "obrigada", "valeu", "agradeço", "muito obrigado", "brigado", "brigada", "vlw", "obg", "obgd")) {
-            return TutorIntent.THANKS;
-        }
-
-        if (containsWord(rawMsg, "você é ótimo", "voce é otimo", "bom tutor", "muito bom", "excelente", "incrível", "incrivel", "gostei da explicação", "gostei da explicacao")) {
-            return TutorIntent.PRAISE;
-        }
-
-        if (containsWord(rawMsg, "passo a passo", "resolver comigo", "me guia", "me orienta", "passo a passo", "me ajuda a resolver")) {
-            return TutorIntent.STEP_BY_STEP;
-        }
-
-        if (containsWord(rawMsg, "acho que", "meu raciocínio", "meu raciocinio", "está certo", "esta certo", "correto", "fiz certo", "esta correto")) {
-            return TutorIntent.VERIFY_REASONING;
-        }
-
-        if (containsWord(rawMsg, "dica", "ajuda", "como começo", "como comeco", "por onde começar", "por onde comecar", "me ajuda")) {
-            return TutorIntent.HINT;
-        }
-
-        if (containsWord(rawMsg, "clima", "tempo", "futebol", "notícias", "noticias", "política", "politica", "preço", "preco", "dinheiro", "comprar", "vender", "filme", "serie", "música", "musica", "jogo", "viagem", "fim de semana", "feriado")) {
-            if (!containsWord(rawMsg, "questão", "questao", "exercício", "exercicio", "prova", "estudo", "matéria", "materia", "aula", "conteúdo", "conteudo")) {
-                return TutorIntent.OUT_OF_SCOPE;
-            }
-        }
-
-        return TutorIntent.EXPLANATION;
-    }
-
     @Transactional
     public String ask(TutorRequest request) throws Exception {
 
@@ -193,53 +101,24 @@ public class TutorAiService {
 
         TutorConversation conversation = conversationService.getOrCreate(request.getUserId(), question);
 
-        TutorIntent intent = detectIntentSimple(request.getMessage());
         String topicName = getTopicName(question);
         boolean hasGraph = hasGraph(question);
         boolean hasImage = hasImage(question);
 
-        log.info("Usuário {} - Questão {} (Tópico: {}) - Intent: {} - Gráfico: {} - Imagem: {}",
-                request.getUserId(), request.getQuestionId(), topicName, intent, hasGraph, hasImage);
+        log.info("Usuário {} - Questão {} (Tópico: {}) - Gráfico: {} - Imagem: {}",
+                request.getUserId(), request.getQuestionId(), topicName, hasGraph, hasImage);
 
-        if (intent == TutorIntent.UNCLEAR) {
-            String response = buildUnclearResponse(getFirstName(user));
+        // Salva a mensagem do usuário
+        if (request.getMessage() != null && !request.getMessage().trim().isEmpty()) {
             messageService.saveUserMessage(conversation, request.getMessage());
-            messageService.saveAssistantMessage(conversation, response);
-            conversation.setUpdatedAt(LocalDateTime.now());
-            return response;
         }
 
-        if (intent == TutorIntent.ACKNOWLEDGMENT) {
-            String response = buildAcknowledgmentResponse(getFirstName(user), topicName);
-            messageService.saveUserMessage(conversation, request.getMessage());
-            messageService.saveAssistantMessage(conversation, response);
-            conversation.setUpdatedAt(LocalDateTime.now());
-            return response;
-        }
-
-        if (intent == TutorIntent.HOW_ARE_YOU) {
-            String response = buildHowAreYouResponse(getFirstName(user));
-            messageService.saveUserMessage(conversation, request.getMessage());
-            messageService.saveAssistantMessage(conversation, response);
-            conversation.setUpdatedAt(LocalDateTime.now());
-            return response;
-        }
-
-        if (intent == TutorIntent.GREETING || intent == TutorIntent.THANKS || intent == TutorIntent.PRAISE) {
-            String response = buildSocialResponse(intent, getFirstName(user));
-            messageService.saveUserMessage(conversation, request.getMessage());
-            messageService.saveAssistantMessage(conversation, response);
-            conversation.setUpdatedAt(LocalDateTime.now());
-            return response;
-        }
-
-        if (intent == TutorIntent.OUT_OF_SCOPE) {
-            String response = buildOutOfScopeResponse(getFirstName(user), topicName);
-            messageService.saveUserMessage(conversation, request.getMessage());
-            messageService.saveAssistantMessage(conversation, response);
-            conversation.setUpdatedAt(LocalDateTime.now());
-            return response;
-        }
+        // Busca histórico recente
+        List<TutorMessage> history = conversationService.getLastMessages(
+                request.getUserId(),
+                request.getQuestionId(),
+                10
+        );
 
         Answer selectedAnswer = null;
         if (request.getSelectedAnswerId() != null) {
@@ -256,23 +135,13 @@ public class TutorAiService {
                 .findFirst()
                 .orElse(null);
 
-        List<TutorMessage> history = conversationService.getLastMessages(
-                request.getUserId(),
-                request.getQuestionId(),
-                8
-        );
-
-        if (request.getMessage() != null && !request.getMessage().trim().isEmpty()) {
-            messageService.saveUserMessage(conversation, request.getMessage());
-        }
-
+        // Constrói o prompt completo (toda a lógica fica aqui)
         String prompt = buildPrompt(
                 question,
                 selectedAnswer,
                 correctAnswer,
                 request.getMessage(),
                 history,
-                intent,
                 user,
                 topicName,
                 hasGraph,
@@ -290,85 +159,12 @@ public class TutorAiService {
         return aiResponse;
     }
 
-    private String buildAcknowledgmentResponse(String firstName, String topicName) {
-        String[] responses = {
-                String.format("Que bom, %s! Continue assim. Tem mais alguma dúvida sobre **%s**? 😊", firstName, topicName),
-                String.format("Ótimo! Estou aqui para ajudar com **%s**. Qual o próximo passo? 📚", firstName, topicName),
-                String.format("Fico feliz que entendeu, %s! Precisando, estou aqui para ajudar com **%s**. 🎯", firstName, topicName),
-                String.format("Perfeito! Vamos continuar então. Alguma outra dúvida sobre **%s**? 💪", firstName, topicName),
-                String.format("Bom saber, %s! Se precisar de mais ajuda com **%s**, é só chamar. 🚀", firstName, topicName)
-        };
-        return responses[(int) (Math.random() * responses.length)];
-    }
-
-    private String buildOutOfScopeResponse(String firstName, String topicName) {
-        String[] responses = {
-                String.format("Olá %s! Posso ajudar apenas com dúvidas relacionadas a **%s**. Vamos focar neste tópico? 😊", firstName, topicName),
-                String.format("%s, minha especialidade é ajudar com **%s**. Que tal voltarmos para a questão? 📚", firstName, topicName),
-                String.format("Entendo sua curiosidade, %s, mas sou especializado em **%s**. Posso ajudar com isso? 🎯", firstName, topicName),
-                String.format("Essa é uma pergunta interessante, %s! Porém, meu foco é auxiliar em **%s**. Vamos continuar com a questão? 💪", firstName, topicName),
-                String.format("Sinto muito, %s, mas só posso ajudar com **%s**. Tem alguma dúvida sobre este tópico? 🤔", firstName, topicName)
-        };
-        return responses[(int) (Math.random() * responses.length)];
-    }
-
-    private String buildHowAreYouResponse(String firstName) {
-        String[] responses = {
-                String.format("Estou muito bem, %s! Obrigado por perguntar. Pronto para ajudar você com os estudos? 😊", firstName),
-                String.format("Tudo ótimo, %s! Estou aqui funcionando perfeitamente. Qual sua dúvida hoje? 🚀", firstName),
-                String.format("Estou bem, sim! E você, %s? Preparado para resolver mais essa questão? 💪", firstName),
-                String.format("Tudo certo por aqui, %s! Ansioso para ajudar você. Qual a dificuldade que está enfrentando? 📚", firstName),
-                String.format("Estou ótimo, %s! Obrigado por perguntar. Vamos focar na questão? 🎯", firstName)
-        };
-        return responses[(int) (Math.random() * responses.length)];
-    }
-
-    private String buildUnclearResponse(String firstName) {
-        String[] responses = {
-                String.format("Desculpe, %s, não consegui entender. Pode reformular sua pergunta? 🤔", firstName),
-                String.format("%s, sua pergunta ficou um pouco confusa. Você poderia explicar melhor? 😊", firstName),
-                String.format("Não entendi completamente, %s. Pode dar mais detalhes? 📝", firstName),
-                String.format("%s, não ficou claro o que você precisa. Pode me dizer com mais detalhes? 🎓", firstName),
-        };
-        return responses[(int) (Math.random() * responses.length)];
-    }
-
-    private String buildSocialResponse(TutorIntent intent, String firstName) {
-        switch (intent) {
-            case GREETING:
-                String[] greetings = {
-                        String.format("Olá %s! Como posso ajudar você com os estudos hoje? 😊", firstName),
-                        String.format("Oi %s! Estou aqui para ajudar. Qual sua dúvida? 📚", firstName),
-                        String.format("Fala, %s! Vamos resolver essa questão? 💪", firstName)
-                };
-                return greetings[(int) (Math.random() * greetings.length)];
-            case THANKS:
-                String[] thanks = {
-                        String.format("Por nada, %s! Estou aqui para ajudar. Mais alguma dúvida? 📚", firstName),
-                        String.format("Disponha, %s! Precisa de ajuda com mais alguma coisa? 🎓", firstName),
-                        String.format("Fico feliz em ajudar, %s! Continue estudando! 💪", firstName),
-                        String.format("Imagina, %s! Vamos em frente! 🚀", firstName)
-                };
-                return thanks[(int) (Math.random() * thanks.length)];
-            case PRAISE:
-                String[] praise = {
-                        String.format("Obrigado, %s! Fico feliz que está gostando. Vamos continuar? 😊", firstName),
-                        String.format("Que legal, %s! Posso ajudar em algo mais? 🌟", firstName),
-                        String.format("Valeu, %s! Tem mais alguma dúvida? 📖", firstName),
-                };
-                return praise[(int) (Math.random() * praise.length)];
-            default:
-                return String.format("Olá %s! Como posso ajudar? 😊", firstName);
-        }
-    }
-
     private String buildPrompt(
             Question question,
             Answer selectedAnswer,
             Answer correctAnswer,
             String userMessage,
             List<TutorMessage> history,
-            TutorIntent intent,
             User user,
             String topicName,
             boolean hasGraph,
@@ -377,54 +173,69 @@ public class TutorAiService {
         StringBuilder prompt = new StringBuilder();
         String firstName = getFirstName(user);
 
+        // =========================================================
+        // SISTEMA E REGRAS
+        // =========================================================
         prompt.append("Você é o Tutor AI da plataforma Dikahub.\n");
         prompt.append("Está ajudando ").append(firstName).append(" com uma questão sobre **").append(topicName).append("**.\n\n");
 
-        prompt.append("REGRAS GERAIS:\n");
+        prompt.append("SEU PAPEL:\n");
         prompt.append("- Seja pedagógico, acolhedor e paciente\n");
-        prompt.append("- Use o nome ").append(firstName).append(" na conversa\n");
+        prompt.append("- Use o nome ").append(firstName).append(" naturalmente na conversa\n");
         prompt.append("- Não dê a resposta pronta, estimule o raciocínio\n");
-        prompt.append("- Se o aluno perguntar algo fora do tópico, redirecione educadamente\n\n");
+        prompt.append("- Seja breve e objetivo (máximo 3-4 parágrafos por resposta)\n\n");
 
+        prompt.append("INTERPRETAÇÃO DE MENSAGENS DO ALUNO:\n");
+        prompt.append("Você DEVE interpretar a intenção do aluno baseado no CONTEXTO da conversa. Exemplos:\n");
+        prompt.append("- Se o aluno disse apenas \"ok\", \"entendi\", \"está bem\", \"certo\", \"blz\" - isso é uma CONFIRMAÇÃO. Responda perguntando se tem mais dúvidas.\n");
+        prompt.append("- Se o aluno disse \"oi\", \"olá\", \"bom dia\" - é um CUMPRIMENTO. Responda educadamente e pergunte como pode ajudar.\n");
+        prompt.append("- Se o aluno disse \"obrigado\", \"valeu\" - é um AGRADECIMENTO. Responda com \"por nada\" e pergunte se precisa de mais ajuda.\n");
+        prompt.append("- Se o aluno disse algo como \"como você está?\" - é uma PERGUNTA SOBRE VOCÊ. Responda que está bem e ofereça ajuda.\n");
+        prompt.append("- Se o aluno disse algo fora do contexto (futebol, clima, política) - diga que só pode ajudar com **").append(topicName).append("**.\n");
+        prompt.append("- Se a mensagem for muito confusa ou sem sentido - peça para reformular educadamente.\n");
+        prompt.append("- Para qualquer outra mensagem, ajude com a questão normalmente.\n\n");
+
+        // =========================================================
+        // FONTES DE INFORMAÇÃO
+        // =========================================================
         prompt.append("FONTES DE INFORMAÇÃO DISPONÍVEIS PARA VOCÊ:\n");
         prompt.append("1. **Dica oficial (tip)**: Use para dar orientações iniciais\n");
         prompt.append("2. **Solução oficial (solution)**: Use como referência para guiar o aluno passo a passo\n");
-        prompt.append("3. **Gráficos/Expressões**: Se houver gráficos, a solution contém a análise detalhada\n");
-        prompt.append("4. **Imagem (urlFile)**: Se houver imagem, a solution descreve o que ela contém\n\n");
+        prompt.append("3. **Gráficos**: Se houver gráficos, a solution contém a análise detalhada\n");
+        prompt.append("4. **Imagem**: Se houver imagem, a solution descreve o que ela contém\n\n");
 
         prompt.append("ESTRATÉGIA PEDAGÓGICA:\n");
         prompt.append("- Você JÁ TEM acesso à solução detalhada da questão\n");
         prompt.append("- Use a solução para guiar o aluno, não para dar a resposta pronta\n");
         prompt.append("- Faça perguntas que levem o aluno a descobrir o caminho sozinho\n");
         prompt.append("- Confirme quando o aluno acertar, corrija gentilmente quando errar\n");
-        prompt.append("- NUNCA dependa do aluno para descrever gráficos ou imagens - você já tem essa informação na solução\n\n");
+        prompt.append("- NUNCA dependa do aluno para descrever gráficos ou imagens - você já tem essa informação\n\n");
 
-        // Se tem gráficos
+        // =========================================================
+        // GRÁFICOS E IMAGENS
+        // =========================================================
         if (hasGraph) {
             prompt.append("📈 INFORMAÇÃO SOBRE GRÁFICOS:\n");
-            prompt.append("- Esta questão contém GRÁFICOS gerados a partir de expressões matemáticas\n");
-            prompt.append("- O aluno vê os gráficos visualmente na tela\n");
-            prompt.append("- Você tem a análise completa dos gráficos na SOLUTION da questão\n");
-            prompt.append("- Use a SOLUTION para entender o que o gráfico mostra\n");
-            prompt.append("- NUNCA mencione as expressões matemáticas originais para o aluno\n");
-            prompt.append("- Exemplo de como usar: \"Observando o gráfico, podemos ver que a curva intersecta o eixo x em...\"\n\n");
+            prompt.append("- Esta questão contém GRÁFICOS que o aluno vê na tela\n");
+            prompt.append("- Você tem a análise completa dos gráficos na SOLUTION\n");
+            prompt.append("- NUNCA mencione expressões matemáticas originais\n");
+            prompt.append("- Exemplo: \"Observando o gráfico, podemos ver que a curva intersecta o eixo x em...\"\n\n");
         }
 
-        // Se tem imagem
         if (hasImage) {
             prompt.append("🖼️ INFORMAÇÃO SOBRE IMAGEM:\n");
-            prompt.append("- Esta questão contém uma imagem/ilustração\n");
-            prompt.append("- URL da imagem: ").append(question.getUrlFile()).append("\n");
-            prompt.append("- O aluno vê esta imagem na tela\n");
-            prompt.append("- Você tem a descrição completa da imagem na SOLUTION da questão\n");
-            prompt.append("- Use a SOLUTION para saber o que a imagem mostra (medidas, formas, etc.)\n");
-            prompt.append("- Exemplo de como usar: \"Na figura, podemos ver um triângulo retângulo com catetos de 3cm e 4cm...\"\n\n");
+            prompt.append("- Esta questão contém uma imagem (URL: ").append(question.getUrlFile()).append(")\n");
+            prompt.append("- O aluno vê esta imagem, você tem a descrição na SOLUTION\n");
+            prompt.append("- Exemplo: \"Na figura, podemos ver um triângulo retângulo com catetos de 3cm e 4cm...\"\n\n");
         }
 
+        // =========================================================
+        // FORMATAÇÃO
+        // =========================================================
         prompt.append("REGRAS DE FORMATAÇÃO:\n");
-        prompt.append("- Use **negrito** para destacar conceitos importantes\n");
+        prompt.append("- Use **negrito** para conceitos importantes\n");
         prompt.append("- Use *itálico* para ênfase\n");
-        prompt.append("- Use `código` para fórmulas ou comandos\n");
+        prompt.append("- Use `código` para fórmulas\n");
         prompt.append("- Para TABELAS, use LaTeX com array:\n");
         prompt.append("  \\[\n");
         prompt.append("  \\begin{array}{|c|c|c|}\n");
@@ -444,32 +255,11 @@ public class TutorAiService {
         prompt.append("    & 1 & 5 & 6 & 0\n");
         prompt.append("  \\end{array}\n");
         prompt.append("  \\]\n");
-        prompt.append("- Use listas numeradas para passos sequenciais\n");
-        prompt.append("- Use quebras de linha entre parágrafos\n\n");
+        prompt.append("- Use listas numeradas para passos sequenciais\n\n");
 
-        prompt.append("TIPO DE AJUDA:\n");
-        switch (intent) {
-            case HINT:
-                prompt.append("Dê apenas uma dica curta, baseada na DICA OFICIAL da questão.\n");
-                prompt.append("NÃO dê a resposta completa.\n\n");
-                break;
-            case STEP_BY_STEP:
-                prompt.append("Guie o aluno passo a passo usando a SOLUÇÃO OFICIAL.\n");
-                prompt.append("Use lista numerada para cada passo.\n");
-                prompt.append("Em cada passo, faça uma pergunta antes de dar a informação.\n");
-                prompt.append("Exemplo: \"1. Primeiro, observe o gráfico. O que você pode dizer sobre a inclinação da reta?\"\n\n");
-                break;
-            case VERIFY_REASONING:
-                prompt.append("Analise o raciocínio do aluno comparando com a SOLUÇÃO OFICIAL.\n");
-                prompt.append("Use formato de diálogo, citando o raciocínio do aluno.\n");
-                prompt.append("Se estiver correto: \"Excelente raciocínio, \" + firstName + \"! Isso está correto porque...\"\n");
-                prompt.append("Se estiver errado: \"Quase lá, \" + firstName + \"! Vamos revisar este ponto...\"\n\n");
-                break;
-            default:
-                prompt.append("Explique o conceito necessário usando a SOLUÇÃO OFICIAL como guia.\n");
-                prompt.append("Use exemplos da própria questão.\n\n");
-        }
-
+        // =========================================================
+        // CONTEÚDO DA QUESTÃO
+        // =========================================================
         prompt.append("TÓPICO: ").append(topicName).append("\n\n");
         prompt.append("QUESTÃO:\n").append(question.getText()).append("\n\n");
 
@@ -481,71 +271,59 @@ public class TutorAiService {
 
         // DICA OFICIAL
         if (question.getTip() != null && !question.getTip().trim().isEmpty()) {
-            prompt.append("💡 DICA OFICIAL DA QUESTÃO:\n");
-            prompt.append(question.getTip()).append("\n\n");
+            prompt.append("💡 DICA OFICIAL:\n").append(question.getTip()).append("\n\n");
         }
 
-        // SOLUÇÃO OFICIAL COMPLETA
+        // SOLUÇÃO OFICIAL
         if (question.getSolution() != null && !question.getSolution().trim().isEmpty()) {
-            prompt.append("🔬 SOLUÇÃO OFICIAL DA QUESTÃO (use como referência para guiar o aluno):\n");
+            prompt.append("🔬 SOLUÇÃO OFICIAL (use como referência, NÃO copie para o aluno):\n");
             prompt.append(question.getSolution()).append("\n\n");
-            prompt.append("IMPORTANTE: Você tem a solução completa. Use-a para:\n");
-            prompt.append("- Entender os conceitos envolvidos\n");
-            prompt.append("- Saber o que o gráfico/imagem mostra\n");
-            prompt.append("- Verificar se o aluno está no caminho certo\n");
-            prompt.append("- Fazer perguntas que levem o aluno à resposta\n");
-            prompt.append("- NUNCA copie e cole a solução diretamente para o aluno\n\n");
         }
 
+        // RESPOSTA DO ALUNO (se houver)
         if (selectedAnswer != null) {
-            prompt.append("RESPOSTA SELECIONADA PELO ALUNO: ").append(selectedAnswer.getText()).append("\n\n");
-            if (intent == TutorIntent.VERIFY_REASONING && correctAnswer != null) {
+            prompt.append("RESPOSTA DO ALUNO: ").append(selectedAnswer.getText()).append("\n");
+            if (correctAnswer != null) {
                 boolean isCorrect = selectedAnswer.getId().equals(correctAnswer.getId());
-                prompt.append("(Para sua referência - Resposta do aluno está ").append(isCorrect ? "CORRETA" : "INCORRETA").append(")\n");
-                prompt.append("Resposta correta: ").append(correctAnswer.getText()).append("\n");
-                prompt.append("NÃO revele esta informação diretamente ao aluno. Use para guiá-lo.\n\n");
+                prompt.append("(Status: ").append(isCorrect ? "CORRETA" : "INCORRETA").append(" - use para guiar, NÃO revele)\n\n");
             }
         }
 
+        // =========================================================
+        // HISTÓRICO DA CONVERSA
+        // =========================================================
         if (!history.isEmpty()) {
             prompt.append("HISTÓRICO DA CONVERSA:\n");
-            int start = Math.max(0, history.size() - 6);
-            for (int i = start; i < history.size(); i++) {
-                TutorMessage msg = history.get(i);
+            for (TutorMessage msg : history) {
                 String role = msg.getRole() == MessageRole.USER ? firstName : "TUTOR";
                 String content = msg.getContent();
-                if (content != null && content.length() > 200) {
-                    content = content.substring(0, 200) + "...";
+                if (content != null && content.length() > 300) {
+                    content = content.substring(0, 300) + "...";
                 }
                 prompt.append(role).append(": ").append(content).append("\n");
             }
             prompt.append("\n");
         }
 
+        // =========================================================
+        // PERGUNTA ATUAL
+        // =========================================================
         prompt.append("PERGUNTA DO ALUNO: ").append(userMessage).append("\n\n");
 
         prompt.append("INSTRUÇÕES FINAIS:\n");
-        prompt.append("1. Use a SOLUTION OFICIAL como seu guia principal\n");
-        prompt.append("2. NUNCA dependa do aluno para descrever gráficos ou imagens - você já tem essa informação\n");
-        prompt.append("3. Faça perguntas que estimulem o raciocínio\n");
-        prompt.append("4. Confirme acertos, corrija erros gentilmente\n");
-        prompt.append("5. Use formatação adequada (LaTeX para tabelas e fórmulas)\n");
-        prompt.append("6. Mantenha o foco no tópico: **").append(topicName).append("**\n");
+        prompt.append("1. Interprete a intenção do aluno pelo CONTEXTO da conversa\n");
+        prompt.append("2. Use a SOLUTION OFICIAL como guia\n");
+        prompt.append("3. NUNCA copie a solução diretamente\n");
+        prompt.append("4. Responda de forma natural, como um tutor humano\n");
+        prompt.append("5. Use a formatação adequada quando necessário\n");
 
         return prompt.toString();
     }
 
     public enum TutorIntent {
-        GREETING,
-        HOW_ARE_YOU,
-        THANKS,
-        PRAISE,
-        ACKNOWLEDGMENT,
-        HINT,
-        EXPLANATION,
-        STEP_BY_STEP,
-        VERIFY_REASONING,
-        OUT_OF_SCOPE,
-        UNCLEAR
+        // Mantido apenas para compatibilidade, mas não usado mais
+        GREETING, HOW_ARE_YOU, THANKS, PRAISE, ACKNOWLEDGMENT,
+        HINT, EXPLANATION, STEP_BY_STEP, VERIFY_REASONING,
+        OUT_OF_SCOPE, UNCLEAR
     }
 }

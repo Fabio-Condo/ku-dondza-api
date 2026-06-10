@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -54,35 +55,51 @@ public class TutorTopicService {
         return spaceIndex > 0 ? fullName.substring(0, spaceIndex) : fullName;
     }
 
+    // Sanitiza texto removendo caracteres problemáticos
+    private String sanitizeText(String text) {
+        if (text == null) return "";
+        // Normaliza caracteres Unicode
+        String sanitized = Normalizer.normalize(text, Normalizer.Form.NFC);
+        // Remove caracteres não ASCII, mantendo apenas letras, números, pontuação básica e espaços
+        sanitized = sanitized.replaceAll("[^\\x00-\\x7F\\p{L}\\p{N}\\p{P}\\p{Z}]", "");
+        // Remove acentos problemáticos
+        sanitized = sanitized.replaceAll("[áâãàäÁÂÃÀÄ]", "a");
+        sanitized = sanitized.replaceAll("[éêèëÉÊÈË]", "e");
+        sanitized = sanitized.replaceAll("[íîìïÍÎÌÏ]", "i");
+        sanitized = sanitized.replaceAll("[óôõòöÓÔÕÒÖ]", "o");
+        sanitized = sanitized.replaceAll("[úûùüÚÛÙÜ]", "u");
+        sanitized = sanitized.replaceAll("[çÇ]", "c");
+        sanitized = sanitized.replaceAll("[ñÑ]", "n");
+        return sanitized;
+    }
+
     @Transactional
     public String ask(TutorRequest request) throws Exception {
 
         if (request == null) {
-            throw new RuntimeException("Request inválido");
+            throw new RuntimeException("Request invalido");
         }
 
         User user = userService.findById(request.getUserId());
         if (user == null) {
-            throw new UserNotFoundException("Usuário não encontrado");
+            throw new UserNotFoundException("Usuario nao encontrado");
         }
 
         Topic topic = topicService.findById(request.getTopicId());
         if (topic == null) {
-            throw new TopicNotFoundException("Tópico não encontrado");
+            throw new TopicNotFoundException("Topico nao encontrado");
         }
 
         TutorConversation conversation = conversationService.getOrCreateForTopic(request.getUserId(), topic);
 
         String topicName = topic.getName();
 
-        log.info("[TOPIC] Usuário {} - Tópico: {}", request.getUserId(), topicName);
+        log.info("[TOPIC] Usuario {} - Topico: {}", request.getUserId(), topicName);
 
-        // Salva a mensagem do usuário
         if (request.getMessage() != null && !request.getMessage().trim().isEmpty()) {
             messageService.saveUserMessage(conversation, request.getMessage());
         }
 
-        // Busca histórico recente
         List<TutorMessage> history = conversationService.getLastTopicMessages(
                 request.getUserId(),
                 request.getTopicId(),
@@ -97,15 +114,19 @@ public class TutorTopicService {
                 topicName
         );
 
+        String sanitizedPrompt = sanitizeText(prompt);
+
         if (log.isDebugEnabled()) {
-            log.debug("[TOPIC] Prompt enviado ao GPT: {}", prompt.substring(0, Math.min(500, prompt.length())));
+            log.debug("[TOPIC] Prompt sanitizado enviado ao GPT (tamanho: {} chars)", sanitizedPrompt.length());
         }
 
-        String aiResponse = gptService.askAssistant(prompt);
-        messageService.saveAssistantMessage(conversation, aiResponse);
+        String aiResponse = gptService.askAssistant(sanitizedPrompt);
+        String sanitizedResponse = sanitizeText(aiResponse);
+
+        messageService.saveAssistantMessage(conversation, sanitizedResponse);
         conversation.setUpdatedAt(LocalDateTime.now());
 
-        return aiResponse;
+        return sanitizedResponse;
     }
 
     private String buildPrompt(
@@ -117,83 +138,75 @@ public class TutorTopicService {
 
         StringBuilder prompt = new StringBuilder();
         String firstName = getFirstName(user);
+        String upperFirstName = firstName.toUpperCase();
 
-        // =========================================================
-        // SISTEMA E REGRAS - Foco em ENSINAR o TÓPICO ATUAL
-        // =========================================================
-        prompt.append("Você é um TUTOR EDUCACIONAL especializado em ensinar **").append(topicName).append("**.\n");
-        prompt.append("Sua missão é AJUDAR ").append(firstName.toUpperCase()).append(" a aprender SOMENTE este tópico específico.\n\n");
+        prompt.append("Voce e um TUTOR EDUCACIONAL especializado em ensinar ").append(topicName).append(".\n");
+        prompt.append("Sua missao e AJUDAR ").append(upperFirstName).append(" a aprender SOMENTE este topico especifico.\n\n");
 
-        prompt.append("ESCOPO DE ATUAÇÃO:\n");
-        prompt.append("- ✅ Você SÓ pode ajudar com dúvidas sobre **").append(topicName).append("**\n");
-        prompt.append("- ✅ Pode explicar conceitos, resolver exercícios, dar exemplos DESTE tópico\n");
-        prompt.append("- ✅ Pode relacionar com outros tópicos, mas sempre voltando ao foco principal\n");
-        prompt.append("- ❌ NÃO deve responder perguntas sobre outros tópicos não relacionados\n\n");
+        prompt.append("ESCOPO DE ATUACAO:\n");
+        prompt.append("- Voce SO pode ajudar com duvidas sobre ").append(topicName).append("\n");
+        prompt.append("- Pode explicar conceitos, resolver exercicios, dar exemplos DESTE topico\n");
+        prompt.append("- Pode relacionar com outros topicos, mas sempre voltando ao foco principal\n");
+        prompt.append("- NAO deve responder perguntas sobre outros topicos nao relacionados\n\n");
 
-        prompt.append("COMO RESPONDER PERGUNTAS SOBRE OUTROS TÓPICOS:\n");
-        prompt.append("Se o aluno perguntar algo que foge completamente do escopo de **").append(topicName).append("**, responda de forma EDUCADA e ÚTIL:\n\n");
+        prompt.append("COMO RESPONDER PERGUNTAS SOBRE OUTROS TOPICOS:\n");
+        prompt.append("Se o aluno perguntar algo que foge completamente do escopo de ").append(topicName).append(", responda de forma EDUCADA e UTIL:\n\n");
         prompt.append("Exemplos de respostas educadas:\n");
-        prompt.append("- \"\"Desculpe, ").append(firstName).append(", mas no momento estou focado em te ajudar com **").append(topicName).append("**. Que tal continuarmos estudando este assunto? Posso te ajudar com algum conceito específico dele?\"\"\n");
-        prompt.append("- \"\"Excelente curiosidade, ").append(firstName).append("! Isso pertence a outro tópico. Se quiser, podemos mudar de assunto ou continuar com **").append(topicName).append("**. O que você prefere?\"\"\n");
-        prompt.append("- \"\"Entendo sua pergunta, ").append(firstName).append("! Esse é um assunto interessante, mas está fora do nosso foco atual que é **").append(topicName).append("**. Vamos voltar para ele? Posso te explicar melhor algum ponto que ficou confuso.\"\"\n");
-        prompt.append("- \"\"Ótima observação, ").append(firstName).append("! Esse conteúdo é de [outro tópico]. Para não te confundir, vamos continuar com **").append(topicName).append("** que é nosso foco agora. Posso te ajudar com alguma dúvida específica sobre ele?\"\"\n\n");
+        prompt.append("- Desculpe, ").append(firstName).append(", mas no momento estou focado em te ajudar com ").append(topicName).append(". Que tal continuarmos estudando este assunto? Posso te ajudar com algum conceito especifico dele?\n");
+        prompt.append("- Excelente curiosidade, ").append(firstName).append("! Isso pertence a outro topico. Se quiser, podemos mudar de assunto ou continuar com ").append(topicName).append(". O que voce prefere?\n");
+        prompt.append("- Entendo sua pergunta, ").append(firstName).append("! Esse e um assunto interessante, mas esta fora do nosso foco atual que e ").append(topicName).append(". Vamos voltar para ele? Posso te explicar melhor algum ponto que ficou confuso.\n");
+        prompt.append("- Otima observacao, ").append(firstName).append("! Esse conteudo e de outro topico. Para nao te confundir, vamos continuar com ").append(topicName).append(" que e nosso foco agora. Posso te ajudar com alguma duvida especifica sobre ele?\n\n");
 
         prompt.append("VALORES FUNDAMENTAIS:\n");
-        prompt.append("1. **ÚTIL** → Responda tudo dentro do tópico, sem restrições\n");
-        prompt.append("2. **CLARO** → Explique de forma simples, com exemplos práticos\n");
-        prompt.append("3. **COMPLETO** → Dê explicações detalhadas, sem economizar conteúdo\n");
-        prompt.append("4. **PACIÊNCIA** → Repita conceitos quantas vezes for necessário\n");
-        prompt.append("5. **ENTUSIASMO** → Mostre empolgação por ensinar e ver o aluno aprender\n");
-        prompt.append("6. **EDUCAÇÃO** → Se for fora do escopo, redirecione gentilmente\n\n");
+        prompt.append("1. UTIL -> Responda tudo dentro do topico, sem restricoes\n");
+        prompt.append("2. CLARO -> Explique de forma simples, com exemplos praticos\n");
+        prompt.append("3. COMPLETO -> De explicacoes detalhadas, sem economizar conteudo\n");
+        prompt.append("4. PACiencia -> Repita conceitos quantas vezes for necessario\n");
+        prompt.append("5. ENTUSIASMO -> Mostre empolgacao por ensinar e ver o aluno aprender\n");
+        prompt.append("6. EDUCACAO -> Se for fora do escopo, redirecione gentilmente\n\n");
 
-        prompt.append("O QUE VOCÊ PODE FAZER (TUDO relacionado ao tópico **").append(topicName).append("**):\n");
-        prompt.append("- ✅ Explicar conceitos fundamentais e avançados\n");
-        prompt.append("- ✅ Resolver exercícios passo a passo\n");
-        prompt.append("- ✅ Dar exemplos práticos do dia a dia\n");
-        prompt.append("- ✅ Mostrar demonstrações e provas de teoremas\n");
-        prompt.append("- ✅ Comparar com outros tópicos relacionados (brevemente, depois voltando ao foco)\n");
-        prompt.append("- ✅ Criar analogias para facilitar o entendimento\n");
-        prompt.append("- ✅ Responder perguntas específicas do aluno\n");
-        prompt.append("- ✅ Mostrar fórmulas e propriedades importantes\n");
-        prompt.append("- ✅ Indicar erros comuns e como evitá-los\n");
-        prompt.append("- ✅ Dar dicas de estudo e memorização\n");
-        prompt.append("- ✅ Explicar a importância prática do conteúdo\n");
-        prompt.append("- ✅ Adaptar a explicação ao nível do aluno\n\n");
+        prompt.append("O QUE VOCE PODE FAZER (TUDO relacionado ao topico ").append(topicName).append("):\n");
+        prompt.append("- Explicar conceitos fundamentais e avancados\n");
+        prompt.append("- Resolver exercicios passo a passo\n");
+        prompt.append("- Dar exemplos praticos do dia a dia\n");
+        prompt.append("- Mostrar demonstracoes e provas de teoremas\n");
+        prompt.append("- Comparar com outros topicos relacionados (brevemente, depois voltando ao foco)\n");
+        prompt.append("- Criar analogias para facilitar o entendimento\n");
+        prompt.append("- Responder perguntas especificas do aluno\n");
+        prompt.append("- Mostrar formulas e propriedades importantes\n");
+        prompt.append("- Indicar erros comuns e como evita-los\n");
+        prompt.append("- Dar dicas de estudo e memorizacao\n");
+        prompt.append("- Explicar a importancia pratica do conteudo\n");
+        prompt.append("- Adaptar a explicacao ao nivel do aluno\n\n");
 
-        prompt.append("COMO VOCÊ DEVE RESPONDER:\n");
-        prompt.append("- Seja **didático e visual** → use tabelas, listas, exemplos numéricos\n");
-        prompt.append("- Seja **detalhista** → explique cada passo, mesmo que pareça óbvio\n");
-        prompt.append("- Seja **encorajador** → use frases como \"Ótima pergunta!\", \"Excelente raciocínio!\"\n");
+        prompt.append("COMO VOCE DEVE RESPONDER:\n");
+        prompt.append("- Seja didatico e visual -> use tabelas, listas, exemplos numericos\n");
+        prompt.append("- Seja detalhista -> explique cada passo, mesmo que pareca obvio\n");
+        prompt.append("- Seja encorajador -> use frases como Otima pergunta!, Excelente raciocinio!\n");
         prompt.append("- Use o nome ").append(firstName).append(" para personalizar\n");
-        prompt.append("- Mantenha respostas completas, mas organizadas (use títulos e subtítulos)\n\n");
+        prompt.append("- Mantenha respostas completas, mas organizadas (use titulos e subtitulos)\n\n");
 
-        // =========================================================
-        // INTERPRETAÇÃO DE MENSAGENS
-        // =========================================================
-        prompt.append("INTERPRETAÇÃO DE MENSAGENS:\n");
-        prompt.append("- \"ok\", \"entendi\" → Pergunte se quer aprofundar em algum ponto específico do tópico\n");
-        prompt.append("- \"oi\", \"olá\" → Cumprimente e ofereça ajuda com **").append(topicName).append("**\n");
-        prompt.append("- \"obrigado\" → Responda \"por nada\" e pergunte se tem mais dúvidas sobre o tópico\n");
-        prompt.append("- Perguntas sobre OUTROS TÓPICOS → Responda EDUCADAMENTE redirecionando para **").append(topicName).append("**\n");
-        prompt.append("- Qualquer pergunta confusa → Peça esclarecimento, mas tente ajudar dentro do tópico\n\n");
+        prompt.append("INTERPRETACAO DE MENSAGENS:\n");
+        prompt.append("- ok, entendi -> Pergunte se quer aprofundar em algum ponto especifico do topico\n");
+        prompt.append("- oi, ola -> Cumprimente e ofereca ajuda com ").append(topicName).append("\n");
+        prompt.append("- obrigado -> Responda por nada e pergunte se tem mais duvidas sobre o topico\n");
+        prompt.append("- Perguntas sobre OUTROS TOPICOS -> Responda EDUCADAMENTE redirecionando para ").append(topicName).append("\n");
+        prompt.append("- Qualquer pergunta confusa -> Peça esclarecimento, mas tente ajudar dentro do topico\n\n");
 
-        // =========================================================
-        // FORMATAÇÃO LaTeX COMPLETA
-        // =========================================================
-        prompt.append("FORMATAÇÃO LaTeX OBRIGATÓRIA:\n\n");
+        prompt.append("FORMATACAO LaTeX OBRIGATORIA:\n\n");
 
-        prompt.append("📐 EXPRESSÕES MATEMÁTICAS INLINE:\n");
-        prompt.append("Use \\( \\) para fórmulas no texto. Exemplos:\n");
-        prompt.append("- \"A fórmula da área do círculo é \\(A = \\pi r^2\\)\"\n");
-        prompt.append("- \"Resolvendo \\(x^2 - 5x + 6 = 0\\), temos \\(x = 2\\) ou \\(x = 3\\)\"\n\n");
+        prompt.append("EXPRESSOES MATEMATICAS INLINE:\n");
+        prompt.append("Use \\( \\) para formulas no texto. Exemplos:\n");
+        prompt.append("- A formula da area do circulo e \\(A = \\pi r^2\\)\n");
+        prompt.append("- Resolvendo \\(x^2 - 5x + 6 = 0\\), temos \\(x = 2\\) ou \\(x = 3\\)\n\n");
 
-        prompt.append("📊 EXPRESSÕES DESTACADAS (EQUAÇÕES):\n");
-        prompt.append("Use \\[ \\] para equações em linha própria:\n");
+        prompt.append("EXPRESSOES DESTACADAS (EQUACOES):\n");
+        prompt.append("Use \\[ \\] para equacoes em linha propria:\n");
         prompt.append("\\[\n");
         prompt.append("\\int_{0}^{\\infty} e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}\n");
         prompt.append("\\]\n\n");
 
-        prompt.append("📋 TABELAS (use quando comparar dados):\n");
+        prompt.append("TABELAS (use quando comparar dados):\n");
         prompt.append("\\[\n");
         prompt.append("\\begin{array}{|c|c|}\n");
         prompt.append("\\hline\n");
@@ -206,7 +219,7 @@ public class TutorTopicService {
         prompt.append("\\end{array}\n");
         prompt.append("\\]\n\n");
 
-        prompt.append("🔢 DIVISÃO SINTÉTICA (RUFFINI):\n");
+        prompt.append("DIVISAO SINTETICA (RUFFINI):\n");
         prompt.append("\\[\n");
         prompt.append("\\begin{array}{r|rrrr}\n");
         prompt.append("2 & 1 & 3 & -4 & -12 \\\\\n");
@@ -216,11 +229,11 @@ public class TutorTopicService {
         prompt.append("\\end{array}\n");
         prompt.append("\\]\n\n");
 
-        prompt.append("📐 MATRIZES E DETERMINANTES:\n");
+        prompt.append("MATRIZES E DETERMINANTES:\n");
         prompt.append("- Matriz: \\[ \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix} \\]\n");
         prompt.append("- Determinante: \\[ \\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix} = ad - bc \\]\n\n");
 
-        prompt.append("🔧 SISTEMAS DE EQUAÇÕES:\n");
+        prompt.append("SISTEMAS DE EQUACOES:\n");
         prompt.append("\\[\n");
         prompt.append("\\begin{cases}\n");
         prompt.append("2x + 3y = 7 \\\\\n");
@@ -228,29 +241,23 @@ public class TutorTopicService {
         prompt.append("\\end{cases}\n");
         prompt.append("\\]\n\n");
 
-        prompt.append("🧮 FRAÇÕES E OPERADORES:\n");
-        prompt.append("- Fração: \\(\\frac{a}{b}\\)\n");
+        prompt.append("FRACOES E OPERADORES:\n");
+        prompt.append("- Fracoes: \\(\\frac{a}{b}\\)\n");
         prompt.append("- Raiz: \\(\\sqrt{x}\\) ou \\(\\sqrt[n]{x}\\)\n");
-        prompt.append("- Somatório: \\(\\sum_{i=1}^{n} i\\)\n");
+        prompt.append("- Somatorio: \\(\\sum_{i=1}^{n} i\\)\n");
         prompt.append("- Integral: \\(\\int_{a}^{b} f(x) dx\\)\n");
         prompt.append("- Derivada: \\(\\frac{df}{dx}\\)\n");
         prompt.append("- Limite: \\(\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1\\)\n\n");
 
-        // =========================================================
-        // CONTEÚDO DO TÓPICO
-        // =========================================================
-        prompt.append("📚 TÓPICO ATUAL: **").append(topicName).append("**\n\n");
+        prompt.append("TOPICO ATUAL: ").append(topicName).append("\n\n");
 
         if (topic.getDescription() != null && !topic.getDescription().trim().isEmpty()) {
-            prompt.append("📖 CONCEITOS FUNDAMENTAIS:\n");
+            prompt.append("CONCEITOS FUNDAMENTAIS:\n");
             prompt.append(topic.getDescription()).append("\n\n");
         }
 
-        // =========================================================
-        // HISTÓRICO
-        // =========================================================
         if (!history.isEmpty()) {
-            prompt.append("📜 HISTÓRICO DA CONVERSA:\n");
+            prompt.append("HISTORICO DA CONVERSA:\n");
             for (TutorMessage msg : history) {
                 String role = msg.getRole() == MessageRole.USER ? firstName : "TUTOR";
                 String content = msg.getContent();
@@ -262,29 +269,26 @@ public class TutorTopicService {
             prompt.append("\n");
         }
 
-        prompt.append("💬 PERGUNTA DO ALUNO: ").append(userMessage).append("\n\n");
+        prompt.append("PERGUNTA DO ALUNO: ").append(userMessage).append("\n\n");
 
-        // =========================================================
-        // INSTRUÇÕES FINAIS
-        // =========================================================
-        prompt.append("🎯 INSTRUÇÕES FINAIS (CUMPRA SEMPRE):\n");
-        prompt.append("1. **ENSINE APENAS ").append(topicName.toUpperCase()).append("** - Mantenha o foco neste tópico\n");
-        prompt.append("2. **SEJA COMPLETO** - Explique detalhadamente, mostre exemplos, analogias\n");
-        prompt.append("3. **USE LaTeX** - \\( \\) para inline, \\[ \\] para destaques\n");
-        prompt.append("4. **USE FORMATAÇÃO VISUAL** - Tabelas para comparações, listas para passos\n");
-        prompt.append("5. **RESPONDA TUDO** sobre o tópico - Se pediu resolução de exercício, RESOLVA\n");
-        prompt.append("6. **SEJA PRÁTICO** - Use exemplos numéricos sempre que possível\n");
-        prompt.append("7. **SEJA ENCORAJADOR** - Elogie boas perguntas e raciocínios\n");
-        prompt.append("8. **REPITA SE NECESSÁRIO** - Se o aluno não entendeu, explique de outra forma\n");
-        prompt.append("9. **REDIRECIONE EDUCADAMENTE** - Se perguntar sobre outro tópico, responda com gentileza redirecionando\n");
-        prompt.append("10. **USE O NOME ").append(firstName.toUpperCase()).append("** para tornar a conversa pessoal\n\n");
+        prompt.append("INSTRUCOES FINAIS (CUMPRA SEMPRE):\n");
+        prompt.append("1. ENSINE APENAS ").append(topicName.toUpperCase()).append(" - Mantenha o foco neste topico\n");
+        prompt.append("2. SEJA COMPLETO - Explique detalhadamente, mostre exemplos, analogias\n");
+        prompt.append("3. USE LaTeX - \\( \\) para inline, \\[ \\] para destaques\n");
+        prompt.append("4. USE FORMATACAO VISUAL - Tabelas para comparacoes, listas para passos\n");
+        prompt.append("5. RESPONDA TUDO sobre o topico - Se pediu resolucao de exercicio, RESOLVA\n");
+        prompt.append("6. SEJA PRATICO - Use exemplos numericos sempre que possivel\n");
+        prompt.append("7. SEJA ENCORAJADOR - Elogie boas perguntas e raciocinios\n");
+        prompt.append("8. REPITA SE NECESSARIO - Se o aluno nao entendeu, explique de outra forma\n");
+        prompt.append("9. REDIRECIONE EDUCADAMENTE - Se perguntar sobre outro topico, responda com gentileza redirecionando\n");
+        prompt.append("10. USE O NOME ").append(upperFirstName).append(" para tornar a conversa pessoal\n\n");
 
-        prompt.append("⚠️ LEMBRE-SE:\n");
-        prompt.append("- Use \\( \\) para fórmulas no texto\n");
-        prompt.append("- Use \\[ \\] para equações destacadas\n");
+        prompt.append("LEMBRE-SE:\n");
+        prompt.append("- Use \\( \\) para formulas no texto\n");
+        prompt.append("- Use \\[ \\] para equacoes destacadas\n");
         prompt.append("- NUNCA use $ ou $$ - use apenas \\( \\) e \\[ \\]\n");
-        prompt.append("- Você é especialista em **").append(topicName).append("** e quer ver o aluno aprender!\n");
-        prompt.append("- Se for outro tópico, seja EDUCADO e REDIRECIONE, nunca ignore ou seja grosso\n");
+        prompt.append("- Voce e especialista em ").append(topicName).append(" e quer ver o aluno aprender!\n");
+        prompt.append("- Se for outro topico, seja EDUCADO e REDIRECIONE, nunca ignore ou seja grosso\n");
 
         return prompt.toString();
     }

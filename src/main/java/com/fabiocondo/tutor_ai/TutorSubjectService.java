@@ -11,6 +11,8 @@ import com.fabiocondo.service.impl.TopicService;
 import com.fabiocondo.service.impl.UserServiceImpl;
 import com.fabiocondo.tutor_ai.conversation.TutorConversation;
 import com.fabiocondo.tutor_ai.conversation.TutorConversationService;
+import com.fabiocondo.tutor_ai.message.MessageRole;
+import com.fabiocondo.tutor_ai.message.TutorMessage;
 import com.fabiocondo.tutor_ai.message.TutorMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +96,13 @@ public class TutorSubjectService {
             messageService.saveUserMessage(subjectConversation, request.getMessage());
         }
 
+        // Busca o histórico da conversa (últimas 15 mensagens)
+        List<TutorMessage> history = conversationService.getLastSubjectMessages(
+                request.getUserId(),
+                request.getQuestionId(),
+                10
+        );
+
         // Busca os tópicos da disciplina
         List<Topic> subjectTopics = topicService.getBySubjectId(subject.getId());
 
@@ -105,6 +114,7 @@ public class TutorSubjectService {
                 subjectTopics,
                 identifiedTopic,
                 request.getMessage(),
+                history,
                 user,
                 subjectName
         );
@@ -191,6 +201,7 @@ public class TutorSubjectService {
             List<Topic> topics,
             Topic identifiedTopic,
             String userMessage,
+            List<TutorMessage> history,
             User user,
             String subjectName) {
 
@@ -215,6 +226,23 @@ public class TutorSubjectService {
         prompt.append("2. **CLARO** → Explique de forma simples, com exemplos práticos\n");
         prompt.append("3. **COMPLETO** → Dê explicações que ajudem o aluno a entender\n");
         prompt.append("4. **ENTUSIASMO** → Mostre empolgação por ensinar\n\n");
+
+        // =========================================================
+        // HISTÓRICO DA CONVERSA
+        // =========================================================
+        if (!history.isEmpty()) {
+            prompt.append("📜 HISTÓRICO DA CONVERSA (para contexto):\n");
+            prompt.append("Use o histórico para entender o que já foi discutido e evitar repetições.\n\n");
+            for (TutorMessage msg : history) {
+                String role = msg.getRole() == MessageRole.USER ? firstName : "TUTOR";
+                String content = msg.getContent();
+                if (content != null && content.length() > 400) {
+                    content = content.substring(0, 400) + "...";
+                }
+                prompt.append(role).append(": ").append(content).append("\n");
+            }
+            prompt.append("\n");
+        }
 
         // =========================================================
         // FORMATAÇÃO LaTeX COMPLETA
@@ -325,6 +353,7 @@ public class TutorSubjectService {
             prompt.append("ESTRATÉGIA:\n");
             prompt.append("- Responda a pergunta de forma clara e útil (1-2 parágrafos)\n");
             prompt.append("- Mostre entusiasmo pelo tópico identificado\n");
+            prompt.append("- Considere o histórico da conversa para não repetir informações\n");
             prompt.append("- Depois da resposta, anuncie o redirecionamento para o especialista\n");
             prompt.append("- O redirecionamento será feito automaticamente pelo sistema\n\n");
         } else {
@@ -332,6 +361,7 @@ public class TutorSubjectService {
             prompt.append("ESTRATÉGIA:\n");
             prompt.append("- Responda normalmente como um tutor geral da disciplina\n");
             prompt.append("- Ajude o aluno com dúvidas gerais sobre a disciplina\n");
+            prompt.append("- Considere o histórico da conversa para dar continuidade\n");
             prompt.append("- Dê exemplos de tópicos que ele pode estudar\n");
             prompt.append("- Não há necessidade de redirecionamento\n\n");
         }
@@ -346,9 +376,10 @@ public class TutorSubjectService {
         prompt.append("2. Seja acolhedor e use o nome ").append(firstName).append("\n");
         prompt.append("3. Responda de forma clara, com exemplos quando possível\n");
         prompt.append("4. Se identificou um tópico, responda brevemente (1-2 parágrafos)\n");
-        prompt.append("5. NUNCA use $ ou $$ - use apenas \\( \\) e \\[ \\]\n");
-        prompt.append("6. Mantenha o foco na disciplina **").append(subjectName).append("**\n");
-        prompt.append("7. Mostre entusiasmo por ajudar o aluno a aprender!\n");
+        prompt.append("5. Considere o histórico da conversa para dar continuidade\n");
+        prompt.append("6. NUNCA use $ ou $$ - use apenas \\( \\) e \\[ \\]\n");
+        prompt.append("7. Mantenha o foco na disciplina **").append(subjectName).append("**\n");
+        prompt.append("8. Mostre entusiasmo por ajudar o aluno a aprender!\n");
 
         return prompt.toString();
     }

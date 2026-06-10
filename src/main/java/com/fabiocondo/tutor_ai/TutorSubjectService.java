@@ -116,7 +116,6 @@ public class TutorSubjectService {
                 subjectName
         );
 
-        // Sanitiza o prompt antes de enviar para o GPT
         String sanitizedPrompt = sanitizeText(prompt);
 
         if (log.isDebugEnabled()) {
@@ -125,7 +124,6 @@ public class TutorSubjectService {
 
         String aiResponse = gptService.askAssistant(sanitizedPrompt);
 
-        // Sanitiza a resposta também
         String sanitizedResponse = sanitizeText(aiResponse);
 
         messageService.saveAssistantMessage(subjectConversation, sanitizedResponse);

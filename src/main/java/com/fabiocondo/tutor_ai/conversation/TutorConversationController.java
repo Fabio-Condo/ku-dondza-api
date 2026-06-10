@@ -47,6 +47,17 @@ public class TutorConversationController {
                 .map(this::toResponse);
     }
 
+    @GetMapping("/{id}/messages/subject")
+    public Page<TutorMessageResponse> getSubjectConversationsMessages(
+            @RequestParam Long userId,
+            @RequestParam Long subjectId,
+            Pageable pageable) {
+
+        return conversationService
+                .findMessagesByUserAndSubject(userId, subjectId, pageable)
+                .map(this::toResponse);
+    }
+
     public TutorMessageResponse toResponse(TutorMessage message) {
 
         TutorMessageResponse dto = new TutorMessageResponse();

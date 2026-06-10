@@ -11,11 +11,18 @@ public class TutorAiController {
 
     private final TutorQuestionService tutorQuestionService;
     private final TutorTopicService tutorTopicService;
+    private final TutorSubjectService tutorSubjectService;
 
 
-    public TutorAiController(TutorQuestionService tutorQuestionService, TutorTopicService tutorTopicService) {
+    public TutorAiController(TutorQuestionService tutorQuestionService, TutorTopicService tutorTopicService, TutorSubjectService tutorSubjectService) {
         this.tutorQuestionService = tutorQuestionService;
         this.tutorTopicService = tutorTopicService;
+        this.tutorSubjectService = tutorSubjectService;
+    }
+
+    @PostMapping("/ask/subject")
+    public ResponseEntity<String> askSubjects(@RequestBody TutorRequest request) throws Exception {
+        return ResponseEntity.status(HttpStatus.OK).body(tutorSubjectService.ask(request));
     }
 
     @PostMapping("/ask/question")

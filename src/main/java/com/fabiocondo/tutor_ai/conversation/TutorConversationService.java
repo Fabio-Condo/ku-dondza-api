@@ -1,6 +1,7 @@
 package com.fabiocondo.tutor_ai.conversation;
 
 import com.fabiocondo.domain.Question;
+import com.fabiocondo.domain.Subject;
 import com.fabiocondo.domain.Topic;
 import com.fabiocondo.tutor_ai.message.TutorMessage;
 import com.fabiocondo.tutor_ai.message.TutorMessageRepository;
@@ -38,6 +39,19 @@ public class TutorConversationService {
         return conversationRepository.findById(id).orElseThrow(() -> new RuntimeException("Conversa não encontrada"));
     }
 
+    public TutorConversation getOrCreateForSubject(Long userId, Subject subject) {
+        return conversationRepository.findByUserIdAndSubjectIdAndType(userId, subject.getId(), ConversationType.QUESTION)
+                .orElseGet(() -> {
+                    TutorConversation conversation = new TutorConversation();
+                    conversation.setUserId(userId);
+                    conversation.setSubject(subject);
+                    conversation.setType(ConversationType.SUBJECT);
+                    conversation.setCreatedAt(LocalDateTime.now());
+                    conversation.setUpdatedAt(LocalDateTime.now());
+                    return conversationRepository.save(conversation);
+                });
+    }
+
     public TutorConversation getOrCreateForTopic(Long userId, Topic topic) {
         // CORREÇÃO: usar o método correto com topic.getId()
         return conversationRepository.findByUserIdAndTopicIdAndType(userId, topic.getId(), ConversationType.TOPIC)
@@ -64,6 +78,24 @@ public class TutorConversationService {
                     conversation.setUpdatedAt(LocalDateTime.now());
                     return conversationRepository.save(conversation);
                 });
+    }
+
+    public Page<TutorMessage> findMessagesByUserAndSubject(Long userId, Long subjectId, Pageable pageable) {
+        Optional<TutorConversation> conversationOpt =
+                conversationRepository.findByUserIdAndSubjectIdAndType(userId, subjectId, ConversationType.SUBJECT);
+
+        if (!conversationOpt.isPresent()) {
+            return new PageImpl<>(
+                    Collections.emptyList(),
+                    pageable,
+                    0
+            );
+        }
+
+        return messageRepository.findByConversationId(
+                conversationOpt.get().getId(),
+                pageable
+        );
     }
 
     public Page<TutorMessage> findMessagesByUserAndQuestion(Long userId, Long questionId, Pageable pageable) {
@@ -100,6 +132,21 @@ public class TutorConversationService {
                 conversationOpt.get().getId(),
                 pageable
         );
+    }
+
+    public List<TutorMessage> getLastSubjectMessages(Long userId, Long subjectId, int limit) {
+        Pageable pageable = PageRequest.of(
+                0,
+                limit,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        Page<TutorMessage> page = findMessagesByUserAndSubject(userId, subjectId, pageable);
+
+        List<TutorMessage> messages = new ArrayList<>(page.getContent());
+        Collections.reverse(messages);
+
+        return messages;
     }
 
     public List<TutorMessage> getLastQuestionMessages(Long userId, Long questionId, int limit) {

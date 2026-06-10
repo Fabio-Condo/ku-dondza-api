@@ -15,6 +15,7 @@ public interface TutorConversationRepository extends JpaRepository<TutorConversa
     Page<TutorConversation> findAllByUserIdOrderByUpdatedAtDesc(Long userId, Pageable pageable);
     Optional<TutorConversation> findByUserIdAndTopicIdAndType(Long userId, Long topicId, ConversationType type);
     Optional<TutorConversation> findByUserIdAndQuestionIdAndType(Long userId, Long questionId, ConversationType type);
+    Optional<TutorConversation> findByUserIdAndSubjectIdAndType(Long userId, Long subjectId, ConversationType type);
 
 
     // CORREÇÃO: usar @Query explícito para evitar confusão de tipos

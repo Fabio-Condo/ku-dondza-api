@@ -1,6 +1,7 @@
 package com.fabiocondo.tutor_ai.conversation;
 
 import com.fabiocondo.domain.Question;
+import com.fabiocondo.domain.Subject;
 import com.fabiocondo.domain.Topic;
 import com.fabiocondo.tutor_ai.message.TutorMessage;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,6 +23,12 @@ public class TutorConversation {
 
     @Enumerated(EnumType.STRING)
     private ConversationType type;
+
+    @JsonIgnoreProperties(
+            value = { "fileName", "urlFile", "topic", "category", "quizEnabled", "courseEnabled", "progressEnabled", "examEnabled"})
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
 
     @JsonIgnoreProperties(
             value = { "fileName", "urlFile", "topic", "timeLimit", "validated", "highlighted", "hibernateLazyInitializer", "handler"})
@@ -69,6 +76,14 @@ public class TutorConversation {
 
     public void setType(ConversationType type) {
         this.type = type;
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
+    public void setSubject(Subject subject) {
+        this.subject = subject;
     }
 
     public Question getQuestion() {

@@ -6,6 +6,8 @@ public class TutorRequest {
 
     private Long questionId; // Se for conversa sobre question - para exercicios e quizzes
 
+    private Long subjectId; // Se for conversa sobre question - para exercicios e quizzes
+
     private Long selectedAnswerId; // Se for conversa sobre question - para exercicios e quizzes
 
     private Long userId;
@@ -26,6 +28,14 @@ public class TutorRequest {
 
     public void setQuestionId(Long questionId) {
         this.questionId = questionId;
+    }
+
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
     }
 
     public Long getSelectedAnswerId() {

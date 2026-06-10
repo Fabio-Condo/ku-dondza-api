@@ -107,7 +107,6 @@ public class TopicService {
 
 
     public List<Topic> getBySubjectId(Long subjectId) {
-
         return topicRepository.findBySubjectIdAndEnabledTrueOrderByPositionAsc(subjectId);
     }
 

@@ -35,6 +35,11 @@ public class TutorSubjectService {
     private final TutorMessageService messageService;
     private final UserServiceImpl userService;
 
+    // Contadores de tokens para estatísticas
+    private long totalPromptTokens = 0;
+    private long totalResponseTokens = 0;
+    private long totalRequests = 0;
+
     public TutorSubjectService(
             SubjectServiceImpl subjectService,
             TopicService topicService,
@@ -60,14 +65,19 @@ public class TutorSubjectService {
         return spaceIndex > 0 ? fullName.substring(0, spaceIndex) : fullName;
     }
 
-    // Sanitiza texto removendo caracteres problemáticos
     private String sanitizeText(String text) {
         if (text == null) return "";
-        // Remove caracteres não ASCII e emojis problemáticos
         String sanitized = Normalizer.normalize(text, Normalizer.Form.NFC);
-        // Remove caracteres de controle e emojis que podem causar erro UTF-8
         sanitized = sanitized.replaceAll("[^\\x00-\\x7F\\p{L}\\p{N}\\p{P}\\p{Z}]", "");
         return sanitized;
+    }
+
+    // Estima o número de tokens (aproximadamente 4 caracteres por token)
+    private int estimateTokens(String text) {
+        if (text == null) return 0;
+        // Média: 1 token ~= 4 caracteres em inglês, ~= 2-3 caracteres em português
+        // Usando uma estimativa conservadora de 3 caracteres por token
+        return (int) Math.ceil(text.length() / 3.0);
     }
 
     @Transactional
@@ -90,7 +100,9 @@ public class TutorSubjectService {
         String subjectName = subject.getName();
         String firstName = getFirstName(user);
 
-        log.info("[SUBJECT] Usuario {} - Disciplina: {}", request.getUserId(), subjectName);
+        log.info("[SUBJECT] =========================================");
+        log.info("[SUBJECT] Iniciando requisicao - Usuario: {} - Disciplina: {}", request.getUserId(), subjectName);
+        log.info("[SUBJECT] Mensagem do aluno: {}", request.getMessage() != null ? request.getMessage().substring(0, Math.min(100, request.getMessage().length())) : "(vazia)");
 
         TutorConversation subjectConversation =
                 conversationService.getOrCreateForSubject(request.getUserId(), subject);
@@ -105,6 +117,8 @@ public class TutorSubjectService {
                 15
         );
 
+        log.info("[SUBJECT] Historico carregado - {} mensagens", history.size());
+
         List<Topic> subjectTopics = topicService.getBySubjectId(subject.getId());
 
         String prompt = buildPrompt(
@@ -118,13 +132,43 @@ public class TutorSubjectService {
 
         String sanitizedPrompt = sanitizeText(prompt);
 
+        // Estatísticas do prompt
+        int promptLength = sanitizedPrompt.length();
+        int estimatedPromptTokens = estimateTokens(sanitizedPrompt);
+
+        log.info("[SUBJECT] PROMPT: tamanho = {} caracteres, tokens estimados = {}", promptLength, estimatedPromptTokens);
+
         if (log.isDebugEnabled()) {
-            log.debug("[SUBJECT] Prompt sanitizado enviado ao GPT (tamanho: {} chars)", sanitizedPrompt.length());
+            log.debug("[SUBJECT] Prompt completo (primeiros 500 caracteres): {}",
+                    sanitizedPrompt.substring(0, Math.min(500, sanitizedPrompt.length())));
         }
 
+        long startTime = System.currentTimeMillis();
         String aiResponse = gptService.askAssistant(sanitizedPrompt);
+        long endTime = System.currentTimeMillis();
+        long responseTime = endTime - startTime;
 
         String sanitizedResponse = sanitizeText(aiResponse);
+
+        // Estatísticas da resposta
+        int responseLength = sanitizedResponse.length();
+        int estimatedResponseTokens = estimateTokens(sanitizedResponse);
+
+        // Atualiza contadores totais
+        totalRequests++;
+        totalPromptTokens += estimatedPromptTokens;
+        totalResponseTokens += estimatedResponseTokens;
+
+        log.info("[SUBJECT] RESPOSTA: tamanho = {} caracteres, tokens estimados = {}", responseLength, estimatedResponseTokens);
+        log.info("[SUBJECT] Tempo de resposta: {} ms", responseTime);
+        log.info("[SUBJECT] =========================================");
+        log.info("[SUBJECT] ESTATISTICAS ACUMULADAS:");
+        log.info("[SUBJECT] - Total de requests: {}", totalRequests);
+        log.info("[SUBJECT] - Total de tokens enviados (prompts): ~{}", totalPromptTokens);
+        log.info("[SUBJECT] - Total de tokens recebidos (respostas): ~{}", totalResponseTokens);
+        log.info("[SUBJECT] - Total de tokens (prompt + resposta): ~{}", totalPromptTokens + totalResponseTokens);
+        log.info("[SUBJECT] - Media de tokens por request: ~{}", (totalPromptTokens + totalResponseTokens) / totalRequests);
+        log.info("[SUBJECT] =========================================\n");
 
         messageService.saveAssistantMessage(subjectConversation, sanitizedResponse);
         subjectConversation.setUpdatedAt(LocalDateTime.now());

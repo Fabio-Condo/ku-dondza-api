@@ -96,11 +96,11 @@ public class TutorSubjectService {
             messageService.saveUserMessage(subjectConversation, request.getMessage());
         }
 
-        // Busca o histórico da conversa (últimas 15 mensagens)
+        // Busca o histórico da conversa (últimas 14 mensagens)
         List<TutorMessage> history = conversationService.getLastSubjectMessages(
                 request.getUserId(),
-                request.getQuestionId(),
-                10
+                request.getSubjectId(),
+                14
         );
 
         // Busca os tópicos da disciplina

@@ -86,7 +86,7 @@ public class TutorTopicService {
         List<TutorMessage> history = conversationService.getLastTopicMessages(
                 request.getUserId(),
                 request.getTopicId(),
-                10
+                14
         );
 
         String prompt = buildPrompt(

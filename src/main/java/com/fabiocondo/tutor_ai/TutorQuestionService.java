@@ -116,7 +116,7 @@ public class TutorQuestionService {
         List<TutorMessage> history = conversationService.getLastQuestionMessages(
                 request.getUserId(),
                 request.getQuestionId(),
-                10
+                14
         );
 
         Answer selectedAnswer = null;

@@ -40,7 +40,7 @@ public class TutorConversationService {
     }
 
     public TutorConversation getOrCreateForSubject(Long userId, Subject subject) {
-        return conversationRepository.findByUserIdAndSubjectIdAndType(userId, subject.getId(), ConversationType.QUESTION)
+        return conversationRepository.findByUserIdAndSubjectIdAndType(userId, subject.getId(), ConversationType.SUBJECT)
                 .orElseGet(() -> {
                     TutorConversation conversation = new TutorConversation();
                     conversation.setUserId(userId);

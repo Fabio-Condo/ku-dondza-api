@@ -127,7 +127,8 @@ public class TutorSubjectService {
                     firstName,
                     subjectName,
                     identifiedTopic.getName(),
-                    aiResponse
+                    aiResponse,
+                    subjectTopics
             );
 
             // Salva a resposta do tutor da disciplina
@@ -176,23 +177,40 @@ public class TutorSubjectService {
     }
 
     private String buildRedirectionMessage(String firstName, String subjectName,
-                                           String topicName, String aiResponse) {
+                                           String topicName, String aiResponse,
+                                           List<Topic> allTopics) {
+
+        // Constrói a lista de tutores especialistas disponíveis
+        StringBuilder tutorsList = new StringBuilder();
+        for (Topic topic : allTopics) {
+            tutorsList.append("   • **").append(topic.getName()).append("**");
+            if (topic.getName().equalsIgnoreCase(topicName)) {
+                tutorsList.append(" ← seu especialista");
+            }
+            tutorsList.append("\n");
+        }
+
         return String.format(
-                "%s\n\n---\n\n🎯 **Vamos aprofundar, %s!** Percebi que sua pergunta é sobre **%s**, que faz parte de **%s**.\n\n" +
-                        "✅ **Sua resposta acima** já te dá uma boa base sobre o assunto.\n\n" +
-                        "📚 **Para se tornar um especialista no tema**, vou te redirecionar para o **Tutor Especialista em %s**.\n\n" +
-                        "Lá você terá:\n" +
-                        "• Acompanhamento contínuo das suas dúvidas\n" +
-                        "• Histórico completo do seu progresso\n" +
-                        "• Explicações mais aprofundadas\n" +
-                        "• Exercícios resolvidos passo a passo\n" +
-                        "• Respostas com formatação profissional (LaTeX, tabelas, gráficos)\n\n" +
-                        "**Iniciando atendimento no tópico de %s...** 🚀\n\n" +
+                "%s\n\n---\n\n" +
+                        "🎯 **Vamos aprofundar, %s!** Percebi que sua pergunta é sobre **%s**.\n\n" +
+                        "📚 **Sobre a estrutura do curso de %s:**\n" +
+                        "Cada módulo do nosso curso possui seu próprio **Tutor AI Especialista**!\n\n" +
+                        "**Tutores disponíveis no curso:**\n%s\n" +
+                        "✅ **Você está no Tutor Geral de %s** - eu ajudo com visão geral e navegação\n" +
+                        "🎓 **Cada módulo tem seu especialista** - eles conhecem profundamente o assunto\n\n" +
+                        "🔍 **Sua pergunta é sobre %s** - e temos um **Tutor Especialista em %s** disponível!\n\n" +
+                        "**Com o especialista você terá:**\n" +
+                        "• ✅ Acompanhamento contínuo das suas dúvidas sobre %s\n" +
+                        "• ✅ Histórico completo do seu progresso no módulo\n" +
+                        "• ✅ Explicações aprofundadas com exemplos práticos\n" +
+                        "• ✅ Exercícios resolvidos passo a passo\n" +
+                        "• ✅ Respostas com formatação profissional (LaTeX, tabelas, gráficos)\n\n" +
+                        "🚀 **Vamos para o módulo de %s?** Lá você terá um acompanhamento personalizado!\n\n" +
                         "---\n" +
                         "💡 *Dica: Quanto mais específica sua pergunta, melhor posso te ajudar!*\n\n" +
-                        "*(A resposta acima é um preview do que o especialista pode te oferecer)*",
-                aiResponse, firstName, topicName, subjectName,
-                topicName, topicName
+                        "*(A resposta acima é um preview do que o especialista em %s pode te oferecer)*",
+                aiResponse, firstName, topicName, subjectName, tutorsList.toString(),
+                subjectName, topicName, topicName, topicName, topicName, topicName
         );
     }
 
@@ -211,21 +229,29 @@ public class TutorSubjectService {
         // =========================================================
         // SISTEMA E REGRAS
         // =========================================================
-        prompt.append("Você é o Tutor da Disciplina **").append(subjectName).append("** na plataforma Dikahub.\n");
+        prompt.append("Você é o **Tutor Geral da Disciplina** ").append(subjectName).append(" na plataforma Dikahub.\n");
         prompt.append("Está conversando com ").append(firstName).append(".\n\n");
+
+        prompt.append("🏛️ **ESTRUTURA DA PLATAFORMA:**\n");
+        prompt.append("- Cada **Curso/Disciplina** (ex: Matemática) tem um **Tutor Geral** (você)\n");
+        prompt.append("- Dentro de cada disciplina, existem **Módulos/Tópicos** (ex: Limites, Derivadas, Integrais)\n");
+        prompt.append("- Cada **Módulo/Tópico** tem seu próprio **Tutor Especialista**\n");
+        prompt.append("- Os módulos contêm: videoaulas, PDFs, exercícios e um Tutor AI especialista\n");
+        prompt.append("- Você (Tutor Geral) ajuda com visão geral e redireciona para os especialistas\n\n");
 
         prompt.append("SEU PAPEL:\n");
         prompt.append("- Seja acolhedor e ajude o aluno a navegar pela disciplina\n");
-        prompt.append("- Responda perguntas gerais sobre a disciplina\n");
-        prompt.append("- IDENTIFIQUE qual tópico específico a pergunta se refere\n");
-        prompt.append("- Se identificar um tópico, responda brevemente (1-2 parágrafos) e depois REDIRECIONE para o tutor especialista\n");
-        prompt.append("- Se NÃO identificar um tópico específico, responda normalmente como um tutor geral\n\n");
+        prompt.append("- Responda perguntas gerais sobre a disciplina e sua estrutura\n");
+        prompt.append("- IDENTIFIQUE qual tópico/módulo específico a pergunta se refere\n");
+        prompt.append("- Se identificar um tópico, responda brevemente (1-2 parágrafos) e REDIRECIONE para o Tutor Especialista\n");
+        prompt.append("- Se NÃO identificar um tópico específico, responda normalmente como tutor geral\n");
+        prompt.append("- Explique que cada módulo tem seu especialista para aprofundamento\n\n");
 
         prompt.append("VALORES FUNDAMENTAIS:\n");
         prompt.append("1. **ÚTIL** → Responda tudo que o aluno perguntar dentro da disciplina\n");
-        prompt.append("2. **CLARO** → Explique de forma simples, com exemplos práticos\n");
-        prompt.append("3. **COMPLETO** → Dê explicações que ajudem o aluno a entender\n");
-        prompt.append("4. **ENTUSIASMO** → Mostre empolgação por ensinar\n\n");
+        prompt.append("2. **CLARO** → Explique a estrutura de forma simples e didática\n");
+        prompt.append("3. **COMPLETO** → Mostre todos os recursos disponíveis (vídeos, PDFs, tutores)\n");
+        prompt.append("4. **ENTUSIASMO** → Mostre empolgação por ensinar e pela estrutura da plataforma\n\n");
 
         // =========================================================
         // HISTÓRICO DA CONVERSA
@@ -315,7 +341,7 @@ public class TutorSubjectService {
         prompt.append("- Use **negrito** para conceitos importantes\n");
         prompt.append("- Use *itálico* para ênfase\n");
         prompt.append("- Use `código` para fórmulas ou comandos\n");
-        prompt.append("- Use emojis com moderação (😊, 📚, 🎯, 💡, 🚀)\n\n");
+        prompt.append("- Use emojis com moderação (😊, 📚, 🎯, 💡, 🚀, 🏛️, 🎓)\n\n");
 
         prompt.append("⚠️ IMPORTANTE:\n");
         prompt.append("- NUNCA use $ ou $$ - use apenas \\( \\) e \\[ \\]\n");
@@ -332,9 +358,13 @@ public class TutorSubjectService {
             prompt.append(subject.getDescription()).append("\n\n");
         }
 
-        prompt.append("TÓPICOS DA DISCIPLINA ").append(subjectName.toUpperCase()).append(":\n");
+        prompt.append("🎓 **MÓDULOS / TÓPICOS** (cada um com seu Tutor Especialista):\n");
         for (Topic topic : topics) {
-            prompt.append("- **").append(topic.getName()).append("**\n");
+            prompt.append("- **").append(topic.getName()).append("**");
+            if (identifiedTopic != null && identifiedTopic.getName().equals(topic.getName())) {
+                prompt.append(" ← tópico identificado na sua pergunta");
+            }
+            prompt.append("\n");
             if (topic.getDescription() != null && !topic.getDescription().isEmpty()) {
                 String desc = topic.getDescription();
                 if (desc.length() > 100) {
@@ -349,21 +379,23 @@ public class TutorSubjectService {
         // ESTRATÉGIA BASEADA NO TÓPICO IDENTIFICADO
         // =========================================================
         if (identifiedTopic != null) {
-            prompt.append("🔍 TÓPICO IDENTIFICADO: **").append(identifiedTopic.getName()).append("**\n");
+            prompt.append("🔍 **TÓPICO IDENTIFICADO:** ").append(identifiedTopic.getName()).append("\n");
             prompt.append("ESTRATÉGIA:\n");
             prompt.append("- Responda a pergunta de forma clara e útil (1-2 parágrafos)\n");
             prompt.append("- Mostre entusiasmo pelo tópico identificado\n");
-            prompt.append("- Considere o histórico da conversa para não repetir informações\n");
-            prompt.append("- Depois da resposta, anuncie o redirecionamento para o especialista\n");
+            prompt.append("- EXPLIQUE que este tópico tem um Tutor Especialista disponível\n");
+            prompt.append("- Mostre a estrutura: Curso → Módulos → Tutor Especialista\n");
+            prompt.append("- Depois da resposta, ofereça redirecionamento para o especialista\n");
             prompt.append("- O redirecionamento será feito automaticamente pelo sistema\n\n");
         } else {
-            prompt.append("❓ NENHUM TÓPICO ESPECÍFICO IDENTIFICADO.\n");
+            prompt.append("❓ **NENHUM TÓPICO ESPECÍFICO IDENTIFICADO.**\n");
             prompt.append("ESTRATÉGIA:\n");
-            prompt.append("- Responda normalmente como um tutor geral da disciplina\n");
+            prompt.append("- Responda normalmente como tutor geral da disciplina\n");
             prompt.append("- Ajude o aluno com dúvidas gerais sobre a disciplina\n");
+            prompt.append("- EXPLIQUE que existem tutores especialistas para cada módulo\n");
+            prompt.append("- Mostre a lista de módulos disponíveis\n");
             prompt.append("- Considere o histórico da conversa para dar continuidade\n");
-            prompt.append("- Dê exemplos de tópicos que ele pode estudar\n");
-            prompt.append("- Não há necessidade de redirecionamento\n\n");
+            prompt.append("- Incentive o aluno a escolher um módulo para aprofundar\n\n");
         }
 
         // =========================================================
@@ -375,11 +407,12 @@ public class TutorSubjectService {
         prompt.append("1. Use formatação LaTeX correta (\\( \\) para inline, \\[ \\] para destaques)\n");
         prompt.append("2. Seja acolhedor e use o nome ").append(firstName).append("\n");
         prompt.append("3. Responda de forma clara, com exemplos quando possível\n");
-        prompt.append("4. Se identificou um tópico, responda brevemente (1-2 parágrafos)\n");
-        prompt.append("5. Considere o histórico da conversa para dar continuidade\n");
-        prompt.append("6. NUNCA use $ ou $$ - use apenas \\( \\) e \\[ \\]\n");
-        prompt.append("7. Mantenha o foco na disciplina **").append(subjectName).append("**\n");
-        prompt.append("8. Mostre entusiasmo por ajudar o aluno a aprender!\n");
+        prompt.append("4. EXPLIQUE a estrutura: Curso → Módulos → Tutores Especialistas\n");
+        prompt.append("5. Se identificou um tópico, responda brevemente e ofereça o especialista\n");
+        prompt.append("6. Considere o histórico da conversa para dar continuidade\n");
+        prompt.append("7. NUNCA use $ ou $$ - use apenas \\( \\) e \\[ \\]\n");
+        prompt.append("8. Mantenha o foco na disciplina **").append(subjectName).append("**\n");
+        prompt.append("9. Mostre entusiasmo pela estrutura de aprendizado da plataforma!\n");
 
         return prompt.toString();
     }

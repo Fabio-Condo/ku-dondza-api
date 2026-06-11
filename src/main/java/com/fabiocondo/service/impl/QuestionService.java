@@ -45,19 +45,17 @@ public class QuestionService {
     private final TopicService topicService;
     private final TopicTestRepository topicTestRepository;
     private final QuestionMapper questionMapper; // ou onde está o domainToDTO
-    private final CommentService commentService;
     private final UserService userService;
     private final UserRepository userRepository;
     private final ImageProcessingService imageProcessingService;
     private final GptService gptService;
 
-    public QuestionService(AmazonS3Service amazonS3Service, QuestionRepository questionRepository, TopicService topicService, TopicTestRepository topicTestRepository, QuestionMapper questionMapper, CommentService commentService, UserService userService, UserRepository userRepository, ImageProcessingService imageProcessingService, GptService gptService) {
+    public QuestionService(AmazonS3Service amazonS3Service, QuestionRepository questionRepository, TopicService topicService, TopicTestRepository topicTestRepository, QuestionMapper questionMapper, UserService userService, UserRepository userRepository, ImageProcessingService imageProcessingService, GptService gptService) {
         this.amazonS3Service = amazonS3Service;
         this.questionRepository = questionRepository;
         this.topicService = topicService;
         this.topicTestRepository = topicTestRepository;
         this.questionMapper = questionMapper;
-        this.commentService = commentService;
         this.userService = userService;
         this.userRepository = userRepository;
         this.imageProcessingService = imageProcessingService;
@@ -548,7 +546,6 @@ public class QuestionService {
             questionDTO.setSavedByUser(userService.checkIfSavedQuestion(question.getId(), currentUserId));
         }
 
-        questionDTO.setNumberOfComments(commentService.countCommentsByQuestionId(question.getId()));
         return questionDTO;
     }
 

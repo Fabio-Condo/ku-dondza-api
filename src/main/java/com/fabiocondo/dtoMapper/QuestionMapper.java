@@ -4,7 +4,6 @@ import com.fabiocondo.domain.*;
 import com.fabiocondo.dto.*;
 import com.fabiocondo.repository.UserRepository;
 import com.fabiocondo.service.UserService;
-import com.fabiocondo.service.impl.CommentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,12 +17,10 @@ import java.util.stream.Collectors;
 @Component
 public class QuestionMapper {
 
-    private final CommentService commentService;
     private final UserService userService;
     private final UserRepository userRepository;
 
-    public QuestionMapper(CommentService commentService, UserService userService, UserRepository userRepository ) {
-        this.commentService = commentService;
+    public QuestionMapper(UserService userService, UserRepository userRepository ) {
         this.userService = userService;
         this.userRepository = userRepository;
     }
@@ -157,7 +154,6 @@ public class QuestionMapper {
             questionDTO.setSavedByUser(userService.checkIfSavedQuestion(question.getId(), currentUserId));
         }
 
-        questionDTO.setNumberOfComments(commentService.countCommentsByQuestionId(question.getId()));
         return questionDTO;
     }
 
@@ -226,7 +222,6 @@ public class QuestionMapper {
             questionDTO.setAnswers(answerDTOs);
         }
 
-        questionDTO.setNumberOfComments(commentService.countCommentsByQuestionId(question.getId()));
         return questionDTO;
     }
 
@@ -240,12 +235,10 @@ public class QuestionMapper {
         );
     }
 
-
     public Set<QuestionDTO> domainPageToDTOSet(Set<Question> questions) {
         return questions.stream()
                 .map(this::domainToDTO)
                 .collect(Collectors.toSet());
     }
-
 
 }

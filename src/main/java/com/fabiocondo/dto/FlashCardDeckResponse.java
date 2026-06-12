@@ -8,6 +8,8 @@ public class FlashCardDeckResponse {
 
     private String topicName;
 
+    private String subjectId;
+
     private String subjectName;
 
     private List<FlashCardResponse> cards;
@@ -22,6 +24,14 @@ public class FlashCardDeckResponse {
 
     public String getTopicName() {
         return topicName;
+    }
+
+    public String getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(String subjectId) {
+        this.subjectId = subjectId;
     }
 
     public void setTopicName(String topicName) {

@@ -22,12 +22,7 @@ public class FlashCardController {
     }
 
     @GetMapping("/topic/{topicId}")
-    public ResponseEntity<FlashCardDeckResponse> getDeck(@PathVariable Long topicId) {
-
-        Long userId = 1L;
-
-        System.out.println("Topic id: " + topicId);
-
+    public ResponseEntity<FlashCardDeckResponse> getDeck(@PathVariable Long topicId, @RequestParam Long userId) {
         return ResponseEntity.ok(flashCardService.getDeck(topicId, userId));
     }
 

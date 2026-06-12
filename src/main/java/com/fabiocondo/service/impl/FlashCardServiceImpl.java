@@ -60,6 +60,7 @@ public class FlashCardServiceImpl {
             response.setTopicName(topic.getName());
 
             if (topic.getSubject() != null) {
+                response.setSubjectId(topic.getSubject().getSubjectId());
                 response.setSubjectName(topic.getSubject().getName());
             }
         }

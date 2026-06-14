@@ -18,6 +18,8 @@ public class FlashCardResponse {
 
     private FlashCardStatus status;
 
+    private TopicDTO topic;
+
 
     public Long getId() {
         return id;
@@ -73,5 +75,13 @@ public class FlashCardResponse {
 
     public void setStatus(FlashCardStatus status) {
         this.status = status;
+    }
+
+    public TopicDTO getTopic() {
+        return topic;
+    }
+
+    public void setTopic(TopicDTO topic) {
+        this.topic = topic;
     }
 }

@@ -11,9 +11,11 @@ public class FlashCard {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Lob // Large Object
     @Column(nullable = false)
     private String question;
 
+    @Lob // Large Object
     @Column(nullable = false, columnDefinition = "TEXT")
     private String answer;
 

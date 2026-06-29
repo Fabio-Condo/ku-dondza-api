@@ -97,6 +97,123 @@ public class SubjectMapper {
         return subjectDto;
     }
 
+    public TopicDtoWithTests mapTopicTestsToDTO(Subject subject, Long userId, Long topicId) {
+
+        // TODOS OS TESTES DO SUBJECT (reutiliza o que já tens)
+        List<Test> testsBySubject = topicTestRepository
+                .findBySubjectId(subject.getId());
+
+        // FILTRA APENAS OS DO TÓPICO
+        List<Test> topicTests = new ArrayList<>();
+        for (Test test : testsBySubject) {
+            if (test.getTopic().getId().equals(topicId)) {
+                topicTests.add(test);
+            }
+        }
+
+        // COMPLETADOS
+        List<Long> completedTestIdsList =
+                topicTestRepository.findCompletedTestIds(userId, subject.getId());
+
+        Set<Long> completedTestIds = new HashSet<>(completedTestIdsList);
+
+        // QUESTÕES (batch já existente no teu código)
+        List<Long> testIds = new ArrayList<>();
+        for (Test t : topicTests) {
+            testIds.add(t.getId());
+        }
+
+        Map<Long, Long> questionsCountMap = new HashMap<>();
+
+        if (!testIds.isEmpty()) {
+            List<Object[]> results =
+                    topicTestRepository.countQuestionsByTestIds(testIds);
+
+            for (Object[] row : results) {
+                Long testId = ((Number) row[0]).longValue();
+                Long count = ((Number) row[1]).longValue();
+                questionsCountMap.put(testId, count);
+            }
+        }
+
+        // QUIZZES (mesma lógica por subject)
+        Map<Long, Quiz> quizByTestId = new HashMap<>();
+
+        List<Object[]> quizResults =
+                topicTestRepository.findUserQuizzesBySubjectGrouped(
+                        subject.getId(),
+                        userId
+                );
+
+        for (Object[] row : quizResults) {
+            Long testId = ((Number) row[0]).longValue();
+            Quiz quiz = (Quiz) row[1];
+            quizByTestId.put(testId, quiz);
+        }
+
+        // ACCURACY
+        Map<Long, Double> accuracyByQuizId =
+                getQuizAccuracyRates(userId, subject.getId());
+
+        // DTO DO TÓPICO
+        TopicDtoWithTests dto = new TopicDtoWithTests();
+
+        int topicSize = topicTests.size();
+        long topicCompleted = 0;
+
+        List<TestDTO> testDTOs = new ArrayList<>(topicSize);
+
+        for (Test test : topicTests) {
+
+            boolean completed = completedTestIds.contains(test.getId());
+            if (completed) topicCompleted++;
+
+            TestDTO testDTO = new TestDTO();
+            testDTO.setId(test.getId());
+            testDTO.setDifficultyLevel(test.getDifficultyLevel());
+            testDTO.setOrderIndex(test.getOrderIndex());
+
+            // QUESTÕES
+            Long questionCount = questionsCountMap.get(test.getId());
+            testDTO.setTotalQuestions(questionCount != null ? questionCount : 0);
+
+            // QUIZ + ACURÁCIA + PONTOS
+            Quiz userQuiz = quizByTestId.get(test.getId());
+
+            if (userQuiz != null) {
+
+                Double accuracy = accuracyByQuizId.get(userQuiz.getId());
+                if (accuracy == null) accuracy = 0.0;
+
+                int correctAnswers = quizService.countCorrectAnswers(userQuiz);
+
+                int earnedPoints = 0;
+                if (accuracy >= 80.0) {
+                    earnedPoints = correctAnswers * 10;
+                }
+
+                Set<Quiz> submittedQuizzes = new HashSet<>();
+                submittedQuizzes.add(userQuiz);
+
+                testDTO.setSubmittedQuizzes(submittedQuizzes);
+                testDTO.setAccuracyRate(accuracy);
+                testDTO.setEarnedPoints(earnedPoints);
+            }
+
+            testDTOs.add(testDTO);
+        }
+
+        dto.setTopicId(topicId);
+        dto.setTests(testDTOs);
+
+        dto.setProgressRate(
+                topicSize == 0 ? 0 : (topicCompleted * 100.0) / topicSize
+        );
+
+        dto.setCompleted(topicSize > 0 && topicCompleted == topicSize);
+
+        return dto;
+    }
     public SubjectProgressDTO mapSubjectToProgressDTO(Subject subject, Long userId) {
 
         SubjectProgressDTO dto = new SubjectProgressDTO();

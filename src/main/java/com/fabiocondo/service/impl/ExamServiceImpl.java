@@ -178,7 +178,6 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public byte[] downloadFile(Long id, @PathVariable String fileName) throws ExamNotFoundException {
         Exam existExam = findById(id);
-        logger.info("Downloading file 1: " + fileName);
         logger.info("Downloading file: " + existExam.getFileName());
         byte[] data = amazonS3Service.downloadFile(fileName, BUCKET_NAME);
         //existExam.setTotalDownloadNumber(existExam.getTotalDownloadNumber() + 1);

@@ -31,6 +31,10 @@ public class KuDondzaApi {
                 "http://localhost:4201",
                 "http://192.168.43.2:4200",
                 "http://192.168.43.2:4201",
+                "http://192.168.11.96:4201",
+
+                "http://187.124.18.185:80",
+
 
                 "https://d2cwnz78eo1z5g.cloudfront.net",  // URL do CloudFront
                 "http://frontend-deploy-bucket-test.s3-website-us-east-1.amazonaws.com",
@@ -38,6 +42,8 @@ public class KuDondzaApi {
                 "http://192.168.11.45:4200",
                 "http://192.168.11.45",
                 "http://192.168.43.2",
+
+                "http://187.124.18.185",
 
                 "http://168.231.87.25",
                 "http://147.93.86.82",
